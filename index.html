@@ -1,315 +1,285 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TakaloCash</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TakaloCash Pro</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <style>
+        :root {
+            --bg-dark: #0f1218;
+            --card-bg: #1b1f28;
+            --text-gray: #848e9c;
+            --yellow: #fcd535;
+            --green: #2ebd85;
+            --border-color: rgba(255, 255, 255, 0.05);
+        }
 
-<style>
-body {
-  margin: 0;
-  background: linear-gradient(135deg, #0f172a, #020617);
-  font-family: 'Segoe UI', sans-serif;
-  color: white;
-}
+        body {
+            margin: 0;
+            background-color: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            color: white;
+            padding-bottom: 50px;
+        }
 
-.container {
-  max-width: 420px;
-  margin: auto;
-  padding: 15px;
-}
+        .container {
+            max-width: 450px;
+            margin: auto;
+            padding: 15px;
+        }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
 
-.logo {
-  font-weight: bold;
-}
+        .logo { font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .logo span { color: #3ea1f0; }
+        
+        .header-icons { display: flex; align-items: center; gap: 15px; }
+        .header-icons i { font-size: 18px; position: relative; }
+        .badge { position: absolute; top: -5px; right: -8px; background: red; font-size: 9px; padding: 2px 5px; border-radius: 50%; }
+        .profile-img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--yellow); }
 
-.profile img {
-  width: 35px;
-  border-radius: 50%;
-}
+        /* SOLDE SECTION */
+        .solde-container {
+            text-align: center;
+            padding: 25px 0;
+        }
 
-.card {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
-  border-radius: 20px;
-  padding: 20px;
-  margin-top: 15px;
-}
+        .solde-container p { color: var(--text-gray); font-size: 14px; margin: 0; display: flex; justify-content: center; align-items: center; gap: 5px;}
+        .solde-container h1 { font-size: 34px; margin: 10px 0; font-weight: 700; }
 
-.actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-}
+        /* BUTTONS */
+        .actions { display: flex; gap: 12px; margin-bottom: 25px; }
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-envoyer { background: var(--yellow); color: black; }
+        .btn-recevoir { background: #5ebf7a; color: white; }
 
-button {
-  flex: 1;
-  padding: 12px;
-  border-radius: 12px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-}
+        /* SERVICES GRID */
+        .services-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
 
-.send {
-  background: linear-gradient(90deg, #facc15, #f59e0b);
-  color: black;
-}
+        .service-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--border-color);
+        }
 
-.receive {
-  background: linear-gradient(90deg, #22c55e, #16a34a);
-  color: black;
-}
+        .icon-box {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--yellow);
+            font-size: 18px;
+        }
 
-.services {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 15px;
-}
+        .service-info h4 { margin: 0; font-size: 14px; }
+        .service-info p { margin: 2px 0 0; font-size: 10px; color: var(--text-gray); }
 
-.box {
-  padding: 15px;
-  border-radius: 15px;
-  background: rgba(255,255,255,0.05);
-}
+        /* FORMULAIRE SECTION */
+        .form-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
 
-input, select {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  margin-top: 5px;
-  background: rgba(255,255,255,0.1);
-  color: white;
-}
+        .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .form-header h3 { margin: 0; font-size: 16px; color: var(--yellow); }
 
-table {
-  width: 100%;
-  margin-top: 10px;
-  border-collapse: collapse;
-}
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 12px; color: var(--text-gray); margin-bottom: 5px; }
+        
+        .input-row { display: flex; gap: 10px; }
+        .input-styled {
+            background: #12151c;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            width: 100%;
+            font-size: 14px;
+        }
 
-th, td {
-  padding: 6px;
-  font-size: 13px;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-}
+        .btn-valider {
+            width: 100%;
+            background: linear-gradient(90deg, #fcd535, #f0b90b);
+            color: black;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            margin-top: 10px;
+        }
 
-.status-ok { color: #22c55e; }
-.status-wait { color: orange; }
+        /* HISTORIQUE TABLE */
+        .history-section { margin-top: 30px; }
+        .history-section h3 { font-size: 16px; margin-bottom: 15px; font-weight: 400; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { text-align: left; color: var(--text-gray); font-weight: 400; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        td { padding: 12px 0; border-bottom: 1px solid var(--border-color); }
 
-#adminPanel button {
-  background: #f59e0b;
-  color: black;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
-}
-</style>
+        .status-confirm { color: var(--yellow); display: flex; align-items: center; gap: 5px; justify-content: flex-end; }
+        .status-sent { color: var(--text-gray); display: flex; align-items: center; gap: 5px; justify-content: flex-end; }
+        .status-green { color: var(--green); display: flex; align-items: center; gap: 5px; justify-content: flex-end; }
+    </style>
 </head>
-
 <body>
 
 <div class="container">
-
-  <!-- HEADER -->
-  <div class="header">
-    <div class="logo">💰 TakaloCash</div>
-    <div class="profile">
-      <img src="https://i.pravatar.cc/100">
+    <div class="header">
+        <div class="logo"><span>TC</span> TakaloCash</div>
+        <div class="header-icons">
+            <i class="fa-solid fa-plus-square" style="color: var(--yellow);"></i>
+            <i class="fa-solid fa-bell"><span class="badge">2</span></i>
+            <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" class="profile-img">
+            <i class="fa-solid fa-bars"></i>
+        </div>
     </div>
-  </div>
 
-  <!-- SOLDE -->
-  <div class="card">
-    <p>Solde disponible</p>
-    <h1 id="solde">0 Ar</h1>
-  </div>
+    <div class="solde-container">
+        <p>Solde disponible <i class="fa-solid fa-arrow-trend-up" style="color: var(--green); font-size: 12px;"></i></p>
+        <h1 id="display-solde">125 000 Ar</h1>
+    </div>
 
-  <!-- ACTIONS -->
-  <div class="actions">
-    <button class="send">Envoyer</button>
-    <button class="receive">Recevoir</button>
-  </div>
+    <div class="actions">
+        <button class="btn btn-envoyer"><i class="fa-solid fa-arrow-right"></i> Envoyer</button>
+        <button class="btn btn-recevoir"><i class="fa-solid fa-arrow-down"></i> Recevoir</button>
+    </div>
 
-  <!-- SERVICES -->
-  <div class="services">
-    <div class="box">💰 Crypto</div>
-    <div class="box">👛 Wallet</div>
-    <div class="box">🎮 1xBet</div>
-    <div class="box">📡 Starlink</div>
-  </div>
+    <div class="services-grid">
+        <div class="service-card">
+            <div class="icon-box"><i class="fa-brands fa-bitcoin"></i></div>
+            <div class="service-info">
+                <h4>Crypto</h4>
+                <p>Envoyer & recevoir</p>
+            </div>
+        </div>
+        <div class="service-card">
+            <div class="icon-box" style="color: #5ebf7a;"><i class="fa-solid fa-wallet"></i></div>
+            <div class="service-info">
+                <h4>Porte-feuille</h4>
+                <p>Skrill / Neteller</p>
+            </div>
+        </div>
+        <div class="service-card">
+            <div class="icon-box" style="color: #3ea1f0;"><i class="fa-solid fa-gamepad"></i></div>
+            <div class="service-info">
+                <h4>1xBet</h4>
+                <p>Retirer & jouer</p>
+            </div>
+        </div>
+        <div class="service-card">
+            <div class="icon-box" style="color: white;"><i class="fa-solid fa-satellite-dish"></i></div>
+            <div class="service-info">
+                <h4>Starlink</h4>
+                <p>Paiement abonnement</p>
+            </div>
+        </div>
+    </div>
 
-  <!-- FORM -->
-  <div class="card">
-    <h3>Envoyer Crypto</h3>
+    <div class="form-card">
+        <div class="form-header">
+            <h3>Envoyer Crypto</h3>
+            <i class="fa-solid fa-chevron-down" style="font-size: 12px; color: var(--text-gray);"></i>
+        </div>
 
-    <label>Montant (Ar)</label>
-    <input type="number" id="ariary">
+        <label>Choisir crypto :</label>
+        <div class="input-row" style="margin-bottom: 15px;">
+            <div class="input-styled" style="display: flex; justify-content: space-between; align-items: center; width: 40%;">
+                <span><i class="fa-brands fa-creative-commons-share" style="color: var(--yellow);"></i> TRX</span>
+                <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
+            </div>
+            <div class="input-styled" style="display: flex; justify-content: space-between; color: var(--text-gray);">
+                <span>Montant (Ar)</span>
+                <span style="color: white; font-weight: bold;">0 Ar</span>
+            </div>
+        </div>
 
-    <label>Equivalent TRX</label>
-    <input type="text" id="cryptoValue" readonly>
+        <label>Adresse crypto destinataire</label>
+        <div class="input-row" style="margin-bottom: 10px;">
+            <input type="text" class="input-styled" placeholder="Entrez l'adresse...">
+            <div class="input-styled" style="width: 40%; color: var(--text-gray); text-align: right;">
+                <span style="color: white; font-weight: bold;">0.00</span> TRX
+            </div>
+        </div>
 
-    <label>Adresse</label>
-    <input type="text" id="adresse">
+        <p style="font-size: 11px; color: var(--green); margin: 5px 0 15px;">Solde disponible: 125 000 Ar</p>
 
-    <button class="send" onclick="envoyer()">Valider</button>
-  </div>
+        <button class="btn-valider">Valider Envoi</button>
+    </div>
 
-  <!-- HISTORIQUE -->
-  <div class="card">
-    <h3>Historique</h3>
-    <table id="table"></table>
-  </div>
-
-  <!-- ADMIN PANEL -->
-  <div class="card" id="adminPanel" style="display:none;">
-    <h3>Admin Panel - Transactions</h3>
-    <table id="adminTable"></table>
-  </div>
-
+    <div class="history-section">
+        <h3>Historique des transferts</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Service</th>
+                    <th>Type</th>
+                    <th>Montant</th>
+                    <th style="text-align: right;">Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>20/04</td>
+                    <td><span style="color: var(--green);">Crypto</span></td>
+                    <td>Envoyer</td>
+                    <td>50 USDT</td>
+                    <td class="status-confirm">Confirmé <i class="fa-solid fa-check-double"></i></td>
+                </tr>
+                <tr>
+                    <td>19/04</td>
+                    <td><span style="color: #3ea1f0;">1xBet</span></td>
+                    <td>Dépôt</td>
+                    <td>100 000 Ar</td>
+                    <td class="status-green">Confirmé <i class="fa-solid fa-check"></i></td>
+                </tr>
+                <tr>
+                    <td>18/04</td>
+                    <td>Starlink</td>
+                    <td>Paiement</td>
+                    <td>150 000 Ar</td>
+                    <td class="status-sent">Envoyé <i class="fa-solid fa-check"></i></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
-
-<script>
-// 🔑 SUPABASE CONFIG
-const supabase = supabase.createClient(
-  "https://nyeopreahmajoisartoz.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA"
-);
-
-// 👤 USER DEMO
-const userId = "USER_ID";
-
-// 💱 TAUX
-const tauxTRX = 10;
-
-// 🔄 CALCUL AR -> TRX
-document.getElementById("ariary").addEventListener("input", function() {
-  let ar = this.value;
-  document.getElementById("cryptoValue").value = (ar / tauxTRX).toFixed(2) + " TRX";
-});
-
-// 📤 ENVOI RETRAIT
-async function envoyer() {
-  let montant = document.getElementById("ariary").value;
-  let adresse = document.getElementById("adresse").value;
-
-  if (!montant || montant <= 0) {
-    alert("Ampidiro montant!");
-    return;
-  }
-
-  await supabase.from("transactions").insert([{
-    user_id: userId,
-    type: "retrait",
-    montant: montant,
-    adresse: adresse,
-    status: "en_attente"
-  }]);
-
-  alert("Demande envoyée ✅");
-  loadTransactions();
-  if (isAdmin) loadAdminTransactions();
-}
-
-// 📊 LOAD HISTORIQUE USER
-async function loadTransactions() {
-  let { data } = await supabase
-    .from("transactions")
-    .select("*")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false });
-
-  let html = "";
-  data.forEach(t => {
-    html += `
-    <tr>
-      <td>${t.type}</td>
-      <td>${t.montant} Ar</td>
-      <td class="${t.status === 'confirmé' ? 'status-ok' : 'status-wait'}">
-        ${t.status}
-      </td>
-    </tr>`;
-  });
-
-  document.getElementById("table").innerHTML = html;
-}
-
-// 💰 LOAD SOLDE
-async function loadSolde() {
-  let { data } = await supabase
-    .from("users")
-    .select("solde")
-    .eq("id", userId)
-    .single();
-
-  if (data) document.getElementById("solde").innerText = data.solde + " Ar";
-}
-
-// 🔑 ADMIN FLAG
-const isAdmin = true; // true raha admin
-
-if (isAdmin) document.getElementById("adminPanel").style.display = "block";
-
-// 📊 LOAD ADMIN TRANSACTIONS
-async function loadAdminTransactions() {
-  let { data } = await supabase
-    .from("transactions")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  let html = `<tr>
-    <th>User</th><th>Type</th><th>Montant</th><th>Adresse</th><th>Status</th><th>Action</th>
-  </tr>`;
-
-  data.forEach(t => {
-    html += `
-    <tr>
-      <td>${t.user_id}</td>
-      <td>${t.type}</td>
-      <td>${t.montant} Ar</td>
-      <td>${t.adresse || '-'}</td>
-      <td class="${t.status === 'confirmé' ? 'status-ok' : 'status-wait'}">${t.status}</td>
-      <td>
-        ${t.status === 'en_attente' ? `<button onclick="validateTransaction('${t.id}')">✔️ Confirmer</button>` : ''}
-      </td>
-    </tr>`;
-  });
-
-  document.getElementById("adminTable").innerHTML = html;
-}
-
-// ✅ VALIDATION
-async function validateTransaction(id) {
-  await supabase.from("transactions").update({ status: "confirmé" }).eq("id", id);
-  alert("Transaction validée ✅");
-  loadTransactions();
-  loadAdminTransactions();
-}
-
-// 🔄 AUTO REFRESH
-setInterval(() => {
-  loadTransactions();
-  loadSolde();
-  if (isAdmin) loadAdminTransactions();
-}, 4000);
-
-// 🚀 INIT
-loadTransactions();
-loadSolde();
-if (isAdmin) loadAdminTransactions();
-</script>
 
 </body>
 </html>
