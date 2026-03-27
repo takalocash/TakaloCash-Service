@@ -23,6 +23,7 @@
             margin: 0; background-color: var(--bg-dark);
             font-family: 'Inter', sans-serif; color: white;
             background: radial-gradient(circle at top right, #1c212e, #0d1117);
+            padding-bottom: 40px;
         }
 
         .container { max-width: 450px; margin: auto; padding: 10px; display: none; }
@@ -38,19 +39,19 @@
             border: 1px solid var(--border); width: 85%; max-width: 350px; text-align: center;
         }
 
-        /* --- EN-TETE (HEADER) --- */
+        /* --- HEADER --- */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 5px; }
         .logo { font-weight: 700; font-size: 19px; display: flex; align-items: center; gap: 5px; }
         .logo span { color: #3ea1f0; }
         .header-right { display: flex; align-items: center; gap: 12px; }
-        .header-right i { color: var(--text-gray); font-size: 18px; position: relative; }
+        .header-right i { color: var(--text-gray); font-size: 18px; position: relative; cursor: pointer; }
         .badge { position: absolute; top: -5px; right: -5px; background: #f44336; font-size: 9px; padding: 2px 4px; border-radius: 50%; color: white; }
-        .profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--yellow); }
+        .profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--yellow); cursor: pointer; }
 
-        /* --- SOLDE SECTION --- */
-        .solde-card { text-align: center; padding: 30px 0; background: transparent; }
+        /* --- SOLDE --- */
+        .solde-card { text-align: center; padding: 30px 0; }
         .solde-card p { color: var(--text-gray); font-size: 14px; margin: 0; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .solde-card h1 { font-size: 38px; margin: 8px 0; font-weight: 700; letter-spacing: -0.5px; }
+        .solde-card h1 { font-size: 38px; margin: 8px 0; font-weight: 700; }
 
         /* --- ACTIONS --- */
         .action-row { display: flex; gap: 10px; margin-bottom: 25px; }
@@ -58,29 +59,29 @@
         .btn-act.envoyer { background: var(--yellow); color: black; }
         .btn-act.recevoir { background: #5ebf7a; color: white; }
 
-        /* --- SERVICES GRID --- */
+        /* --- SERVICES --- */
         .grid-services { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
         .service-box { background: var(--glass-bg); padding: 15px; border-radius: 15px; border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; backdrop-filter: blur(5px); }
-        .s-icon { color: var(--yellow); font-size: 20px; width: 35px; text-align: center; }
-        .s-info h4 { margin: 0; font-size: 14px; }
-        .s-info p { margin: 2px 0 0; font-size: 10px; color: var(--text-gray); }
+        .s-icon { color: var(--yellow); font-size: 20px; width: 30px; text-align: center; }
 
-        /* --- FORM ENVOYER --- */
-        .glass-card { background: var(--glass-bg); border-radius: 18px; border: 1px solid var(--border); padding: 18px; margin-bottom: 20px; }
-        .card-title { font-size: 15px; color: var(--yellow); margin-bottom: 18px; font-weight: 600; }
+        /* --- FORM --- */
+        .glass-card { background: var(--glass-bg); border-radius: 18px; border: 1px solid var(--border); padding: 18px; margin-bottom: 25px; }
+        .card-title { font-size: 15px; color: var(--yellow); margin-bottom: 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
         .input-group { background: #12151c; border-radius: 10px; padding: 12px; display: flex; align-items: center; margin-bottom: 12px; border: 1px solid var(--border); }
-        .input-group select, .input-group input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
-        
-        .valider-btn { width: 100%; background: var(--yellow); border: none; padding: 15px; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; color: black; margin-top: 10px; }
+        .input-group input, .input-group select { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
 
         /* --- HISTORY --- */
-        .history-section h3 { font-size: 15px; color: var(--text-gray); font-weight: 400; margin-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { text-align: left; color: var(--text-gray); padding-bottom: 10px; border-bottom: 1px solid var(--border); font-weight: 400; }
-        td { padding: 14px 0; border-bottom: 1px solid var(--border); }
+        .history-section h3 { font-size: 15px; color: var(--text-gray); font-weight: 400; margin-bottom: 12px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 30px; }
+        th { text-align: left; color: var(--text-gray); padding-bottom: 8px; border-bottom: 1px solid var(--border); font-weight: 400; }
+        td { padding: 12px 0; border-bottom: 1px solid var(--border); }
         .status-confirm { color: var(--yellow); font-weight: 600; text-align: right; }
 
-        /* --- FLOATING CHAT --- */
+        /* --- FOOTER --- */
+        .footer { border-top: 1px solid var(--border); padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 11px; margin-top: 20px; }
+        .footer a { color: var(--text-gray); text-decoration: none; display: block; margin-bottom: 6px; }
+        .footer-title { color: white; font-weight: 600; margin-bottom: 8px; display: block; }
+
         .chat-btn { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-decoration: none; z-index: 1000; }
     </style>
 </head>
@@ -91,8 +92,7 @@
         <h2 style="color:var(--yellow)">TakaloCash</h2>
         <input type="email" id="auth-email" placeholder="Email" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #333; background:#12151c; color:white;">
         <input type="password" id="auth-password" placeholder="Mot de passe" style="width:100%; padding:12px; margin-bottom:20px; border-radius:8px; border:1px solid #333; background:#12151c; color:white;">
-        <button class="valider-btn" onclick="handleAuth()">Se connecter</button>
-        <p style="font-size:12px; color:gray; margin-top:15px;" onclick="switchAuth()">Pas de compte ? S'inscrire</p>
+        <button onclick="handleAuth()" style="width:100%; background:var(--yellow); border:none; padding:15px; border-radius:10px; font-weight:700; cursor:pointer;">Se connecter</button>
     </div>
 </div>
 
@@ -118,35 +118,24 @@
     </div>
 
     <div class="grid-services">
-        <div class="service-box"><i class="fa-brands fa-bitcoin s-icon"></i><div class="s-info"><h4>Crypto</h4><p>Envoyer & recevoir</p></div></div>
-        <div class="service-box"><i class="fa-solid fa-wallet s-icon" style="color:#2ebd85"></i><div class="s-info"><h4>Porte-feuille</h4><p>Skrill / Neteller</p></div></div>
-        <div class="service-box"><i class="fa-solid fa-gamepad s-info" style="color:#3ea1f0"></i><div class="s-info"><h4>1xBet</h4><p>Retirer & jouer</p></div></div>
-        <div class="service-box"><i class="fa-solid fa-satellite-dish s-info" style="color:white"></i><div class="s-info"><h4>Starlink</h4><p>Abonnement</p></div></div>
+        <div class="service-box"><i class="fa-brands fa-bitcoin s-icon"></i><div style="font-size:12px;"><b>Crypto</b><p style="margin:0; font-size:9px; color:var(--text-gray)">Envoyer & recevoir</p></div></div>
+        <div class="service-box"><i class="fa-solid fa-wallet s-icon" style="color:#2ebd85"></i><div style="font-size:12px;"><b>Porte-feuille</b><p style="margin:0; font-size:9px; color:var(--text-gray)">Skrill / Neteller</p></div></div>
+        <div class="service-box"><i class="fa-solid fa-gamepad s-icon" style="color:#3ea1f0"></i><div style="font-size:12px;"><b>1xBet</b><p style="margin:0; font-size:9px; color:var(--text-gray)">Retirer & jouer</p></div></div>
+        <div class="service-box"><i class="fa-solid fa-satellite-dish s-icon" style="color:white"></i><div style="font-size:12px;"><b>Starlink</b><p style="margin:0; font-size:9px; color:var(--text-gray)">Abonnement</p></div></div>
     </div>
 
     <div class="glass-card">
-        <div class="card-title">Envoyer Crypto <i class="fa-solid fa-chevron-down" style="float:right; font-size:12px; color:gray"></i></div>
-        <p style="font-size:12px; color:var(--text-gray); margin-bottom:10px;">Choisir crypto :</p>
+        <div class="card-title">Envoyer Crypto <i class="fa-solid fa-chevron-down" style="color:gray; font-size:12px;"></i></div>
         <div style="display:flex; gap:10px;">
-            <div class="input-group" style="flex:1;">
-                <select id="crypto-select" onchange="calc()">
-                    <option value="TRX">🪙 TRX</option>
-                    <option value="USDT">💵 USDT</option>
-                    <option value="BTC">₿ BTC</option>
-                </select>
-            </div>
-            <div class="input-group" style="flex:1.5;">
-                <input type="number" id="ariary-val" placeholder="0 Ar" oninput="calc()">
-            </div>
+            <div class="input-group" style="flex:1;"><select id="cryp-sel" onchange="calc()"><option value="TRX">TRX</option><option value="USDT">USDT</option></select></div>
+            <div class="input-group" style="flex:1.5;"><input type="number" id="ar-val" placeholder="Montant Ar" oninput="calc()"></div>
         </div>
-        <div class="input-group">
-            <input type="text" placeholder="Adresse crypto destinataire">
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-gray); padding:5px;">
+        <div class="input-group"><input type="text" placeholder="Adresse crypto destinataire"></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-gray); margin:5px 0 15px;">
             <span>Equivalent crypto</span>
-            <span style="color:white; font-weight:600;"><span id="crypto-res">0.00</span> <span id="crypto-label">TRX</span></span>
+            <span style="color:white; font-weight:600;"><span id="cryp-res">0.00</span> <span id="cryp-lab">TRX</span></span>
         </div>
-        <button class="valider-btn">Valider Envoi</button>
+        <button style="width:100%; background:var(--yellow); border:none; padding:15px; border-radius:10px; font-weight:700; cursor:pointer;">Valider Envoi</button>
     </div>
 
     <div class="history-section">
@@ -156,35 +145,44 @@
             <tbody id="hist-body"></tbody>
         </table>
     </div>
+
+    <div class="footer">
+        <div>
+            <a href="#">Conditions d'utilisation</a>
+            <a href="#">Politique de confidentialité</a>
+        </div>
+        <div>
+            <span class="footer-title">Chat & Aide</span>
+            <a href="#"><i class="fa-solid fa-headset" style="margin-right:5px;"></i> Centre d'aide</a>
+            <a href="#"><i class="fa-brands fa-whatsapp" style="margin-right:5px;"></i> WhatsApp</a>
+        </div>
+    </div>
 </div>
 
 <a href="https://wa.me/261340000000" class="chat-btn"><i class="fa-solid fa-comment-dots"></i></a>
 
 <script>
-// --- CONFIG SUPABASE ---
 const supabaseClient = supabase.createClient(
     "https://nyeopreahmajoisartoz.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA"
 );
 
-const TAUX = { "TRX": 150, "USDT": 4650, "BTC": 320000000 };
+const TAUX = { "TRX": 150, "USDT": 4650 };
 let currentUID = null;
 
-// --- KAJY AUTOMATIQUE ---
 function calc() {
-    const crypto = document.getElementById("crypto-select").value;
-    const ar = parseFloat(document.getElementById("ariary-val").value) || 0;
+    const crypto = document.getElementById("cryp-sel").value;
+    const ar = parseFloat(document.getElementById("ar-val").value) || 0;
     const res = ar / TAUX[crypto];
-    document.getElementById("crypto-res").innerText = (crypto === "BTC" ? res.toFixed(8) : res.toFixed(2));
-    document.getElementById("crypto-label").innerText = crypto;
+    document.getElementById("cryp-res").innerText = res.toFixed(2);
+    document.getElementById("cryp-lab").innerText = crypto;
 }
 
-// --- AUTH LOGIC ---
 async function handleAuth() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
-    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-    if(error) alert("Diso email na password!");
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if(error) alert("Email na mot de passe diso!");
     else checkUser();
 }
 
@@ -199,15 +197,8 @@ async function checkUser() {
 }
 
 async function loadData() {
-    const { data: user } = await supabaseClient.from('users').select('solde').eq('id', currentUID).single();
-    if(user) document.getElementById('display-solde').innerText = user.solde.toLocaleString() + " Ar";
-
-    const { data: hist } = await supabaseClient.from('transactions').select('*').eq('user_id', currentUID);
-    let hStr = "";
-    hist?.forEach(t => {
-        hStr += `<tr><td>${new Date(t.created_at).toLocaleDateString()}</td><td>${t.service}</td><td>${t.montant} Ar</td><td class="status-confirm">${t.status}</td></tr>`;
-    });
-    document.getElementById('hist-body').innerHTML = hStr;
+    const { data: u } = await supabaseClient.from('users').select('solde').eq('id', currentUID).single();
+    if(u) document.getElementById('display-solde').innerText = u.solde.toLocaleString() + " Ar";
 }
 
 async function logout() { await supabaseClient.auth.signOut(); location.reload(); }
