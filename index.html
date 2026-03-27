@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TakaloCash Pro</title>
-
+    <title>TakaloCash Pro - Madagascar</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
     <style>
         :root {
-            --bg-dark: #0b0e14;
+            --bg-dark: #0b0e11;
             --card-bg: #1e2329;
             --text-gray: #848e9c;
             --yellow: #fcd535;
@@ -26,132 +26,113 @@
             padding-bottom: 100px;
         }
 
-        .container { max-width: 420px; margin: auto; padding: 15px; }
+        .container { max-width: 420px; margin: auto; padding: 15px; display: none; } /* Afenina raha tsy loggé */
 
-        /* HEADER */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
-        .logo { font-weight: 800; font-size: 20px; }
-        .logo span { color: #3ea1f0; }
-        .profile-img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--yellow); }
-
-        /* SOLDE AREA */
-        .solde-card { text-align: center; padding: 30px 0; }
-        .solde-card p { color: var(--text-gray); font-size: 14px; margin: 0; }
-        .solde-card h1 { font-size: 36px; margin: 10px 0; font-weight: 700; letter-spacing: -1px; }
-
-        /* BUTTONS */
-        .actions { display: flex; gap: 12px; margin-bottom: 25px; }
-        .btn-main {
-            flex: 1; padding: 15px; border-radius: 12px; border: none;
-            font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+        /* AUTH CONTAINER */
+        #auth-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark); z-index: 2000;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
         }
-        .btn-send { background: var(--yellow-grad); color: black; }
-        .btn-receive { background: #2ebd85; color: white; }
-
-        /* SERVICES GRID */
-        .services { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .s-box {
-            background: var(--card-bg); padding: 15px; border-radius: 15px;
-            display: flex; align-items: center; gap: 12px; border: 1px solid var(--border);
+        .auth-card {
+            background: var(--card-bg); width: 100%; max-width: 350px;
+            padding: 30px; border-radius: 20px; border: 1px solid var(--border); text-align: center;
         }
-        .s-icon { color: var(--yellow); font-size: 20px; background: rgba(252,213,53,0.1); padding: 10px; border-radius: 12px; }
-        .s-info h4 { margin: 0; font-size: 14px; }
-        .s-info p { margin: 2px 0 0; font-size: 10px; color: var(--text-gray); }
+        .auth-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
+        .auth-tab { flex: 1; padding: 10px; cursor: pointer; color: var(--text-gray); border-bottom: 2px solid transparent; }
+        .auth-tab.active { color: var(--yellow); border-bottom: 2px solid var(--yellow); font-weight: bold; }
 
-        /* FORMULAIRE */
-        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
-        .card h3 { margin-top: 0; font-size: 16px; color: var(--yellow); margin-bottom: 20px; }
-        
-        .input-box { background: #12151c; border-radius: 12px; padding: 12px; display: flex; align-items: center; margin-bottom: 15px; border: 1px solid var(--border); }
-        .input-box select, .input-box input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
-        .input-box select { font-weight: bold; cursor: pointer; }
-
+        /* INPUTS & BUTTONS */
+        .input-styled {
+            background: #12151c; border: 1px solid var(--border); border-radius: 12px;
+            padding: 14px; color: white; width: 100%; margin-bottom: 15px; box-sizing: border-box; outline: none;
+        }
         .btn-valider {
             width: 100%; background: var(--yellow-grad); border: none; padding: 16px;
-            border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer;
+            border-radius: 12px; font-weight: 700; cursor: pointer; color: black;
         }
         .btn-valider:disabled { opacity: 0.6; }
 
+        /* DASHBOARD ELEMENTS */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
+        .logo { font-weight: 800; font-size: 20px; }
+        .logo span { color: #3ea1f0; }
+        .profile-area { display: flex; align-items: center; gap: 10px; }
+        .profile-img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--yellow); }
+
+        .solde-card { text-align: center; padding: 30px 0; }
+        .solde-card h1 { font-size: 36px; margin: 10px 0; font-weight: 700; }
+
+        .services { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .s-box { background: var(--card-bg); padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 12px; border: 1px solid var(--border); }
+        .s-icon { color: var(--yellow); font-size: 18px; }
+
+        .form-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border); }
+        
         /* SPINNER */
         .spinner { display: none; width: 20px; height: 20px; border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid black; border-radius: 50%; animation: spin 0.8s linear infinite; margin: auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .loading .btn-text { display: none; }
         .loading .spinner { display: block; }
 
-        /* HISTORY */
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { text-align: left; color: var(--text-gray); padding-bottom: 10px; }
-        td { padding: 12px 0; border-bottom: 1px solid var(--border); }
-        .status-wait { color: var(--yellow); }
-
         /* TOAST */
-        .toast {
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px);
-            background: #1b1f28; padding: 12px 25px; border-radius: 30px; border: 1px solid var(--yellow);
-            transition: 0.5s; opacity: 0; z-index: 10000;
-        }
+        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1b1f28; padding: 12px 25px; border-radius: 30px; border: 1px solid var(--yellow); transition: 0.5s; opacity: 0; z-index: 3000; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* FLOATING CHAT */
-        .fab { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-size: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); text-decoration: none; }
-
-        /* FOOTER */
-        .footer { text-align: center; margin-top: 30px; font-size: 11px; color: var(--text-gray); }
-        .footer a { color: var(--text-gray); text-decoration: none; margin: 0 10px; }
-
-        #adminPanel { display: none; margin-top: 20px; border: 1px solid var(--yellow); }
+        .fab { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-size: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); text-decoration: none; z-index: 1000; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div id="auth-container">
+    <div class="auth-card">
+        <h2 style="color:var(--yellow);">TakaloCash</h2>
+        <div class="auth-tabs">
+            <div id="tab-login" class="auth-tab active" onclick="switchAuth('login')">Connexion</div>
+            <div id="tab-signup" class="auth-tab" onclick="switchAuth('signup')">Inscription</div>
+        </div>
+        <input type="email" id="auth-email" class="input-styled" placeholder="Email">
+        <input type="password" id="auth-password" class="input-styled" placeholder="Mot de passe">
+        <button class="btn-valider" id="btn-auth" onclick="handleAuth()">
+            <span id="auth-text">Se connecter</span>
+        </button>
+    </div>
+</div>
+
+<div class="container" id="main-container">
     <div class="header">
         <div class="logo"><span>TC</span> TakaloCash</div>
-        <div class="header-icons">
+        <div class="profile-area">
             <i class="fa-solid fa-bell"></i>
-            <img src="https://i.pravatar.cc/100" class="profile-img">
+            <img src="https://i.pravatar.cc/100" class="profile-img" onclick="logout()" title="Déconnexion">
         </div>
     </div>
 
     <div class="solde-card">
-        <p>Solde disponible</p>
-        <h1 id="solde">0 Ar</h1>
-    </div>
-
-    <div class="actions">
-        <button class="btn-main btn-send"><i class="fa-solid fa-paper-plane"></i> Envoyer</button>
-        <button class="btn-main btn-receive"><i class="fa-solid fa-qrcode"></i> Recevoir</button>
+        <p style="color:var(--text-gray)">Solde disponible</p>
+        <h1 id="solde-display">0 Ar</h1>
     </div>
 
     <div class="services">
-        <div class="s-box"><i class="fa-brands fa-bitcoin s-icon"></i><div class="s-info"><h4>Crypto</h4><p>TRX, USDT, BTC</p></div></div>
-        <div class="s-box"><i class="fa-solid fa-wallet s-icon" style="color:#2ebd85"></i><div class="s-info"><h4>Wallet</h4><p>Skrill, Neteller</p></div></div>
-        <div class="s-box"><i class="fa-solid fa-gamepad s-icon" style="color:#3ea1f0"></i><div class="s-info"><h4>1xBet</h4><p>Dépôt & Retrait</p></div></div>
-        <div class="s-box"><i class="fa-solid fa-satellite-dish s-icon" style="color:white"></i><div class="s-info"><h4>Starlink</h4><p>Abonnement</p></div></div>
+        <div class="s-box"><i class="fa-brands fa-bitcoin s-icon"></i><div><h4 style="margin:0">Crypto</h4><p style="margin:0;font-size:10px;color:var(--text-gray)">TRX, USDT</p></div></div>
+        <div class="s-box"><i class="fa-solid fa-gamepad s-icon" style="color:#3ea1f0"></i><div><h4 style="margin:0">1xBet</h4><p style="margin:0;font-size:10px;color:var(--text-gray)">Dépôt/Retrait</p></div></div>
     </div>
 
-    <div class="card">
-        <h3>Envoyer Crypto</h3>
-        <div style="display: flex; gap: 10px;">
-            <div class="input-box" style="flex: 1;">
-                <select id="crypto-select" onchange="updateCalcul()">
-                    <option value="TRX">🪙 TRX</option>
-                    <option value="USDT">💵 USDT</option>
-                    <option value="BTC">₿ BTC</option>
-                </select>
-            </div>
-            <div class="input-box" style="flex: 1.5;">
-                <input type="number" id="ariary" placeholder="Montant Ar" oninput="updateCalcul()">
-            </div>
+    <div class="form-card">
+        <h3 style="margin-top:0; color:var(--yellow)">Envoyer Crypto</h3>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <select id="crypto-select" class="input-styled" style="flex:1; margin-bottom:0;" onchange="updateCalcul()">
+                <option value="TRX">🪙 TRX</option>
+                <option value="USDT">💵 USDT</option>
+                <option value="BTC">₿ BTC</option>
+            </select>
+            <input type="number" id="ariary" class="input-styled" style="flex:1.5; margin-bottom:0;" placeholder="Montant Ar" oninput="updateCalcul()">
         </div>
-
-        <div class="input-box">
-            <input type="text" id="adresse" placeholder="Adresse du destinataire">
-        </div>
-
-        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 20px; padding: 0 5px;">
-            <span style="color:var(--text-gray)">Valeur estimée:</span>
-            <span style="font-weight: bold; color: var(--yellow)"><span id="valeur-crypto">0.00</span> <span id="label-crypto">TRX</span></span>
+        <input type="text" id="adresse" class="input-styled" placeholder="Adresse destinataire">
+        
+        <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:20px;">
+            <span style="color:var(--text-gray)">Equivalent crypto:</span>
+            <span style="font-weight:bold; color:var(--yellow)"><span id="crypto-val">0.00</span> <span id="crypto-label">TRX</span></span>
         </div>
 
         <button class="btn-valider" id="btn-envoyer" onclick="envoyer()">
@@ -159,30 +140,10 @@
             <div class="spinner"></div>
         </button>
     </div>
-
-    <div class="card">
-        <h3 style="color: white">Historique</h3>
-        <table>
-            <thead><tr><th>Date</th><th>Service</th><th>Montant</th><th>Status</th></tr></thead>
-            <tbody id="history-table"></tbody>
-        </table>
-    </div>
-
-    <div id="adminPanel" class="card">
-        <h3>Admin Panel - Attente</h3>
-        <table id="admin-table"></table>
-    </div>
-
-    <div class="footer">
-        <div style="margin-bottom: 10px;">
-            <a href="#">Conditions</a> | <a href="#">Confidentialité</a>
-        </div>
-        &copy; 2026 TakaloCash Madagascar
-    </div>
 </div>
 
 <a href="https://wa.me/261340000000" class="fab"><i class="fa-solid fa-comment-dots"></i></a>
-<div id="toast" class="toast">Message envoyé!</div>
+<div id="toast" class="toast"></div>
 
 <script>
 // --- CONFIG SUPABASE ---
@@ -191,7 +152,8 @@ const supabaseClient = supabase.createClient(
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA"
 );
 
-const userId = "USER_ID_REEL"; // AMPIDIRO ETO NY ID AVY AO AMIN'NY SUPABASE
+let currentMode = 'login';
+let currentUserId = null;
 const TAUX = { "TRX": 150, "USDT": 4600, "BTC": 300000000 };
 
 // --- NOTIFICATION ---
@@ -202,80 +164,86 @@ function notify(msg) {
     setTimeout(() => t.classList.remove("show"), 3000);
 }
 
-// --- CALCUL AUTOMATIQUE ---
+// --- AUTH LOGIC ---
+function switchAuth(mode) {
+    currentMode = mode;
+    document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+    document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+    document.getElementById('auth-text').innerText = (mode === 'login') ? 'Se connecter' : "S'inscrire";
+}
+
+async function handleAuth() {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    if(!email || !password) return notify("Fenoy ny banga! ⚠️");
+
+    if (currentMode === 'signup') {
+        const { data, error } = await supabaseClient.auth.signUp({ email, password });
+        if (error) return notify(error.message);
+        // Automatique: mampiditra solde 0 Ar ao amin'ny tabilao 'users'
+        await supabaseClient.from('users').insert([{ id: data.user.id, solde: 0 }]);
+        notify("Kaonty voatomboka! ✅");
+    } else {
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) return notify("Email na teny miafina diso! ❌");
+    }
+    checkUser();
+}
+
+async function checkUser() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (user) {
+        currentUserId = user.id;
+        document.getElementById('auth-container').style.display = 'none';
+        document.getElementById('main-container').style.display = 'block';
+        fetchUserData();
+    } else {
+        document.getElementById('auth-container').style.display = 'flex';
+        document.getElementById('main-container').style.display = 'none';
+    }
+}
+
+async function logout() {
+    await supabaseClient.auth.signOut();
+    location.reload();
+}
+
+// --- DASHBOARD LOGIC ---
+async function fetchUserData() {
+    const { data } = await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
+    if (data) document.getElementById('solde-display').innerText = data.solde.toLocaleString() + " Ar";
+}
+
 function updateCalcul() {
     const crypto = document.getElementById("crypto-select").value;
     const ar = parseFloat(document.getElementById("ariary").value) || 0;
     const result = ar / TAUX[crypto];
-    document.getElementById("valeur-crypto").innerText = (crypto === "BTC" ? result.toFixed(8) : result.toFixed(2));
-    document.getElementById("label-crypto").innerText = crypto;
+    document.getElementById("crypto-val").innerText = (crypto === "BTC" ? result.toFixed(8) : result.toFixed(2));
+    document.getElementById("crypto-label").innerText = crypto;
 }
 
-// --- FAKANA DATA ---
-async function fetchData() {
-    // Solde
-    const { data: user } = await supabaseClient.from("users").select("solde").eq("id", userId).single();
-    if (user) document.getElementById("solde").innerText = user.solde.toLocaleString() + " Ar";
-
-    // History
-    const { data: trans } = await supabaseClient.from("transactions").select("*").eq("user_id", userId).order("created_at", {ascending:false});
-    let hHtml = "";
-    trans?.forEach(t => {
-        hHtml += `<tr><td>${new Date(t.created_at).toLocaleDateString()}</td><td>${t.service}</td><td>${t.montant} Ar</td><td class="status-wait">${t.status}</td></tr>`;
-    });
-    document.getElementById("history-table").innerHTML = hHtml;
-}
-
-// --- ENVOYER ---
 async function envoyer() {
-    const btn = document.getElementById("btn-envoyer");
     const ar = document.getElementById("ariary").value;
     const adr = document.getElementById("adresse").value;
     const crypto = document.getElementById("crypto-select").value;
+    if(!ar || !adr) return notify("Fenoy ny banga! ⚠️");
 
-    if (!ar || !adr) return notify("Fenoy ny banga rehetra! ⚠️");
-
+    const btn = document.getElementById("btn-envoyer");
     btn.classList.add("loading");
-    btn.disabled = true;
 
-    const { error } = await supabaseClient.from("transactions").insert([{
-        user_id: userId, type: "Retrait", montant: ar, adresse: adr, status: "En attente", service: "Crypto ("+crypto+")"
+    const { error } = await supabaseClient.from('transactions').insert([{
+        user_id: currentUserId, montant: ar, adresse: adr, service: "Crypto ("+crypto+")", status: "En attente"
     }]);
 
     setTimeout(() => {
         btn.classList.remove("loading");
-        btn.disabled = false;
-        if (!error) {
-            notify("Fangatahana voaray ✅");
-            document.getElementById("adminPanel").style.display = "block";
-            fetchData(); loadAdmin();
-        } else {
-            notify("Nisy olana: " + error.message);
-        }
-    }, 2000);
-}
-
-// --- ADMIN LOGIC ---
-async function loadAdmin() {
-    const { data } = await supabaseClient.from("transactions").select("*").eq("status", "En attente");
-    let aHtml = "<tr><th>Vola</th><th>Action</th></tr>";
-    data?.forEach(t => {
-        aHtml += `<tr><td>${t.montant} Ar</td><td><button onclick="validerAdmin('${t.id}')" style="background:var(--green); border:none; color:white; padding:5px 10px; border-radius:5px; font-size:10px;">Confirmer</button></td></tr>`;
-    });
-    document.getElementById("admin-table").innerHTML = aHtml;
-}
-
-async function validerAdmin(id) {
-    await supabaseClient.from("transactions").update({ status: "Confirmé" }).eq("id", id);
-    notify("Transaction voamarina! 🚀");
-    fetchData(); loadAdmin();
+        if(!error) notify("Fangatahana voaray! ✅");
+        else notify("Nisy olana kely... ❌");
+    }, 1500);
 }
 
 // INIT
-fetchData();
-loadAdmin();
-setInterval(fetchData, 10000);
+checkUser();
 </script>
-
 </body>
 </html>
