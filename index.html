@@ -3,288 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TakaloCash Pro</title>
+    <title>TakaloCash Pro - Madagascar</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
     <style>
         :root {
-            --bg-dark: #0d1117;
-            --card-bg: #161b22;
-            --glass-bg: rgba(30, 39, 53, 0.6);
+            --bg-dark: #0b0e11;
+            --card-bg: #1e2329;
+            --text-gray: #848e9c;
             --yellow: #fcd535;
             --green: #2ebd85;
-            --border: rgba(255, 255, 255, 0.08);
-            --text-gray: #848e9c;
+            --border: rgba(255, 255, 255, 0.05);
+            --yellow-grad: linear-gradient(90deg, #fcd535, #f0b90b);
         }
 
         body {
             margin: 0; background-color: var(--bg-dark);
             font-family: 'Inter', sans-serif; color: white;
-            background: radial-gradient(circle at top right, #1c212e, #0d1117);
-            padding-bottom: 40px;
+            padding-bottom: 100px;
         }
 
-        .container { max-width: 450px; margin: auto; padding: 10px; display: none; }
+        .container { max-width: 420px; margin: auto; padding: 15px; display: none; } /* Afenina raha tsy loggé */
 
-        /* --- AUTH LAYER --- */
+        /* AUTH CONTAINER */
         #auth-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-dark); z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
+            background: var(--bg-dark); z-index: 2000;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
         }
         .auth-card {
-            background: var(--card-bg); padding: 30px; border-radius: 20px;
-            border: 1px solid var(--border); width: 85%; max-width: 350px; text-align: center;
+            background: var(--card-bg); width: 100%; max-width: 350px;
+            padding: 30px; border-radius: 20px; border: 1px solid var(--border); text-align: center;
         }
+        .auth-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
+        .auth-tab { flex: 1; padding: 10px; cursor: pointer; color: var(--text-gray); border-bottom: 2px solid transparent; }
+        .auth-tab.active { color: var(--yellow); border-bottom: 2px solid var(--yellow); font-weight: bold; }
 
-        /* --- HEADER --- */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 5px; }
-        .logo { font-weight: 700; font-size: 19px; display: flex; align-items: center; gap: 5px; }
+        /* INPUTS & BUTTONS */
+        .input-styled {
+            background: #12151c; border: 1px solid var(--border); border-radius: 12px;
+            padding: 14px; color: white; width: 100%; margin-bottom: 15px; box-sizing: border-box; outline: none;
+        }
+        .btn-valider {
+            width: 100%; background: var(--yellow-grad); border: none; padding: 16px;
+            border-radius: 12px; font-weight: 700; cursor: pointer; color: black;
+        }
+        .btn-valider:disabled { opacity: 0.6; }
+
+        /* DASHBOARD ELEMENTS */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
+        .logo { font-weight: 800; font-size: 20px; }
         .logo span { color: #3ea1f0; }
-        .header-right { display: flex; align-items: center; gap: 12px; }
-        .header-right i { color: var(--text-gray); font-size: 18px; position: relative; cursor: pointer; }
-        .badge { position: absolute; top: -5px; right: -5px; background: #f44336; font-size: 9px; padding: 2px 4px; border-radius: 50%; color: white; }
-        .profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--yellow); cursor: pointer; }
+        .profile-area { display: flex; align-items: center; gap: 10px; }
+        .profile-img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--yellow); }
 
-        /* --- SOLDE --- */
         .solde-card { text-align: center; padding: 30px 0; }
-        .solde-card p { color: var(--text-gray); font-size: 14px; margin: 0; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .solde-card h1 { font-size: 38px; margin: 8px 0; font-weight: 700; }
+        .solde-card h1 { font-size: 36px; margin: 10px 0; font-weight: 700; }
 
-        /* --- ACTIONS --- */
-        .action-row { display: flex; gap: 10px; margin-bottom: 25px; }
-        .btn-act { flex: 1; padding: 14px; border-radius: 10px; border: none; font-weight: 700; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-act.envoyer { background: var(--yellow); color: black; }
-        .btn-act.recevoir { background: #5ebf7a; color: white; }
+        .services { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .s-box { background: var(--card-bg); padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 12px; border: 1px solid var(--border); }
+        .s-icon { color: var(--yellow); font-size: 18px; }
 
-        /* --- SERVICES --- */
-        .grid-services { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
-        .service-box { background: var(--glass-bg); padding: 15px; border-radius: 15px; border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; backdrop-filter: blur(5px); }
-        .s-icon { color: var(--yellow); font-size: 20px; width: 30px; text-align: center; }
-
-        /* --- FORM --- */
-        .glass-card { background: var(--glass-bg); border-radius: 18px; border: 1px solid var(--border); padding: 18px; margin-bottom: 25px; }
-        .card-title { font-size: 15px; color: var(--yellow); margin-bottom: 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-        .input-group { background: #12151c; border-radius: 10px; padding: 12px; display: flex; align-items: center; margin-bottom: 12px; border: 1px solid var(--border); }
-        .input-group input, .input-group select { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
+        .form-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border); }
         
-        .valider-btn { width: 100%; background: var(--yellow); border: none; padding: 15px; border-radius: 10px; font-weight: 700; cursor: pointer; color: black; }
+        /* SPINNER */
+        .spinner { display: none; width: 20px; height: 20px; border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid black; border-radius: 50%; animation: spin 0.8s linear infinite; margin: auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading .btn-text { display: none; }
+        .loading .spinner { display: block; }
 
-        /* --- HISTORY --- */
-        .history-section h3 { font-size: 15px; color: var(--text-gray); font-weight: 400; margin-bottom: 12px; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 30px; }
-        th { text-align: left; color: var(--text-gray); padding-bottom: 8px; border-bottom: 1px solid var(--border); font-weight: 400; }
-        td { padding: 12px 0; border-bottom: 1px solid var(--border); }
+        /* TOAST */
+        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1b1f28; padding: 12px 25px; border-radius: 30px; border: 1px solid var(--yellow); transition: 0.5s; opacity: 0; z-index: 3000; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        .footer { border-top: 1px solid var(--border); padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 11px; margin-top: 20px; }
-        .footer a { color: var(--text-gray); text-decoration: none; display: block; margin-bottom: 6px; }
-        .footer-title { color: white; font-weight: 600; margin-bottom: 8px; display: block; }
-
-        .chat-btn { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-decoration: none; z-index: 1000; }
+        .fab { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-size: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); text-decoration: none; z-index: 1000; }
     </style>
 </head>
 <body>
 
 <div id="auth-container">
     <div class="auth-card">
-        <h1 style="color:var(--yellow); font-size: 28px; margin-bottom: 5px; font-weight: 800; letter-spacing: -1px;">TakaloCash</h1>
-        <p id="auth-subtitle" style="color: var(--text-gray); font-size: 13px; margin-bottom: 25px;">Connectez-vous à votre compte</p>
-        
-        <div style="text-align: left; width: 100%;">
-            <label style="font-size: 12px; color: var(--text-gray); margin-left: 5px;">Adresse Email</label>
-            <input type="email" id="auth-email" placeholder="exemple@gmail.com" 
-                   style="width:100%; padding:14px; margin: 5px 0 15px; border-radius:12px; border:1px solid var(--border); background:#12151c; color:white; box-sizing:border-box; outline: none;">
-            
-            <label style="font-size: 12px; color: var(--text-gray); margin-left: 5px;">Mot de passe</label>
-            <input type="password" id="auth-password" placeholder="••••••••" 
-                   style="width:100%; padding:14px; margin: 5px 0 20px; border-radius:12px; border:1px solid var(--border); background:#12151c; color:white; box-sizing:border-box; outline: none;">
+        <h2 style="color:var(--yellow);">TakaloCash</h2>
+        <div class="auth-tabs">
+            <div id="tab-login" class="auth-tab active" onclick="switchAuth('login')">Connexion</div>
+            <div id="tab-signup" class="auth-tab" onclick="switchAuth('signup')">Inscription</div>
         </div>
-        
-        <button id="auth-submit-btn" class="valider-btn" onclick="handleAuth()">Se connecter</button>
-        
-        <div style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px;">
-            <p id="auth-switch-text" style="font-size:13px; color:var(--text-gray); cursor:pointer;" onclick="toggleAuthMode()">
-                Pas encore de compte ? <span style="color:var(--yellow); font-weight: 600;">S'inscrire</span>
-            </p>
-        </div>
+        <input type="email" id="auth-email" class="input-styled" placeholder="Email">
+        <input type="password" id="auth-password" class="input-styled" placeholder="Mot de passe">
+        <button class="btn-valider" id="btn-auth" onclick="handleAuth()">
+            <span id="auth-text">Se connecter</span>
+        </button>
     </div>
 </div>
 
-<div class="container" id="main-app">
+<div class="container" id="main-container">
     <div class="header">
         <div class="logo"><span>TC</span> TakaloCash</div>
-        <div class="header-right">
-            <i class="fa-solid fa-plus-square" style="color:var(--yellow)"></i>
-            <i class="fa-solid fa-bell"><span class="badge">2</span></i>
-            <img src="https://i.pravatar.cc/150?u=12" class="profile-pic" onclick="logout()">
-            <i class="fa-solid fa-bars"></i>
+        <div class="profile-area">
+            <i class="fa-solid fa-bell"></i>
+            <img src="https://i.pravatar.cc/100" class="profile-img" onclick="logout()" title="Déconnexion">
         </div>
     </div>
 
     <div class="solde-card">
-        <p>Solde disponible <i class="fa-solid fa-arrow-trend-up" style="color:var(--green)"></i></p>
-        <h1 id="display-solde">0 Ar</h1>
+        <p style="color:var(--text-gray)">Solde disponible</p>
+        <h1 id="solde-display">0 Ar</h1>
     </div>
 
-    <div class="action-row">
-        <button class="btn-act envoyer"><i class="fa-solid fa-arrow-right"></i> Envoyer</button>
-        <button class="btn-act recevoir"><i class="fa-solid fa-arrow-down"></i> Recevoir</button>
+    <div class="services">
+        <div class="s-box"><i class="fa-brands fa-bitcoin s-icon"></i><div><h4 style="margin:0">Crypto</h4><p style="margin:0;font-size:10px;color:var(--text-gray)">TRX, USDT</p></div></div>
+        <div class="s-box"><i class="fa-solid fa-gamepad s-icon" style="color:#3ea1f0"></i><div><h4 style="margin:0">1xBet</h4><p style="margin:0;font-size:10px;color:var(--text-gray)">Dépôt/Retrait</p></div></div>
     </div>
 
-    <div class="grid-services">
-        <div class="service-box"><i class="fa-brands fa-bitcoin s-icon"></i><div style="font-size:12px;"><b>Crypto</b><p style="margin:0; font-size:9px; color:var(--text-gray)">Envoyer & recevoir</p></div></div>
-        <div class="service-box"><i class="fa-solid fa-wallet s-icon" style="color:#2ebd85"></i><div style="font-size:12px;"><b>E-Wallet</b><p style="margin:0; font-size:9px; color:var(--text-gray)">Skrill / Neteller</p></div></div>
-        <div class="service-box"><i class="fa-solid fa-gamepad s-icon" style="color:#3ea1f0"></i><div style="font-size:12px;"><b>1xBet</b><p style="margin:0; font-size:9px; color:var(--text-gray)">Dépôt & Retrait</p></div></div>
-        <div class="service-box"><i class="fa-solid fa-satellite-dish s-icon" style="color:white"></i><div style="font-size:12px;"><b>Starlink</b><p style="margin:0; font-size:9px; color:var(--text-gray)">Abonnement</p></div></div>
-    </div>
-
-    <div class="glass-card">
-        <div class="card-title">Envoyer Crypto <i class="fa-solid fa-chevron-down" style="color:gray; font-size:12px;"></i></div>
-        <div style="display:flex; gap:10px;">
-            <div class="input-group" style="flex:1;"><select id="cryp-sel" onchange="calc()"><option value="TRX">TRX</option><option value="USDT">USDT</option></select></div>
-            <div class="input-group" style="flex:1.5;"><input type="number" id="ar-val" placeholder="Montant en Ar" oninput="calc()"></div>
+    <div class="form-card">
+        <h3 style="margin-top:0; color:var(--yellow)">Envoyer Crypto</h3>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <select id="crypto-select" class="input-styled" style="flex:1; margin-bottom:0;" onchange="updateCalcul()">
+                <option value="TRX">🪙 TRX</option>
+                <option value="USDT">💵 USDT</option>
+                <option value="BTC">₿ BTC</option>
+            </select>
+            <input type="number" id="ariary" class="input-styled" style="flex:1.5; margin-bottom:0;" placeholder="Montant Ar" oninput="updateCalcul()">
         </div>
-        <div class="input-group"><input type="text" placeholder="Adresse crypto destinataire"></div>
-        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-gray); margin:5px 0 15px;">
-            <span>Équivalent crypto</span>
-            <span style="color:white; font-weight:600;"><span id="cryp-res">0.00</span> <span id="cryp-lab">TRX</span></span>
+        <input type="text" id="adresse" class="input-styled" placeholder="Adresse destinataire">
+        
+        <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:20px;">
+            <span style="color:var(--text-gray)">Equivalent crypto:</span>
+            <span style="font-weight:bold; color:var(--yellow)"><span id="crypto-val">0.00</span> <span id="crypto-label">TRX</span></span>
         </div>
-        <button class="valider-btn">Valider l'envoi</button>
-    </div>
 
-    <div class="history-section">
-        <h3>Historique des transactions</h3>
-        <table>
-            <thead><tr><th>Date</th><th>Service</th><th>Montant</th><th style="text-align:right">Statut</th></tr></thead>
-            <tbody id="hist-body"></tbody>
-        </table>
-    </div>
-
-    <div class="footer">
-        <div>
-            <a href="#">Conditions d'utilisation</a>
-            <a href="#">Confidentialité</a>
-        </div>
-        <div>
-            <span class="footer-title">Support & Aide</span>
-            <a href="#"><i class="fa-solid fa-headset" style="margin-right:5px;"></i> Centre d'aide</a>
-            <a href="#"><i class="fa-brands fa-whatsapp" style="margin-right:5px;"></i> WhatsApp</a>
-        </div>
+        <button class="btn-valider" id="btn-envoyer" onclick="envoyer()">
+            <span class="btn-text">Valider Envoi</span>
+            <div class="spinner"></div>
+        </button>
     </div>
 </div>
 
-<a href="https://wa.me/261340000000" class="chat-btn"><i class="fa-solid fa-comment-dots"></i></a>
+<a href="https://wa.me/261340000000" class="fab"><i class="fa-solid fa-comment-dots"></i></a>
+<div id="toast" class="toast"></div>
 
 <script>
-// --- CONFIGURATION SUPABASE ---
+// --- CONFIG SUPABASE ---
 const supabaseClient = supabase.createClient(
     "https://nyeopreahmajoisartoz.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA"
 );
 
-const TAUX = { "TRX": 150, "USDT": 4650 };
-let currentUID = null;
-let isLoginMode = true;
+let currentMode = 'login';
+let currentUserId = null;
+const TAUX = { "TRX": 150, "USDT": 4600, "BTC": 300000000 };
 
-// Fonction de basculement Login/Signup
-function toggleAuthMode() {
-    isLoginMode = !isLoginMode;
-    const subtitle = document.getElementById('auth-subtitle');
-    const btn = document.getElementById('auth-submit-btn');
-    const switchText = document.getElementById('auth-switch-text');
-
-    if (!isLoginMode) {
-        subtitle.innerText = "Créez votre compte gratuit";
-        btn.innerText = "S'inscrire";
-        switchText.innerHTML = 'Déjà un compte ? <span style="color:var(--yellow); font-weight:600;">Se connecter</span>';
-    } else {
-        subtitle.innerText = "Connectez-vous à votre compte";
-        btn.innerText = "Se connecter";
-        switchText.innerHTML = 'Pas encore de compte ? <span style="color:var(--yellow); font-weight:600;">S'inscrire</span>';
-    }
+// --- NOTIFICATION ---
+function notify(msg) {
+    const t = document.getElementById("toast");
+    t.innerText = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 3000);
 }
 
-// Fonction principale d'authentification avec DEBUG
+// --- AUTH LOGIC ---
+function switchAuth(mode) {
+    currentMode = mode;
+    document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+    document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+    document.getElementById('auth-text').innerText = (mode === 'login') ? 'Se connecter' : "S'inscrire";
+}
+
 async function handleAuth() {
-    console.log("Tentative d'authentification lancée...");
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
+    if(!email || !password) return notify("Fenoy ny banga! ⚠️");
 
-    if (!email || !password) {
-        alert("Veuillez remplir tous les champs !");
-        return;
+    if (currentMode === 'signup') {
+        const { data, error } = await supabaseClient.auth.signUp({ email, password });
+        if (error) return notify(error.message);
+        // Automatique: mampiditra solde 0 Ar ao amin'ny tabilao 'users'
+        await supabaseClient.from('users').insert([{ id: data.user.id, solde: 0 }]);
+        notify("Kaonty voatomboka! ✅");
+    } else {
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) return notify("Email na teny miafina diso! ❌");
     }
-
-    try {
-        if (isLoginMode) {
-            // CONNEXION
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) throw error;
-            console.log("Connexion réussie");
-            checkUser();
-        } else {
-            // INSCRIPTION
-            const { data, error } = await supabaseClient.auth.signUp({ email, password });
-            if (error) throw error;
-
-            if (data.user) {
-                // Création auto dans la table 'users'
-                const { error: dbError } = await supabaseClient.from('users').insert([{ id: data.user.id, solde: 0 }]);
-                if (dbError) console.error("Erreur DB:", dbError.message);
-                
-                alert("Inscription réussie ! Vous pouvez maintenant vous connecter.");
-                toggleAuthMode();
-            }
-        }
-    } catch (err) {
-        console.error("Erreur détectée:", err.message);
-        alert("Erreur : " + err.message);
-    }
+    checkUser();
 }
 
-// Vérification de la session active
 async function checkUser() {
     const { data: { user } } = await supabaseClient.auth.getUser();
-    if(user) {
-        currentUID = user.id;
+    if (user) {
+        currentUserId = user.id;
         document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('main-app').style.display = 'block';
-        loadData();
+        document.getElementById('main-container').style.display = 'block';
+        fetchUserData();
+    } else {
+        document.getElementById('auth-container').style.display = 'flex';
+        document.getElementById('main-container').style.display = 'none';
     }
 }
 
-// Chargement du solde depuis la DB
-async function loadData() {
-    try {
-        const { data, error } = await supabaseClient.from('users').select('solde').eq('id', currentUID).single();
-        if (data) {
-            document.getElementById('display-solde').innerText = data.solde.toLocaleString() + " Ar";
-        }
-    } catch (e) {
-        console.log("Erreur chargement solde");
-    }
+async function logout() {
+    await supabaseClient.auth.signOut();
+    location.reload();
 }
 
-// Calculatrice de change
-function calc() {
-    const crypto = document.getElementById("cryp-sel").value;
-    const ar = parseFloat(document.getElementById("ar-val").value) || 0;
-    const res = ar / TAUX[crypto];
-    document.getElementById("cryp-res").innerText = res.toFixed(2);
-    document.getElementById("cryp-lab").innerText = crypto;
+// --- DASHBOARD LOGIC ---
+async function fetchUserData() {
+    const { data } = await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
+    if (data) document.getElementById('solde-display').innerText = data.solde.toLocaleString() + " Ar";
 }
 
-// Déconnexion
-async function logout() { 
-    await supabaseClient.auth.signOut(); 
-    location.reload(); 
+function updateCalcul() {
+    const crypto = document.getElementById("crypto-select").value;
+    const ar = parseFloat(document.getElementById("ariary").value) || 0;
+    const result = ar / TAUX[crypto];
+    document.getElementById("crypto-val").innerText = (crypto === "BTC" ? result.toFixed(8) : result.toFixed(2));
+    document.getElementById("crypto-label").innerText = crypto;
 }
 
-// Lancement au démarrage
+async function envoyer() {
+    const ar = document.getElementById("ariary").value;
+    const adr = document.getElementById("adresse").value;
+    const crypto = document.getElementById("crypto-select").value;
+    if(!ar || !adr) return notify("Fenoy ny banga! ⚠️");
+
+    const btn = document.getElementById("btn-envoyer");
+    btn.classList.add("loading");
+
+    const { error } = await supabaseClient.from('transactions').insert([{
+        user_id: currentUserId, montant: ar, adresse: adr, service: "Crypto ("+crypto+")", status: "En attente"
+    }]);
+
+    setTimeout(() => {
+        btn.classList.remove("loading");
+        if(!error) notify("Fangatahana voaray! ✅");
+        else notify("Nisy olana kely... ❌");
+    }, 1500);
+}
+
+// INIT
 checkUser();
 </script>
-
 </body>
 </html>
