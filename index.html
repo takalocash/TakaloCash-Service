@@ -89,12 +89,61 @@
 
 <div id="auth-container">
     <div class="auth-card">
-        <h2 style="color:var(--yellow)">TakaloCash</h2>
-        <input type="email" id="auth-email" placeholder="Email" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #333; background:#12151c; color:white;">
-        <input type="password" id="auth-password" placeholder="Mot de passe" style="width:100%; padding:12px; margin-bottom:20px; border-radius:8px; border:1px solid #333; background:#12151c; color:white;">
-        <button onclick="handleAuth()" style="width:100%; background:var(--yellow); border:none; padding:15px; border-radius:10px; font-weight:700; cursor:pointer;">Se connecter</button>
+        <h2 id="auth-title" style="color:var(--yellow); margin-bottom:20px;">Connexion</h2>
+        
+        <input type="email" id="auth-email" placeholder="Email" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #333; background:#12151c; color:white; box-sizing:border-box;">
+        
+        <input type="password" id="auth-password" placeholder="Mot de passe" style="width:100%; padding:12px; margin-bottom:20px; border-radius:8px; border:1px solid #333; background:#12151c; color:white; box-sizing:border-box;">
+        
+        <button id="auth-submit-btn" class="valider-btn" onclick="handleAuth()">Se connecter</button>
+        
+        <p id="auth-switch-text" style="font-size:12px; color:gray; margin-top:20px; cursor:pointer;" onclick="toggleAuthMode()">
+            Pas de compte ? <span style="color:var(--yellow)">S'inscrire</span>
+        </p>
     </div>
 </div>
+
+<script>
+// --- IZAY AO ANATIN'NY SCRIPT REHEFA AVY EO ---
+let isLoginMode = true;
+
+function toggleAuthMode() {
+    isLoginMode = !isLoginMode;
+    document.getElementById('auth-title').innerText = isLoginMode ? "Connexion" : "Inscription";
+    document.getElementById('auth-submit-btn').innerText = isLoginMode ? "Se connecter" : "S'inscrire";
+    document.getElementById('auth-switch-text').innerHTML = isLoginMode ? 
+        'Pas de compte ? <span style="color:var(--yellow)">S'inscrire</span>' : 
+        'Déjà un compte ? <span style="color:var(--yellow)">Se connecter</span>';
+}
+
+async function handleAuth() {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+
+    if (isLoginMode) {
+        // LOGIN
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) alert("Email na teny miafina diso!");
+        else checkUser();
+    } else {
+        // SIGN UP
+        const { data, error } = await supabaseClient.auth.signUp({ email, password });
+        if (error) {
+            alert("Fahadisoana tamin'ny inscription: " + error.message);
+        } else if (data.user) {
+            // AUTOMATIQUE: Mamorona row ao amin'ny tabilao 'users'
+            const { error: dbError } = await supabaseClient
+                .from('users')
+                .insert([{ id: data.user.id, solde: 0 }]);
+            
+            if (dbError) console.error("Tsy tafiditra ao amin'ny tabilao users:", dbError);
+            
+            alert("Kaonty voatomboka! Afaka miditra ianao izao.");
+            toggleAuthMode(); // Averina amin'ny Login
+        }
+    }
+}
+</script>
 
 <div class="container" id="main-app">
     <div class="header">
