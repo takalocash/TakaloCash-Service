@@ -43,7 +43,7 @@
         .auth-tab { flex: 1; padding: 10px; cursor: pointer; color: var(--text-gray); border-bottom: 2px solid transparent; }
         .auth-tab.active { color: var(--yellow); border-bottom: 2px solid var(--yellow); font-weight: 700; }
 
-        /* --- UI ELEMENTS --- */
+        /* --- INPUTS --- */
         .input-styled {
             background: #12151c; border: 1px solid var(--border); border-radius: 12px;
             padding: 14px; color: white; width: 100%; margin-bottom: 15px; box-sizing: border-box; outline: none; font-size: 14px;
@@ -67,11 +67,11 @@
         .btn-env { background: var(--yellow); color: black; }
         .btn-rec { background: var(--green); color: white; }
 
-        /* --- HISTORIQUE --- */
+        /* --- HISTORY --- */
         .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
         .history-table td { padding: 15px 0; border-bottom: 1px solid var(--border); }
-        .miditra { color: var(--green); }
-        .mivoaka { color: var(--red); }
+        .miditra { color: var(--green); font-weight: 700; }
+        .mivoaka { color: var(--red); font-weight: 700; }
         .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; }
         .status-confirme { color: var(--green); background: rgba(46, 189, 133, 0.1); }
         .status-attente { color: var(--yellow); background: rgba(252, 213, 53, 0.1); }
@@ -116,7 +116,7 @@
                 <div class="menu-item" onclick="openMobile('Dépôt')"><i class="fa-solid fa-arrow-down" style="color:var(--green)"></i> Dépôt MM</div>
                 <div class="menu-item" onclick="openMobile('Retrait')"><i class="fa-solid fa-arrow-up" style="color:var(--red)"></i> Retrait MM</div>
             </div>
-            <img src="https://i.pravatar.cc/100?u=12" class="profile-img" onclick="logout()">
+            <img src="https://i.pravatar.cc/100?u=99" class="profile-img" onclick="logout()">
         </div>
     </div>
 
@@ -131,24 +131,19 @@
     </div>
 
     <div id="env-form" style="background:var(--card-bg); padding:20px; border-radius:20px; border:1px solid var(--border); margin-bottom:30px;">
-        <h3 style="margin-top:0; color:var(--yellow); font-size:15px;">Vendre / Envoyer Crypto</h3>
-        <div style="display:flex; gap:10px;">
-            <select id="env-crypto" class="input-styled" style="flex:1;" onchange="updateEnvCalc()">
-                <option value="TRX">TRX</option>
-                <option value="USDT">USDT</option>
-            </select>
-            <input type="number" id="env-ariary" class="input-styled" style="flex:1.5;" placeholder="Montant Ar" oninput="updateEnvCalc()">
-        </div>
-        <input type="text" id="env-adr" class="input-styled" placeholder="Adresse destinataire">
-        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:15px; color:var(--text-gray);">
-            <span>Valeur Crypto:</span>
-            <span id="env-calc-res" style="color:white; font-weight:bold;">0.00 TRX</span>
-        </div>
-        <button class="btn-valider" onclick="envoyer()">Valider l'envoi</button>
+        <h3 style="margin-top:0; color:var(--yellow); font-size:15px;">Vendre Crypto (Envoyer)</h3>
+        <select id="env-crypto" class="input-styled" onchange="updateEnvCalc()">
+            <option value="TRX">TRX</option>
+            <option value="USDT">USDT</option>
+        </select>
+        <input type="number" id="env-ariary" class="input-styled" placeholder="Montant en Ar" oninput="updateEnvCalc()">
+        <input type="text" id="env-adr" class="input-styled" placeholder="Adresse de réception">
+        <p id="env-calc-res" style="font-size:12px; color:var(--yellow);">Valeur : 0.00 TRX</p>
+        <button class="btn-valider" onclick="envoyer()">Confirmer l'envoi</button>
     </div>
 
     <div class="history-section">
-        <p style="color:var(--text-gray); font-size:14px; margin-bottom:10px;">Historique des activités</p>
+        <p style="color:var(--text-gray); font-size:14px; margin-bottom:10px;">Dernières transactions</p>
         <table class="history-table"><tbody id="history-body"></tbody></table>
     </div>
 </div>
@@ -156,74 +151,66 @@
 <div id="modal-recevoir" class="modal">
     <div class="modal-content">
         <div id="rec-step1" class="active-step">
-            <h3 style="color:var(--yellow);">Acheter / Recevoir</h3>
+            <h3>Recevoir / Achat</h3>
             <select id="rec-type" class="input-styled" onchange="updateRecCalc()">
-                <option value="USDT">USDT (TRC20)</option>
+                <option value="USDT">USDT</option>
                 <option value="TRX">TRX</option>
-                <option value="1XBET">Retrait 1xBet</option>
+                <option value="1XBET">1xBet</option>
             </select>
-            <div style="display:flex; gap:8px; align-items:center;">
-                <input type="number" id="rec-qty" class="input-styled" style="flex:1;" placeholder="Quantité" oninput="updateRecCalc()">
-                <span style="margin-bottom:15px;">=</span>
-                <input type="text" id="rec-ar" class="input-styled" style="flex:1.5; background:#000;" readonly placeholder="Ariary">
-            </div>
+            <input type="number" id="rec-qty" class="input-styled" placeholder="Quantité" oninput="updateRecCalc()">
+            <input type="text" id="rec-ar" class="input-styled" style="background:#000" readonly placeholder="Ariary">
             <button class="btn-valider" onclick="goToRecStep2()">Continuer</button>
-            <p onclick="closeModal('modal-recevoir')" style="cursor:pointer; color:gray; font-size:12px; margin-top:15px;">Annuler</p>
+            <p onclick="closeModal('modal-recevoir')" style="cursor:pointer; color:gray; font-size:12px; margin-top:10px;">Fermer</p>
         </div>
         <div id="rec-step2" class="modal-step">
-            <h3 style="color:var(--yellow);">Finaliser l'achat</h3>
             <div class="timer-box" id="timer-display">05:00</div>
-            <p id="addr-instr" style="font-size:12px; text-align:left; color:var(--text-gray);">Envoyez à cette adresse :</p>
             <div id="target-addr" class="addr-box">---</div>
-            <button class="btn-valider" style="background:var(--green); color:white;" onclick="confirmSent()">J'ai envoyé</button>
+            <button class="btn-valider" style="background:var(--green); color:white" onclick="confirmSent()">J'ai envoyé</button>
         </div>
     </div>
 </div>
 
 <div id="modal-mobile" class="modal">
     <div class="modal-content">
-        <h3 id="mob-title" style="color:var(--yellow);">Action</h3>
+        <h3 id="mob-title">Mobile Money</h3>
         <select id="mob-op" class="input-styled">
             <option value="Mvola">Mvola</option>
             <option value="Orange Money">Orange Money</option>
             <option value="Airtel Money">Airtel Money</option>
         </select>
-        <input type="number" id="mob-amount" class="input-styled" placeholder="Montant Ariary">
-        <input type="tel" id="mob-phone" class="input-styled" placeholder="Numéro Mobile Money">
-        <button class="btn-valider" onclick="executeMobile()">Confirmer</button>
-        <p onclick="closeModal('modal-mobile')" style="cursor:pointer; color:gray; font-size:12px; margin-top:15px;">Annuler</p>
+        <input type="number" id="mob-amount" class="input-styled" placeholder="Montant Ar">
+        <input type="tel" id="mob-phone" class="input-styled" placeholder="Numéro de téléphone">
+        <button class="btn-valider" onclick="executeMobile()">Valider</button>
+        <p onclick="closeModal('modal-mobile')" style="cursor:pointer; color:gray; font-size:12px; margin-top:10px;">Fermer</p>
     </div>
 </div>
 
 <div id="toast" class="toast"></div>
 
 <script>
-// --- CONFIG SUPABASE ---
 const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
 
-let currentUserId = null, countdown, currentTransId;
+let currentUserId = null, countdown, currentTransId, currentMode='login';
 const TAUX = { "TRX": 150, "USDT": 4600, "1XBET": 1 };
-const ADDRS = { "USDT": "T9yZ1p9R7xS5uB4sE...V8aN2oP", "TRX": "T9yZ1p9R7xS5uB4sE...V8aN2oP", "1XBET": "ID Agent: 1234567" };
+const ADDRS = { "USDT": "ADR_USDT_TRC20_HERE", "TRX": "ADR_TRX_HERE", "1XBET": "ID_AGENT_12345" };
 
 function notify(m){ const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 
-// --- AUTH LOGIC ---
+// --- AUTH ---
 function switchAuth(m){ 
-    document.getElementById('tab-login').classList.toggle('active', m==='login');
-    document.getElementById('tab-signup').classList.toggle('active', m==='signup');
+    currentMode = m;
+    document.getElementById('tab-login').className = m==='login'?'auth-tab active':'auth-tab';
+    document.getElementById('tab-signup').className = m==='signup'?'auth-tab active':'auth-tab';
     document.getElementById('btn-auth').innerText = m==='login'?'Se connecter':"S'inscrire";
-    window.currentMode = m;
 }
 
 async function handleAuth(){
     const e=document.getElementById('auth-email').value, p=document.getElementById('auth-password').value;
-    if(!e || !p) return notify("Fenoy ny banga! ⚠️");
     try {
-        if(window.currentMode==='signup'){
+        if(currentMode==='signup'){
             const {data, error}=await supabaseClient.auth.signUp({email:e, password:p});
             if(error) throw error;
             await supabaseClient.from('users').insert([{id:data.user.id, solde:0}]);
-            notify("Compte créé ! ✅");
         } else {
             const {error}=await supabaseClient.auth.signInWithPassword({email:e, password:p});
             if(error) throw error;
@@ -242,7 +229,7 @@ async function checkUser(){
     }
 }
 
-// --- DATA FETCHING ---
+// --- CORE DATA ---
 async function fetchData(){
     const {data:u}=await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
     if(u) document.getElementById('display-solde').innerText = u.solde.toLocaleString()+" Ar";
@@ -251,62 +238,56 @@ async function fetchData(){
 
 async function fetchHistory(){
     const {data:ts, error}=await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at',{ascending:false});
+    if(error) console.error("History Error:", error);
+    
     const b=document.getElementById('history-body'); b.innerHTML="";
-    if(ts) {
-        ts.forEach(t=>{
-            const s=t.service.toLowerCase();
-            const isPos = s.includes("recevoir") || s.includes("dépôt") || s.includes("depot");
-            let cls = t.status==='Confirmé'?'status-confirme':(t.status==='Annulé'?'status-annule':'status-attente');
-            
-            b.innerHTML += `<tr>
-                <td><b>${t.service}</b><br><small style="color:gray">${new Date(t.created_at).toLocaleDateString()}</small></td>
-                <td style="text-align:right"><span class="${isPos?'miditra':'mivoaka'}" style="font-weight:700">${isPos?'+':'-'} ${parseFloat(t.montant).toLocaleString()} Ar</span></td>
-                <td style="text-align:right"><span class="status-badge ${cls}">${t.status}</span></td>
-            </tr>`;
-        });
-    }
+    if(ts) ts.forEach(t=>{
+        const s=t.service.toLowerCase();
+        const isPos = s.includes("recevoir") || s.includes("dépôt") || s.includes("depot");
+        let cls = t.status==='Confirmé'?'status-confirme':(t.status==='Annulé'?'status-annule':'status-attente');
+        
+        b.innerHTML += `<tr>
+            <td><b>${t.service}</b><br><small style="color:gray">${new Date(t.created_at).toLocaleDateString()}</small></td>
+            <td style="text-align:right"><span class="${isPos?'miditra':'mivoaka'}">${isPos?'+':'-'} ${parseFloat(t.montant).toLocaleString()} Ar</span></td>
+            <td style="text-align:right"><span class="status-badge ${cls}">${t.status}</span></td>
+        </tr>`;
+    });
 }
 
-// --- ACTIONS ---
-function updateEnvCalc(){ const c=document.getElementById('env-crypto').value, ar=document.getElementById('env-ariary').value||0; document.getElementById('env-calc-res').innerText=(ar/TAUX[c]).toFixed(2)+" "+c; }
+// --- LOGIC ---
+function updateEnvCalc(){ const c=document.getElementById('env-crypto').value, ar=document.getElementById('env-ariary').value||0; document.getElementById('env-calc-res').innerText="Valeur : "+(ar/TAUX[c]).toFixed(2)+" "+c; }
 function updateRecCalc(){ const t=document.getElementById('rec-type').value, q=document.getElementById('rec-qty').value||0; document.getElementById('rec-ar').value=(q*TAUX[t]).toLocaleString()+" Ar"; }
 
 async function envoyer(){
     const ar=parseFloat(document.getElementById('env-ariary').value), adr=document.getElementById('env-adr').value;
     if(!ar || !adr) return notify("Fenoy ny banga! ⚠️");
-    if(!confirm(`Confirmer l'envoi de ${ar.toLocaleString()} Ar ?`)) return;
-
-    const {data:u}=await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
-    if(u.solde < ar) return notify("Tsy ampy solde! ❌");
-
-    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:ar, service:"Envoyer Crypto", status:"En attente", adresse:adr}]);
-    await supabaseClient.from('users').update({solde:u.solde - ar}).eq('id',currentUserId);
     
-    notify("Transfert enregistré! ✅"); fetchData();
+    const {data:u}=await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
+    if(u.solde < ar) return notify("Solde insuffisant! ❌");
+
+    const {error} = await supabaseClient.from('transactions').insert([{
+        user_id: currentUserId, montant: ar, service: "Envoyer Crypto", status: "En attente", adresse: adr
+    }]);
+
+    if(!error) {
+        await supabaseClient.from('users').update({solde:u.solde - ar}).eq('id',currentUserId);
+        notify("Envoyé ! ✅"); fetchData();
+    } else { console.error("Envoyer Error:", error); }
 }
 
-function openRecevoir(){ 
-    document.getElementById('modal-recevoir').style.display='block'; 
-    document.getElementById('rec-step1').className='active-step'; 
-    document.getElementById('rec-step2').className='modal-step'; 
-}
-
+function openRecevoir(){ document.getElementById('modal-recevoir').style.display='block'; document.getElementById('rec-step1').className='active-step'; document.getElementById('rec-step2').className='modal-step'; }
 async function goToRecStep2(){
     const q=document.getElementById('rec-qty').value, t=document.getElementById('rec-type').value;
-    if(!q || q<=0) return notify("Ampidiro ny quantité! ⚠️");
-    
+    if(!q) return notify("Ampidiro ny quantité!");
     document.getElementById('target-addr').innerText=ADDRS[t];
     document.getElementById('rec-step1').className='modal-step';
     document.getElementById('rec-step2').className='active-step';
 
-    const {data}=await supabaseClient.from('transactions').insert([{
-        user_id:currentUserId, 
-        montant: q * TAUX[t], 
-        service: "Recevoir " + t, 
-        status: "En attente"
+    const {data, error}=await supabaseClient.from('transactions').insert([{
+        user_id:currentUserId, montant: q * TAUX[t], service: "Recevoir " + t, status: "En attente"
     }]).select().single();
     
-    currentTransId=data.id; startTimer(300); fetchHistory();
+    if(!error) { currentTransId=data.id; startTimer(300); fetchHistory(); }
 }
 
 function startTimer(s){
@@ -324,30 +305,25 @@ function startTimer(s){
 }
 
 let curMob="";
-function openMobile(t){ curMob=t; document.getElementById('mob-title').innerText=t+" Mobile Money"; document.getElementById('modal-mobile').style.display='block'; }
-
+function openMobile(t){ curMob=t; document.getElementById('mob-title').innerText=t; document.getElementById('modal-mobile').style.display='block'; }
 async function executeMobile(){
-    const op=document.getElementById('mob-op').value, am=parseFloat(document.getElementById('mob-amount').value), ph=document.getElementById('mob-phone').value;
-    if(!am || !ph) return notify("Fenoy ny banga! ⚠️");
-    
+    const am=parseFloat(document.getElementById('mob-amount').value), ph=document.getElementById('mob-phone').value, op=document.getElementById('mob-op').value;
+    if(!am || !ph) return notify("Banga!");
+
     if(curMob==='Retrait'){
         const {data:u}=await supabaseClient.from('users').select('solde').eq('id',currentUserId).single();
-        if(u.solde < am) return notify("Tsy ampy solde! ❌");
+        if(u.solde < am) return notify("Tsy ampy solde!");
         await supabaseClient.from('users').update({solde:u.solde - am}).eq('id',currentUserId);
     }
 
-    await supabaseClient.from('transactions').insert([{
-        user_id:currentUserId, 
-        montant:am, 
-        service: curMob + " " + op, 
-        status: "En attente", 
-        adresse: ph
+    const {error} = await supabaseClient.from('transactions').insert([{
+        user_id:currentUserId, montant:am, service: curMob + " " + op, status: "En attente", adresse: ph
     }]);
-
-    notify("Action enregistrée ! ✅"); closeModal('modal-mobile'); fetchData();
+    
+    if(!error) { notify("Enregistré !"); closeModal('modal-mobile'); fetchData(); }
 }
 
-function confirmSent(){ notify("Fahombiazana ! Miandry fanamarinana."); closeModal('modal-recevoir'); }
+function confirmSent(){ notify("Fahombiazana!"); closeModal('modal-recevoir'); fetchHistory(); }
 function closeModal(id){ clearInterval(countdown); document.getElementById(id).style.display='none'; }
 function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
 
