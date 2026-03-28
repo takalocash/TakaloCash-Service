@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mg">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -77,9 +77,7 @@
         table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 30px; }
         th { text-align: left; color: var(--text-gray); padding-bottom: 8px; border-bottom: 1px solid var(--border); font-weight: 400; }
         td { padding: 12px 0; border-bottom: 1px solid var(--border); }
-        .status-confirm { color: var(--yellow); font-weight: 600; text-align: right; }
 
-        /* --- FOOTER --- */
         .footer { border-top: 1px solid var(--border); padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 11px; margin-top: 20px; }
         .footer a { color: var(--text-gray); text-decoration: none; display: block; margin-bottom: 6px; }
         .footer-title { color: white; font-weight: 600; margin-bottom: 8px; display: block; }
@@ -92,14 +90,14 @@
 <div id="auth-container">
     <div class="auth-card">
         <h1 style="color:var(--yellow); font-size: 28px; margin-bottom: 5px; font-weight: 800; letter-spacing: -1px;">TakaloCash</h1>
-        <p id="auth-subtitle" style="color: var(--text-gray); font-size: 13px; margin-bottom: 25px;">Miditra amin'ny kaontinao</p>
+        <p id="auth-subtitle" style="color: var(--text-gray); font-size: 13px; margin-bottom: 25px;">Connectez-vous à votre compte</p>
         
         <div style="text-align: left; width: 100%;">
-            <label style="font-size: 12px; color: var(--text-gray); margin-left: 5px;">Email address</label>
-            <input type="email" id="auth-email" placeholder="ohatra@gmail.com" 
+            <label style="font-size: 12px; color: var(--text-gray); margin-left: 5px;">Adresse Email</label>
+            <input type="email" id="auth-email" placeholder="exemple@gmail.com" 
                    style="width:100%; padding:14px; margin: 5px 0 15px; border-radius:12px; border:1px solid var(--border); background:#12151c; color:white; box-sizing:border-box; outline: none;">
             
-            <label style="font-size: 12px; color: var(--text-gray); margin-left: 5px;">Password</label>
+            <label style="font-size: 12px; color: var(--text-gray); margin-left: 5px;">Mot de passe</label>
             <input type="password" id="auth-password" placeholder="••••••••" 
                    style="width:100%; padding:14px; margin: 5px 0 20px; border-radius:12px; border:1px solid var(--border); background:#12151c; color:white; box-sizing:border-box; outline: none;">
         </div>
@@ -108,7 +106,7 @@
         
         <div style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px;">
             <p id="auth-switch-text" style="font-size:13px; color:var(--text-gray); cursor:pointer;" onclick="toggleAuthMode()">
-                Mbola tsy manana kaonty? <span style="color:var(--yellow); font-weight: 600;">S'inscrire</span>
+                Pas encore de compte ? <span style="color:var(--yellow); font-weight: 600;">S'inscrire</span>
             </p>
         </div>
     </div>
@@ -137,8 +135,8 @@
 
     <div class="grid-services">
         <div class="service-box"><i class="fa-brands fa-bitcoin s-icon"></i><div style="font-size:12px;"><b>Crypto</b><p style="margin:0; font-size:9px; color:var(--text-gray)">Envoyer & recevoir</p></div></div>
-        <div class="service-box"><i class="fa-solid fa-wallet s-icon" style="color:#2ebd85"></i><div style="font-size:12px;"><b>Porte-feuille</b><p style="margin:0; font-size:9px; color:var(--text-gray)">Skrill / Neteller</p></div></div>
-        <div class="service-box"><i class="fa-solid fa-gamepad s-icon" style="color:#3ea1f0"></i><div style="font-size:12px;"><b>1xBet</b><p style="margin:0; font-size:9px; color:var(--text-gray)">Retirer & jouer</p></div></div>
+        <div class="service-box"><i class="fa-solid fa-wallet s-icon" style="color:#2ebd85"></i><div style="font-size:12px;"><b>E-Wallet</b><p style="margin:0; font-size:9px; color:var(--text-gray)">Skrill / Neteller</p></div></div>
+        <div class="service-box"><i class="fa-solid fa-gamepad s-icon" style="color:#3ea1f0"></i><div style="font-size:12px;"><b>1xBet</b><p style="margin:0; font-size:9px; color:var(--text-gray)">Dépôt & Retrait</p></div></div>
         <div class="service-box"><i class="fa-solid fa-satellite-dish s-icon" style="color:white"></i><div style="font-size:12px;"><b>Starlink</b><p style="margin:0; font-size:9px; color:var(--text-gray)">Abonnement</p></div></div>
     </div>
 
@@ -146,18 +144,18 @@
         <div class="card-title">Envoyer Crypto <i class="fa-solid fa-chevron-down" style="color:gray; font-size:12px;"></i></div>
         <div style="display:flex; gap:10px;">
             <div class="input-group" style="flex:1;"><select id="cryp-sel" onchange="calc()"><option value="TRX">TRX</option><option value="USDT">USDT</option></select></div>
-            <div class="input-group" style="flex:1.5;"><input type="number" id="ar-val" placeholder="Montant Ar" oninput="calc()"></div>
+            <div class="input-group" style="flex:1.5;"><input type="number" id="ar-val" placeholder="Montant en Ar" oninput="calc()"></div>
         </div>
         <div class="input-group"><input type="text" placeholder="Adresse crypto destinataire"></div>
         <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-gray); margin:5px 0 15px;">
-            <span>Equivalent crypto</span>
+            <span>Équivalent crypto</span>
             <span style="color:white; font-weight:600;"><span id="cryp-res">0.00</span> <span id="cryp-lab">TRX</span></span>
         </div>
-        <button class="valider-btn">Valider Envoi</button>
+        <button class="valider-btn">Valider l'envoi</button>
     </div>
 
     <div class="history-section">
-        <h3>Historique des transferts</h3>
+        <h3>Historique des transactions</h3>
         <table>
             <thead><tr><th>Date</th><th>Service</th><th>Montant</th><th style="text-align:right">Statut</th></tr></thead>
             <tbody id="hist-body"></tbody>
@@ -167,10 +165,10 @@
     <div class="footer">
         <div>
             <a href="#">Conditions d'utilisation</a>
-            <a href="#">Politique de confidentialité</a>
+            <a href="#">Confidentialité</a>
         </div>
         <div>
-            <span class="footer-title">Chat & Aide</span>
+            <span class="footer-title">Support & Aide</span>
             <a href="#"><i class="fa-solid fa-headset" style="margin-right:5px;"></i> Centre d'aide</a>
             <a href="#"><i class="fa-brands fa-whatsapp" style="margin-right:5px;"></i> WhatsApp</a>
         </div>
@@ -180,6 +178,7 @@
 <a href="https://wa.me/261340000000" class="chat-btn"><i class="fa-solid fa-comment-dots"></i></a>
 
 <script>
+// --- CONFIGURATION SUPABASE ---
 const supabaseClient = supabase.createClient(
     "https://nyeopreahmajoisartoz.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA"
@@ -189,7 +188,7 @@ const TAUX = { "TRX": 150, "USDT": 4650 };
 let currentUID = null;
 let isLoginMode = true;
 
-// TOGGLE LOGIN / SIGNUP
+// Fonction de basculement Login/Signup
 function toggleAuthMode() {
     isLoginMode = !isLoginMode;
     const subtitle = document.getElementById('auth-subtitle');
@@ -197,46 +196,55 @@ function toggleAuthMode() {
     const switchText = document.getElementById('auth-switch-text');
 
     if (!isLoginMode) {
-        subtitle.innerText = "Mamorona kaonty vaovao";
+        subtitle.innerText = "Créez votre compte gratuit";
         btn.innerText = "S'inscrire";
-        switchText.innerHTML = 'Efa manana kaonty? <span style="color:var(--yellow); font-weight:600;">Se connecter</span>';
+        switchText.innerHTML = 'Déjà un compte ? <span style="color:var(--yellow); font-weight:600;">Se connecter</span>';
     } else {
-        subtitle.innerText = "Miditra amin'ny kaontinao";
+        subtitle.innerText = "Connectez-vous à votre compte";
         btn.innerText = "Se connecter";
-        switchText.innerHTML = 'Mbola tsy manana kaonty? <span style="color:var(--yellow); font-weight:600;">S'inscrire</span>';
+        switchText.innerHTML = 'Pas encore de compte ? <span style="color:var(--yellow); font-weight:600;">S'inscrire</span>';
     }
 }
 
-// HANDLE AUTH
+// Fonction principale d'authentification avec DEBUG
 async function handleAuth() {
+    console.log("Tentative d'authentification lancée...");
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
 
     if (!email || !password) {
-        alert("Fenoy ny banga azafady!");
+        alert("Veuillez remplir tous les champs !");
         return;
     }
 
-    if (isLoginMode) {
-        // LOGIN
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) alert("Email na password diso!");
-        else checkUser();
-    } else {
-        // SIGN UP
-        const { data, error } = await supabaseClient.auth.signUp({ email, password });
-        if (error) {
-            alert("Hadisoana: " + error.message);
-        } else if (data.user) {
-            // Mampiditra automatique ao amin'ny tabilao 'users'
-            await supabaseClient.from('users').insert([{ id: data.user.id, solde: 0 }]);
-            alert("Tafa! Afaka miditra ianao izao (Se connecter).");
-            toggleAuthMode();
+    try {
+        if (isLoginMode) {
+            // CONNEXION
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            console.log("Connexion réussie");
+            checkUser();
+        } else {
+            // INSCRIPTION
+            const { data, error } = await supabaseClient.auth.signUp({ email, password });
+            if (error) throw error;
+
+            if (data.user) {
+                // Création auto dans la table 'users'
+                const { error: dbError } = await supabaseClient.from('users').insert([{ id: data.user.id, solde: 0 }]);
+                if (dbError) console.error("Erreur DB:", dbError.message);
+                
+                alert("Inscription réussie ! Vous pouvez maintenant vous connecter.");
+                toggleAuthMode();
+            }
         }
+    } catch (err) {
+        console.error("Erreur détectée:", err.message);
+        alert("Erreur : " + err.message);
     }
 }
 
-// CHECK SESSION
+// Vérification de la session active
 async function checkUser() {
     const { data: { user } } = await supabaseClient.auth.getUser();
     if(user) {
@@ -247,13 +255,19 @@ async function checkUser() {
     }
 }
 
-// LOAD DATA
+// Chargement du solde depuis la DB
 async function loadData() {
-    const { data: u } = await supabaseClient.from('users').select('solde').eq('id', currentUID).single();
-    if(u) document.getElementById('display-solde').innerText = u.solde.toLocaleString() + " Ar";
+    try {
+        const { data, error } = await supabaseClient.from('users').select('solde').eq('id', currentUID).single();
+        if (data) {
+            document.getElementById('display-solde').innerText = data.solde.toLocaleString() + " Ar";
+        }
+    } catch (e) {
+        console.log("Erreur chargement solde");
+    }
 }
 
-// CALC EQUIVALENT
+// Calculatrice de change
 function calc() {
     const crypto = document.getElementById("cryp-sel").value;
     const ar = parseFloat(document.getElementById("ar-val").value) || 0;
@@ -262,12 +276,13 @@ function calc() {
     document.getElementById("cryp-lab").innerText = crypto;
 }
 
+// Déconnexion
 async function logout() { 
     await supabaseClient.auth.signOut(); 
     location.reload(); 
 }
 
-// INITIAL CHECK
+// Lancement au démarrage
 checkUser();
 </script>
 
