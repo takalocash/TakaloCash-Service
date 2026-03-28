@@ -6,32 +6,34 @@
     <title>TakaloCash Pro - Madagascar</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
-            --bg-dark: #0b0e11;
-            --card-bg: #1e2329;
-            --text-gray: #848e9c;
+            --bg-dark: #0d1117;
+            --card-bg: #161b22;
             --yellow: #fcd535;
             --green: #2ebd85;
-            --border: rgba(255, 255, 255, 0.05);
-            --yellow-grad: linear-gradient(90deg, #fcd535, #f0b90b);
+            --red: #ff4d4d;
+            --text-gray: #848e9c;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass: rgba(255, 255, 255, 0.03);
         }
 
         body {
             margin: 0; background-color: var(--bg-dark);
             font-family: 'Inter', sans-serif; color: white;
-            padding-bottom: 100px;
+            background: radial-gradient(circle at top right, #1c212e, #0d1117);
+            padding-bottom: 50px;
         }
 
-        .container { max-width: 420px; margin: auto; padding: 15px; display: none; } /* Afenina raha tsy loggé */
+        .container { max-width: 420px; margin: auto; padding: 15px; display: none; }
 
-        /* AUTH CONTAINER */
+        /* --- AUTH LAYER --- */
         #auth-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-dark); z-index: 2000;
+            background: var(--bg-dark); z-index: 5000;
             display: flex; align-items: center; justify-content: center; padding: 20px;
         }
         .auth-card {
@@ -40,209 +42,321 @@
         }
         .auth-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
         .auth-tab { flex: 1; padding: 10px; cursor: pointer; color: var(--text-gray); border-bottom: 2px solid transparent; }
-        .auth-tab.active { color: var(--yellow); border-bottom: 2px solid var(--yellow); font-weight: bold; }
+        .auth-tab.active { color: var(--yellow); border-bottom: 2px solid var(--yellow); font-weight: 700; }
 
-        /* INPUTS & BUTTONS */
+        /* --- INPUTS & BUTTONS --- */
         .input-styled {
             background: #12151c; border: 1px solid var(--border); border-radius: 12px;
-            padding: 14px; color: white; width: 100%; margin-bottom: 15px; box-sizing: border-box; outline: none;
+            padding: 14px; color: white; width: 100%; margin-bottom: 15px; box-sizing: border-box; outline: none; font-size: 14px;
         }
         .btn-valider {
-            width: 100%; background: var(--yellow-grad); border: none; padding: 16px;
-            border-radius: 12px; font-weight: 700; cursor: pointer; color: black;
+            width: 100%; background: var(--yellow); border: none; padding: 16px;
+            border-radius: 12px; font-weight: 700; cursor: pointer; color: black; font-size: 15px;
         }
-        .btn-valider:disabled { opacity: 0.6; }
 
-        /* DASHBOARD ELEMENTS */
+        /* --- HEADER --- */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
-        .logo { font-weight: 800; font-size: 20px; }
+        .logo { font-weight: 800; font-size: 22px; letter-spacing: -1px; }
         .logo span { color: #3ea1f0; }
-        .profile-area { display: flex; align-items: center; gap: 10px; }
-        .profile-img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--yellow); }
+        .profile-area { display: flex; align-items: center; gap: 15px; position: relative; }
+        .profile-img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--yellow); cursor: pointer; }
 
-        .solde-card { text-align: center; padding: 30px 0; }
-        .solde-card h1 { font-size: 36px; margin: 10px 0; font-weight: 700; }
+        /* --- SOLDE --- */
+        .solde-section { text-align: center; padding: 30px 0; }
+        .solde-label { color: var(--text-gray); font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .solde-amount { font-size: 40px; font-weight: 700; margin: 0; }
 
-        .services { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .s-box { background: var(--card-bg); padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 12px; border: 1px solid var(--border); }
-        .s-icon { color: var(--yellow); font-size: 18px; }
+        /* --- ACTION GRID --- */
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .btn-main { border: none; padding: 15px; border-radius: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+        .btn-env { background: var(--yellow); color: black; }
+        .btn-rec { background: var(--green); color: white; }
 
-        .form-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border); }
-        
-        /* SPINNER */
-        .spinner { display: none; width: 20px; height: 20px; border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid black; border-radius: 50%; animation: spin 0.8s linear infinite; margin: auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loading .btn-text { display: none; }
-        .loading .spinner { display: block; }
+        /* --- SERVICES --- */
+        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .service-item { background: var(--glass); border: 1px solid var(--border); padding: 18px; border-radius: 18px; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px); }
+        .service-icon { font-size: 20px; color: var(--yellow); }
+
+        /* --- HISTORIQUE --- */
+        .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .history-table td { padding: 15px 0; border-bottom: 1px solid var(--border); }
+        .miditra { color: var(--green); font-weight: 700; }
+        .mivoaka { color: var(--red); font-weight: 700; }
+        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .status-confirme { color: var(--green); background: rgba(46, 189, 133, 0.1); }
+        .status-attente { color: var(--yellow); background: rgba(252, 213, 53, 0.1); }
+        .status-annule { color: var(--red); background: rgba(255, 77, 77, 0.1); }
+
+        /* --- MODAL & TIMER --- */
+        .modal { display: none; position: fixed; z-index: 6000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); }
+        .modal-content { background: var(--card-bg); margin: 15% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 340px; text-align: center; border: 1px solid var(--border); }
+        .timer-box { background: rgba(252, 213, 53, 0.1); color: var(--yellow); padding: 15px; border-radius: 12px; margin: 15px 0; font-weight: 700; font-size: 24px; border: 1px dashed var(--yellow); }
+        .modal-step { display: none; }
+        .active-step { display: block; }
+
+        /* PLUS MENU */
+        #plus-menu { display: none; position: absolute; top: 40px; right: 0; background: #1e2329; border: 1px solid var(--border); border-radius: 12px; width: 140px; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .menu-item { padding: 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid var(--border); }
 
         /* TOAST */
-        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1b1f28; padding: 12px 25px; border-radius: 30px; border: 1px solid var(--yellow); transition: 0.5s; opacity: 0; z-index: 3000; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1b1f28; padding: 12px 20px; border-radius: 30px; border: 1px solid var(--yellow); transition: 0.4s; opacity: 0; z-index: 9000; font-size: 13px; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        .fab { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-size: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); text-decoration: none; z-index: 1000; }
+        .loading .spinner { display: block; }
+        .spinner { display: none; width: 18px; height: 18px; border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid black; border-radius: 50%; animation: spin 0.8s linear infinite; margin: auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div id="auth-container">
     <div class="auth-card">
-        <h2 style="color:var(--yellow);">TakaloCash</h2>
+        <h2 style="color:var(--yellow); font-size: 28px; margin-bottom: 5px;">TakaloCash</h2>
         <div class="auth-tabs">
             <div id="tab-login" class="auth-tab active" onclick="switchAuth('login')">Connexion</div>
             <div id="tab-signup" class="auth-tab" onclick="switchAuth('signup')">Inscription</div>
         </div>
-        <input type="email" id="auth-email" class="input-styled" placeholder="Email">
+        <input type="email" id="auth-email" class="input-styled" placeholder="Adresse Email">
         <input type="password" id="auth-password" class="input-styled" placeholder="Mot de passe">
-        <button class="btn-valider" id="btn-auth" onclick="handleAuth()">
-            <span id="auth-text">Se connecter</span>
-        </button>
+        <button class="btn-valider" id="btn-auth" onclick="handleAuth()">Se connecter</button>
     </div>
 </div>
 
-<div class="container" id="main-container">
+<div class="container" id="main-app">
     <div class="header">
         <div class="logo"><span>TC</span> TakaloCash</div>
         <div class="profile-area">
+            <i class="fa-solid fa-plus-square" id="plus-btn" style="color:var(--yellow); font-size: 22px; cursor:pointer;"></i>
+            <div id="plus-menu">
+                <div class="menu-item" onclick="openAction('Dépôt')"><i class="fa-solid fa-arrow-down" style="color:var(--green)"></i> Dépôt</div>
+                <div class="menu-item" onclick="openAction('Retrait')"><i class="fa-solid fa-arrow-up" style="color:var(--red)"></i> Retrait</div>
+            </div>
             <i class="fa-solid fa-bell"></i>
-            <img src="https://i.pravatar.cc/100" class="profile-img" onclick="logout()" title="Déconnexion">
+            <img src="https://i.pravatar.cc/100?u=myuser" class="profile-img" onclick="logout()">
         </div>
     </div>
 
-    <div class="solde-card">
-        <p style="color:var(--text-gray)">Solde disponible</p>
-        <h1 id="solde-display">0 Ar</h1>
+    <div class="solde-section">
+        <div class="solde-label">Solde disponible <i class="fa-solid fa-arrow-trend-up" style="color:var(--green)"></i></div>
+        <h1 class="solde-amount" id="display-solde">0 Ar</h1>
     </div>
 
-    <div class="services">
-        <div class="s-box"><i class="fa-brands fa-bitcoin s-icon"></i><div><h4 style="margin:0">Crypto</h4><p style="margin:0;font-size:10px;color:var(--text-gray)">TRX, USDT</p></div></div>
-        <div class="s-box"><i class="fa-solid fa-gamepad s-icon" style="color:#3ea1f0"></i><div><h4 style="margin:0">1xBet</h4><p style="margin:0;font-size:10px;color:var(--text-gray)">Dépôt/Retrait</p></div></div>
+    <div class="action-grid">
+        <button class="btn-main btn-env" onclick="document.getElementById('env-form').scrollIntoView({behavior:'smooth'})"><i class="fa-solid fa-arrow-right"></i> Envoyer</button>
+        <button class="btn-main btn-rec" onclick="openRecevoir()"><i class="fa-solid fa-arrow-down"></i> Recevoir</button>
     </div>
 
-    <div class="form-card">
-        <h3 style="margin-top:0; color:var(--yellow)">Envoyer Crypto</h3>
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <select id="crypto-select" class="input-styled" style="flex:1; margin-bottom:0;" onchange="updateCalcul()">
-                <option value="TRX">🪙 TRX</option>
-                <option value="USDT">💵 USDT</option>
-                <option value="BTC">₿ BTC</option>
+    <div class="services-grid">
+        <div class="service-item"><i class="fa-brands fa-bitcoin service-icon"></i><div><b style="font-size:13px;">Crypto</b><p style="margin:0; font-size:9px; color:gray">TRX, USDT</p></div></div>
+        <div class="service-item"><i class="fa-solid fa-wallet service-icon" style="color:var(--green)"></i><div><b style="font-size:13px;">E-Wallet</b><p style="margin:0; font-size:9px; color:gray">Skrill, Neteller</p></div></div>
+        <div class="service-item"><i class="fa-solid fa-gamepad service-icon" style="color:#3ea1f0"></i><div><b style="font-size:13px;">1xBet</b><p style="margin:0; font-size:9px; color:gray">Dépôt/Retrait</p></div></div>
+        <div class="service-item"><i class="fa-solid fa-satellite-dish service-icon" style="color:white"></i><div><b style="font-size:13px;">Starlink</b><p style="margin:0; font-size:9px; color:gray">Abonnement</p></div></div>
+    </div>
+
+    <div id="env-form" style="background:var(--card-bg); padding:20px; border-radius:20px; border:1px solid var(--border); margin-bottom:30px;">
+        <h3 style="margin-top:0; color:var(--yellow); font-size:16px;">Envoyer Crypto</h3>
+        <div style="display:flex; gap:10px;">
+            <select id="env-crypto" class="input-styled" style="flex:1;" onchange="updateCalc()">
+                <option value="TRX">TRX</option>
+                <option value="USDT">USDT</option>
             </select>
-            <input type="number" id="ariary" class="input-styled" style="flex:1.5; margin-bottom:0;" placeholder="Montant Ar" oninput="updateCalcul()">
+            <input type="number" id="env-ariary" class="input-styled" style="flex:1.5;" placeholder="Montant Ar" oninput="updateCalc()">
         </div>
-        <input type="text" id="adresse" class="input-styled" placeholder="Adresse destinataire">
-        
-        <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:20px;">
+        <input type="text" id="env-adr" class="input-styled" placeholder="Adresse destinataire">
+        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:15px;">
             <span style="color:var(--text-gray)">Equivalent crypto:</span>
-            <span style="font-weight:bold; color:var(--yellow)"><span id="crypto-val">0.00</span> <span id="crypto-label">TRX</span></span>
+            <span style="font-weight:700;"><span id="calc-val">0.00</span> <span id="calc-lab">TRX</span></span>
         </div>
+        <button class="btn-valider" id="btn-send" onclick="envoyer()">Valider Envoi</button>
+    </div>
 
-        <button class="btn-valider" id="btn-envoyer" onclick="envoyer()">
-            <span class="btn-text">Valider Envoi</span>
-            <div class="spinner"></div>
-        </button>
+    <div class="history-section">
+        <p style="color:var(--text-gray); font-size:14px; margin-bottom:15px;">Historique des transactions</p>
+        <table class="history-table">
+            <tbody id="history-body"></tbody>
+        </table>
     </div>
 </div>
 
-<a href="https://wa.me/261340000000" class="fab"><i class="fa-solid fa-comment-dots"></i></a>
+<div id="modal-recevoir" class="modal">
+    <div class="modal-content">
+        <div id="step1" class="active-step">
+            <h3 style="color:var(--yellow);">Déclarer un dépôt</h3>
+            <input type="number" id="rec-amount" class="input-styled" placeholder="Montant en Ar">
+            <input type="text" id="rec-ref" class="input-styled" placeholder="Référence (ex: Orange Money)">
+            <button class="btn-valider" onclick="validerRecevoir()">Continuer</button>
+            <p onclick="closeRecevoir()" style="cursor:pointer; color:gray; font-size:12px; margin-top:15px;">Annuler</p>
+        </div>
+        <div id="step2" class="modal-step">
+            <h3 style="color:var(--yellow);">Attente de transfert</h3>
+            <div class="timer-box" id="timer-display">05:00</div>
+            <p style="font-size:12px; color:var(--text-gray);">Envoyez à cette adresse :</p>
+            <div style="background:#000; padding:10px; border-radius:8px; font-size:11px; word-break:break-all; border:1px dashed var(--yellow); margin:10px 0;">T9yZ1p9R7xS5uB4sE...V8aN2oP</div>
+            <button class="btn-valider" style="background:var(--green); color:white;" onclick="confirmSent()">J'ai envoyé le transfert</button>
+        </div>
+    </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
-// --- CONFIG SUPABASE ---
 const supabaseClient = supabase.createClient(
     "https://nyeopreahmajoisartoz.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA"
 );
 
-let currentMode = 'login';
 let currentUserId = null;
-const TAUX = { "TRX": 150, "USDT": 4600, "BTC": 300000000 };
+let currentMode = 'login';
+let countdownInterval;
+let currentTransId = null;
+const TAUX = { "TRX": 150, "USDT": 4600 };
 
-// --- NOTIFICATION ---
-function notify(msg) {
-    const t = document.getElementById("toast");
-    t.innerText = msg;
-    t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 3000);
-}
+function notify(m) { const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 
-// --- AUTH LOGIC ---
-function switchAuth(mode) {
-    currentMode = mode;
-    document.getElementById('tab-login').classList.toggle('active', mode === 'login');
-    document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
-    document.getElementById('auth-text').innerText = (mode === 'login') ? 'Se connecter' : "S'inscrire";
+// --- AUTH ---
+function switchAuth(m) {
+    currentMode = m;
+    document.getElementById('tab-login').classList.toggle('active', m==='login');
+    document.getElementById('tab-signup').classList.toggle('active', m==='signup');
+    document.getElementById('btn-auth').innerText = (m==='login') ? 'Se connecter' : "S'inscrire";
 }
 
 async function handleAuth() {
     const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
-    if(!email || !password) return notify("Fenoy ny banga! ⚠️");
+    const pass = document.getElementById('auth-password').value;
+    if(!email || !pass) return notify("Fenoy ny banga! ⚠️");
 
-    if (currentMode === 'signup') {
-        const { data, error } = await supabaseClient.auth.signUp({ email, password });
-        if (error) return notify(error.message);
-        // Automatique: mampiditra solde 0 Ar ao amin'ny tabilao 'users'
-        await supabaseClient.from('users').insert([{ id: data.user.id, solde: 0 }]);
-        notify("Kaonty voatomboka! ✅");
-    } else {
-        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) return notify("Email na teny miafina diso! ❌");
-    }
-    checkUser();
+    try {
+        if(currentMode === 'signup') {
+            const { data, error } = await supabaseClient.auth.signUp({ email, password:pass });
+            if(error) throw error;
+            await supabaseClient.from('users').insert([{ id: data.user.id, solde: 0 }]);
+            notify("Compte créé! ✅");
+        } else {
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password:pass });
+            if(error) throw error;
+        }
+        checkUser();
+    } catch(e) { notify(e.message); }
 }
 
 async function checkUser() {
     const { data: { user } } = await supabaseClient.auth.getUser();
-    if (user) {
+    if(user) {
         currentUserId = user.id;
         document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('main-container').style.display = 'block';
-        fetchUserData();
-    } else {
-        document.getElementById('auth-container').style.display = 'flex';
-        document.getElementById('main-container').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        fetchData();
     }
 }
 
-async function logout() {
-    await supabaseClient.auth.signOut();
-    location.reload();
+// --- DATA ---
+async function fetchData() {
+    const { data:u } = await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
+    if(u) document.getElementById('display-solde').innerText = u.solde.toLocaleString() + " Ar";
+    fetchHistory();
 }
 
-// --- DASHBOARD LOGIC ---
-async function fetchUserData() {
-    const { data } = await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
-    if (data) document.getElementById('solde-display').innerText = data.solde.toLocaleString() + " Ar";
+async function fetchHistory() {
+    const { data:ts } = await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at',{ascending:false});
+    const body = document.getElementById('history-body');
+    body.innerHTML = "";
+    if(ts) {
+        ts.forEach(t => {
+            const isPos = t.service.toLowerCase().includes("recevoir") || t.service.toLowerCase().includes("dépôt");
+            const color = isPos ? "miditra" : "mivoaka";
+            const sign = isPos ? "+" : "-";
+            let sCls = "status-attente", sIc = "fa-clock";
+            if(t.status==="Confirmé") { sCls="status-confirme"; sIc="fa-check-circle"; }
+            if(t.status==="Annulé") { sCls="status-annule"; sIc="fa-times-circle"; }
+
+            body.innerHTML += `<tr>
+                <td><b style="display:block">${t.service}</b><small style="color:gray">${new Date(t.created_at).toLocaleDateString()}</small></td>
+                <td style="text-align:right"><span class="${color}">${sign} ${parseFloat(t.montant).toLocaleString()} Ar</span></td>
+                <td style="text-align:right"><span class="status-badge ${sCls}">${t.status} <i class="fa-solid ${sIc}"></i></span></td>
+            </tr>`;
+        });
+    }
 }
 
-function updateCalcul() {
-    const crypto = document.getElementById("crypto-select").value;
-    const ar = parseFloat(document.getElementById("ariary").value) || 0;
-    const result = ar / TAUX[crypto];
-    document.getElementById("crypto-val").innerText = (crypto === "BTC" ? result.toFixed(8) : result.toFixed(2));
-    document.getElementById("crypto-label").innerText = crypto;
+// --- OPERATIONS ---
+function updateCalc() {
+    const c = document.getElementById('env-crypto').value;
+    const ar = parseFloat(document.getElementById('env-ariary').value) || 0;
+    document.getElementById('calc-val').innerText = (ar/TAUX[c]).toFixed(2);
+    document.getElementById('calc-lab').innerText = c;
 }
 
 async function envoyer() {
-    const ar = document.getElementById("ariary").value;
-    const adr = document.getElementById("adresse").value;
-    const crypto = document.getElementById("crypto-select").value;
+    const ar = parseFloat(document.getElementById('env-ariary').value);
+    const adr = document.getElementById('env-adr').value;
     if(!ar || !adr) return notify("Fenoy ny banga! ⚠️");
 
-    const btn = document.getElementById("btn-envoyer");
-    btn.classList.add("loading");
+    if(!confirm(`Confirmez-vous l'envoi de ${ar.toLocaleString()} Ar ?`)) return;
 
-    const { error } = await supabaseClient.from('transactions').insert([{
-        user_id: currentUserId, montant: ar, adresse: adr, service: "Crypto ("+crypto+")", status: "En attente"
-    }]);
+    const { data:u } = await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
+    if(u.solde < ar) return notify("Solde insuffisant! ❌");
 
-    setTimeout(() => {
-        btn.classList.remove("loading");
-        if(!error) notify("Fangatahana voaray! ✅");
-        else notify("Nisy olana kely... ❌");
-    }, 1500);
+    await supabaseClient.from('transactions').insert([{ user_id:currentUserId, montant:ar, service:"Envoyer Crypto", status:"En attente", adresse:adr }]);
+    await supabaseClient.from('users').update({ solde: u.solde - ar }).eq('id', currentUserId);
+    
+    notify("Transfert réussi! ✅");
+    fetchData();
 }
 
-// INIT
+// --- RECEVOIR & TIMER ---
+function openRecevoir() { document.getElementById('modal-recevoir').style.display='block'; }
+function closeRecevoir() { clearInterval(countdownInterval); document.getElementById('modal-recevoir').style.display='none'; }
+
+async function validerRecevoir() {
+    const mt = document.getElementById('rec-amount').value;
+    const rf = document.getElementById('rec-ref').value;
+    if(!mt || !rf) return notify("Fenoy ny banga! ⚠️");
+
+    const { data, error } = await supabaseClient.from('transactions').insert([{ user_id:currentUserId, montant:mt, service:"Dépôt ("+rf+")", status:"En attente" }]).select().single();
+    if(error) return;
+    currentTransId = data.id;
+
+    document.getElementById('step1').className = 'modal-step';
+    document.getElementById('step2').className = 'active-step';
+    startTimer(300);
+}
+
+function startTimer(sec) {
+    let t = sec;
+    countdownInterval = setInterval(async () => {
+        let m = Math.floor(t/60), s = t%60;
+        document.getElementById('timer-display').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        if(t <= 0) {
+            clearInterval(countdownInterval);
+            await supabaseClient.from('transactions').update({status:'Annulé'}).eq('id', currentTransId).eq('status','En attente');
+            notify("Temps écoulé! ❌");
+            closeRecevoir();
+            fetchHistory();
+        }
+        t--;
+    }, 1000);
+}
+
+function confirmSent() { notify("Vérification en cours... ✅"); closeRecevoir(); fetchHistory(); }
+
+// --- UI MISC ---
+document.getElementById('plus-btn').onclick = (e) => { 
+    const m = document.getElementById('plus-menu'); 
+    m.style.display = m.style.display==='block'?'none':'block'; 
+    e.stopPropagation(); 
+};
+window.onclick = () => { document.getElementById('plus-menu').style.display='none'; };
+
+function openAction(type) {
+    const m = prompt(`Montant du ${type} (Ar):`);
+    if(m && !isNaN(m)) {
+        supabaseClient.from('transactions').insert([{ user_id:currentUserId, montant:m, service:type, status:"En attente" }]).then(()=>fetchHistory());
+    }
+}
+
+async function logout() { await supabaseClient.auth.signOut(); location.reload(); }
+
 checkUser();
 </script>
 </body>
