@@ -89,57 +89,91 @@
 
 <div id="auth-container">
     <div class="auth-card">
-        <h2 id="auth-title" style="color:var(--yellow); margin-bottom:20px;">Connexion</h2>
-        
-        <input type="email" id="auth-email" placeholder="Email" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #333; background:#12151c; color:white; box-sizing:border-box;">
-        
-        <input type="password" id="auth-password" placeholder="Mot de passe" style="width:100%; padding:12px; margin-bottom:20px; border-radius:8px; border:1px solid #333; background:#12151c; color:white; box-sizing:border-box;">
-        
-        <button id="auth-submit-btn" class="valider-btn" onclick="handleAuth()">Se connecter</button>
-        
-        <p id="auth-switch-text" style="font-size:12px; color:gray; margin-top:20px; cursor:pointer;" onclick="toggleAuthMode()">
-            Pas de compte ? <span style="color:var(--yellow)">S'inscrire</span>
+        <h1 style="color:var(--yellow); font-size: 28px; margin-bottom: 5px; font-weight: 800; letter-spacing: -1px;">
+            TakaloCash
+        </h1>
+        <p id="auth-subtitle" style="color: var(--text-gray); font-size: 13px; margin-bottom: 25px;">
+            Miditra amin'ny kaontinao
         </p>
+        
+        <div style="text-align: left; width: 100%;">
+            <label style="font-size: 12px; color: var(--text-gray); margin-left: 5px;">Email address</label>
+            <input type="email" id="auth-email" placeholder="ohatra@gmail.com" 
+                   style="width:100%; padding:14px; margin: 5px 0 15px; border-radius:12px; border:1px solid var(--border); background:#12151c; color:white; box-sizing:border-box; outline: none;">
+            
+            <label style="font-size: 12px; color: var(--text-gray); margin-left: 5px;">Password</label>
+            <input type="password" id="auth-password" placeholder="••••••••" 
+                   style="width:100%; padding:14px; margin: 5px 0 20px; border-radius:12px; border:1px solid var(--border); background:#12151c; color:white; box-sizing:border-box; outline: none;">
+        </div>
+        
+        <button id="auth-submit-btn" class="valider-btn" onclick="handleAuth()" 
+                style="box-shadow: 0 4px 15px rgba(252, 213, 53, 0.2);">
+            Se connecter
+        </button>
+        
+        <div style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px;">
+            <p id="auth-switch-text" style="font-size:13px; color:var(--text-gray); cursor:pointer;" onclick="toggleAuthMode()">
+                Mbola tsy manana kaonty? <span style="color:var(--yellow); font-weight: 600;">S'inscrire</span>
+            </p>
+        </div>
     </div>
 </div>
 
 <script>
-// --- IZAY AO ANATIN'NY SCRIPT REHEFA AVY EO ---
 let isLoginMode = true;
 
 function toggleAuthMode() {
     isLoginMode = !isLoginMode;
-    document.getElementById('auth-title').innerText = isLoginMode ? "Connexion" : "Inscription";
-    document.getElementById('auth-submit-btn').innerText = isLoginMode ? "Se connecter" : "S'inscrire";
-    document.getElementById('auth-switch-text').innerHTML = isLoginMode ? 
-        'Pas de compte ? <span style="color:var(--yellow)">S'inscrire</span>' : 
-        'Déjà un compte ? <span style="color:var(--yellow)">Se connecter</span>';
+    const title = document.getElementById('auth-title'); // Tsy misy id ity teo fa ovaina ny subtitle
+    const subtitle = document.getElementById('auth-subtitle');
+    const btn = document.getElementById('auth-submit-btn');
+    const switchText = document.getElementById('auth-switch-text');
+
+    if (!isLoginMode) {
+        subtitle.innerText = "Mamorona kaonty vaovao";
+        btn.innerText = "S'inscrire";
+        switchText.innerHTML = 'Efa manana kaonty? <span style="color:var(--yellow); font-weight:600;">Se connecter</span>';
+    } else {
+        subtitle.innerText = "Miditra amin'ny kaontinao";
+        btn.innerText = "Se connecter";
+        switchText.innerHTML = 'Mbola tsy manana kaonty? <span style="color:var(--yellow); font-weight:600;">S'inscrire</span>';
+    }
 }
 
 async function handleAuth() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
 
+    if (!email || !password) {
+        alert("Fenoy ny banga azafady!");
+        return;
+    }
+
     if (isLoginMode) {
-        // LOGIN
+        // --- LOGIN ---
         const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) alert("Email na teny miafina diso!");
-        else checkUser();
+        if (error) {
+            alert("Email na password diso!");
+        } else {
+            checkUser(); // Miditra dashboard
+        }
     } else {
-        // SIGN UP
+        // --- SIGN UP ---
         const { data, error } = await supabaseClient.auth.signUp({ email, password });
         if (error) {
-            alert("Fahadisoana tamin'ny inscription: " + error.message);
+            alert("Hadisoana: " + error.message);
         } else if (data.user) {
-            // AUTOMATIQUE: Mamorona row ao amin'ny tabilao 'users'
+            // Mampiditra automatique ao amin'ny tabilao 'users'
             const { error: dbError } = await supabaseClient
                 .from('users')
                 .insert([{ id: data.user.id, solde: 0 }]);
             
-            if (dbError) console.error("Tsy tafiditra ao amin'ny tabilao users:", dbError);
+            if (dbError) {
+                console.error("Database error:", dbError);
+            }
             
-            alert("Kaonty voatomboka! Afaka miditra ianao izao.");
-            toggleAuthMode(); // Averina amin'ny Login
+            alert("Tafa! Afaka miditra ianao izao (Connectez-vous).");
+            toggleAuthMode(); // Averina amin'ny Login mode
         }
     }
 }
