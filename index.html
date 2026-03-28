@@ -69,6 +69,8 @@
         .card-title { font-size: 15px; color: var(--yellow); margin-bottom: 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
         .input-group { background: #12151c; border-radius: 10px; padding: 12px; display: flex; align-items: center; margin-bottom: 12px; border: 1px solid var(--border); }
         .input-group input, .input-group select { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
+        
+        .valider-btn { width: 100%; background: var(--yellow); border: none; padding: 15px; border-radius: 10px; font-weight: 700; cursor: pointer; color: black; }
 
         /* --- HISTORY --- */
         .history-section h3 { font-size: 15px; color: var(--text-gray); font-weight: 400; margin-bottom: 12px; }
@@ -89,12 +91,8 @@
 
 <div id="auth-container">
     <div class="auth-card">
-        <h1 style="color:var(--yellow); font-size: 28px; margin-bottom: 5px; font-weight: 800; letter-spacing: -1px;">
-            TakaloCash
-        </h1>
-        <p id="auth-subtitle" style="color: var(--text-gray); font-size: 13px; margin-bottom: 25px;">
-            Miditra amin'ny kaontinao
-        </p>
+        <h1 style="color:var(--yellow); font-size: 28px; margin-bottom: 5px; font-weight: 800; letter-spacing: -1px;">TakaloCash</h1>
+        <p id="auth-subtitle" style="color: var(--text-gray); font-size: 13px; margin-bottom: 25px;">Miditra amin'ny kaontinao</p>
         
         <div style="text-align: left; width: 100%;">
             <label style="font-size: 12px; color: var(--text-gray); margin-left: 5px;">Email address</label>
@@ -106,10 +104,7 @@
                    style="width:100%; padding:14px; margin: 5px 0 20px; border-radius:12px; border:1px solid var(--border); background:#12151c; color:white; box-sizing:border-box; outline: none;">
         </div>
         
-        <button id="auth-submit-btn" class="valider-btn" onclick="handleAuth()" 
-                style="box-shadow: 0 4px 15px rgba(252, 213, 53, 0.2);">
-            Se connecter
-        </button>
+        <button id="auth-submit-btn" class="valider-btn" onclick="handleAuth()">Se connecter</button>
         
         <div style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px;">
             <p id="auth-switch-text" style="font-size:13px; color:var(--text-gray); cursor:pointer;" onclick="toggleAuthMode()">
@@ -118,66 +113,6 @@
         </div>
     </div>
 </div>
-
-<script>
-let isLoginMode = true;
-
-function toggleAuthMode() {
-    isLoginMode = !isLoginMode;
-    const title = document.getElementById('auth-title'); // Tsy misy id ity teo fa ovaina ny subtitle
-    const subtitle = document.getElementById('auth-subtitle');
-    const btn = document.getElementById('auth-submit-btn');
-    const switchText = document.getElementById('auth-switch-text');
-
-    if (!isLoginMode) {
-        subtitle.innerText = "Mamorona kaonty vaovao";
-        btn.innerText = "S'inscrire";
-        switchText.innerHTML = 'Efa manana kaonty? <span style="color:var(--yellow); font-weight:600;">Se connecter</span>';
-    } else {
-        subtitle.innerText = "Miditra amin'ny kaontinao";
-        btn.innerText = "Se connecter";
-        switchText.innerHTML = 'Mbola tsy manana kaonty? <span style="color:var(--yellow); font-weight:600;">S'inscrire</span>';
-    }
-}
-
-async function handleAuth() {
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
-
-    if (!email || !password) {
-        alert("Fenoy ny banga azafady!");
-        return;
-    }
-
-    if (isLoginMode) {
-        // --- LOGIN ---
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) {
-            alert("Email na password diso!");
-        } else {
-            checkUser(); // Miditra dashboard
-        }
-    } else {
-        // --- SIGN UP ---
-        const { data, error } = await supabaseClient.auth.signUp({ email, password });
-        if (error) {
-            alert("Hadisoana: " + error.message);
-        } else if (data.user) {
-            // Mampiditra automatique ao amin'ny tabilao 'users'
-            const { error: dbError } = await supabaseClient
-                .from('users')
-                .insert([{ id: data.user.id, solde: 0 }]);
-            
-            if (dbError) {
-                console.error("Database error:", dbError);
-            }
-            
-            alert("Tafa! Afaka miditra ianao izao (Connectez-vous).");
-            toggleAuthMode(); // Averina amin'ny Login mode
-        }
-    }
-}
-</script>
 
 <div class="container" id="main-app">
     <div class="header">
@@ -218,7 +153,7 @@ async function handleAuth() {
             <span>Equivalent crypto</span>
             <span style="color:white; font-weight:600;"><span id="cryp-res">0.00</span> <span id="cryp-lab">TRX</span></span>
         </div>
-        <button style="width:100%; background:var(--yellow); border:none; padding:15px; border-radius:10px; font-weight:700; cursor:pointer;">Valider Envoi</button>
+        <button class="valider-btn">Valider Envoi</button>
     </div>
 
     <div class="history-section">
@@ -252,23 +187,56 @@ const supabaseClient = supabase.createClient(
 
 const TAUX = { "TRX": 150, "USDT": 4650 };
 let currentUID = null;
+let isLoginMode = true;
 
-function calc() {
-    const crypto = document.getElementById("cryp-sel").value;
-    const ar = parseFloat(document.getElementById("ar-val").value) || 0;
-    const res = ar / TAUX[crypto];
-    document.getElementById("cryp-res").innerText = res.toFixed(2);
-    document.getElementById("cryp-lab").innerText = crypto;
+// TOGGLE LOGIN / SIGNUP
+function toggleAuthMode() {
+    isLoginMode = !isLoginMode;
+    const subtitle = document.getElementById('auth-subtitle');
+    const btn = document.getElementById('auth-submit-btn');
+    const switchText = document.getElementById('auth-switch-text');
+
+    if (!isLoginMode) {
+        subtitle.innerText = "Mamorona kaonty vaovao";
+        btn.innerText = "S'inscrire";
+        switchText.innerHTML = 'Efa manana kaonty? <span style="color:var(--yellow); font-weight:600;">Se connecter</span>';
+    } else {
+        subtitle.innerText = "Miditra amin'ny kaontinao";
+        btn.innerText = "Se connecter";
+        switchText.innerHTML = 'Mbola tsy manana kaonty? <span style="color:var(--yellow); font-weight:600;">S'inscrire</span>';
+    }
 }
 
+// HANDLE AUTH
 async function handleAuth() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
-    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-    if(error) alert("Email na mot de passe diso!");
-    else checkUser();
+
+    if (!email || !password) {
+        alert("Fenoy ny banga azafady!");
+        return;
+    }
+
+    if (isLoginMode) {
+        // LOGIN
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) alert("Email na password diso!");
+        else checkUser();
+    } else {
+        // SIGN UP
+        const { data, error } = await supabaseClient.auth.signUp({ email, password });
+        if (error) {
+            alert("Hadisoana: " + error.message);
+        } else if (data.user) {
+            // Mampiditra automatique ao amin'ny tabilao 'users'
+            await supabaseClient.from('users').insert([{ id: data.user.id, solde: 0 }]);
+            alert("Tafa! Afaka miditra ianao izao (Se connecter).");
+            toggleAuthMode();
+        }
+    }
 }
 
+// CHECK SESSION
 async function checkUser() {
     const { data: { user } } = await supabaseClient.auth.getUser();
     if(user) {
@@ -279,14 +247,29 @@ async function checkUser() {
     }
 }
 
+// LOAD DATA
 async function loadData() {
     const { data: u } = await supabaseClient.from('users').select('solde').eq('id', currentUID).single();
     if(u) document.getElementById('display-solde').innerText = u.solde.toLocaleString() + " Ar";
 }
 
-async function logout() { await supabaseClient.auth.signOut(); location.reload(); }
+// CALC EQUIVALENT
+function calc() {
+    const crypto = document.getElementById("cryp-sel").value;
+    const ar = parseFloat(document.getElementById("ar-val").value) || 0;
+    const res = ar / TAUX[crypto];
+    document.getElementById("cryp-res").innerText = res.toFixed(2);
+    document.getElementById("cryp-lab").innerText = crypto;
+}
 
+async function logout() { 
+    await supabaseClient.auth.signOut(); 
+    location.reload(); 
+}
+
+// INITIAL CHECK
 checkUser();
 </script>
+
 </body>
 </html>
