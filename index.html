@@ -9,216 +9,196 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { 
-            --bg: #0b0e11; --card: #1e2329; --yellow: #fcd535; --green: #2ebd85; 
-            --red: #f6465d; --text: #eaecef; --gray: #848e9c; --border: #2b3139;
+            --bg: #0d1117; --card: #161b22; --yellow: #fcd535; --green: #2ebd85; 
+            --red: #f6465d; --text: #eaecef; --gray: #848e9c; --border: #30363d;
         }
         body { 
             margin: 0; background: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text); 
             display: flex; flex-direction: column; min-height: 100vh;
         }
-        .container { max-width: 480px; margin: 0 auto; padding: 20px; width: 100%; box-sizing: border-box; display: block; }
+        .container { max-width: 480px; margin: 0 auto; padding: 15px; width: 100%; box-sizing: border-box; }
 
         /* HEADER */
         header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
-        .brand { font-size: 26px; font-weight: 800; color: var(--yellow); letter-spacing: -1px; }
-        .nav-icons { display: flex; align-items: center; gap: 15px; }
-        .menu-btn { font-size: 22px; cursor: pointer; color: var(--gray); }
-        .profile-pic { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--yellow); cursor: pointer; }
+        .logo { font-size: 22px; font-weight: 800; color: white; display: flex; align-items: center; gap: 5px; }
+        .logo span { color: var(--yellow); }
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .profile-img { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid var(--yellow); }
 
-        /* SIDEBAR */
-        .sidebar { position: fixed; top: 0; right: -100%; width: 80%; height: 100%; background: var(--card); z-index: 9999; transition: 0.4s; padding: 30px; }
+        /* BALANCE CARD */
+        .balance-section { text-align: center; padding: 30px 0; background: radial-gradient(circle at top, #1c2128, var(--bg)); }
+        .bal-label { color: var(--gray); font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .bal-value { font-size: 38px; font-weight: 800; margin: 10px 0; }
+
+        /* MAIN ACTIONS */
+        .main-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .btn-main { border: none; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; }
+        .btn-send { background: var(--yellow); color: #000; }
+        .btn-receive { background: var(--green); color: #fff; }
+
+        /* SERVICES GRID */
+        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
+        .service-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .service-card i { font-size: 20px; color: var(--yellow); width: 30px; }
+        .service-info b { display: block; font-size: 14px; }
+        .service-info small { color: var(--gray); font-size: 10px; }
+
+        /* HISTORIQUE ACCUEIL (3 LAST) */
+        .section-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; }
+        .history-mini { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+        .mini-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid var(--border); }
+        .mini-item:last-child { border-bottom: none; }
+
+        /* SIDEBAR / MENU */
+        .sidebar { position: fixed; top: 0; right: -100%; width: 85%; height: 100%; background: #0d1117; z-index: 10000; transition: 0.3s; padding: 25px; box-shadow: -5px 0 20px rgba(0,0,0,0.5); }
         .sidebar.active { right: 0; }
-        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 9998; }
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 9999; }
+        
+        /* FOOTER MENU */
+        .footer-links { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; font-size: 12px; color: var(--gray); text-align: center; }
 
-        /* BALANCE */
-        .balance-card { text-align: center; padding: 30px 0; }
-        .balance-label { color: var(--gray); font-size: 14px; margin-bottom: 8px; }
-        .balance-value { font-size: 36px; font-weight: 800; color: white; }
-
-        /* ACTIONS */
-        .actions-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .btn-act { border: none; padding: 16px; border-radius: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-y { background: var(--yellow); color: #000; }
-        .btn-g { background: var(--green); color: #fff; }
-
-        /* TABS */
-        .history-tabs { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px; scrollbar-width: none; }
-        .tab-item { background: transparent; border: none; color: var(--gray); padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 20px; white-space: nowrap; }
-        .tab-item.active { background: var(--border); color: var(--yellow); }
-
-        /* LIST */
-        .trans-item { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .t-info b { display: block; font-size: 14px; }
-        .t-info small { color: var(--gray); font-size: 11px; }
-        .t-amount { text-align: right; }
-        .status-pill { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
-
-        footer { margin-top: auto; padding: 20px; text-align: center; color: var(--gray); font-size: 11px; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-body { background: var(--card); width: 100%; max-width: 350px; padding: 25px; border-radius: 20px; }
-        .input-box { width: 100%; background: #12151c; border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: #fff; margin: 10px 0; box-sizing: border-box; }
+        /* MODALS */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 11000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: var(--card); width: 100%; max-width: 400px; padding: 25px; border-radius: 15px; border: 1px solid var(--border); }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 12px; color: var(--gray); margin-bottom: 5px; }
+        .input-field { width: 100%; background: #0d1117; border: 1px solid var(--border); padding: 12px; border-radius: 8px; color: white; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
 <div class="sidebar" id="sidebar">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <h3>Menu</h3>
-        <i class="fa-solid fa-xmark" onclick="toggleSidebar()"></i>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+        <h2 style="margin:0;">Menu</h2>
+        <i class="fa-solid fa-xmark" onclick="toggleSidebar()" style="font-size:24px;"></i>
     </div>
-    <div style="display:flex; flex-direction:column; gap:20px;">
-        <div onclick="showFullHistory()" style="cursor:pointer;"><i class="fa-solid fa-clock"></i> Historique Complet</div>
-        <div onclick="logout()" style="cursor:pointer; color:var(--red);"><i class="fa-solid fa-power-off"></i> Déconnexion</div>
+    <div style="display:flex; flex-direction:column; gap:25px;">
+        <div onclick="openAction('Dépôt')" style="cursor:pointer;"><i class="fa-solid fa-plus-circle" style="color:var(--green)"></i> &nbsp; Faire un Dépôt</div>
+        <div onclick="openAction('Retrait')" style="cursor:pointer;"><i class="fa-solid fa-minus-circle" style="color:var(--red)"></i> &nbsp; Faire un Retrait</div>
+        <hr style="border:0; border-top:1px solid var(--border); width:100%;">
+        <div onclick="showFullHistory()" style="cursor:pointer;"><i class="fa-solid fa-list-ul"></i> &nbsp; Historique Complet (5 Filtres)</div>
+        <div onclick="logout()" style="color:var(--red); cursor:pointer;"><i class="fa-solid fa-right-from-bracket"></i> &nbsp; Déconnexion</div>
     </div>
 </div>
 
-<div class="container" id="app">
+<div class="container">
     <header>
-        <div class="brand">TakaloCash</div>
-        <div class="nav-icons">
-            <i class="fa-solid fa-bars menu-btn" onclick="toggleSidebar()"></i>
-            <img src="https://i.pravatar.cc/100?u=1" class="profile-pic">
+        <div class="logo">TC <span>TakaloCash</span></div>
+        <div class="nav-right">
+            <i class="fa-regular fa-bell"></i>
+            <i class="fa-solid fa-bars" onclick="toggleSidebar()" style="cursor:pointer;"></i>
+            <img src="https://i.pravatar.cc/100?u=julio" class="profile-img">
         </div>
     </header>
 
-    <div class="balance-card">
-        <div class="balance-label">Solde disponible</div>
-        <div class="balance-value" id="user-solde">0 Ar</div>
+    <section class="balance-section">
+        <div class="bal-label">Solde disponible <i class="fa-solid fa-arrow-trend-up" style="color:var(--green)"></i></div>
+        <div class="bal-value" id="user-solde">0 Ar</div>
+    </section>
+
+    <div class="main-buttons">
+        <button class="btn-main btn-send" onclick="openAction('Envoyer')"><i class="fa-solid fa-arrow-right"></i> Envoyer</button>
+        <button class="btn-main btn-receive" onclick="openAction('Recevoir')"><i class="fa-solid fa-arrow-left"></i> Recevoir</button>
     </div>
 
-    <div class="actions-row">
-        <button class="btn-act btn-y" onclick="openModal('modal-envoyer')">Envoyer</button>
-        <button class="btn-act btn-g" onclick="openModal('modal-recevoir')">Recevoir</button>
+    <div class="services-grid">
+        <div class="service-card" onclick="openAction('Crypto')">
+            <i class="fa-solid fa-bitcoin-sign"></i>
+            <div class="service-info"><b>Crypto</b><small>Envoyer & recevoir</small></div>
+        </div>
+        <div class="service-card" onclick="openAction('Wallet')">
+            <i class="fa-solid fa-wallet"></i>
+            <div class="service-info"><b>Porte-feuille</b><small>Skrill, Neteller...</small></div>
+        </div>
+        <div class="service-card" onclick="openAction('1xBet')">
+            <i class="fa-solid fa-trophy"></i>
+            <div class="service-info"><b>1xBet</b><small>Déposer & retirer</small></div>
+        </div>
+        <div class="service-card" onclick="openAction('Starlink')">
+            <i class="fa-solid fa-satellite"></i>
+            <div class="service-info"><b>Starlink</b><small>Paiement abonnement</small></div>
+        </div>
     </div>
 
-    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-        <h3 style="font-size:15px; margin:0;">Activités</h3>
-        <span onclick="showFullHistory()" style="font-size:12px; color:var(--yellow); cursor:pointer;">Voir tout</span>
+    <div class="section-title">Historique des transferts</div>
+    <div class="history-mini" id="mini-history">
+        </div>
+
+    <div class="footer-links">
+        <div>Conditions d'utilisation</div>
+        <div>Chat & Aide</div>
     </div>
-
-    <div class="history-tabs">
-        <button class="tab-item active" onclick="filterHistory('all', this)">Tous</button>
-        <button class="tab-item" onclick="filterHistory('envoyer', this)">Envoyer</button>
-        <button class="tab-item" onclick="filterHistory('recevoir', this)">Recevoir</button>
-        <button class="tab-item" onclick="filterHistory('dépôt', this)">Dépôt</button>
-        <button class="tab-item" onclick="filterHistory('retrait', this)">Retrait</button>
-    </div>
-
-    <div id="history-list"></div>
-
-    <footer>&copy; 2026 TakaloCash Madagascar</footer>
 </div>
 
-<div id="modal-envoyer" class="modal">
-    <div class="modal-body">
-        <h3>Vendre Crypto</h3>
-        <input type="number" id="env-amount" class="input-box" placeholder="Montant Ar">
-        <button class="btn-act btn-y" style="width:100%" onclick="closeModal('modal-envoyer')">Valider</button>
-    </div>
-</div>
-
-<div id="modal-recevoir" class="modal">
-    <div class="modal-body">
-        <h3>Acheter Crypto</h3>
-        <input type="number" id="rec-qty" class="input-box" placeholder="Quantité">
-        <button class="btn-act btn-g" style="width:100%" onclick="closeModal('modal-recevoir')">Continuer</button>
+<div id="modal-action" class="modal">
+    <div class="modal-content">
+        <h3 id="modal-title" style="margin-top:0;">Action</h3>
+        <div class="input-group">
+            <label>Montant (Ar)</label>
+            <input type="number" id="act-amount" class="input-field" placeholder="Ex: 50000">
+        </div>
+        <div id="extra-fields"></div>
+        <button class="btn-main btn-send" style="width:100%;" onclick="processAction()">Valider l'opération</button>
+        <button class="btn-main" style="width:100%; background:transparent; color:var(--gray);" onclick="closeModal()">Annuler</button>
     </div>
 </div>
 
 <script>
-// === AMPIDIRO ETO NY CREDENTIALS-NAO ===
-const supabaseUrl = "https://nyeopreahmajoisartoz.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA";
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
 
 let currentUserId = null;
-let allTransactions = [];
-let showAll = false;
+let currentAction = "";
 
 function toggleSidebar(){ 
-    const s = document.getElementById('sidebar');
-    const o = document.getElementById('overlay');
-    s.classList.toggle('active');
-    o.style.display = s.classList.contains('active') ? 'block' : 'none';
+    document.getElementById('sidebar').classList.toggle('active');
+    document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
 }
-function openModal(id){ document.getElementById(id).style.display='flex'; }
-function closeModal(id){ document.getElementById(id).style.display='none'; }
+
+function openAction(type){
+    currentAction = type;
+    document.getElementById('modal-title').innerText = type;
+    document.getElementById('modal-action').style.display = 'flex';
+}
+
+function closeModal(){ document.getElementById('modal-action').style.display = 'none'; }
 
 async function checkUser(){
     const {data:{user}} = await supabaseClient.auth.getUser();
-    if(user){ 
-        currentUserId = user.id; 
-        refreshData(); 
-    } else {
-        // Raha tsy misy user dia avereno any amin'ny login pejy
-        console.log("Tsy misy olona logué");
-    }
+    if(user){ currentUserId = user.id; refreshData(); }
 }
 
 async function refreshData(){
-    // 1. Alaina ny solde
     const {data:u} = await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
     if(u) document.getElementById('user-solde').innerText = u.solde.toLocaleString() + " Ar";
 
-    // 2. Alaina ny transactions
-    const {data:ts} = await supabaseClient.from('transactions')
-        .select('*')
-        .eq('user_id', currentUserId)
-        .order('created_at', {ascending:false});
-    
-    allTransactions = ts || [];
-    renderHistory('all');
-}
-
-function renderHistory(filter = 'all'){
-    const list = document.getElementById('history-list');
+    const {data:ts} = await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at', {ascending:false}).limit(3);
+    const list = document.getElementById('mini-history');
     list.innerHTML = "";
-    
-    let filtered = allTransactions;
-    if(filter !== 'all') {
-        filtered = allTransactions.filter(t => t.service.toLowerCase().includes(filter.toLowerCase()));
-    }
 
-    const toDisplay = showAll ? filtered : filtered.slice(0, 3);
-
-    toDisplay.forEach(t => {
-        const s = t.service.toLowerCase();
-        const isPos = s.includes('recevoir') || s.includes('dépôt');
-        const color = t.status === 'Confirmé' ? 'var(--green)' : (t.status === 'Annulé' ? 'var(--red)' : 'var(--yellow)');
-        
+    if(ts) ts.forEach(t => {
+        const isPos = t.service.toLowerCase().includes('recevoir') || t.service.toLowerCase().includes('dépôt');
         list.innerHTML += `
-            <div class="trans-item">
-                <div class="t-info">
-                    <b>${t.service}</b>
-                    <small>${new Date(t.created_at).toLocaleString('fr-MG')}</small>
+            <div class="mini-item">
+                <div>
+                    <b style="font-size:14px;">${t.service}</b><br>
+                    <small style="color:var(--gray); font-size:11px;">${new Date(t.created_at).toLocaleDateString('fr-FR')}</small>
                 </div>
-                <div class="t-amount">
-                    <span style="color:${isPos ? 'var(--green)' : 'var(--red)'}; font-weight:700;">
-                        ${isPos?'+':'-'} ${t.montant.toLocaleString()} Ar
-                    </span><br>
-                    <span class="status-pill" style="background:${color}22; color:${color}">${t.status}</span>
+                <div style="text-align:right">
+                    <b style="color:${isPos ? 'var(--green)' : 'var(--red)'}">${isPos?'+':'-'} ${t.montant.toLocaleString()} Ar</b><br>
+                    <small style="color:var(--yellow); font-size:10px; font-weight:700;">${t.status.toUpperCase()}</small>
                 </div>
             </div>`;
     });
 }
 
-function filterHistory(type, btn){
-    showAll = false;
-    document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderHistory(type);
-}
-
 function showFullHistory(){
-    showAll = true;
-    renderHistory('all');
-    if(document.getElementById('sidebar').classList.contains('active')) toggleSidebar();
+    // Ity dia hanokatra pejy vaovao na modal lehibe misy an'ilay fizarana 5 (tous, envoyer...)
+    alert("Haseho eto ny historique feno miaraka amin'ny filtre 5 (Tous, Envoyer, Recevoir, Dépôt, Retrait)");
+    toggleSidebar();
 }
 
-function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
-
-// Atomboka ny fisavana user
 checkUser();
 </script>
 </body>
