@@ -3,237 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TakaloCash | Madagascar</title>
+    <title>TakaloCash Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { 
-            --bg: #0d1117; --card: #161b22; --yellow: #fcd535; --green: #2ebd85; 
-            --red: #f6465d; --text: #eaecef; --gray: #848e9c; --border: #30363d;
-        }
-        body { 
-            margin: 0; background: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text); 
-            display: flex; flex-direction: column; min-height: 100vh;
-        }
-        .container { max-width: 480px; margin: 0 auto; padding: 15px; width: 100%; box-sizing: border-box; }
+        :root { --bg: #0d1117; --card: #161b22; --yellow: #fcd535; --green: #2ebd85; --red: #ff4d4d; --gray: #848e9c; --border: rgba(255,255,255,0.1); }
+        body { margin: 0; background: var(--bg); font-family: 'Inter', sans-serif; color: white; padding-bottom: 30px; }
+        .container { max-width: 420px; margin: auto; padding: 15px; display: none; }
+        
+        /* AUTH */
+        #auth-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .auth-card { background: var(--card); width: 100%; max-width: 350px; padding: 30px; border-radius: 20px; border: 1px solid var(--border); text-align: center; }
+        .auth-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
+        .auth-tab { flex: 1; padding: 10px; cursor: pointer; color: var(--gray); border-bottom: 2px solid transparent; }
+        .auth-tab.active { color: var(--yellow); border-bottom: 2px solid var(--yellow); font-weight: 700; }
 
-        /* HEADER */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
-        .logo { font-size: 22px; font-weight: 800; color: white; display: flex; align-items: center; gap: 8px; }
-        .logo span { color: var(--yellow); }
-        .nav-right { display: flex; align-items: center; gap: 15px; font-size: 18px; color: var(--gray); }
-        .profile-img { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid var(--yellow); cursor: pointer; }
+        /* UI */
+        .input-styled { background: #12151c; border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: white; width: 100%; margin-bottom: 15px; box-sizing: border-box; outline: none; }
+        .btn-valider { width: 100%; background: var(--yellow); border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; color: black; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
+        .solde-section { text-align: center; padding: 20px 0; }
+        .solde-amount { font-size: 38px; font-weight: 700; margin: 0; }
+        
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .btn-main { border: none; padding: 15px; border-radius: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+        .btn-env { background: var(--yellow); color: black; }
+        .btn-rec { background: var(--green); color: white; }
 
-        /* BALANCE SECTION */
-        .balance-section { text-align: center; padding: 25px 0; }
-        .bal-label { color: var(--gray); font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .bal-value { font-size: 40px; font-weight: 800; margin: 10px 0; letter-spacing: -1px; }
+        /* HISTORY */
+        .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .history-table td { padding: 15px 0; border-bottom: 1px solid var(--border); }
+        .miditra { color: var(--green); font-weight: bold; }
+        .mivoaka { color: var(--red); font-weight: bold; }
+        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; }
+        .status-confirme { color: var(--green); background: rgba(46, 189, 133, 0.1); }
+        .status-attente { color: var(--yellow); background: rgba(252, 213, 53, 0.1); }
+        .status-annule { color: var(--red); background: rgba(255, 77, 77, 0.1); }
 
-        /* MAIN BUTTONS */
-        .main-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .btn-main { border: none; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; transition: 0.2s; }
-        .btn-send { background: var(--yellow); color: #000; }
-        .btn-receive { background: var(--green); color: #fff; }
-
-        /* SERVICES GRID */
-        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
-        .service-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .service-card i { font-size: 20px; color: var(--yellow); width: 25px; text-align: center; }
-        .service-info b { display: block; font-size: 14px; margin-bottom: 2px; }
-        .service-info small { color: var(--gray); font-size: 10px; }
-
-        /* HISTORIQUE ACCUEIL */
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .history-mini { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
-        .mini-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid var(--border); }
-        .mini-item:last-child { border-bottom: none; }
-
-        /* SIDEBAR */
-        .sidebar { position: fixed; top: 0; right: -100%; width: 85%; height: 100%; background: #0d1117; z-index: 10000; transition: 0.3s; padding: 25px; box-shadow: -5px 0 20px rgba(0,0,0,0.5); box-sizing: border-box; }
-        .sidebar.active { right: 0; }
-        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 9999; }
-
-        /* MODAL (ENVOYER - TAHAKA ILAY SARY) */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 11000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: var(--card); width: 100%; max-width: 400px; padding: 25px; border-radius: 20px; border: 1px solid var(--border); box-sizing: border-box; }
-        .input-group { margin-bottom: 18px; }
-        .input-group label { display: block; font-size: 12px; color: var(--gray); margin-bottom: 8px; }
-        .input-field { width: 100%; background: #0d1117; border: 1px solid var(--border); padding: 12px; border-radius: 10px; color: white; box-sizing: border-box; outline: none; font-family: inherit; }
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
-        footer { text-align: center; padding: 20px; font-size: 11px; color: var(--gray); border-top: 1px solid var(--border); margin-top: 20px; }
+        /* MODAL */
+        .modal { display: none; position: fixed; z-index: 6000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
+        .modal-content { background: var(--card); margin: 20% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 340px; text-align: center; border: 1px solid var(--border); }
+        .timer-box { background: rgba(252, 213, 53, 0.1); color: var(--yellow); padding: 15px; border-radius: 12px; margin: 15px 0; font-weight: 700; font-size: 24px; }
+        .addr-box { background: #000; padding: 10px; border-radius: 8px; font-size: 11px; word-break: break-all; border: 1px dashed var(--yellow); margin: 10px 0; color: var(--yellow); }
+        
+        #plus-menu { display: none; position: absolute; top: 40px; right: 0; background: #1e2329; border-radius: 12px; width: 150px; z-index: 100; border: 1px solid var(--border); }
+        .menu-item { padding: 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid var(--border); text-align: left; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1b1f28; padding: 12px 20px; border-radius: 30px; border: 1px solid var(--yellow); transition: 0.4s; opacity: 0; z-index: 9000; font-size: 13px; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
 
-<div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
-
-<div class="sidebar" id="sidebar">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:35px;">
-        <h2 style="margin:0;">Menu</h2>
-        <i class="fa-solid fa-xmark" onclick="toggleSidebar()" style="font-size:24px; cursor:pointer;"></i>
-    </div>
-    <div style="display:flex; flex-direction:column; gap:25px;">
-        <div onclick="openAction('Dépôt')" style="cursor:pointer;"><i class="fa-solid fa-plus-circle" style="color:var(--green)"></i> &nbsp; Faire un Dépôt</div>
-        <div onclick="openAction('Retrait')" style="cursor:pointer;"><i class="fa-solid fa-minus-circle" style="color:var(--red)"></i> &nbsp; Faire un Retrait</div>
-        <hr style="border:0; border-top:1px solid var(--border);">
-        <div onclick="alert('Haseho eto ny tantara feno miaraka amin\'ny filtre 5')" style="cursor:pointer;"><i class="fa-solid fa-clock-rotate-left"></i> &nbsp; Historique Complet</div>
-        <div onclick="location.reload()" style="color:var(--red); cursor:pointer;"><i class="fa-solid fa-right-from-bracket"></i> &nbsp; Déconnexion</div>
+<div id="auth-container">
+    <div class="auth-card">
+        <h2 style="color:var(--yellow);">TakaloCash</h2>
+        <div class="auth-tabs">
+            <div id="tab-login" class="auth-tab active" onclick="switchAuth('login')">Connexion</div>
+            <div id="tab-signup" class="auth-tab" onclick="switchAuth('signup')">Inscription</div>
+        </div>
+        <input type="email" id="auth-email" class="input-styled" placeholder="Email">
+        <input type="password" id="auth-password" class="input-styled" placeholder="Mot de passe">
+        <button class="btn-valider" id="btn-auth" onclick="handleAuth()">Se connecter</button>
     </div>
 </div>
 
-<div class="container">
-    <header>
-        <div class="logo"><img src="https://cdn-icons-png.flaticon.com/512/6001/6001527.png" width="25"> <span>TakaloCash</span></div>
-        <div class="nav-right">
-            <i class="fa-regular fa-bell"></i>
-            <i class="fa-solid fa-bars" onclick="toggleSidebar()" style="cursor:pointer;"></i>
-            <img src="https://i.pravatar.cc/100?u=julio" class="profile-img">
+<div class="container" id="main-app">
+    <div class="header">
+        <div style="font-weight:800; font-size:22px;">TakaloCash</div>
+        <div style="position:relative; display:flex; align-items:center;">
+            <i class="fa-solid fa-plus-square" id="plus-btn" style="color:var(--yellow); font-size: 24px; cursor:pointer;"></i>
+            <div id="plus-menu">
+                <div class="menu-item" onclick="openMobile('Dépôt')">💰 Dépôt MM</div>
+                <div class="menu-item" onclick="openMobile('Retrait')">💸 Retrait MM</div>
+            </div>
+            <img src="https://i.pravatar.cc/100?u=1" onclick="logout()" style="width:35px; border-radius:50%; margin-left:15px; border:2px solid var(--yellow);">
         </div>
-    </header>
-
-    <section class="balance-section">
-        <div class="bal-label">Solde disponible <i class="fa-solid fa-arrow-trend-up" style="color:var(--green)"></i></div>
-        <div class="bal-value" id="user-solde">0 Ar</div>
-    </section>
-
-    <div class="main-buttons">
-        <button class="btn-main btn-send" onclick="openEnvoyer()"><i class="fa-solid fa-arrow-right"></i> Envoyer</button>
-        <button class="btn-main btn-receive" onclick="alert('Recevoir mbola an-dalana...')"><i class="fa-solid fa-arrow-left"></i> Recevoir</button>
     </div>
 
-    <div class="services-grid">
-        <div class="service-card"><i class="fa-solid fa-bitcoin-sign"></i><div class="service-info"><b>Crypto</b><small>Envoyer & recevoir</small></div></div>
-        <div class="service-card"><i class="fa-solid fa-wallet"></i><div class="service-info"><b>Porte-feuille</b><small>Skrill, Neteller...</small></div></div>
-        <div class="service-card"><i class="fa-solid fa-trophy"></i><div class="service-info"><b>1xBet</b><small>Déposer & retirer</small></div></div>
-        <div class="service-card"><i class="fa-solid fa-satellite"></i><div class="service-info"><b>Starlink</b><small>Abonnement</small></div></div>
+    <div class="solde-section">
+        <div style="color:var(--gray); font-size:14px;">Solde disponible</div>
+        <h1 class="solde-amount" id="display-solde">0 Ar</h1>
     </div>
 
-    <div class="section-header">
-        <h3 style="margin:0; font-size:16px;">Historique des transferts</h3>
+    <div class="action-grid">
+        <button class="btn-main btn-env" onclick="document.getElementById('env-form').scrollIntoView({behavior:'smooth'})"><i class="fa-solid fa-paper-plane"></i> Envoyer</button>
+        <button class="btn-main btn-rec" onclick="openRecevoir()"><i class="fa-solid fa-qrcode"></i> Recevoir</button>
     </div>
 
-    <div class="history-mini" id="mini-history">
-        </div>
+    <div id="env-form" style="background:var(--card); padding:20px; border-radius:20px; border:1px solid var(--border); margin-bottom:30px;">
+        <h3 style="margin:0 0 15px 0; color:var(--yellow); font-size:15px;">Vendre Crypto</h3>
+        <select id="env-crypto" class="input-styled" onchange="updateEnvCalc()">
+            <option value="TRX">TRX</option>
+            <option value="USDT">USDT</option>
+        </select>
+        <input type="number" id="env-ariary" class="input-styled" placeholder="Montant Ar" oninput="updateEnvCalc()">
+        <input type="text" id="env-adr" class="input-styled" placeholder="Adresse crypto">
+        <p id="env-calc-res" style="font-size:12px; color:var(--yellow); margin:0 0 15px 0;">0.00 TRX</p>
+        <button class="btn-valider" onclick="envoyer()">Confirmer</button>
+    </div>
 
-    <footer>
-        <div style="margin-bottom:10px;">TakaloCash Madagascar &copy; 2026</div>
-        <div style="display:flex; justify-content:center; gap:15px;">
-            <span>Conditions</span><span>Aide</span><span>Contact</span>
-        </div>
-    </footer>
+    <div class="history-section">
+        <p style="color:var(--gray); font-size:14px; margin-bottom:15px;">Historique</p>
+        <table class="history-table"><tbody id="history-body"></tbody></table>
+    </div>
 </div>
 
-<div id="modal-envoyer" class="modal">
+<div id="modal-recevoir" class="modal">
     <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            <h3 style="margin:0; color:var(--yellow);">Envoyer Crypto</h3>
-            <i class="fa-solid fa-xmark" onclick="closeModal()" style="cursor:pointer;"></i>
-        </div>
-
-        <div class="input-group">
-            <label>Choisir crypto :</label>
-            <select id="crypto-type" onchange="updateCalcul()" class="input-field" style="font-weight:700;">
-                <option value="TRX">TRX</option>
+        <div id="rec-step1">
+            <h3>Recevoir Crypto</h3>
+            <select id="rec-type" class="input-styled" onchange="updateRecCalc()">
                 <option value="USDT">USDT</option>
+                <option value="TRX">TRX</option>
+                <option value="1XBET">1xBet</option>
             </select>
+            <input type="number" id="rec-qty" class="input-styled" placeholder="Quantité" oninput="updateRecCalc()">
+            <input type="text" id="rec-ar" class="input-styled" style="background:#000" readonly placeholder="Ariary">
+            <button class="btn-valider" onclick="goToRecStep2()">Continuer</button>
+            <p onclick="closeModal('modal-recevoir')" style="cursor:pointer; color:gray; font-size:12px; margin-top:15px;">Annuler</p>
         </div>
-
-        <div class="input-row">
-            <div class="input-group">
-                <label>Montant (Ar)</label>
-                <input type="number" id="input-mga" oninput="updateCalcul()" class="input-field" placeholder="0 Ar">
-            </div>
-            <div class="input-group">
-                <label>Equivalent crypto</label>
-                <div id="display-crypto" style="background:#0d1117; padding:12px; border-radius:10px; border:1px solid var(--border); font-weight:700; text-align:right;">0.00 TRX</div>
-            </div>
+        <div id="rec-step2" style="display:none;">
+            <div class="timer-box" id="timer-display">05:00</div>
+            <div id="target-addr" class="addr-box">---</div>
+            <button class="btn-valider" style="background:var(--green); color:white" onclick="confirmSent()">J'ai envoyé</button>
         </div>
-
-        <div class="input-group">
-            <label>Adresse crypto destinataire</label>
-            <input type="text" id="crypto-adr" class="input-field" placeholder="Ampidiro ny adresse...">
-        </div>
-
-        <div style="margin-bottom:20px; font-size:12px; color:var(--green);">
-            Solde disponible: <b id="modal-bal">0 Ar</b>
-        </div>
-
-        <button class="btn-main btn-send" style="width:100%;" onclick="confirmSend()">Valider l'envoi</button>
     </div>
 </div>
+
+<div id="modal-mobile" class="modal">
+    <div class="modal-content">
+        <h3 id="mob-title">Mobile Money</h3>
+        <select id="mob-op" class="input-styled"><option value="Mvola">Mvola</option><option value="Orange Money">Orange Money</option><option value="Airtel Money">Airtel Money</option></select>
+        <input type="number" id="mob-amount" class="input-styled" placeholder="Montant Ar">
+        <input type="tel" id="mob-phone" class="input-styled" placeholder="Numéro">
+        <button class="btn-valider" onclick="executeMobile()">Valider</button>
+        <p onclick="closeModal('modal-mobile')" style="cursor:pointer; color:gray; font-size:12px; margin-top:15px;">Fermer</p>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
 
 <script>
-// === SUPABASE CONFIG ===
-const supabaseUrl = "https://nyeopreahmajoisartoz.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA";
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
 
-const COURS = { "TRX": 600, "USDT": 4600 };
-let currentUserId = "3887c675-9984-4860-9bc7-6302e3b8a1c3"; // ID-nao test
+let currentUserId = null, countdown, currentTransId, currentMode='login', curMob='';
+const TAUX = { "TRX": 150, "USDT": 4600, "1XBET": 1 };
+const ADDRS = { "USDT": "ADR_USDT_TRC20_VOAVELO", "TRX": "ADR_TRX_VOAVELO", "1XBET": "ID_AGENT_12345" };
 
-function toggleSidebar(){ 
-    document.getElementById('sidebar').classList.toggle('active');
-    document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+function notify(m){ const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+
+// AUTH
+function switchAuth(m){ currentMode=m; document.getElementById('tab-login').classList.toggle('active', m==='login'); document.getElementById('tab-signup').classList.toggle('active', m==='signup'); document.getElementById('btn-auth').innerText=m==='login'?'Se connecter':"S'inscrire"; }
+async function handleAuth(){
+    const e=document.getElementById('auth-email').value, p=document.getElementById('auth-password').value;
+    try {
+        if(currentMode==='signup'){
+            const {data, error}=await supabaseClient.auth.signUp({email:e, password:p});
+            if(error) throw error;
+            await supabaseClient.from('users').insert([{id:data.user.id, solde:0}]);
+        } else {
+            const {error}=await supabaseClient.auth.signInWithPassword({email:e, password:p});
+            if(error) throw error;
+        }
+        checkUser();
+    } catch(err){ notify(err.message); }
+}
+async function checkUser(){
+    const {data:{user}}=await supabaseClient.auth.getUser();
+    if(user){ currentUserId=user.id; document.getElementById('auth-container').style.display='none'; document.getElementById('main-app').style.display='block'; fetchData(); }
 }
 
-function openEnvoyer(){ 
-    document.getElementById('modal-bal').innerText = document.getElementById('user-solde').innerText;
-    document.getElementById('modal-envoyer').style.display = 'flex'; 
+async function fetchData(){
+    const {data:u}=await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
+    if(u) document.getElementById('display-solde').innerText = u.solde.toLocaleString()+" Ar";
+    fetchHistory();
 }
 
-function closeModal(){ document.getElementById('modal-envoyer').style.display = 'none'; }
-
-function updateCalcul(){
-    const mga = document.getElementById('input-mga').value;
-    const type = document.getElementById('crypto-type').value;
-    const res = mga > 0 ? (mga / COURS[type]).toFixed(2) : "0.00";
-    document.getElementById('display-crypto').innerText = res + " " + type;
-}
-
-async function refreshData(){
-    // 1. Solde
-    const {data:u} = await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
-    if(u) document.getElementById('user-solde').innerText = u.solde.toLocaleString() + " Ar";
-
-    // 2. 3 Last Transactions
-    const {data:ts} = await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at', {ascending:false}).limit(3);
-    const list = document.getElementById('mini-history');
-    list.innerHTML = "";
-
-    if(ts) ts.forEach(t => {
-        const isPos = t.service.toLowerCase().includes('recevoir') || t.service.toLowerCase().includes('dépôt');
-        const color = t.status === 'Confirmé' ? 'var(--green)' : (t.status === 'Annulé' ? 'var(--red)' : 'var(--yellow)');
-        list.innerHTML += `
-            <div class="mini-item">
-                <div>
-                    <b>${t.service}</b><br>
-                    <small style="color:var(--gray)">${new Date(t.created_at).toLocaleDateString('fr-MG')}</small>
-                </div>
-                <div style="text-align:right">
-                    <b style="color:${isPos ? 'var(--green)' : 'var(--red)'}">${isPos?'+':'-'} ${t.montant.toLocaleString()} Ar</b><br>
-                    <span style="font-size:9px; font-weight:800; color:${color}">${t.status.toUpperCase()}</span>
-                </div>
-            </div>`;
+// HISTORY
+async function fetchHistory(){
+    const {data:ts}=await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at',{ascending:false});
+    const b=document.getElementById('history-body'); b.innerHTML="";
+    if(ts) ts.forEach(t=>{
+        const s = t.service.toLowerCase();
+        const isPos = s.includes("recevoir") || s.includes("dépôt") || s.includes("depot");
+        let cls = t.status === 'Confirmé' ? 'status-confirme' : (t.status === 'Annulé' ? 'status-annule' : 'status-attente');
+        b.innerHTML += `<tr><td><b>${t.service}</b><br><small style="color:gray">${new Date(t.created_at).toLocaleDateString()}</small></td>
+        <td style="text-align:right"><span class="${isPos?'miditra':'mivoaka'}">${isPos?'+':'-'} ${parseFloat(t.montant).toLocaleString()} Ar</span></td>
+        <td style="text-align:right"><span class="status-badge ${cls}">${t.status}</span></td></tr>`;
     });
 }
 
-async function confirmSend(){
-    const amt = document.getElementById('input-mga').value;
-    const adr = document.getElementById('crypto-adr').value;
-    const type = document.getElementById('crypto-type').value;
+function updateEnvCalc(){ const c=document.getElementById('env-crypto').value, ar=document.getElementById('env-ariary').value||0; document.getElementById('env-calc-res').innerText=(ar/TAUX[c]).toFixed(2)+" "+c; }
+function updateRecCalc(){ const t=document.getElementById('rec-type').value, q=document.getElementById('rec-qty').value||0; document.getElementById('rec-ar').value=(q*TAUX[t]).toLocaleString()+" Ar"; }
 
-    if(!amt || !adr) return alert("Fenoy ny banga!");
-
-    const {error} = await supabaseClient.from('transactions').insert([
-        { user_id: currentUserId, montant: amt, service: 'Envoyer ' + type, status: 'En attente' }
-    ]);
-
-    if(!error) { alert("Enregistré! Miandry fanamafisana."); closeModal(); refreshData(); }
+// ACTIONS
+async function envoyer(){
+    const ar=parseFloat(document.getElementById('env-ariary').value), adr=document.getElementById('env-adr').value, crypto=document.getElementById('env-crypto').value;
+    if(!ar || !adr) return notify("Fenoy ny banga! ⚠️");
+    const {data:u}=await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
+    if(u.solde < ar) return notify("Solde insuffisant! ❌");
+    
+    // N.B: Tokony efa misy column 'adresse' any amin'ny DB vao mandeha ity
+    const {error} = await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:ar, service:"Envoyer "+crypto, status:"En attente", adresse:adr}]);
+    if(error) return notify("Erreur réseau! Hamarino ny column 'adresse' any amin'ny Supabase.");
+    
+    await supabaseClient.from('users').update({solde: u.solde - ar}).eq('id',currentUserId);
+    notify("Envoyé! Miandry fanamarinana. ✅"); fetchData();
 }
 
-refreshData();
+function openRecevoir(){ document.getElementById('modal-recevoir').style.display='block'; document.getElementById('rec-step1').style.display='block'; document.getElementById('rec-step2').style.display='none'; }
+async function goToRecStep2(){
+    const q=document.getElementById('rec-qty').value, t=document.getElementById('rec-type').value;
+    if(!q) return notify("Ampidiro ny quantité!");
+    document.getElementById('target-addr').innerText=ADDRS[t];
+    document.getElementById('rec-step1').style.display='none'; document.getElementById('rec-step2').style.display='block';
+    const {data}=await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant: q*TAUX[t], service: "Recevoir "+t, status: "En attente"}]).select().single();
+    currentTransId=data.id; startTimer(300); fetchHistory();
+}
+
+function startTimer(s){
+    clearInterval(countdown);
+    countdown = setInterval(async ()=>{
+        let m=Math.floor(s/60), sec=s%60;
+        document.getElementById('timer-display').innerText=`${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
+        if(s<=0){ clearInterval(countdown); await supabaseClient.from('transactions').update({status:'Annulé'}).eq('id',currentTransId).eq('status','En attente'); closeModal('modal-recevoir'); fetchHistory(); }
+        s--;
+    },1000);
+}
+
+function openMobile(t){ curMob=t; document.getElementById('mob-title').innerText=t; document.getElementById('modal-mobile').style.display='block'; }
+async function executeMobile(){
+    const am=parseFloat(document.getElementById('mob-amount').value), ph=document.getElementById('mob-phone').value, op=document.getElementById('mob-op').value;
+    if(!am || !ph) return notify("Banga!");
+    if(curMob==='Retrait'){
+        const {data:u}=await supabaseClient.from('users').select('solde').eq('id',currentUserId).single();
+        if(u.solde < am) return notify("Tsy ampy solde!");
+        await supabaseClient.from('users').update({solde: u.solde - am}).eq('id',currentUserId);
+    }
+    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:am, service:curMob+" "+op, status:"En attente", adresse:ph}]);
+    notify("Vita! Miandry fanamarinana. ✅"); closeModal('modal-mobile'); fetchData();
+}
+
+function confirmSent(){ notify("Fahombiazana!"); closeModal('modal-recevoir'); fetchHistory(); }
+function closeModal(id){ clearInterval(countdown); document.getElementById(id).style.display='none'; }
+function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
+document.getElementById('plus-btn').onclick=(e)=>{ const m=document.getElementById('plus-menu'); m.style.display=m.style.display==='block'?'none':'block'; e.stopPropagation(); };
+window.onclick=()=>{ document.getElementById('plus-menu').style.display='none'; };
+checkUser();
 </script>
 </body>
 </html>
