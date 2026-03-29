@@ -22,17 +22,12 @@
         .btn-valider { width: 100%; background: var(--yellow); border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; color: black; }
         
         /* HEADER & SIDEBAR */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; min-height: 40px; }
         .sidebar { position: fixed; top: 0; right: -100%; width: 80%; height: 100%; background: #1c2128; z-index: 7000; transition: 0.3s; padding: 25px; box-sizing: border-box; }
         .sidebar.active { right: 0; }
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 6500; }
         
-        /* TABS HISTORY */
-        .history-tabs { display: flex; gap: 8px; overflow-x: auto; margin: 15px 0; scrollbar-width: none; }
-        .tab-btn { background: var(--card); border: 1px solid var(--border); color: var(--gray); padding: 8px 15px; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer; }
-        .tab-btn.active { background: var(--yellow); color: black; font-weight: 700; border-color: var(--yellow); }
-
-        /* DASHBOARD */
+        /* DASHBOARD ELEMENTS */
         .solde-section { text-align: center; padding: 20px 0; }
         .solde-amount { font-size: 38px; font-weight: 700; margin: 0; }
         .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
@@ -40,11 +35,18 @@
         .btn-env { background: var(--yellow); color: black; }
         .btn-rec { background: var(--green); color: white; }
 
-        /* LISTS */
+        /* HISTORY TABS & GROUPS */
+        .history-tabs { display: flex; gap: 8px; overflow-x: auto; margin: 15px 0; scrollbar-width: none; padding-bottom: 5px; }
+        .tab-btn { background: var(--card); border: 1px solid var(--border); color: var(--gray); padding: 8px 15px; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer; }
+        .tab-btn.active { background: var(--yellow); color: black; font-weight: 700; border-color: var(--yellow); }
+        
+        .month-group { background: rgba(255, 255, 255, 0.05); padding: 8px 15px; margin: 15px -15px 5px -15px; font-size: 11px; font-weight: 700; color: var(--yellow); text-transform: uppercase; border-left: 3px solid var(--yellow); }
+
+        /* TABLES */
         .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .history-table td { padding: 15px 0; border-bottom: 1px solid var(--border); }
-        .miditra { color: var(--green); font-weight: bold; }
-        .mivoaka { color: var(--red); font-weight: bold; }
+        .history-table td { padding: 15px 0; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .miditra { color: var(--green); font-weight: 700; }
+        .mivoaka { color: var(--red); font-weight: 700; }
         .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; min-width: 85px; text-align: center; display: inline-block; }
         .status-confirme { color: var(--green); background: rgba(46, 189, 133, 0.1); }
         .status-attente { color: var(--yellow); background: rgba(252, 213, 53, 0.1); }
@@ -84,7 +86,7 @@
 </div>
 
 <div class="container" id="main-app">
-    <div class="header">
+    <div id="app-header" class="header">
         <div style="font-weight:800; font-size:22px;">TakaloCash</div>
         <div style="display:flex; align-items:center; gap:15px;">
             <i class="fa-solid fa-bars" onclick="toggleSidebar()" style="color:var(--yellow); font-size: 24px; cursor:pointer;"></i>
@@ -92,32 +94,34 @@
         </div>
     </div>
 
-    <div class="solde-section">
-        <div style="color:var(--gray); font-size:14px;">Solde disponible</div>
-        <h1 class="solde-amount" id="display-solde">0 Ar</h1>
-    </div>
+    <div id="accueil-content">
+        <div class="solde-section">
+            <div style="color:var(--gray); font-size:14px;">Solde disponible</div>
+            <h1 class="solde-amount" id="display-solde">0 Ar</h1>
+        </div>
 
-    <div class="action-grid">
-        <button class="btn-main btn-env" onclick="document.getElementById('env-form').scrollIntoView({behavior:'smooth'})"><i class="fa-solid fa-paper-plane"></i> Envoyer</button>
-        <button class="btn-main btn-rec" onclick="openRecevoir()"><i class="fa-solid fa-qrcode"></i> Recevoir</button>
-    </div>
+        <div class="action-grid">
+            <button class="btn-main btn-env" onclick="document.getElementById('env-form').scrollIntoView({behavior:'smooth'})"><i class="fa-solid fa-paper-plane"></i> Envoyer</button>
+            <button class="btn-main btn-rec" onclick="openRecevoir()"><i class="fa-solid fa-qrcode"></i> Recevoir</button>
+        </div>
 
-    <div id="env-form" style="background:var(--card); padding:20px; border-radius:20px; border:1px solid var(--border); margin-bottom:30px;">
-        <h3 style="margin:0 0 15px 0; color:var(--yellow); font-size:15px;">Vendre Crypto</h3>
-        <select id="env-crypto" class="input-styled" onchange="updateEnvCalc()">
-            <option value="TRX">TRX</option>
-            <option value="USDT">USDT</option>
-        </select>
-        <input type="number" id="env-ariary" class="input-styled" placeholder="Montant Ar" oninput="updateEnvCalc()">
-        <input type="text" id="env-adr" class="input-styled" placeholder="Adresse crypto">
-        <p id="env-calc-res" style="font-size:12px; color:var(--yellow); margin:0 0 15px 0;">0.00 TRX</p>
-        <button class="btn-valider" onclick="envoyer()">Confirmer</button>
+        <div id="env-form" style="background:var(--card); padding:20px; border-radius:20px; border:1px solid var(--border); margin-bottom:30px;">
+            <h3 style="margin:0 0 15px 0; color:var(--yellow); font-size:15px;">Vendre Crypto</h3>
+            <select id="env-crypto" class="input-styled" onchange="updateEnvCalc()">
+                <option value="TRX">TRX</option>
+                <option value="USDT">USDT</option>
+            </select>
+            <input type="number" id="env-ariary" class="input-styled" placeholder="Montant Ar" oninput="updateEnvCalc()">
+            <input type="text" id="env-adr" class="input-styled" placeholder="Adresse crypto">
+            <p id="env-calc-res" style="font-size:12px; color:var(--yellow); margin:0 0 15px 0;">0.00 TRX</p>
+            <button class="btn-valider" onclick="envoyer()">Confirmer</button>
+        </div>
     </div>
 
     <div class="history-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-            <p style="color:var(--gray); font-size:14px; margin:0;">Activités</p>
-            <small id="view-all-btn" onclick="showAllHistory()" style="color:var(--yellow); cursor:pointer;">Voir tout</small>
+        <div id="history-header-box" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+            <p style="color:var(--gray); font-size:14px; margin:0;">Activités récentes</p>
+            <small id="view-all-link" onclick="showAllHistory()" style="color:var(--yellow); cursor:pointer;">Voir tout</small>
         </div>
 
         <div id="history-tabs-container" style="display:none;">
@@ -138,10 +142,7 @@
     <div class="modal-content">
         <div id="rec-step1">
             <h3>Recevoir Crypto</h3>
-            <select id="rec-type" class="input-styled" onchange="updateRecCalc()">
-                <option value="USDT">USDT</option>
-                <option value="TRX">TRX</option>
-            </select>
+            <select id="rec-type" class="input-styled" onchange="updateRecCalc()"><option value="USDT">USDT</option><option value="TRX">TRX</option></select>
             <input type="number" id="rec-qty" class="input-styled" placeholder="Quantité" oninput="updateRecCalc()">
             <input type="text" id="rec-ar" class="input-styled" style="background:#000" readonly placeholder="Ariary">
             <button class="btn-valider" onclick="goToRecStep2()">Continuer</button>
@@ -169,18 +170,22 @@
 <div id="toast" class="toast"></div>
 
 <script>
-// --- CONFIGURATION ---
+// --- SUPABASE CONFIG ---
 const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
 
-let currentUserId = null, countdown, currentMode='login', allTransactions=[], showAll=false;
-const TAUX = { "TRX": 150, "USDT": 4600 };
-const ADDRS = { "USDT": "ADR_USDT_TRC20_VOAVELO", "TRX": "ADR_TRX_VOAVELO" };
+let currentUserId = null, countdown, allTransactions=[], showAll=false;
+const TAUX = { "TRX": 150, "USDT": 4600 }, ADDRS = { "USDT": "ADR_USDT_TRC20_VOAVELO", "TRX": "ADR_TRX_VOAVELO" };
 
 function notify(m){ const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display=document.getElementById('sidebar').classList.contains('active')?'block':'none'; }
 
-// --- AUTHENTICATION ---
-function switchAuth(m){ currentMode=m; document.getElementById('tab-login').classList.toggle('active', m==='login'); document.getElementById('tab-signup').classList.toggle('active', m==='signup'); document.getElementById('btn-auth').innerText=m==='login'?'Se connecter':"S'inscrire"; }
+// --- AUTH ---
+function switchAuth(m){ 
+    currentMode=m; 
+    document.getElementById('tab-login').classList.toggle('active', m==='login'); 
+    document.getElementById('tab-signup').classList.toggle('active', m==='signup'); 
+    document.getElementById('btn-auth').innerText=m==='login'?'Se connecter':"S'inscrire"; 
+}
 async function handleAuth(){
     const e=document.getElementById('auth-email').value, p=document.getElementById('auth-password').value;
     try {
@@ -201,71 +206,71 @@ async function checkUser(){
     if(user){ currentUserId=user.id; document.getElementById('auth-container').style.display='none'; document.getElementById('main-app').style.display='block'; fetchData(); }
 }
 
-// --- DATA FETCHING ---
+// --- DATA ---
 async function fetchData(){
     const {data:u}=await supabaseClient.from('users').select('solde').eq('id', currentUserId).maybeSingle();
     if(u) document.getElementById('display-solde').innerText = u.solde.toLocaleString()+" Ar";
-    
     const {data:ts}=await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at',{ascending:false});
     allTransactions = ts || [];
     renderHistory('all');
 }
 
-// --- RENDERING HISTORY (FIXED LERA & STATUS) ---
+// --- HISTORY LOGIC (GROUPED BY MONTH) ---
 function renderHistory(filter='all'){
-    const b = document.getElementById('history-body'); 
-    b.innerHTML = "";
+    const b = document.getElementById('history-body'); b.innerHTML = "";
     let filtered = allTransactions;
-    
-    if(filter !== 'all') {
-        filtered = allTransactions.filter(t => t.service.toLowerCase().includes(filter.toLowerCase()));
-    }
-    
+    if(filter !== 'all') filtered = allTransactions.filter(t => t.service.toLowerCase().includes(filter.toLowerCase()));
     const toDisplay = showAll ? filtered : filtered.slice(0, 3);
     
+    let lastMonth = "";
+    const monthNames = ["Janoary", "Febroary", "Martsa", "Aprily", "May", "Jona", "Jolay", "Aogositra", "Septambra", "Oktobra", "Novambra", "Desambra"];
+
     toDisplay.forEach(t => {
+        const d = new Date(t.created_at);
+        const currentMonthLabel = monthNames[d.getMonth()] + " " + d.getFullYear();
+
+        if (showAll && currentMonthLabel !== lastMonth) {
+            b.innerHTML += `<tr><td colspan="3"><div class="month-group">${currentMonthLabel}</div></td></tr>`;
+            lastMonth = currentMonthLabel;
+        }
+
         const isPos = t.service.toLowerCase().match(/recevoir|dépôt|depot/);
-        const statusStr = t.status ? t.status.toLowerCase() : 'en attente';
+        const statusStr = (t.status || 'en attente').toLowerCase();
         const cls = statusStr === 'confirmé' ? 'status-confirme' : (statusStr === 'annulé' ? 'status-annule' : 'status-attente');
         
-        // GMT+3 Conversion for Madagascar
-        const d = new Date(t.created_at);
-        const dateStr = d.toLocaleDateString('fr-FR');
-        const heureStr = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-
         b.innerHTML += `
             <tr>
-                <td>
-                    <b style="font-size:14px">${t.service}</b><br>
-                    <small style="color:var(--gray)">${dateStr} ${heureStr}</small>
-                </td>
-                <td style="text-align:right">
-                    <span class="${isPos ? 'miditra' : 'mivoaka'}" style="font-weight:700; font-size:14px">
-                        ${isPos ? '+' : '-'} ${parseFloat(t.montant).toLocaleString()} Ar
-                    </span>
-                </td>
-                <td style="text-align:right; padding-left:10px">
-                    <span class="status-badge ${cls}">${statusStr.toUpperCase()}</span>
-                </td>
+                <td><b>${t.service}</b><br><small style="color:var(--gray)">${d.toLocaleDateString('fr-FR')} ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</small></td>
+                <td style="text-align:right"><span class="${isPos?'miditra':'mivoaka'}">${isPos?'+':'-'} ${parseFloat(t.montant).toLocaleString()} Ar</span></td>
+                <td style="text-align:right"><span class="status-badge ${cls}">${statusStr.toUpperCase()}</span></td>
             </tr>`;
     });
 }
 
-// --- LOGICS ---
+function showAllHistory(){
+    showAll = true;
+    document.getElementById('accueil-content').style.display = 'none';
+    document.getElementById('history-header-box').style.display = 'none';
+    document.getElementById('history-tabs-container').style.display = 'block';
+    
+    document.getElementById('app-header').innerHTML = `
+        <div style="display:flex; align-items:center; gap:15px;">
+            <i class="fa-solid fa-arrow-left" onclick="location.reload()" style="cursor:pointer; font-size:20px; color:var(--yellow)"></i>
+            <span style="font-weight:800; font-size:20px;">Historique</span>
+        </div>
+        <img src="https://i.pravatar.cc/100?u=1" style="width:30px; border-radius:50%; border:1px solid var(--yellow);">
+    `;
+    if(document.getElementById('sidebar').classList.contains('active')) toggleSidebar();
+    renderHistory('all');
+}
+
 function filterHistory(type, btn){
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     renderHistory(type);
 }
 
-function showAllHistory(){
-    showAll = true;
-    document.getElementById('history-tabs-container').style.display = 'block';
-    document.getElementById('view-all-btn').style.display = 'none';
-    if(document.getElementById('sidebar').classList.contains('active')) toggleSidebar();
-    renderHistory('all');
-}
-
+// --- OTHER LOGICS (Envoyer, Mobile, sns.) ---
 function updateEnvCalc(){ const c=document.getElementById('env-crypto').value, ar=document.getElementById('env-ariary').value||0; document.getElementById('env-calc-res').innerText=(ar/TAUX[c]).toFixed(2)+" "+c; }
 function updateRecCalc(){ const t=document.getElementById('rec-type').value, q=document.getElementById('rec-qty').value||0; document.getElementById('rec-ar').value=(q*TAUX[t]).toLocaleString()+" Ar"; }
 
