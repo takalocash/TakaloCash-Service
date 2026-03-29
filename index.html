@@ -27,7 +27,7 @@
         .sidebar.active { right: 0; }
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 6500; }
         
-        /* DASHBOARD ELEMENTS */
+        /* DASHBOARD */
         .solde-section { text-align: center; padding: 20px 0; }
         .solde-amount { font-size: 38px; font-weight: 700; margin: 0; }
         .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
@@ -35,14 +35,19 @@
         .btn-env { background: var(--yellow); color: black; }
         .btn-rec { background: var(--green); color: white; }
 
-        /* HISTORY TABS & GROUPS */
-        .history-tabs { display: flex; gap: 8px; overflow-x: auto; margin: 15px 0; scrollbar-width: none; padding-bottom: 5px; }
+        /* MONTH PICKER & TABS */
+        .month-picker { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; }
+        .month-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--gray); padding: 7px 15px; border-radius: 10px; font-size: 11px; white-space: nowrap; cursor: pointer; }
+        .month-btn.active { border-color: var(--yellow); color: var(--yellow); background: rgba(252, 213, 53, 0.05); }
+
+        .history-tabs { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 15px; scrollbar-width: none; }
         .tab-btn { background: var(--card); border: 1px solid var(--border); color: var(--gray); padding: 8px 15px; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer; }
         .tab-btn.active { background: var(--yellow); color: black; font-weight: 700; border-color: var(--yellow); }
         
-        .month-group { background: rgba(255, 255, 255, 0.05); padding: 8px 15px; margin: 15px -15px 5px -15px; font-size: 11px; font-weight: 700; color: var(--yellow); text-transform: uppercase; border-left: 3px solid var(--yellow); }
+        /* GROUPING */
+        .month-group { background: rgba(255, 255, 255, 0.05); padding: 8px 15px; margin: 15px -15px 5px -15px; font-size: 11px; font-weight: 700; color: var(--yellow); text-transform: uppercase; border-left: 3px solid var(--yellow); display: flex; justify-content: space-between; }
 
-        /* TABLES */
+        /* TABLE */
         .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
         .history-table td { padding: 15px 0; border-bottom: 1px solid var(--border); vertical-align: middle; }
         .miditra { color: var(--green); font-weight: 700; }
@@ -99,18 +104,13 @@
             <div style="color:var(--gray); font-size:14px;">Solde disponible</div>
             <h1 class="solde-amount" id="display-solde">0 Ar</h1>
         </div>
-
         <div class="action-grid">
             <button class="btn-main btn-env" onclick="document.getElementById('env-form').scrollIntoView({behavior:'smooth'})"><i class="fa-solid fa-paper-plane"></i> Envoyer</button>
             <button class="btn-main btn-rec" onclick="openRecevoir()"><i class="fa-solid fa-qrcode"></i> Recevoir</button>
         </div>
-
         <div id="env-form" style="background:var(--card); padding:20px; border-radius:20px; border:1px solid var(--border); margin-bottom:30px;">
             <h3 style="margin:0 0 15px 0; color:var(--yellow); font-size:15px;">Vendre Crypto</h3>
-            <select id="env-crypto" class="input-styled" onchange="updateEnvCalc()">
-                <option value="TRX">TRX</option>
-                <option value="USDT">USDT</option>
-            </select>
+            <select id="env-crypto" class="input-styled" onchange="updateEnvCalc()"><option value="TRX">TRX</option><option value="USDT">USDT</option></select>
             <input type="number" id="env-ariary" class="input-styled" placeholder="Montant Ar" oninput="updateEnvCalc()">
             <input type="text" id="env-adr" class="input-styled" placeholder="Adresse crypto">
             <p id="env-calc-res" style="font-size:12px; color:var(--yellow); margin:0 0 15px 0;">0.00 TRX</p>
@@ -121,10 +121,11 @@
     <div class="history-section">
         <div id="history-header-box" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
             <p style="color:var(--gray); font-size:14px; margin:0;">Activités récentes</p>
-            <small id="view-all-link" onclick="showAllHistory()" style="color:var(--yellow); cursor:pointer;">Voir tout</small>
+            <small onclick="showAllHistory()" style="color:var(--yellow); cursor:pointer;">Voir tout</small>
         </div>
 
-        <div id="history-tabs-container" style="display:none;">
+        <div id="full-history-controls" style="display:none;">
+            <div class="month-picker" id="month-picker-container"></div>
             <div class="history-tabs">
                 <button class="tab-btn active" onclick="filterHistory('all', this)">Tous</button>
                 <button class="tab-btn" onclick="filterHistory('envoyer', this)">Envoyer</button>
@@ -170,22 +171,18 @@
 <div id="toast" class="toast"></div>
 
 <script>
-// --- SUPABASE CONFIG ---
+// --- CONFIG ---
 const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
 
-let currentUserId = null, countdown, allTransactions=[], showAll=false;
+let currentUserId = null, countdown, allTransactions=[], showAll=false, selectedMonthIndex = null, currentTypeFilter = 'all';
 const TAUX = { "TRX": 150, "USDT": 4600 }, ADDRS = { "USDT": "ADR_USDT_TRC20_VOAVELO", "TRX": "ADR_TRX_VOAVELO" };
+const monthNames = ["Janoary", "Febroary", "Martsa", "Aprily", "May", "Jona", "Jolay", "Aogositra", "Septambra", "Oktobra", "Novambra", "Desambra"];
 
 function notify(m){ const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display=document.getElementById('sidebar').classList.contains('active')?'block':'none'; }
 
 // --- AUTH ---
-function switchAuth(m){ 
-    currentMode=m; 
-    document.getElementById('tab-login').classList.toggle('active', m==='login'); 
-    document.getElementById('tab-signup').classList.toggle('active', m==='signup'); 
-    document.getElementById('btn-auth').innerText=m==='login'?'Se connecter':"S'inscrire"; 
-}
+function switchAuth(m){ currentMode=m; document.getElementById('tab-login').classList.toggle('active', m==='login'); document.getElementById('tab-signup').classList.toggle('active', m==='signup'); document.getElementById('btn-auth').innerText=m==='login'?'Se connecter':"S'inscrire"; }
 async function handleAuth(){
     const e=document.getElementById('auth-email').value, p=document.getElementById('auth-password').value;
     try {
@@ -215,26 +212,51 @@ async function fetchData(){
     renderHistory('all');
 }
 
-// --- HISTORY LOGIC (GROUPED BY MONTH) ---
-function renderHistory(filter='all'){
-    const b = document.getElementById('history-body'); b.innerHTML = "";
-    let filtered = allTransactions;
-    if(filter !== 'all') filtered = allTransactions.filter(t => t.service.toLowerCase().includes(filter.toLowerCase()));
-    const toDisplay = showAll ? filtered : filtered.slice(0, 3);
+// --- MONTH PICKER GENERATOR ---
+function generateMonthPicker() {
+    const container = document.getElementById('month-picker-container');
+    container.innerHTML = `<div class="month-btn ${selectedMonthIndex === null ? 'active' : ''}" onclick="setMonthFilter(null)">Tontolo</div>`;
     
-    let lastMonth = "";
-    const monthNames = ["Janoary", "Febroary", "Martsa", "Aprily", "May", "Jona", "Jolay", "Aogositra", "Septambra", "Oktobra", "Novambra", "Desambra"];
+    // Alaina ny volana misy transaction ihany
+    const monthsInDb = [...new Set(allTransactions.map(t => new Date(t.created_at).getMonth()))].sort((a,b) => b-a);
+    
+    monthsInDb.forEach(m => {
+        container.innerHTML += `<div class="month-btn ${selectedMonthIndex === m ? 'active' : ''}" onclick="setMonthFilter(${m})">${monthNames[m]}</div>`;
+    });
+}
 
-    toDisplay.forEach(t => {
+function setMonthFilter(m) {
+    selectedMonthIndex = m;
+    generateMonthPicker();
+    renderHistory(currentTypeFilter);
+}
+
+// --- RENDER HISTORY ---
+function renderHistory(typeFilter = 'all'){
+    currentTypeFilter = typeFilter;
+    const b = document.getElementById('history-body'); b.innerHTML = "";
+    
+    // Sivana
+    let filtered = allTransactions;
+    if(typeFilter !== 'all') filtered = filtered.filter(t => t.service.toLowerCase().includes(typeFilter.toLowerCase()));
+    if(showAll && selectedMonthIndex !== null) filtered = filtered.filter(t => new Date(t.created_at).getMonth() === selectedMonthIndex);
+    
+    const toDisplay = showAll ? filtered : filtered.slice(0, 3);
+    let lastMonthGroup = "";
+    let monthlyTotal = 0;
+
+    toDisplay.forEach((t, index) => {
         const d = new Date(t.created_at);
         const currentMonthLabel = monthNames[d.getMonth()] + " " + d.getFullYear();
+        const isPos = t.service.toLowerCase().match(/recevoir|dépôt|depot/);
 
-        if (showAll && currentMonthLabel !== lastMonth) {
-            b.innerHTML += `<tr><td colspan="3"><div class="month-group">${currentMonthLabel}</div></td></tr>`;
-            lastMonth = currentMonthLabel;
+        // Grouping logic
+        if (showAll && currentMonthLabel !== lastMonthGroup) {
+            // Rehefa miova ny volana dia asiana header
+            b.innerHTML += `<tr><td colspan="3"><div class="month-group"><span>${currentMonthLabel}</span><span id="total-${d.getMonth()}"></span></div></td></tr>`;
+            lastMonthGroup = currentMonthLabel;
         }
 
-        const isPos = t.service.toLowerCase().match(/recevoir|dépôt|depot/);
         const statusStr = (t.status || 'en attente').toLowerCase();
         const cls = statusStr === 'confirmé' ? 'status-confirme' : (statusStr === 'annulé' ? 'status-annule' : 'status-attente');
         
@@ -245,13 +267,15 @@ function renderHistory(filter='all'){
                 <td style="text-align:right"><span class="status-badge ${cls}">${statusStr.toUpperCase()}</span></td>
             </tr>`;
     });
+    
+    if(toDisplay.length === 0) b.innerHTML = "<tr><td colspan='3' style='text-align:center; padding:30px; color:gray;'>Tsy misy fifanakalozana hita.</td></tr>";
 }
 
 function showAllHistory(){
     showAll = true;
     document.getElementById('accueil-content').style.display = 'none';
     document.getElementById('history-header-box').style.display = 'none';
-    document.getElementById('history-tabs-container').style.display = 'block';
+    document.getElementById('full-history-controls').style.display = 'block';
     
     document.getElementById('app-header').innerHTML = `
         <div style="display:flex; align-items:center; gap:15px;">
@@ -260,6 +284,7 @@ function showAllHistory(){
         </div>
         <img src="https://i.pravatar.cc/100?u=1" style="width:30px; border-radius:50%; border:1px solid var(--yellow);">
     `;
+    generateMonthPicker();
     if(document.getElementById('sidebar').classList.contains('active')) toggleSidebar();
     renderHistory('all');
 }
@@ -270,7 +295,7 @@ function filterHistory(type, btn){
     renderHistory(type);
 }
 
-// --- OTHER LOGICS (Envoyer, Mobile, sns.) ---
+// --- LOGICS ---
 function updateEnvCalc(){ const c=document.getElementById('env-crypto').value, ar=document.getElementById('env-ariary').value||0; document.getElementById('env-calc-res').innerText=(ar/TAUX[c]).toFixed(2)+" "+c; }
 function updateRecCalc(){ const t=document.getElementById('rec-type').value, q=document.getElementById('rec-qty').value||0; document.getElementById('rec-ar').value=(q*TAUX[t]).toLocaleString()+" Ar"; }
 
