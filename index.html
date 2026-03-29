@@ -27,6 +27,11 @@
         .sidebar.active { right: 0; }
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 6500; }
         
+        /* TABS HISTORY */
+        .history-tabs { display: flex; gap: 8px; overflow-x: auto; margin: 15px 0; scrollbar-width: none; }
+        .tab-btn { background: var(--card); border: 1px solid var(--border); color: var(--gray); padding: 8px 15px; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer; }
+        .tab-btn.active { background: var(--yellow); color: black; font-weight: 700; border-color: var(--yellow); }
+
         /* DASHBOARD */
         .solde-section { text-align: center; padding: 20px 0; }
         .solde-amount { font-size: 38px; font-weight: 700; margin: 0; }
@@ -35,12 +40,12 @@
         .btn-env { background: var(--yellow); color: black; }
         .btn-rec { background: var(--green); color: white; }
 
-        /* HISTORY LIST */
-        .history-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
-        .history-table td { padding: 15px 0; border-bottom: 1px solid var(--border); vertical-align: middle; }
-        .miditra { color: var(--green); }
-        .mivoaka { color: var(--red); }
-        .status-badge { padding: 5px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        /* LISTS */
+        .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .history-table td { padding: 15px 0; border-bottom: 1px solid var(--border); }
+        .miditra { color: var(--green); font-weight: bold; }
+        .mivoaka { color: var(--red); font-weight: bold; }
+        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; min-width: 85px; text-align: center; display: inline-block; }
         .status-confirme { color: var(--green); background: rgba(46, 189, 133, 0.1); }
         .status-attente { color: var(--yellow); background: rgba(252, 213, 53, 0.1); }
         .status-annule { color: var(--red); background: rgba(255, 77, 77, 0.1); }
@@ -74,13 +79,17 @@
     </div>
     <div onclick="openMobile('Dépôt')" style="padding:15px 0; cursor:pointer;"><i class="fa-solid fa-plus-circle"></i> Dépôt MM</div>
     <div onclick="openMobile('Retrait')" style="padding:15px 0; cursor:pointer;"><i class="fa-solid fa-minus-circle"></i> Retrait MM</div>
+    <div onclick="showAllHistory()" style="padding:15px 0; cursor:pointer;"><i class="fa-solid fa-clock-rotate-left"></i> Historique Complet</div>
     <div onclick="logout()" style="padding:15px 0; color:var(--red); cursor:pointer; margin-top:20px;"><i class="fa-solid fa-power-off"></i> Déconnexion</div>
 </div>
 
 <div class="container" id="main-app">
     <div class="header">
         <div style="font-weight:800; font-size:22px;">TakaloCash</div>
-        <i class="fa-solid fa-bars" onclick="toggleSidebar()" style="color:var(--yellow); font-size: 24px; cursor:pointer;"></i>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <i class="fa-solid fa-bars" onclick="toggleSidebar()" style="color:var(--yellow); font-size: 24px; cursor:pointer;"></i>
+            <img src="https://i.pravatar.cc/100?u=1" style="width:35px; border-radius:50%; border:2px solid var(--yellow);">
+        </div>
     </div>
 
     <div class="solde-section">
@@ -102,11 +111,25 @@
         <input type="number" id="env-ariary" class="input-styled" placeholder="Montant Ar" oninput="updateEnvCalc()">
         <input type="text" id="env-adr" class="input-styled" placeholder="Adresse crypto">
         <p id="env-calc-res" style="font-size:12px; color:var(--yellow); margin:0 0 15px 0;">0.00 TRX</p>
-        <button class="btn-valider" onclick="envoyer()">Confirmer l'envoi</button>
+        <button class="btn-valider" onclick="envoyer()">Confirmer</button>
     </div>
 
     <div class="history-section">
-        <p style="color:var(--gray); font-size:14px; margin-bottom:10px;">Activités récentes</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+            <p style="color:var(--gray); font-size:14px; margin:0;">Activités</p>
+            <small id="view-all-btn" onclick="showAllHistory()" style="color:var(--yellow); cursor:pointer;">Voir tout</small>
+        </div>
+
+        <div id="history-tabs-container" style="display:none;">
+            <div class="history-tabs">
+                <button class="tab-btn active" onclick="filterHistory('all', this)">Tous</button>
+                <button class="tab-btn" onclick="filterHistory('envoyer', this)">Envoyer</button>
+                <button class="tab-btn" onclick="filterHistory('recevoir', this)">Recevoir</button>
+                <button class="tab-btn" onclick="filterHistory('dépôt', this)">Dépôt</button>
+                <button class="tab-btn" onclick="filterHistory('retrait', this)">Retrait</button>
+            </div>
+        </div>
+
         <table class="history-table"><tbody id="history-body"></tbody></table>
     </div>
 </div>
@@ -146,17 +169,17 @@
 <div id="toast" class="toast"></div>
 
 <script>
-// CONFIG SUPABASE
+// --- CONFIGURATION ---
 const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
 
-let currentUserId = null, countdown, currentMode='login';
+let currentUserId = null, countdown, currentMode='login', allTransactions=[], showAll=false;
 const TAUX = { "TRX": 150, "USDT": 4600 };
 const ADDRS = { "USDT": "ADR_USDT_TRC20_VOAVELO", "TRX": "ADR_TRX_VOAVELO" };
 
 function notify(m){ const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display=document.getElementById('sidebar').classList.contains('active')?'block':'none'; }
 
-// AUTH
+// --- AUTHENTICATION ---
 function switchAuth(m){ currentMode=m; document.getElementById('tab-login').classList.toggle('active', m==='login'); document.getElementById('tab-signup').classList.toggle('active', m==='signup'); document.getElementById('btn-auth').innerText=m==='login'?'Se connecter':"S'inscrire"; }
 async function handleAuth(){
     const e=document.getElementById('auth-email').value, p=document.getElementById('auth-password').value;
@@ -178,23 +201,34 @@ async function checkUser(){
     if(user){ currentUserId=user.id; document.getElementById('auth-container').style.display='none'; document.getElementById('main-app').style.display='block'; fetchData(); }
 }
 
+// --- DATA FETCHING ---
 async function fetchData(){
     const {data:u}=await supabaseClient.from('users').select('solde').eq('id', currentUserId).maybeSingle();
     if(u) document.getElementById('display-solde').innerText = u.solde.toLocaleString()+" Ar";
     
     const {data:ts}=await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at',{ascending:false});
-    renderHistory(ts || []);
+    allTransactions = ts || [];
+    renderHistory('all');
 }
 
-function renderHistory(data){
+// --- RENDERING HISTORY (FIXED LERA & STATUS) ---
+function renderHistory(filter='all'){
     const b = document.getElementById('history-body'); 
     b.innerHTML = "";
-    data.forEach(t => {
+    let filtered = allTransactions;
+    
+    if(filter !== 'all') {
+        filtered = allTransactions.filter(t => t.service.toLowerCase().includes(filter.toLowerCase()));
+    }
+    
+    const toDisplay = showAll ? filtered : filtered.slice(0, 3);
+    
+    toDisplay.forEach(t => {
         const isPos = t.service.toLowerCase().match(/recevoir|dépôt|depot/);
         const statusStr = t.status ? t.status.toLowerCase() : 'en attente';
         const cls = statusStr === 'confirmé' ? 'status-confirme' : (statusStr === 'annulé' ? 'status-annule' : 'status-attente');
         
-        // FORMAT DATE SY LERA (UTC -> Madagascar)
+        // GMT+3 Conversion for Madagascar
         const d = new Date(t.created_at);
         const dateStr = d.toLocaleDateString('fr-FR');
         const heureStr = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
@@ -211,10 +245,25 @@ function renderHistory(data){
                     </span>
                 </td>
                 <td style="text-align:right; padding-left:10px">
-                    <span class="status-badge ${cls}">${statusStr}</span>
+                    <span class="status-badge ${cls}">${statusStr.toUpperCase()}</span>
                 </td>
             </tr>`;
     });
+}
+
+// --- LOGICS ---
+function filterHistory(type, btn){
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderHistory(type);
+}
+
+function showAllHistory(){
+    showAll = true;
+    document.getElementById('history-tabs-container').style.display = 'block';
+    document.getElementById('view-all-btn').style.display = 'none';
+    if(document.getElementById('sidebar').classList.contains('active')) toggleSidebar();
+    renderHistory('all');
 }
 
 function updateEnvCalc(){ const c=document.getElementById('env-crypto').value, ar=document.getElementById('env-ariary').value||0; document.getElementById('env-calc-res').innerText=(ar/TAUX[c]).toFixed(2)+" "+c; }
@@ -261,6 +310,7 @@ async function executeMobile(){
 function confirmSent(){ notify("Fahombiazana!"); closeModal('modal-recevoir'); fetchData(); }
 function closeModal(id){ clearInterval(countdown); document.getElementById(id).style.display='none'; }
 function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
+
 checkUser();
 </script>
 </body>
