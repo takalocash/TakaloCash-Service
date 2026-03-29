@@ -223,17 +223,145 @@ async function fetchData(){
     fetchHistory();
 }
 
+// ================= FETCH HISTORY (NOHAVAOZINA) =================
 async function fetchHistory(){
-    const {data:ts}=await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at',{ascending:false});
-    const b=document.getElementById('history-body'); b.innerHTML="";
-    if(ts) ts.forEach(t=>{
+    const { data: ts, error } = await supabaseClient
+        .from('transactions')
+        .select('*')
+        .eq('user_id', currentUserId)
+        .order('created_at', { ascending: false });
+
+    if (error) return console.error("History Error:", error);
+
+    const b = document.getElementById('history-body'); 
+    b.innerHTML = "";
+
+    if (ts) ts.forEach(t => {
         const s = t.service.toLowerCase();
+        // Lojika hamantarana raha vola miditra na mivoaka
         const isPos = s.includes("recevoir") || s.includes("dépôt") || s.includes("depot");
-        let cls = t.status==='Confirmé'?'status-confirme':(t.status==='Annulé'?'status-annule':'status-attente');
-        b.innerHTML += `<tr><td><b>${t.service}</b><br><small style="color:gray">${new Date(t.created_at).toLocaleDateString()}</small></td>
-        <td style="text-align:right"><span class="${isPos?'miditra':'mivoaka'}">${isPos?'+':'-'} ${parseFloat(t.montant).toLocaleString()} Ar</span></td>
-        <td style="text-align:right"><span class="status-badge ${cls}">${t.status}</span></td></tr>`;
+        
+        let cls = 'status-attente';
+        if (t.status === 'Confirmé') cls = 'status-confirme';
+        if (t.status === 'Annulé') cls = 'status-annule';
+
+        b.innerHTML += `
+        <tr>
+            <td>
+                <b>${t.service}</b><br>
+                <small style="color:gray">${new Date(t.created_at).toLocaleString('fr-FR')}</small>
+            </td>
+            <td style="text-align:right">
+                <span class="${isPos ? 'miditra' : 'mivoaka'}">
+                    ${isPos ? '+' : '-'} ${parseFloat(t.montant).toLocaleString()} Ar
+                </span>
+            </td>
+            <td style="text-align:right">
+                <span class="status-badge ${cls}">${t.status}</span>
+            </td>
+        </tr>`;
     });
+}
+
+// ================= ENVOYER (NOHAVAOZINA) =================
+async function envoyer(){
+    const ar = parseFloat(document.getElementById('env-ariary').value);
+    const adr = document.getElementById('env-adr').value;
+    const crypto = document.getElementById('env-crypto').value;
+
+    if(!ar || !adr) return notify("Fenoy ny banga! ⚠️");
+
+    // 1. Jerevo aloha ny solde
+    const { data: u, error: userError } = await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
+    if(userError || u.solde < ar) return notify("Tsy ampy solde! ❌");
+
+    // 2. Ampidiro ny transaction (Ampiasao anarana mazava: "Envoyer USDT" ohatra)
+    const { error: insError } = await supabaseClient.from('transactions').insert([{
+        user_id: currentUserId,
+        montant: ar,
+        service: "Envoyer " + crypto,
+        status: "En attente",
+        adresse: adr
+    }]);
+
+    if(insError) {
+        console.error("Insert Error:", insError);
+        return notify("Erreur reseau (Insert)! ⚠️");
+    }
+
+    // 3. Esory ny solde
+    const { error: updError } = await supabaseClient.from('users').update({ solde: u.solde - ar }).eq('id', currentUserId);
+    
+    if(updError) {
+        console.error("Update Error:", updError);
+        return notify("Erreur reseau (Update)! ⚠️");
+    }
+
+    notify("Envoyé ! ✅");
+    fetchData(); // Ity no miantso ny fetchHistory koa
+}
+
+async function executeMobile(){
+    const am = parseFloat(document.getElementById('mob-amount').value);
+    const ph = document.getElementById('mob-phone').value;
+    const op = document.getElementById('mob-op').value;
+
+    if(!am || !ph) return notify("Banga! ⚠️");
+
+    if(curMob === 'Retrait'){
+        const { data: u } = await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
+        if(u.solde < am) return notify("Tsy ampy solde! ❌");
+
+        // Retrait: Tonga dia miala ny solde
+        await supabaseClient.from('users').update({ solde: u.solde - am }).eq('id', currentUserId);
+        
+        await supabaseClient.from('transactions').insert([{
+            user_id: currentUserId,
+            montant: am,
+            service: "Retrait " + op,
+            status: "En attente",
+            adresse: ph
+        }]);
+    } 
+    else if(curMob === 'Dépôt'){
+        // Dépôt: TSY miova ny solde eto, miandry confirmation admin
+        await supabaseClient.from('transactions').insert([{
+            user_id: currentUserId,
+            montant: am,
+            service: "Dépôt " + op,
+            status: "En attente",
+            adresse: ph
+        }]);
+    }
+
+    notify("Vita! Miandry fanamarinana. ✅");
+    closeModal('modal-mobile');
+    fetchData();
+}
+
+// ================= RECEVOIR (NOHAVAOZINA) =================
+async function goToRecStep2(){
+    const q = document.getElementById('rec-qty').value;
+    const t = document.getElementById('rec-type').value;
+    if(!q) return notify("Ampidiro ny quantité! ⚠️");
+
+    document.getElementById('target-addr').innerText = ADDRS[t];
+    document.getElementById('rec-step1').className = 'modal-step';
+    document.getElementById('rec-step2').className = 'active-step';
+
+    // Ampiasao ny anaran'ny crypto ao amin'ny service
+    const { data, error } = await supabaseClient.from('transactions').insert([{
+        user_id: currentUserId,
+        montant: q * TAUX[t],
+        service: "Recevoir " + t,
+        status: "En attente"
+    }]).select().single();
+    
+    if(!error) {
+        currentTransId = data.id;
+        startTimer(300);
+        fetchHistory();
+    }
 }
 
 // TRANSACTION LOGIC
