@@ -11,84 +11,59 @@
 
     <style>
         :root {
-            --bg-dark: #0d1117;
-            --card-bg: #161b22;
-            --yellow: #fcd535;
-            --green: #2ebd85;
-            --red: #ff4d4d;
-            --text-gray: #848e9c;
-            --border: rgba(255, 255, 255, 0.08);
+            --bg-dark: #0d1117; --card-bg: #161b22; --yellow: #fcd535;
+            --green: #2ebd85; --red: #ff4d4d; --text-gray: #848e9c; --border: rgba(255, 255, 255, 0.08);
         }
-
-        body {
-            margin: 0; background-color: var(--bg-dark);
-            font-family: 'Inter', sans-serif; color: white;
-            background: radial-gradient(circle at top right, #1c212e, #0d1117);
-            padding-bottom: 50px;
-        }
-
+        body { margin: 0; background-color: var(--bg-dark); font-family: 'Inter', sans-serif; color: white; padding-bottom: 50px; overflow-x: hidden; }
         .container { max-width: 420px; margin: auto; padding: 15px; display: none; }
-
-        /* --- AUTH --- */
-        #auth-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-dark); z-index: 5000;
-            display: flex; align-items: center; justify-content: center; padding: 20px;
-        }
-        .auth-card {
-            background: var(--card-bg); width: 100%; max-width: 350px;
-            padding: 30px; border-radius: 20px; border: 1px solid var(--border); text-align: center;
-        }
+        
+        /* AUTH SECTION */
+        #auth-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .auth-card { background: var(--card-bg); width: 100%; max-width: 350px; padding: 30px; border-radius: 20px; border: 1px solid var(--border); text-align: center; }
         .auth-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
-        .auth-tab { flex: 1; padding: 10px; cursor: pointer; color: var(--text-gray); border-bottom: 2px solid transparent; }
+        .auth-tab { flex: 1; padding: 10px; cursor: pointer; color: var(--text-gray); border-bottom: 2px solid transparent; transition: 0.3s; }
         .auth-tab.active { color: var(--yellow); border-bottom: 2px solid var(--yellow); font-weight: 700; }
 
-        /* --- INPUTS --- */
-        .input-styled {
-            background: #12151c; border: 1px solid var(--border); border-radius: 12px;
-            padding: 14px; color: white; width: 100%; margin-bottom: 15px; box-sizing: border-box; outline: none; font-size: 14px;
-        }
-        .btn-valider {
-            width: 100%; background: var(--yellow); border: none; padding: 16px;
-            border-radius: 12px; font-weight: 700; cursor: pointer; color: black; font-size: 15px;
-        }
+        /* UI ELEMENTS */
+        .input-styled { background: #12151c; border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: white; width: 100%; margin-bottom: 15px; box-sizing: border-box; outline: none; font-size: 14px; }
+        .input-styled:focus { border-color: var(--yellow); }
+        .btn-valider { width: 100%; background: var(--yellow); border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; color: black; transition: 0.2s; }
+        .btn-valider:active { transform: scale(0.98); }
 
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
-        .logo { font-weight: 800; font-size: 22px; }
-        .logo span { color: #3ea1f0; }
-        .profile-area { display: flex; align-items: center; gap: 15px; position: relative; }
         .profile-img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--yellow); cursor: pointer; }
-
+        
         .solde-section { text-align: center; padding: 30px 0; }
-        .solde-amount { font-size: 40px; font-weight: 700; margin: 0; }
-
+        .solde-amount { font-size: 42px; font-weight: 700; margin: 0; color: white; }
+        
         .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .btn-main { border: none; padding: 15px; border-radius: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+        .btn-main { border: none; padding: 15px; border-radius: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: 0.3s; }
         .btn-env { background: var(--yellow); color: black; }
         .btn-rec { background: var(--green); color: white; }
 
-        /* --- HISTORY --- */
+        /* HISTORY STYLING */
         .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
         .history-table td { padding: 15px 0; border-bottom: 1px solid var(--border); }
-        .miditra { color: var(--green); font-weight: 700; }
-        .mivoaka { color: var(--red); font-weight: 700; }
-        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; }
+        .miditra { color: var(--green); font-weight: bold; }
+        .mivoaka { color: var(--red); font-weight: bold; }
+        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; text-transform: uppercase; }
         .status-confirme { color: var(--green); background: rgba(46, 189, 133, 0.1); }
         .status-attente { color: var(--yellow); background: rgba(252, 213, 53, 0.1); }
         .status-annule { color: var(--red); background: rgba(255, 77, 77, 0.1); }
 
-        /* --- MODAL --- */
+        /* MODAL SYSTEM */
         .modal { display: none; position: fixed; z-index: 6000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); }
-        .modal-content { background: var(--card-bg); margin: 15% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 340px; text-align: center; border: 1px solid var(--border); }
-        .timer-box { background: rgba(252, 213, 53, 0.1); color: var(--yellow); padding: 15px; border-radius: 12px; margin: 15px 0; font-weight: 700; font-size: 24px; border: 1px dashed var(--yellow); }
+        .modal-content { background: var(--card-bg); margin: 15% auto; padding: 25px; border-radius: 24px; width: 85%; max-width: 340px; text-align: center; border: 1px solid var(--border); }
+        .timer-box { background: rgba(252, 213, 53, 0.1); color: var(--yellow); padding: 15px; border-radius: 12px; margin: 15px 0; font-weight: 700; font-size: 26px; border: 1px dashed var(--yellow); }
         .modal-step { display: none; }
         .active-step { display: block; }
-        .addr-box { background: #000; padding: 10px; border-radius: 8px; font-size: 11px; word-break: break-all; border: 1px dashed var(--yellow); margin: 10px 0; color: var(--yellow); }
+        .addr-box { background: #000; padding: 12px; border-radius: 10px; font-size: 11px; word-break: break-all; border: 1px dashed var(--yellow); margin: 12px 0; color: var(--yellow); font-family: monospace; }
+        
+        #plus-menu { display: none; position: absolute; top: 45px; right: 0; background: #1e2329; border: 1px solid var(--border); border-radius: 12px; width: 150px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .menu-item { padding: 14px; cursor: pointer; font-size: 13px; border-bottom: 1px solid var(--border); text-align: left; transition: 0.2s; }
+        .menu-item:hover { background: rgba(255,255,255,0.05); }
 
-        #plus-menu { display: none; position: absolute; top: 40px; right: 0; background: #1e2329; border: 1px solid var(--border); border-radius: 12px; width: 140px; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .menu-item { padding: 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid var(--border); text-align: left;}
-
-        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1b1f28; padding: 12px 20px; border-radius: 30px; border: 1px solid var(--yellow); transition: 0.4s; opacity: 0; z-index: 9000; font-size: 13px; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1b1f28; padding: 12px 25px; border-radius: 30px; border: 1px solid var(--yellow); transition: 0.4s; opacity: 0; z-index: 9000; font-size: 13px; text-align: center; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
@@ -96,7 +71,7 @@
 
 <div id="auth-container">
     <div class="auth-card">
-        <h2 style="color:var(--yellow);">TakaloCash</h2>
+        <h2 style="color:var(--yellow); margin-bottom:20px;">TakaloCash</h2>
         <div class="auth-tabs">
             <div id="tab-login" class="auth-tab active" onclick="switchAuth('login')">Connexion</div>
             <div id="tab-signup" class="auth-tab" onclick="switchAuth('signup')">Inscription</div>
@@ -109,41 +84,44 @@
 
 <div class="container" id="main-app">
     <div class="header">
-        <div class="logo"><span>TC</span> TakaloCash</div>
-        <div class="profile-area">
-            <i class="fa-solid fa-plus-square" id="plus-btn" style="color:var(--yellow); font-size: 22px; cursor:pointer;"></i>
+        <div style="font-weight:800; font-size:24px; letter-spacing:-1px;">TakaloCash<span style="color:var(--yellow);">.</span></div>
+        <div class="profile-area" style="position:relative; display:flex; align-items:center;">
+            <i class="fa-solid fa-circle-plus" id="plus-btn" style="color:var(--yellow); font-size: 24px; cursor:pointer;"></i>
             <div id="plus-menu">
-                <div class="menu-item" onclick="openMobile('Dépôt')"><i class="fa-solid fa-arrow-down" style="color:var(--green)"></i> Dépôt MM</div>
-                <div class="menu-item" onclick="openMobile('Retrait')"><i class="fa-solid fa-arrow-up" style="color:var(--red)"></i> Retrait MM</div>
+                <div class="menu-item" onclick="openMobile('Dépôt')">💰 Dépôt MM</div>
+                <div class="menu-item" onclick="openMobile('Retrait')">💸 Retrait MM</div>
             </div>
-            <img src="https://i.pravatar.cc/100?u=99" class="profile-img" onclick="logout()">
+            <img src="https://i.pravatar.cc/100?u=myprofile" class="profile-img" onclick="logout()" style="margin-left:15px;">
         </div>
     </div>
 
     <div class="solde-section">
-        <div style="color:var(--text-gray); font-size:14px;">Solde disponible</div>
+        <div style="color:var(--text-gray); font-size:14px; margin-bottom:5px;">Solde Ariary</div>
         <h1 class="solde-amount" id="display-solde">0 Ar</h1>
     </div>
 
     <div class="action-grid">
         <button class="btn-main btn-env" onclick="document.getElementById('env-form').scrollIntoView({behavior:'smooth'})"><i class="fa-solid fa-paper-plane"></i> Envoyer</button>
-        <button class="btn-main btn-rec" onclick="openRecevoir()"><i class="fa-solid fa-qrcode"></i> Recevoir</button>
+        <button class="btn-main btn-rec" onclick="openRecevoir()"><i class="fa-solid fa-wallet"></i> Recevoir</button>
     </div>
 
-    <div id="env-form" style="background:var(--card-bg); padding:20px; border-radius:20px; border:1px solid var(--border); margin-bottom:30px;">
-        <h3 style="margin-top:0; color:var(--yellow); font-size:15px;">Vendre Crypto (Envoyer)</h3>
+    <div id="env-form" style="background:var(--card-bg); padding:20px; border-radius:24px; border:1px solid var(--border); margin-bottom:30px;">
+        <h3 style="margin-top:0; color:var(--yellow); font-size:16px;">Vendre Crypto</h3>
         <select id="env-crypto" class="input-styled" onchange="updateEnvCalc()">
-            <option value="TRX">TRX</option>
-            <option value="USDT">USDT</option>
+            <option value="TRX">TRON (TRX)</option>
+            <option value="USDT">USDT (TRC20)</option>
         </select>
         <input type="number" id="env-ariary" class="input-styled" placeholder="Montant en Ar" oninput="updateEnvCalc()">
-        <input type="text" id="env-adr" class="input-styled" placeholder="Adresse de réception">
-        <p id="env-calc-res" style="font-size:12px; color:var(--yellow);">Valeur : 0.00 TRX</p>
-        <button class="btn-valider" onclick="envoyer()">Confirmer l'envoi</button>
+        <input type="text" id="env-adr" class="input-styled" placeholder="Adresse crypto destinataire">
+        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:15px; color:var(--yellow);">
+            <span>Valeur estimée :</span>
+            <span id="env-calc-res" style="font-weight:bold;">0.00 TRX</span>
+        </div>
+        <button class="btn-valider" onclick="envoyer()">Confirmer l'opération</button>
     </div>
 
     <div class="history-section">
-        <p style="color:var(--text-gray); font-size:14px; margin-bottom:10px;">Dernières transactions</p>
+        <p style="color:var(--text-gray); font-size:14px; margin-bottom:15px; font-weight:600;">Historique des transactions</p>
         <table class="history-table"><tbody id="history-body"></tbody></table>
     </div>
 </div>
@@ -151,66 +129,80 @@
 <div id="modal-recevoir" class="modal">
     <div class="modal-content">
         <div id="rec-step1" class="active-step">
-            <h3>Recevoir / Achat</h3>
+            <h3 style="color:var(--yellow);">Recevoir / Acheter</h3>
             <select id="rec-type" class="input-styled" onchange="updateRecCalc()">
-                <option value="USDT">USDT</option>
-                <option value="TRX">TRX</option>
-                <option value="1XBET">1xBet</option>
+                <option value="USDT">USDT (TRC20)</option>
+                <option value="TRX">TRX (TRON)</option>
+                <option value="1XBET">Retrait 1xBet</option>
             </select>
-            <input type="number" id="rec-qty" class="input-styled" placeholder="Quantité" oninput="updateRecCalc()">
-            <input type="text" id="rec-ar" class="input-styled" style="background:#000" readonly placeholder="Ariary">
+            <div style="display:flex; gap:8px; align-items:center;">
+                <input type="number" id="rec-qty" class="input-styled" style="flex:1;" placeholder="Quantité" oninput="updateRecCalc()">
+                <span style="margin-bottom:15px; font-weight:bold;">=</span>
+                <input type="text" id="rec-ar" class="input-styled" style="flex:1.5; background:#000; border-color:var(--green);" readonly placeholder="Ariary">
+            </div>
             <button class="btn-valider" onclick="goToRecStep2()">Continuer</button>
-            <p onclick="closeModal('modal-recevoir')" style="cursor:pointer; color:gray; font-size:12px; margin-top:10px;">Fermer</p>
+            <p onclick="closeModal('modal-recevoir')" style="cursor:pointer; color:gray; font-size:12px; margin-top:15px;">Annuler</p>
         </div>
         <div id="rec-step2" class="modal-step">
             <div class="timer-box" id="timer-display">05:00</div>
+            <p id="addr-instr" style="font-size:12px; text-align:left; color:var(--text-gray);">Envoyez à cette adresse :</p>
             <div id="target-addr" class="addr-box">---</div>
-            <button class="btn-valider" style="background:var(--green); color:white" onclick="confirmSent()">J'ai envoyé</button>
+            <button class="btn-valider" style="background:var(--green); color:white" onclick="confirmSent()">J'ai bien envoyé</button>
         </div>
     </div>
 </div>
 
 <div id="modal-mobile" class="modal">
     <div class="modal-content">
-        <h3 id="mob-title">Mobile Money</h3>
+        <h3 id="mob-title" style="color:var(--yellow);">Dépôt / Retrait</h3>
         <select id="mob-op" class="input-styled">
             <option value="Mvola">Mvola</option>
             <option value="Orange Money">Orange Money</option>
             <option value="Airtel Money">Airtel Money</option>
         </select>
-        <input type="number" id="mob-amount" class="input-styled" placeholder="Montant Ar">
+        <input type="number" id="mob-amount" class="input-styled" placeholder="Montant en Ar">
         <input type="tel" id="mob-phone" class="input-styled" placeholder="Numéro de téléphone">
-        <button class="btn-valider" onclick="executeMobile()">Valider</button>
-        <p onclick="closeModal('modal-mobile')" style="cursor:pointer; color:gray; font-size:12px; margin-top:10px;">Fermer</p>
+        <button class="btn-valider" onclick="executeMobile()">Valider l'opération</button>
+        <p onclick="closeModal('modal-mobile')" style="cursor:pointer; color:gray; font-size:12px; margin-top:15px;">Fermer</p>
     </div>
 </div>
 
 <div id="toast" class="toast"></div>
 
 <script>
-const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
+// INITIALIZATION
+const supabaseClient = supabase.createClient(
+    "https://nyeopreahmajoisartoz.supabase.co", 
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA"
+);
 
-let currentUserId = null, countdown, currentTransId, currentMode='login';
+let currentUserId = null, countdown, currentTransId, currentMode='login', curMob='';
 const TAUX = { "TRX": 150, "USDT": 4600, "1XBET": 1 };
-const ADDRS = { "USDT": "ADR_USDT_TRC20_HERE", "TRX": "ADR_TRX_HERE", "1XBET": "ID_AGENT_12345" };
+const ADDRS = { 
+    "USDT": "T9yZ1p9R7xS5uB4sE...V8aN2oP (TRC20)", 
+    "TRX": "T9yZ1p9R7xS5uB4sE...V8aN2oP (TRX)", 
+    "1XBET": "ID Agent: 1234567 (Nom: TC-MADA)" 
+};
 
 function notify(m){ const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 
-// --- AUTH ---
+// AUTH LOGIC
 function switchAuth(m){ 
-    currentMode = m;
-    document.getElementById('tab-login').className = m==='login'?'auth-tab active':'auth-tab';
-    document.getElementById('tab-signup').className = m==='signup'?'auth-tab active':'auth-tab';
-    document.getElementById('btn-auth').innerText = m==='login'?'Se connecter':"S'inscrire";
+    currentMode=m; 
+    document.getElementById('tab-login').classList.toggle('active', m==='login');
+    document.getElementById('tab-signup').classList.toggle('active', m==='signup');
+    document.getElementById('btn-auth').innerText=m==='login'?'Se connecter':"S'inscrire"; 
 }
 
 async function handleAuth(){
     const e=document.getElementById('auth-email').value, p=document.getElementById('auth-password').value;
+    if(!e || !p) return notify("Fenoy ny banga rehetra! ⚠️");
     try {
         if(currentMode==='signup'){
             const {data, error}=await supabaseClient.auth.signUp({email:e, password:p});
             if(error) throw error;
             await supabaseClient.from('users').insert([{id:data.user.id, solde:0}]);
+            notify("Compte créé ! ✅");
         } else {
             const {error}=await supabaseClient.auth.signInWithPassword({email:e, password:p});
             if(error) throw error;
@@ -221,15 +213,10 @@ async function handleAuth(){
 
 async function checkUser(){
     const {data:{user}}=await supabaseClient.auth.getUser();
-    if(user){ 
-        currentUserId = user.id; 
-        document.getElementById('auth-container').style.display='none'; 
-        document.getElementById('main-app').style.display='block'; 
-        fetchData(); 
-    }
+    if(user){ currentUserId=user.id; document.getElementById('auth-container').style.display='none'; document.getElementById('main-app').style.display='block'; fetchData(); }
 }
 
-// --- CORE DATA ---
+// DASHBOARD DATA
 async function fetchData(){
     const {data:u}=await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
     if(u) document.getElementById('display-solde').innerText = u.solde.toLocaleString()+" Ar";
@@ -237,57 +224,50 @@ async function fetchData(){
 }
 
 async function fetchHistory(){
-    const {data:ts, error}=await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at',{ascending:false});
-    if(error) console.error("History Error:", error);
-    
+    const {data:ts}=await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at',{ascending:false});
     const b=document.getElementById('history-body'); b.innerHTML="";
     if(ts) ts.forEach(t=>{
-        const s=t.service.toLowerCase();
+        const s = t.service.toLowerCase();
         const isPos = s.includes("recevoir") || s.includes("dépôt") || s.includes("depot");
         let cls = t.status==='Confirmé'?'status-confirme':(t.status==='Annulé'?'status-annule':'status-attente');
-        
-        b.innerHTML += `<tr>
-            <td><b>${t.service}</b><br><small style="color:gray">${new Date(t.created_at).toLocaleDateString()}</small></td>
-            <td style="text-align:right"><span class="${isPos?'miditra':'mivoaka'}">${isPos?'+':'-'} ${parseFloat(t.montant).toLocaleString()} Ar</span></td>
-            <td style="text-align:right"><span class="status-badge ${cls}">${t.status}</span></td>
-        </tr>`;
+        b.innerHTML += `<tr><td><b>${t.service}</b><br><small style="color:gray">${new Date(t.created_at).toLocaleDateString()}</small></td>
+        <td style="text-align:right"><span class="${isPos?'miditra':'mivoaka'}">${isPos?'+':'-'} ${parseFloat(t.montant).toLocaleString()} Ar</span></td>
+        <td style="text-align:right"><span class="status-badge ${cls}">${t.status}</span></td></tr>`;
     });
 }
 
-// --- LOGIC ---
-function updateEnvCalc(){ const c=document.getElementById('env-crypto').value, ar=document.getElementById('env-ariary').value||0; document.getElementById('env-calc-res').innerText="Valeur : "+(ar/TAUX[c]).toFixed(2)+" "+c; }
+// TRANSACTION LOGIC
+function updateEnvCalc(){ const c=document.getElementById('env-crypto').value, ar=document.getElementById('env-ariary').value||0; document.getElementById('env-calc-res').innerText=(ar/TAUX[c]).toFixed(2)+" "+c; }
 function updateRecCalc(){ const t=document.getElementById('rec-type').value, q=document.getElementById('rec-qty').value||0; document.getElementById('rec-ar').value=(q*TAUX[t]).toLocaleString()+" Ar"; }
 
 async function envoyer(){
     const ar=parseFloat(document.getElementById('env-ariary').value), adr=document.getElementById('env-adr').value;
     if(!ar || !adr) return notify("Fenoy ny banga! ⚠️");
-    
     const {data:u}=await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
     if(u.solde < ar) return notify("Solde insuffisant! ❌");
-
-    const {error} = await supabaseClient.from('transactions').insert([{
-        user_id: currentUserId, montant: ar, service: "Envoyer Crypto", status: "En attente", adresse: adr
-    }]);
-
-    if(!error) {
-        await supabaseClient.from('users').update({solde:u.solde - ar}).eq('id',currentUserId);
-        notify("Envoyé ! ✅"); fetchData();
-    } else { console.error("Envoyer Error:", error); }
+    
+    const {error} = await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:ar, service:"Envoyer", status:"En attente", adresse:adr}]);
+    if(error) return notify("Erreur réseau!");
+    
+    await supabaseClient.from('users').update({solde: u.solde - ar}).eq('id',currentUserId);
+    notify("Demande envoyée ! ✅"); fetchData();
 }
 
 function openRecevoir(){ document.getElementById('modal-recevoir').style.display='block'; document.getElementById('rec-step1').className='active-step'; document.getElementById('rec-step2').className='modal-step'; }
+
 async function goToRecStep2(){
     const q=document.getElementById('rec-qty').value, t=document.getElementById('rec-type').value;
-    if(!q) return notify("Ampidiro ny quantité!");
+    if(!q || q <= 0) return notify("Ampidiro ny quantité marina! ⚠️");
+    
     document.getElementById('target-addr').innerText=ADDRS[t];
-    document.getElementById('rec-step1').className='modal-step';
+    document.getElementById('rec-step1').className='modal-step'; 
     document.getElementById('rec-step2').className='active-step';
-
-    const {data, error}=await supabaseClient.from('transactions').insert([{
-        user_id:currentUserId, montant: q * TAUX[t], service: "Recevoir " + t, status: "En attente"
+    
+    const {data}=await supabaseClient.from('transactions').insert([{
+        user_id:currentUserId, montant: q*TAUX[t], service: "Recevoir", status: "En attente"
     }]).select().single();
     
-    if(!error) { currentTransId=data.id; startTimer(300); fetchHistory(); }
+    currentTransId=data.id; startTimer(300); fetchHistory();
 }
 
 function startTimer(s){
@@ -297,41 +277,36 @@ function startTimer(s){
         document.getElementById('timer-display').innerText=`${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
         if(s<=0){ 
             clearInterval(countdown); 
-            await supabaseClient.from('transactions').update({status:'Annulé'}).eq('id',currentTransId).eq('status','En attente');
-            closeModal('modal-recevoir'); fetchHistory();
+            await supabaseClient.from('transactions').update({status:'Annulé'}).eq('id',currentTransId).eq('status','En attente'); 
+            closeModal('modal-recevoir'); fetchHistory(); 
         }
         s--;
     },1000);
 }
 
-let curMob="";
 function openMobile(t){ curMob=t; document.getElementById('mob-title').innerText=t; document.getElementById('modal-mobile').style.display='block'; }
+
 async function executeMobile(){
-    const am=parseFloat(document.getElementById('mob-amount').value), ph=document.getElementById('mob-phone').value, op=document.getElementById('mob-op').value;
-    if(!am || !ph) return notify("Banga!");
-
-    if(curMob==='Retrait'){
-        const {data:u}=await supabaseClient.from('users').select('solde').eq('id',currentUserId).single();
-        if(u.solde < am) return notify("Tsy ampy solde!");
-        await supabaseClient.from('users').update({solde:u.solde - am}).eq('id',currentUserId);
-    }
-
-    const {error} = await supabaseClient.from('transactions').insert([{
-        user_id:currentUserId, montant:am, service: curMob + " " + op, status: "En attente", adresse: ph
-    }]);
+    const am=parseFloat(document.getElementById('mob-amount').value), ph=document.getElementById('mob-phone').value;
+    if(!am || !ph) return notify("Fenoy ny banga! ⚠️");
+    const {data:u}=await supabaseClient.from('users').select('solde').eq('id',currentUserId).single();
     
-    if(!error) { notify("Enregistré !"); closeModal('modal-mobile'); fetchData(); }
+    if(curMob==='Retrait'){
+        if(u.solde < am) return notify("Tsy ampy ny solde-nao! ❌");
+        await supabaseClient.from('users').update({solde: u.solde - am}).eq('id',currentUserId);
+    } else {
+        await supabaseClient.from('users').update({solde: u.solde + am}).eq('id',currentUserId);
+    }
+    
+    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:am, service:curMob, status:"Confirmé", adresse:ph}]);
+    notify("Vita soa aman-tsara! ✅"); closeModal('modal-mobile'); fetchData();
 }
 
-function confirmSent(){ notify("Fahombiazana!"); closeModal('modal-recevoir'); fetchHistory(); }
+function confirmSent(){ notify("Misaotra! Miandry fanamarinana."); closeModal('modal-recevoir'); fetchHistory(); }
 function closeModal(id){ clearInterval(countdown); document.getElementById(id).style.display='none'; }
 function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
 
-document.getElementById('plus-btn').onclick=(e)=>{ 
-    const m=document.getElementById('plus-menu'); 
-    m.style.display=m.style.display==='block'?'none':'block'; 
-    e.stopPropagation(); 
-};
+document.getElementById('plus-btn').onclick=(e)=>{ const m=document.getElementById('plus-menu'); m.style.display=m.style.display==='block'?'none':'block'; e.stopPropagation(); };
 window.onclick=()=>{ document.getElementById('plus-menu').style.display='none'; };
 
 checkUser();
