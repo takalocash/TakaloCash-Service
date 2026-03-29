@@ -209,19 +209,41 @@ async function fetchData(){
 }
 
 function renderHistory(filter='all'){
-    const b=document.getElementById('history-body'); b.innerHTML="";
+    const b = document.getElementById('history-body'); 
+    b.innerHTML = "";
     let filtered = allTransactions;
-    if(filter !== 'all') filtered = allTransactions.filter(t => t.service.toLowerCase().includes(filter));
     
-    // 3 ihany raha tsy showAll
+    if(filter !== 'all') {
+        filtered = allTransactions.filter(t => t.service.toLowerCase().includes(filter));
+    }
+    
+    // 3 ihany raha eo amin'ny accueil (raha tsy showAll)
     const toDisplay = showAll ? filtered : filtered.slice(0, 3);
     
-    toDisplay.forEach(t=>{
+    toDisplay.forEach(t => {
         const isPos = t.service.toLowerCase().match(/recevoir|dépôt|depot/);
         let cls = t.status === 'Confirmé' ? 'status-confirme' : (t.status === 'Annulé' ? 'status-annule' : 'status-attente');
-        b.innerHTML += `<tr><td><b>${t.service}</b><br><small style="color:gray">${new Date(t.created_at).toLocaleDateString()}</small></td>
-        <td style="text-align:right"><span class="${isPos?'miditra':'mivoaka'}">${isPos?'+':'-'} ${parseFloat(t.montant).toLocaleString()} Ar</span></td>
-        <td style="text-align:right"><span class="status-badge ${cls}">${t.status}</span></td></tr>`;
+        
+        // Eto no manampy ny lera (heure)
+        const dateObj = new Date(t.created_at);
+        const dateFormatted = dateObj.toLocaleDateString('fr-FR');
+        const heureFormatted = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+        b.innerHTML += `
+            <tr>
+                <td>
+                    <b>${t.service}</b><br>
+                    <small style="color:var(--gray)">${dateFormatted} à ${heureFormatted}</small>
+                </td>
+                <td style="text-align:right">
+                    <span class="${isPos ? 'miditra' : 'mivoaka'}">
+                        ${isPos ? '+' : '-'} ${parseFloat(t.montant).toLocaleString()} Ar
+                    </span>
+                </td>
+                <td style="text-align:right">
+                    <span class="status-badge ${cls}">${t.status}</span>
+                </td>
+            </tr>`;
     });
 }
 
