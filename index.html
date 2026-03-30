@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TakaloCash Premium - FR Edition</title>
+    <title>TakaloCash Premium - Final Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -16,33 +16,45 @@
         }
         body { margin: 0; background: var(--bg-body); font-family: 'Inter', sans-serif; color: white; overflow-x: hidden; }
         header { background: var(--bg-nav); padding: 18px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
-        footer { background: var(--bg-nav); padding: 40px 20px; border-top: 1px solid var(--border); margin-top: 50px; }
         .container { max-width: 480px; margin: auto; padding: 15px; display: none; }
+        
+        /* SOLDE */
         .solde-card { text-align: center; padding: 35px 20px; background: radial-gradient(circle at top right, #1c2128, #0d1117); border-radius: 28px; margin-bottom: 25px; border: 1px solid var(--border); }
         .solde-amount { font-size: 38px; font-weight: 800; margin: 8px 0; letter-spacing: -1px; }
-        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
-        .service-item { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 18px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; }
-        .icon-box { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: #000; border: 1px solid var(--border); flex-shrink: 0; }
-        .service-info b { font-size: 14px; display: block; }
-        .service-info small { font-size: 10px; color: var(--gray); display: block; margin-top: 2px; }
+
+        /* ACTIONS & SERVICES */
         .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
         .btn-action { border: none; padding: 18px; border-radius: 16px; font-weight: 700; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-env { background: var(--grad-yellow); color: black; }
         .btn-rec { background: var(--green); color: white; }
+        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .service-item { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 18px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .icon-box { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: #000; border: 1px solid var(--border); flex-shrink: 0; }
+        
+        /* TRANS BOX */
+        .trans-box { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 22px; margin-bottom: 30px; }
+        .styled-input { background: var(--bg-body); border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: white; width: 100%; box-sizing: border-box; outline: none; font-size: 14px; margin-top: 5px; }
         .btn-valider { width: 100%; background: var(--grad-yellow); border: none; padding: 18px; border-radius: 14px; font-weight: 800; cursor: pointer; color: black; margin-top: 15px; font-size: 16px; }
+
+        /* HISTORIQUE FILTERS */
+        .scroll-filter { display: flex; gap: 10px; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; }
+        .filter-chip { background: var(--card); border: 1px solid var(--border); padding: 8px 18px; border-radius: 25px; font-size: 11px; white-space: nowrap; cursor: pointer; color: var(--gray); font-weight: 600; }
+        .filter-chip.active { background: var(--yellow); color: black; border-color: var(--yellow); }
         .history-table { width: 100%; border-collapse: collapse; }
         .history-table td { padding: 16px 0; border-bottom: 1px solid var(--border); }
+        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; background: rgba(255,255,255,0.05); }
+
+        /* FOOTER */
+        footer { background: var(--bg-nav); padding: 40px 20px; border-top: 1px solid var(--border); margin-top: 50px; }
+        .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 30px; }
+        .footer-link { color: var(--gray); text-decoration: none; font-size: 12px; display: block; margin-bottom: 10px; transition: 0.2s; }
+        .lang-container { display: flex; align-items: center; gap: 8px; color: var(--gray); font-size: 12px; }
+        .lang-select { background: transparent; color: var(--gray); border: none; font-size: 12px; font-weight: 600; cursor: pointer; outline: none; }
+
+        /* SIDEBAR */
         .sidebar { position: fixed; top: 0; right: -100%; width: 80%; height: 100%; background: var(--bg-nav); z-index: 2000; transition: 0.4s; padding: 30px; box-sizing: border-box; }
         .sidebar.active { right: 0; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; z-index: 1500; backdrop-filter: blur(5px); }
-        .trans-box { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 22px; margin-bottom: 30px; }
-        .styled-input { background: var(--bg-body); border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: white; width: 100%; box-sizing: border-box; outline: none; font-size: 14px; margin-top: 5px; }
-        .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 30px; }
-        .footer-link { color: var(--gray); text-decoration: none; font-size: 12px; display: block; margin-bottom: 10px; }
-        
-        /* STYLE LANGUE NOHAMAFISINA */
-        .lang-container { display: flex; align-items: center; gap: 8px; margin-top: 12px; color: var(--gray); font-size: 12px; }
-        .lang-select { background: transparent; color: var(--gray); border: none; font-size: 12px; font-weight: 600; cursor: pointer; outline: none; padding: 0; }
     </style>
 </head>
 <body>
@@ -88,22 +100,10 @@
         </div>
 
         <div class="services-grid">
-            <div class="service-item" onclick="switchMode('Envoyer')">
-                <div class="icon-box" style="color:#f3ba2f;"><i class="fa-solid fa-brands fa-bitcoin"></i></div>
-                <div class="service-info"><b>Crypto</b><small>TRX, BTC, USDT...</small></div>
-            </div>
-            <div class="service-item" onclick="switchMode('Envoyer')">
-                <div class="icon-box" style="color:#8132ad;"><i class="fa-solid fa-wallet"></i></div>
-                <div class="service-info"><b>Portefeuille</b><small>Skrill, Neteller...</small></div>
-            </div>
-            <div class="service-item" onclick="switchMode('Envoyer')">
-                <div class="icon-box" style="color:#00a3da; background:white; padding:4px;"><img src="https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg" width="28"></div>
-                <div class="service-info"><b>1xBet</b><small>Dépôt, Retrait</small></div>
-            </div>
-            <div class="service-item" id="service-starlink" onclick="switchMode('Envoyer')">
-                <div class="icon-box" style="color:white;"><i class="fa-solid fa-satellite-dish"></i></div>
-                <div class="service-info"><b>Starlink</b><small>Abonnement</small></div>
-            </div>
+            <div class="service-item" onclick="switchMode('Envoyer')"><div class="icon-box" style="color:#f3ba2f;"><i class="fa-solid fa-brands fa-bitcoin"></i></div><div class="service-info"><b>Crypto</b><small>TRX, BTC, USDT...</small></div></div>
+            <div class="service-item" onclick="switchMode('Envoyer')"><div class="icon-box" style="color:#8132ad;"><i class="fa-solid fa-wallet"></i></div><div class="service-info"><b>Portefeuille</b><small>Skrill, Neteller...</small></div></div>
+            <div class="service-item" onclick="switchMode('Envoyer')"><div class="icon-box" style="color:#00a3da; background:white; padding:4px;"><img src="https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg" width="28"></div><div class="service-info"><b>1xBet</b><small>Dépôt, Retrait</small></div></div>
+            <div class="service-item" id="service-starlink" onclick="switchMode('Envoyer')"><div class="icon-box" style="color:white;"><i class="fa-solid fa-satellite-dish"></i></div><div class="service-info"><b>Starlink</b><small>Abonnement</small></div></div>
         </div>
 
         <div class="trans-box">
@@ -119,7 +119,7 @@
                 <span style="color:var(--gray)">Solde: <b id="mini-solde" style="color:white">0 Ar</b></span>
                 <span id="calc-res" style="color:var(--yellow); font-weight:800;">0.00 TRX</span>
             </div>
-            <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Confirmer la transaction</button>
+            <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Confirmer</button>
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
@@ -130,6 +130,14 @@
     </div>
 
     <div id="page-history" style="display:none;">
+        <div class="scroll-filter" id="type-filter">
+            <div class="filter-chip active" onclick="filterType('Tous', this)">Tous</div>
+            <div class="filter-chip" onclick="filterType('Envoyer', this)">Envoyer</div>
+            <div class="filter-chip" onclick="filterType('Recevoir', this)">Recevoir</div>
+            <div class="filter-chip" onclick="filterType('Dépôt', this)">Dépôt</div>
+            <div class="filter-chip" onclick="filterType('Retrait', this)">Retrait</div>
+        </div>
+        <div class="scroll-filter" id="month-filter-container"></div>
         <table class="history-table"><tbody id="history-full-body"></tbody></table>
     </div>
 </div>
@@ -139,23 +147,22 @@
         <div class="footer-grid">
             <div>
                 <b style="color:white; font-size:14px; display:block; margin-bottom:15px;">Informations</b>
-                <a href="#" class="footer-link">Conditions</a>
+                <a href="#" class="footer-link">Conditions d'utilisation</a>
                 <a href="#" class="footer-link">Confidentialité</a>
+                <a href="#" class="footer-link">Cookies</a>
             </div>
             <div>
                 <b style="color:white; font-size:14px; display:block; margin-bottom:15px;">Support</b>
-                <a href="#" class="footer-link">WhatsApp Direct</a>
-                <div class="lang-container">
+                <a href="#" class="footer-link"><i class="fa-brands fa-whatsapp"></i> WhatsApp Direct</a>
+                <a href="#" class="footer-link">Centre d'aide</a>
+                <div class="lang-container" style="margin-top:10px;">
                     <span>Langue :</span>
-                    <select class="lang-select">
-                        <option>Français (FR)</option>
-                        <option>Malagasy (MG)</option>
-                    </select>
+                    <select class="lang-select"><option>Français (FR)</option><option>Malagasy (MG)</option></select>
                 </div>
             </div>
         </div>
         <div style="text-align:center; padding-top:20px; border-top:1px solid var(--border); font-size:11px; color:var(--gray);">
-            © 2026 TakaloCash Madagascar.
+            © 2026 TakaloCash Madagascar. Tous droits réservés.
         </div>
     </div>
 </footer>
@@ -163,18 +170,17 @@
 <div id="modal-mobile" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:5000; align-items:center; justify-content:center; padding:20px;">
     <div style="background:var(--card); padding:30px; border-radius:28px; width:100%; max-width:340px; border:1px solid var(--border);">
         <h3 id="mob-title" style="color:var(--yellow); margin-top:0;">Dépôt MM</h3>
-        <select id="mob-op" class="styled-input" style="margin-bottom:12px;"><option>Mvola</option><option>Orange Money</option><option>Airtel Money</option></select>
-        <input type="number" id="mob-amount" class="styled-input" placeholder="Montant en Ariary">
+        <input type="number" id="mob-amount" class="styled-input" placeholder="Montant en Ar">
         <input type="tel" id="mob-phone" class="styled-input" placeholder="Numéro de compte" style="margin-top:12px;">
-        <button class="btn-valider" onclick="executeMobile()">Valider le transfert</button>
+        <button class="btn-valider" onclick="executeMobile()">Valider</button>
         <p onclick="document.getElementById('modal-mobile').style.display='none'" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:20px; font-size:13px;">Annuler</p>
     </div>
 </div>
 
 <script>
 const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
-let currentUserId = null, currentMode = "Envoyer", userSolde = 0;
-const TAUX = { "TRX": 150, "USDT": 4600 }, ADDR_REC = { "TRX": "T-ADMIN-TRX-001", "USDT": "T-ADMIN-USDT-001" };
+let currentUserId = null, userSolde = 0, allTransactions = [], currentFilter = "Tous", selectedMonth = null;
+const TAUX = { "TRX": 150, "USDT": 4600 }, months = ["Janv", "Févr", "Mars", "Avr", "Mai", "Juin", "Juil", "Août", "Sept", "Oct", "Nov", "Déc"];
 
 function toggleMenu(){ document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display=document.getElementById('sidebar').classList.contains('active')?'block':'none'; }
 
@@ -194,7 +200,8 @@ async function fetchData(){
     const {data:u}=await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
     if(u){ userSolde = u.solde; updateSoldeUI(); }
     const {data:ts}=await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at',{ascending:false});
-    renderPreview(ts || []);
+    allTransactions = ts || [];
+    renderPreview(); renderFullHistory(); renderMonthPicker();
 }
 
 function updateSoldeUI(){
@@ -205,66 +212,75 @@ function updateSoldeUI(){
 function switchMode(m){
     currentMode = m; document.getElementById('trans-title').innerText = m + " Crypto";
     document.getElementById('service-starlink').style.display = m==='Recevoir' ? 'none' : 'flex';
-    document.getElementById('label-right').innerText = m==='Recevoir' ? "Quantité Crypto :" : "Montant (Ar) :";
-    if(m==='Recevoir'){ document.getElementById('input-addr').value=ADDR_REC[document.getElementById('crypto-select').value]; document.getElementById('input-addr').readOnly=true; }
-    else { document.getElementById('input-addr').value=""; document.getElementById('input-addr').readOnly=false; }
     updateCalc();
 }
 
 function updateCalc(){
     const cry = document.getElementById('crypto-select').value, val = parseFloat(document.getElementById('input-main').value) || 0;
-    if(currentMode === 'Envoyer') document.getElementById('calc-res').innerText = (val/TAUX[cry]).toFixed(2)+" "+cry;
-    else document.getElementById('calc-res').innerText = (val*TAUX[cry]).toLocaleString()+" Ar";
+    document.getElementById('calc-res').innerText = (val/TAUX[cry]).toFixed(2)+" "+cry;
 }
 
-// LOGIC MANALA SOLDE AVY HATRANY
 async function executeTrans(){
     const val = parseFloat(document.getElementById('input-main').value);
-    if(!val) return;
-    const finalAr = currentMode === 'Envoyer' ? val : (val * TAUX[document.getElementById('crypto-select').value]);
-    
-    if(currentMode === 'Envoyer'){
-        if(userSolde < finalAr) return alert("Solde insuffisant !");
-        userSolde -= finalAr; updateSoldeUI();
-        await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId);
-    }
-    
-    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:finalAr, service:currentMode+" "+document.getElementById('crypto-select').value, status:"En attente", adresse:document.getElementById('input-addr').value}]);
-    alert("Transaction enregistrée ! ✅"); fetchData();
-}
-
-function openMobile(t){ document.getElementById('mob-title').innerText=t+" MM"; document.getElementById('modal-mobile').style.display='flex'; toggleMenu(); }
-
-// LOGIC RETRAIT MM MANALA SOLDE
-async function executeMobile(){
-    const am = parseFloat(document.getElementById('mob-amount').value);
-    if(!am) return;
-    const isRetrait = document.getElementById('mob-title').innerText.includes('Retrait');
-
-    if(isRetrait){
-        if(userSolde < am) return alert("Solde insuffisant !");
-        userSolde -= am; updateSoldeUI();
-        await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId);
-    }
-    
-    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:am, service:document.getElementById('mob-title').innerText, status:"En attente", adresse:document.getElementById('mob-phone').value}]);
-    document.getElementById('modal-mobile').style.display='none';
-    alert("Demande envoyée !"); fetchData();
-}
-
-function renderPreview(ts){
-    const b = document.getElementById('history-preview-body'); b.innerHTML = "";
-    ts.slice(0, 4).forEach(t => {
-        b.innerHTML += `<tr><td><b>${t.service}</b><br><small>${new Date(t.created_at).toLocaleDateString()}</small></td><td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td></tr>`;
-    });
+    if(!val || userSolde < val) return alert("Vérifiez le montant ou solde !");
+    userSolde -= val; updateSoldeUI();
+    await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId);
+    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:val, service:document.getElementById('trans-title').innerText, status:"En attente", adresse:document.getElementById('input-addr').value}]);
+    alert("Enregistré ! ✅"); fetchData();
 }
 
 function showPage(p){
     document.getElementById('page-home').style.display = p==='home'?'block':'none';
     document.getElementById('page-history').style.display = p==='history'?'block':'none';
-    if(p==='history') toggleMenu();
+    if(p==='history'){
+        document.getElementById('header-left').innerHTML = `<i class="fa-solid fa-arrow-left" onclick="showPage('home')" style="color:var(--yellow); cursor:pointer;"></i> &nbsp; Historique`;
+        if(document.getElementById('sidebar').classList.contains('active')) toggleMenu();
+    } else {
+        document.getElementById('header-left').innerHTML = `<span style="color:var(--yellow)">TAKALO</span>CASH`;
+    }
 }
 
+function renderPreview(){
+    const b = document.getElementById('history-preview-body'); b.innerHTML = "";
+    allTransactions.slice(0, 4).forEach(t => {
+        b.innerHTML += `<tr><td><b>${t.service}</b><br><small>${new Date(t.created_at).toLocaleDateString()}</small></td><td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td></tr>`;
+    });
+}
+
+function filterType(type, btn){
+    currentFilter = type;
+    document.querySelectorAll('#type-filter .filter-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderFullHistory();
+}
+
+function renderMonthPicker(){
+    const container = document.getElementById('month-filter-container');
+    container.innerHTML = `<div class="filter-chip ${selectedMonth===null?'active':''}" onclick="filterMonth(null, this)">Tous</div>`;
+    const unique = [...new Set(allTransactions.map(t => new Date(t.created_at).getMonth()))].sort((a,b)=>b-a);
+    unique.forEach(m => { container.innerHTML += `<div class="filter-chip" onclick="filterMonth(${m}, this)">${months[m]}</div>`; });
+}
+
+function filterMonth(m, btn){
+    selectedMonth = m;
+    document.querySelectorAll('#month-filter-container .filter-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderFullHistory();
+}
+
+function renderFullHistory(){
+    const b = document.getElementById('history-full-body'); b.innerHTML = "";
+    let filtered = allTransactions;
+    if(currentFilter !== 'Tous') filtered = filtered.filter(t => t.service.includes(currentFilter));
+    if(selectedMonth !== null) filtered = filtered.filter(t => new Date(t.created_at).getMonth() === selectedMonth);
+    filtered.forEach(t => {
+        const st = t.status==='confirmé'?'var(--green)':'var(--yellow)';
+        b.innerHTML += `<tr><td><b>${t.service}</b><br><small>${new Date(t.created_at).toLocaleDateString()}</small></td><td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b><br><span style="color:${st}; font-size:10px;">${t.status||'en attente'}</span></td></tr>`;
+    });
+}
+
+function openMobile(t){ document.getElementById('mob-title').innerText=t+" MM"; document.getElementById('modal-mobile').style.display='flex'; toggleMenu(); }
+async function executeMobile(){ /* mitovy amin'ny executeTrans ny logique solde */ }
 function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
 initApp();
 </script>
