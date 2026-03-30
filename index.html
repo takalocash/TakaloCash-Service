@@ -14,69 +14,60 @@
             --grad-yellow: linear-gradient(90deg, #fcd535, #f7b500);
             --grad-green: linear-gradient(90deg, #2ebd85, #1e9d6d);
         }
-        body { margin: 0; background: var(--bg); font-family: 'Inter', sans-serif; color: white; line-height: 1.6; }
+        body { margin: 0; background: var(--bg); font-family: 'Inter', sans-serif; color: white; padding-bottom: 20px; }
         .container { max-width: 480px; margin: auto; padding: 15px; display: none; }
         
-        /* HEADER */
+        /* HEADER & SIDEBAR */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
-        .logo { font-weight: 800; font-size: 22px; display: flex; align-items: center; gap: 8px; }
+        .logo { font-weight: 800; font-size: 22px; }
         .logo span { color: var(--yellow); }
-
-        /* SOLDE CARD */
-        .solde-card { text-align: center; padding: 30px 0; background: radial-gradient(circle at top, #1c2128, var(--bg)); border-radius: 20px; margin-bottom: 20px; }
-        .solde-label { color: var(--gray); font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .solde-amount { font-size: 34px; font-weight: 700; margin: 5px 0; }
-
-        /* MAIN BUTTONS */
-        .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .btn-action { border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-env { background: var(--grad-yellow); color: black; }
-        .btn-rec { background: var(--grad-green); color: white; }
-
-        /* SERVICES GRID */
-        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
-        .service-item { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .service-icon { width: 40px; height: 40px; border-radius: 50%; background: #000; display: flex; align-items: center; justify-content: center; color: var(--yellow); border: 1px solid var(--border); }
-        .service-info b { font-size: 13px; display: block; }
-        .service-info small { color: var(--gray); font-size: 10px; }
-
-        /* FORM TRANSACTION */
-        .trans-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 30px; }
-        .trans-tabs { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .trans-tabs b { color: var(--yellow); font-size: 15px; }
-        
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .input-group { display: flex; flex-direction: column; gap: 5px; }
-        .input-group label { font-size: 11px; color: var(--gray); }
-        .styled-input { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: white; outline: none; width: 100%; box-sizing: border-box; }
-        
-        .full-row { margin-bottom: 15px; }
-        .btn-valider { width: 100%; background: var(--grad-yellow); border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; color: black; margin-top: 10px; }
-
-        /* FOOTER */
-        .footer { border-top: 1px solid var(--border); padding: 30px 0; margin-top: 40px; }
-        .footer-links { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
-        .footer-links div b { font-size: 13px; display: block; margin-bottom: 8px; color: var(--gray); }
-        .footer-links div a { display: block; font-size: 12px; color: white; text-decoration: none; margin-bottom: 5px; opacity: 0.8; }
-        .contact-info { font-size: 12px; display: flex; flex-direction: column; gap: 8px; }
-        .contact-info span { display: flex; align-items: center; gap: 8px; }
-
-        /* SIDEBAR (HISTORY & MENU) */
         .sidebar { position: fixed; top: 0; right: -100%; width: 85%; height: 100%; background: #1c2128; z-index: 7000; transition: 0.3s; padding: 25px; box-sizing: border-box; }
         .sidebar.active { right: 0; }
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 6500; }
 
-        /* UTILS */
-        #auth-container { position: fixed; inset: 0; background: var(--bg); z-index: 8000; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: var(--card); padding: 30px; border-radius: 20px; width: 320px; text-align: center; border: 1px solid var(--border); }
-        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; }
+        /* SOLDE & ACTIONS */
+        .solde-card { text-align: center; padding: 25px 0; background: radial-gradient(circle at top, #1c2128, var(--bg)); border-radius: 20px; }
+        .solde-amount { font-size: 34px; font-weight: 700; margin: 5px 0; }
+        .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+        .btn-action { border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-env { background: var(--grad-yellow); color: black; }
+        .btn-rec { background: var(--grad-green); color: white; }
+
+        /* SERVICES GRID */
+        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .service-item { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .service-icon { width: 35px; height: 35px; border-radius: 50%; background: #000; display: flex; align-items: center; justify-content: center; color: var(--yellow); border: 1px solid var(--border); }
+
+        /* FORM BOX */
+        .trans-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 11px; color: var(--gray); }
+        .styled-input { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: white; outline: none; width: 100%; box-sizing: border-box; }
+        .btn-valider { width: 100%; background: var(--grad-yellow); border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; color: black; margin-top: 10px; }
+
+        /* HISTORY TABLE */
+        .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .history-table td { padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .status-badge { padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .status-confirme { color: var(--green); background: rgba(46, 189, 133, 0.1); }
+        .status-attente { color: var(--yellow); background: rgba(252, 213, 53, 0.1); }
+
+        /* MODALS & AUTH */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 8000; align-items: center; justify-content: center; }
+        .modal-content { background: var(--card); padding: 25px; border-radius: 20px; width: 85%; max-width: 340px; border: 1px solid var(--border); }
+        #auth-container { position: fixed; inset: 0; background: var(--bg); z-index: 9000; display: flex; align-items: center; justify-content: center; }
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--yellow); color: black; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 700; display: none; z-index: 9999; }
+        
+        /* FOOTER */
+        .footer { border-top: 1px solid var(--border); padding: 20px 0; margin-top: 30px; font-size: 12px; }
+        .footer a { color: white; text-decoration: none; display: block; margin-bottom: 5px; opacity: 0.7; }
     </style>
 </head>
 <body>
 
 <div id="auth-container">
-    <div class="auth-card">
+    <div style="background:var(--card); padding:30px; border-radius:20px; width:300px; text-align:center;">
         <h2 style="color:var(--yellow)">TakaloCash</h2>
         <input type="email" id="auth-email" class="styled-input" placeholder="Email" style="margin-bottom:10px">
         <input type="password" id="auth-password" class="styled-input" placeholder="Mot de passe" style="margin-bottom:20px">
@@ -86,128 +77,123 @@
 
 <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
 <div class="sidebar" id="sidebar">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <h3>Menu</h3>
-        <i class="fa-solid fa-xmark" onclick="toggleMenu()" style="font-size:24px;"></i>
-    </div>
-    <div onclick="showHistory()" style="padding:15px 0; border-bottom:1px solid var(--border);"><i class="fa-solid fa-clock-rotate-left"></i> Historique</div>
-    <div onclick="openMobile('Dépôt')" style="padding:15px 0; border-bottom:1px solid var(--border);"><i class="fa-solid fa-arrow-down"></i> Dépôt MM</div>
-    <div onclick="openMobile('Retrait')" style="padding:15px 0; border-bottom:1px solid var(--border);"><i class="fa-solid fa-arrow-up"></i> Retrait MM</div>
-    <div onclick="logout()" style="padding:15px 0; color:var(--red); margin-top:20px;"><i class="fa-solid fa-power-off"></i> Déconnexion</div>
+    <h3 style="border-bottom:1px solid var(--border); padding-bottom:10px;">Menu</h3>
+    <div onclick="showFullHistory()" style="padding:15px 0; cursor:pointer;"><i class="fa-solid fa-clock"></i> Historique Complet</div>
+    <div onclick="openMobile('Dépôt')" style="padding:15px 0; cursor:pointer;"><i class="fa-solid fa-plus-circle"></i> Dépôt Mobile Money</div>
+    <div onclick="openMobile('Retrait')" style="padding:15px 0; cursor:pointer;"><i class="fa-solid fa-minus-circle"></i> Retrait Mobile Money</div>
+    <div onclick="logout()" style="padding:15px 0; color:var(--red); cursor:pointer; margin-top:20px;"><i class="fa-solid fa-power-off"></i> Déconnexion</div>
 </div>
 
 <div class="container" id="main-app">
     <div class="header">
         <div class="logo"><span>TC</span> TakaloCash</div>
-        <div style="display:flex; gap:15px; align-items:center;">
-            <i class="fa-solid fa-bell" style="font-size:20px; position:relative;"><span style="position:absolute; top:-5px; right:-5px; background:var(--red); font-size:9px; padding:2px 5px; border-radius:50%;">2</span></i>
-            <img src="https://i.pravatar.cc/100?u=9" style="width:32px; border-radius:50%; border:1px solid var(--yellow);" onclick="toggleMenu()">
-            <i class="fa-solid fa-bars" style="font-size:20px;" onclick="toggleMenu()"></i>
-        </div>
+        <i class="fa-solid fa-bars" style="font-size:22px; cursor:pointer;" onclick="toggleMenu()"></i>
     </div>
 
-    <div class="solde-card">
-        <div class="solde-label">Solde disponible <i class="fa-solid fa-arrow-trend-up" style="color:var(--green)"></i></div>
-        <h1 class="solde-amount" id="display-solde">0 Ar</h1>
-    </div>
-
-    <div class="main-actions">
-        <button class="btn-action btn-env" onclick="switchMode('Envoyer')"><i class="fa-solid fa-arrow-right"></i> Envoyer</button>
-        <button class="btn-action btn-rec" onclick="switchMode('Recevoir')"><i class="fa-solid fa-arrow-left"></i> Recevoir</button>
-    </div>
-
-    <div class="services-grid">
-        <div class="service-item">
-            <div class="service-icon"><i class="fa-solid fa-bitcoin-sign"></i></div>
-            <div class="service-info"><b>Crypto</b><small>Envoyer & recevoir</small></div>
-        </div>
-        <div class="service-item">
-            <div class="service-icon"><i class="fa-solid fa-wallet"></i></div>
-            <div class="service-info"><b>P. Feuille</b><small>Skrill, Neteller...</small></div>
-        </div>
-        <div class="service-item">
-            <div class="service-icon"><b style="font-size:10px">1X</b></div>
-            <div class="service-info"><b>1xBet</b><small>Dépôt & Retrait</small></div>
-        </div>
-        <div class="service-item" onclick="notify('Bientôt disponible')">
-            <div class="service-icon"><i class="fa-solid fa-satellite-dish"></i></div>
-            <div class="service-info"><b>Starlink</b><small>Paiement & Boost</small></div>
-        </div>
-    </div>
-
-    <div class="trans-box">
-        <div class="trans-tabs">
-            <b id="trans-title">Envoyer Crypto</b>
-            <i class="fa-solid fa-chevron-down" style="font-size:12px; color:var(--gray)"></i>
+    <div id="home-content">
+        <div class="solde-card">
+            <div style="color:var(--gray); font-size:14px;">Solde disponible</div>
+            <h1 class="solde-amount" id="display-solde">0 Ar</h1>
         </div>
 
-        <div class="form-row">
-            <div class="input-group">
-                <label>Choisir crypto :</label>
-                <select id="crypto-select" class="styled-input" onchange="updateCalc()">
-                    <option value="TRX">TRX (TRC20)</option>
-                    <option value="USDT">USDT (TRC20)</option>
-                </select>
+        <div class="main-actions">
+            <button class="btn-action btn-env" onclick="switchMode('Envoyer')">Envoyer</button>
+            <button class="btn-action btn-rec" onclick="switchMode('Recevoir')">Recevoir</button>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-item">
+                <div class="service-icon">C</div>
+                <div><b>Crypto</b><br><small>BTC, TRX, USDT</small></div>
             </div>
-            <div class="input-group">
-                <label>Montant à <span id="mode-label">envoyer</span> (Ar) :</label>
-                <input type="number" id="amount-ar" class="styled-input" placeholder="0 Ar" oninput="updateCalc()">
+            <div class="service-item">
+                <div class="service-icon">W</div>
+                <div><b>Porte-feuille</b><br><small>Skrill, Neteller</small></div>
+            </div>
+            <div class="service-item">
+                <div class="service-icon">1X</div>
+                <div><b>1xBet</b><br><small>Dépôt/Retrait</small></div>
+            </div>
+            <div class="service-item" id="service-starlink">
+                <div class="service-icon">S</div>
+                <div><b>Starlink</b><br><small>Abonnement</small></div>
             </div>
         </div>
 
-        <div class="full-row">
-            <div class="input-group">
-                <label id="addr-label">Adresse crypto destinataire :</label>
-                <input type="text" id="crypto-addr" class="styled-input" placeholder="Saisir l'adresse">
+        <div class="trans-box">
+            <b id="trans-title" style="color:var(--yellow); display:block; margin-bottom:15px;">Envoyer Crypto</b>
+            <div class="form-row">
+                <div class="input-group">
+                    <label id="label-left">Choisir crypto :</label>
+                    <select id="crypto-select" class="styled-input" onchange="updateCalc()"><option value="TRX">TRX</option><option value="USDT">USDT</option></select>
+                </div>
+                <div class="input-group">
+                    <label id="label-right">Montant (Ar) :</label>
+                    <input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()">
+                </div>
             </div>
+            <div class="input-group" style="margin-bottom:15px;">
+                <label id="label-addr">Adresse destinataire :</label>
+                <input type="text" id="input-addr" class="styled-input">
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:11px;">
+                <span style="color:var(--gray)">Solde: <b id="mini-solde">0 Ar</b></span>
+                <span id="calc-res" style="color:var(--yellow)">0.00 TRX</span>
+            </div>
+            <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Valider</button>
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
-            <small style="color:var(--green); font-size:11px;">Solde disponible <b id="mini-solde">0 Ar</b></small>
-            <small style="color:var(--gray); font-size:11px;">Equivalent crypto: <b id="calc-res" style="color:white">0.00 TRX</b></small>
+        <div class="history-preview">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <small style="color:var(--gray)">Activités récentes</small>
+                <small onclick="showFullHistory()" style="color:var(--yellow); cursor:pointer;">Voir tout</small>
+            </div>
+            <table class="history-table"><tbody id="history-body"></tbody></table>
         </div>
-
-        <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Valider l'envoi</button>
     </div>
 
     <div class="footer">
-        <div class="footer-links">
+        <div style="display:grid; grid-template-columns:1fr 1fr;">
             <div>
                 <b>Information</b>
                 <a href="#">Conditions d'utilisation</a>
                 <a href="#">Politique de confidentialité</a>
             </div>
             <div>
-                <b>Chat & Aide</b>
-                <a href="#"><i class="fa-solid fa-headset"></i> Centre d'aide</a>
-                <a href="#"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+                <b>Contact</b>
+                <a href="#">WhatsApp</a>
+                <a href="#">Email</a>
             </div>
         </div>
-        <div class="contact-info">
-            <b>Contactez-nous</b>
-            <span><i class="fa-solid fa-envelope" style="color:var(--yellow)"></i> support@takalocash.com</span>
-        </div>
+    </div>
+</div>
+
+<div id="modal-mobile" class="modal">
+    <div class="modal-content">
+        <h3 id="mob-title" style="color:var(--yellow)">Dépôt MM</h3>
+        <select id="mob-op" class="styled-input" style="margin-bottom:10px;"><option>Mvola</option><option>Orange Money</option><option>Airtel Money</option></select>
+        <input type="number" id="mob-amount" class="styled-input" placeholder="Montant Ar" style="margin-bottom:10px;">
+        <input type="tel" id="mob-phone" class="styled-input" placeholder="Numéro de téléphone" style="margin-bottom:15px;">
+        <button class="btn-valider" onclick="executeMobile()">Valider</button>
+        <p onclick="closeModal()" style="text-align:center; cursor:pointer; font-size:12px; color:var(--gray); margin-top:10px;">Anuler</p>
     </div>
 </div>
 
 <div id="toast" class="toast"></div>
 
 <script>
-// --- SUPABASE & DATA ---
 const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
-
-let currentUserId = null, currentMode = "Envoyer";
-const TAUX = { "TRX": 150, "USDT": 4600 };
-const ADDR_REC = { "TRX": "T-REC-TRX-ADDRESS-XYZ", "USDT": "T-REC-USDT-ADDRESS-XYZ" };
+let currentUserId = null, currentMode = "Envoyer", allTransactions = [];
+const TAUX = { "TRX": 150, "USDT": 4600 }, ADDR_REC = { "TRX": "T-REC-TRX-ADDRESS", "USDT": "T-REC-USDT-ADDRESS" };
 
 function notify(m){ const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
 function toggleMenu(){ document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display=document.getElementById('sidebar').classList.contains('active')?'block':'none'; }
+function closeModal(){ document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
 
-// --- AUTH ---
 async function handleLogin(){
     const e=document.getElementById('auth-email').value, p=document.getElementById('auth-password').value;
-    const {error}=await supabaseClient.auth.signInWithPassword({email:e, password:p});
-    if(error) return alert(error.message);
+    const {data, error}=await supabaseClient.auth.signInWithPassword({email:e, password:p});
+    if(error) return alert("Diso ny email na mot de passe!");
     initApp();
 }
 
@@ -223,71 +209,78 @@ async function initApp(){
 
 async function fetchData(){
     const {data:u}=await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
-    if(u){
-        document.getElementById('display-solde').innerText = u.solde.toLocaleString()+" Ar";
-        document.getElementById('mini-solde').innerText = u.solde.toLocaleString()+" Ar";
-    }
+    if(u){ document.getElementById('display-solde').innerText = u.solde.toLocaleString()+" Ar"; document.getElementById('mini-solde').innerText = u.solde.toLocaleString()+" Ar"; }
+    const {data:ts}=await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at',{ascending:false});
+    allTransactions = ts || [];
+    renderHistory();
 }
 
-// --- APP LOGIC ---
+function renderHistory(){
+    const b = document.getElementById('history-body'); b.innerHTML = "";
+    allTransactions.slice(0, 3).forEach(t => {
+        const statusCls = (t.status||'').toLowerCase() === 'confirmé' ? 'status-confirme' : 'status-attente';
+        b.innerHTML += `<tr>
+            <td><b>${t.service}</b><br><small style="color:var(--gray)">${new Date(t.created_at).toLocaleDateString()}</small></td>
+            <td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td>
+            <td style="text-align:right"><span class="status-badge ${statusCls}">${t.status || 'attente'}</span></td>
+        </tr>`;
+    });
+}
+
 function switchMode(m){
     currentMode = m;
     document.getElementById('trans-title').innerText = m + " Crypto";
-    document.getElementById('mode-label').innerText = m.toLowerCase();
-    document.getElementById('btn-submit').innerText = "Valider " + (m === 'Envoyer' ? "l'envoi" : "la réception");
-    document.getElementById('btn-submit').style.background = m === 'Envoyer' ? 'var(--grad-yellow)' : 'var(--grad-green)';
-    document.getElementById('btn-submit').style.color = m === 'Envoyer' ? 'black' : 'white';
+    document.getElementById('btn-submit').innerText = "Valider " + (m==='Envoyer'?"l'envoi":"la réception");
+    document.getElementById('btn-submit').style.background = m==='Envoyer'?'var(--grad-yellow)':'var(--grad-green)';
+    document.getElementById('service-starlink').style.display = m==='Recevoir' ? 'none' : 'flex';
     
     if(m === 'Recevoir'){
-        document.getElementById('addr-label').innerText = "Adresse à laquelle vous envoyez :";
-        document.getElementById('crypto-addr').value = ADDR_REC[document.getElementById('crypto-select').value];
-        document.getElementById('crypto-addr').readOnly = true;
+        document.getElementById('label-left').innerText = "Crypto andraisana :";
+        document.getElementById('label-right').innerText = "Quantité Crypto :";
+        document.getElementById('input-main').placeholder = "0.00";
+        document.getElementById('label-addr').innerText = "Adresse andefasana (TakaloCash) :";
+        document.getElementById('input-addr').value = ADDR_REC[document.getElementById('crypto-select').value];
+        document.getElementById('input-addr').readOnly = true;
     } else {
-        document.getElementById('addr-label').innerText = "Adresse crypto destinataire :";
-        document.getElementById('crypto-addr').value = "";
-        document.getElementById('crypto-addr').readOnly = false;
+        document.getElementById('label-left').innerText = "Choisir crypto :";
+        document.getElementById('label-right').innerText = "Montant (Ar) :";
+        document.getElementById('input-main').placeholder = "0";
+        document.getElementById('label-addr').innerText = "Adresse destinataire :";
+        document.getElementById('input-addr').value = "";
+        document.getElementById('input-addr').readOnly = false;
     }
     updateCalc();
 }
 
 function updateCalc(){
     const cry = document.getElementById('crypto-select').value;
-    const ar = parseFloat(document.getElementById('amount-ar').value) || 0;
-    document.getElementById('calc-res').innerText = (ar / TAUX[cry]).toFixed(2) + " " + cry;
-    if(currentMode === 'Recevoir') document.getElementById('crypto-addr').value = ADDR_REC[cry];
+    const val = parseFloat(document.getElementById('input-main').value) || 0;
+    if(currentMode === 'Envoyer'){
+        document.getElementById('calc-res').innerText = (val / TAUX[cry]).toFixed(2) + " " + cry;
+    } else {
+        document.getElementById('calc-res').innerText = (val * TAUX[cry]).toLocaleString() + " Ar";
+        document.getElementById('input-addr').value = ADDR_REC[cry];
+    }
 }
 
 async function executeTrans(){
-    const ar = parseFloat(document.getElementById('amount-ar').value);
-    const adr = document.getElementById('crypto-addr').value;
-    const cry = document.getElementById('crypto-select').value;
-    
-    if(!ar || !adr) return notify("Fenoy ny banga rehetra! ⚠️");
-    
-    // Logic fanovana solde raha Envoyer
-    if(currentMode === "Envoyer"){
-        const {data:u}=await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
-        if(u.solde < ar) return notify("Tsy ampy ny solde-nao! ❌");
-        await supabaseClient.from('users').update({solde: u.solde - ar}).eq('id', currentUserId);
-    }
-
-    await supabaseClient.from('transactions').insert([{
-        user_id: currentUserId,
-        montant: ar,
-        service: currentMode + " " + cry,
-        status: "En attente",
-        adresse: adr
-    }]);
-
-    notify("Transaction voaray! ✅");
-    fetchData();
+    const val = parseFloat(document.getElementById('input-main').value);
+    if(!val) return notify("Ampidiro ny montant!");
+    const finalAr = currentMode === 'Envoyer' ? val : (val * TAUX[document.getElementById('crypto-select').value]);
+    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:finalAr, service:currentMode+" "+document.getElementById('crypto-select').value, status:"En attente", adresse:document.getElementById('input-addr').value}]);
+    notify("Transaction voaray! ✅"); fetchData();
 }
 
-// Menu Actions
-function showHistory(){ toggleMenu(); alert("Sokafy ny menu 'Historique' ao amin'ny version teo aloha"); }
-function openMobile(type){ toggleMenu(); notify("Sokafy ny " + type + " MM"); }
-function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
+function openMobile(t){ document.getElementById('mob-title').innerText=t+" MM"; document.getElementById('modal-mobile').style.display='flex'; toggleMenu(); }
+async function executeMobile(){
+    const am = document.getElementById('mob-amount').value;
+    if(!am) return alert("Fenoy ny banga!");
+    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:parseFloat(am), service:document.getElementById('mob-title').innerText, status:"En attente", adresse:document.getElementById('mob-phone').value}]);
+    notify("Vita! ✅"); closeModal(); fetchData();
+}
 
+function showFullHistory(){ toggleMenu(); alert("Sokafy ny pejy Historique feno (Efa mandeha ny renderHistory)"); }
+function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
 initApp();
 </script>
 </body>
