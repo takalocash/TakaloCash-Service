@@ -3,95 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TakaloCash Premium - FR Edition</title>
+    <title>TakaloCash Pro v6 - High End</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { 
             --bg-body: #0d1117; --bg-nav: #161b22; --card: #1c2128;
             --yellow: #fcd535; --green: #2ebd85; --red: #ff4d4d; 
-            --gray: #848e9c; --border: rgba(255,255,255,0.1);
-            --grad-yellow: linear-gradient(135deg, #fcd535, #f7b500);
+            --gray: #848e9c; --border: rgba(255,255,255,0.08);
+            --grad-premium: linear-gradient(135deg, #fcd535, #f7b500);
+            --glass: rgba(255, 255, 255, 0.03);
         }
-        body { margin: 0; background: var(--bg-body); font-family: 'Inter', sans-serif; color: white; overflow-x: hidden; }
+        body { margin: 0; background: var(--bg-body); font-family: 'Inter', sans-serif; color: white; -webkit-font-smoothing: antialiased; }
         
-        header { background: var(--bg-nav); padding: 18px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
-        footer { background: var(--bg-nav); padding: 40px 20px; border-top: 1px solid var(--border); margin-top: 50px; }
+        /* NAVIGATION */
+        header { background: var(--bg-nav); padding: 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .container { max-width: 480px; margin: auto; padding: 20px; display: none; animation: fadeIn 0.4s ease; }
         
-        .container { max-width: 480px; margin: auto; padding: 15px; display: none; }
-        
-        .solde-card { text-align: center; padding: 35px 20px; background: radial-gradient(circle at top right, #1c2128, #0d1117); border-radius: 28px; margin-bottom: 25px; border: 1px solid var(--border); }
-        .solde-amount { font-size: 38px; font-weight: 800; margin: 8px 0; letter-spacing: -1px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
-        .service-item { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 18px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; }
-        .icon-box { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: #000; border: 1px solid var(--border); flex-shrink: 0; }
-        .service-info b { font-size: 14px; display: block; }
-        .service-info small { font-size: 10px; color: var(--gray); display: block; margin-top: 2px; }
+        /* SOLDE CARD - GLOW EFFECT */
+        .solde-card { 
+            text-align: center; padding: 40px 20px; 
+            background: radial-gradient(circle at top right, #242c36, #0d1117); 
+            border-radius: 32px; margin-bottom: 30px; border: 1px solid var(--border);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .solde-amount { font-size: 42px; font-weight: 900; margin: 10px 0; letter-spacing: -1.5px; background: #fff; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .scroll-filter { display: flex; gap: 10px; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; }
-        .filter-chip { background: var(--card); border: 1px solid var(--border); padding: 8px 18px; border-radius: 25px; font-size: 11px; white-space: nowrap; cursor: pointer; color: var(--gray); font-weight: 600; }
-        .filter-chip.active { background: var(--yellow); color: black; border-color: var(--yellow); }
+        /* ACTIONS */
+        .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 35px; }
+        .btn-action { border: none; padding: 20px; border-radius: 20px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s; box-shadow: 0 8px 15px rgba(0,0,0,0.2); }
+        .btn-env { background: var(--grad-premium); color: #000; }
+        .btn-rec { background: var(--green); color: #fff; }
+        .btn-action:active { transform: scale(0.95); }
 
-        .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
-        .btn-action { border: none; padding: 18px; border-radius: 16px; font-weight: 700; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-env { background: var(--grad-yellow); color: black; }
-        .btn-rec { background: var(--green); color: white; }
-        .btn-valider { width: 100%; background: var(--grad-yellow); border: none; padding: 18px; border-radius: 14px; font-weight: 800; cursor: pointer; color: black; margin-top: 15px; font-size: 16px; }
+        /* SERVICES GRID */
+        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 35px; }
+        .service-item { 
+            background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 22px; 
+            display: flex; align-items: center; gap: 14px; cursor: pointer; transition: 0.2s;
+        }
+        .service-item:hover { background: #222933; }
+        .icon-box { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; background: #000; border: 1px solid var(--border); }
+        .service-info b { font-size: 15px; display: block; font-weight: 700; }
+        .service-info small { font-size: 10px; color: var(--gray); display: block; margin-top: 3px; font-weight: 500; }
 
-        .history-table { width: 100%; border-collapse: collapse; }
-        .history-table td { padding: 16px 0; border-bottom: 1px solid var(--border); }
-        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; }
+        /* TRANSACTION BOX */
+        .trans-box { background: var(--card); border: 1px solid var(--border); border-radius: 28px; padding: 25px; margin-bottom: 35px; box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
+        .styled-input { background: var(--bg-body); border: 1px solid var(--border); border-radius: 14px; padding: 16px; color: white; width: 100%; box-sizing: border-box; outline: none; font-size: 15px; margin-top: 8px; transition: 0.3s; }
+        .styled-input:focus { border-color: var(--yellow); box-shadow: 0 0 10px rgba(252, 213, 53, 0.1); }
+        .btn-valider { width: 100%; background: var(--grad-premium); border: none; padding: 20px; border-radius: 18px; font-weight: 900; cursor: pointer; color: black; margin-top: 20px; font-size: 16px; letter-spacing: 0.5px; }
 
-        .sidebar { position: fixed; top: 0; right: -100%; width: 80%; height: 100%; background: var(--bg-nav); z-index: 2000; transition: 0.4s; padding: 30px; box-sizing: border-box; }
+        /* FOOTER MODERN */
+        footer { background: var(--bg-nav); padding: 50px 25px; border-top: 1px solid var(--border); margin-top: 60px; }
+        .footer-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 30px; margin-bottom: 30px; }
+        .footer-link { color: var(--gray); text-decoration: none; font-size: 13px; display: block; margin-bottom: 12px; font-weight: 500; transition: 0.2s; }
+        .footer-link:hover { color: #fff; }
+        .lang-wrapper { font-size: 13px; color: var(--gray); margin-top: 20px; display: flex; align-items: center; gap: 6px; }
+        .lang-select { background: transparent; color: var(--yellow); border: none; font-size: 13px; font-weight: 700; cursor: pointer; outline: none; padding: 0; appearance: none; }
+
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: 0; right: -100%; width: 85%; height: 100%; background: var(--bg-nav); z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 40px 30px; }
         .sidebar.active { right: 0; }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; z-index: 1500; backdrop-filter: blur(5px); }
-        
-        .trans-box { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 22px; margin-bottom: 30px; }
-        .styled-input { background: var(--bg-body); border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: white; width: 100%; box-sizing: border-box; outline: none; font-size: 14px; margin-top: 5px; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; z-index: 1500; backdrop-filter: blur(8px); }
 
-        /* FOOTER LINKS */
-        .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 30px; }
-        .footer-link { color: var(--gray); text-decoration: none; font-size: 12px; display: block; margin-bottom: 10px; transition: 0.2s; }
-        .footer-link:hover { color: var(--yellow); }
-        .lang-select { background: #000; color: white; border: 1px solid var(--border); border-radius: 8px; padding: 8px; font-size: 12px; outline: none; width: 100%; }
+        /* HISTORY */
+        .history-table { width: 100%; border-collapse: collapse; }
+        .history-table td { padding: 18px 0; border-bottom: 1px solid var(--border); }
+        .status-badge { padding: 5px 10px; border-radius: 8px; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
 
 <header id="nav-header" style="display:none;">
     <div style="max-width:480px; margin:auto; display:flex; justify-content:space-between; align-items:center;">
-        <div id="header-left" style="font-weight:900; font-size:24px; letter-spacing:-1px;" onclick="showPage('home')"><span style="color:var(--yellow)">TAKALO</span>CASH</div>
+        <div id="header-left" style="font-weight:900; font-size:26px; letter-spacing:-1.2px;" onclick="showPage('home')"><span style="color:var(--yellow)">TAKALO</span>CASH</div>
         <i class="fa-solid fa-bars-staggered" style="font-size:26px; cursor:pointer; color:var(--yellow);" onclick="toggleMenu()"></i>
     </div>
 </header>
 
 <div id="auth-container" style="position:fixed; inset:0; background:var(--bg-body); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:var(--card); padding:40px 30px; border-radius:30px; width:100%; max-width:320px; text-align:center; border:1px solid var(--border);">
-        <h1 style="color:var(--yellow); font-weight:900; margin-bottom:30px;">Connexion</h1>
+    <div style="background:var(--card); padding:45px 35px; border-radius:35px; width:100%; max-width:340px; text-align:center; border:1px solid var(--border); box-shadow: 0 30px 60px rgba(0,0,0,0.5);">
+        <h1 style="color:var(--yellow); font-weight:900; font-size:32px; margin-bottom:10px;">TC Login</h1>
+        <p style="color:var(--gray); font-size:14px; margin-bottom:35px;">Accédez à votre espace sécurisé</p>
         <input type="email" id="auth-email" class="styled-input" placeholder="Adresse Email">
         <input type="password" id="auth-password" class="styled-input" placeholder="Mot de passe" style="margin-top:15px">
-        <button class="btn-valider" onclick="handleLogin()">Se connecter</button>
+        <button class="btn-valider" onclick="handleLogin()">Se connecter maintenant</button>
     </div>
 </div>
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 <div class="sidebar" id="sidebar">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-        <h2 style="color:var(--yellow); margin:0;">Menu</h2>
-        <i class="fa-solid fa-xmark" onclick="toggleMenu()" style="font-size:24px;"></i>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:50px;">
+        <h2 style="color:var(--yellow); font-weight:900; font-size:28px;">Menu</h2>
+        <i class="fa-solid fa-xmark" onclick="toggleMenu()" style="font-size:28px; color:var(--gray)"></i>
     </div>
-    <div onclick="showPage('history')" style="padding:20px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-clock-rotate-left"></i> &nbsp; Historique complet</div>
-    <div onclick="openMobile('Dépôt')" style="padding:20px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-plus-circle"></i> &nbsp; Dépôt MM</div>
-    <div onclick="openMobile('Retrait')" style="padding:20px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-minus-circle"></i> &nbsp; Retrait MM</div>
-    <div onclick="logout()" style="padding:20px 0; color:var(--red); cursor:pointer; margin-top:40px;"><i class="fa-solid fa-power-off"></i> &nbsp; Déconnexion</div>
+    <div onclick="showPage('history')" style="padding:22px 0; border-bottom:1px solid var(--border); cursor:pointer; font-weight:600; font-size:18px;"><i class="fa-solid fa-history" style="width:30px; color:var(--yellow)"></i> Historique complet</div>
+    <div onclick="openMobile('Dépôt')" style="padding:22px 0; border-bottom:1px solid var(--border); cursor:pointer; font-weight:600; font-size:18px;"><i class="fa-solid fa-arrow-down" style="width:30px; color:var(--green)"></i> Dépôt Mobile Money</div>
+    <div onclick="openMobile('Retrait')" style="padding:22px 0; border-bottom:1px solid var(--border); cursor:pointer; font-weight:600; font-size:18px;"><i class="fa-solid fa-arrow-up" style="width:30px; color:var(--red)"></i> Retrait Mobile Money</div>
+    <div onclick="logout()" style="padding:22px 0; color:var(--red); cursor:pointer; margin-top:50px; font-weight:700;"><i class="fa-solid fa-power-off" style="width:30px;"></i> Déconnexion</div>
 </div>
 
 <div class="container" id="main-app">
     <div id="page-home">
         <div class="solde-card">
-            <div style="color:var(--gray); font-size:13px; font-weight:600; text-transform:uppercase;">Solde Disponible</div>
+            <div style="color:var(--gray); font-size:13px; font-weight:700; letter-spacing:1px;">SOLDE DISPONIBLE</div>
             <h1 class="solde-amount" id="display-solde">0 Ar</h1>
         </div>
 
@@ -110,47 +128,37 @@
                 <div class="service-info"><b>Portefeuille</b><small>Skrill, Neteller...</small></div>
             </div>
             <div class="service-item">
-                <div class="icon-box" style="color:#00a3da; background:white; padding:4px;"><img src="https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg" width="28"></div>
-                <div class="service-info"><b>1xBet</b><small>Dépôt, Retrait</small></div>
+                <div class="icon-box" style="background:#fff; padding:4px;"><img src="https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg" width="30"></div>
+                <div class="service-info"><b>1xBet Pro</b><small>Dépôt & Retrait</small></div>
             </div>
-            <div class="service-item" id="service-starlink">
-                <div class="icon-box" style="color:white;"><i class="fa-solid fa-satellite-dish"></i></div>
+            <div class="service-item">
+                <div class="icon-box" style="color:#fff;"><i class="fa-solid fa-satellite-dish"></i></div>
                 <div class="service-info"><b>Starlink</b><small>Abonnement</small></div>
             </div>
         </div>
 
         <div class="trans-box">
-            <b id="trans-title" style="color:var(--yellow); font-size:18px; display:block; margin-bottom:20px;">Envoyer Crypto</b>
+            <b id="trans-title" style="color:var(--yellow); font-size:20px; display:block; margin-bottom:25px; font-weight:800;">Envoyer Crypto</b>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                <div><label style="font-size:11px; color:var(--gray)">Asset :</label>
-                    <select id="crypto-select" class="styled-input" onchange="updateCalc()"><option value="TRX">TRX (TRC20)</option><option value="USDT">USDT (TRC20)</option></select>
-                </div>
-                <div><label id="label-right" style="font-size:11px; color:var(--gray)">Montant (Ar) :</label><input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()"></div>
+                <div><label style="font-size:11px; color:var(--gray); font-weight:700;">Asset</label><select id="crypto-select" class="styled-input" onchange="updateCalc()"><option value="TRX">TRX (TRC20)</option><option value="USDT">USDT (TRC20)</option></select></div>
+                <div><label id="label-right" style="font-size:11px; color:var(--gray); font-weight:700;">Montant (Ar)</label><input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()"></div>
             </div>
-            <div style="margin-top:20px;"><label id="label-addr" style="font-size:11px; color:var(--gray)">Adresse destinataire :</label><input type="text" id="input-addr" class="styled-input" placeholder="Saisir l'adresse"></div>
-            <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:15px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;">
-                <span style="color:var(--gray)">Solde: <b id="mini-solde" style="color:white">0 Ar</b></span>
-                <span id="calc-res" style="color:var(--yellow); font-weight:800;">0.00 TRX</span>
+            <div style="margin-top:20px;"><label id="label-addr" style="font-size:11px; color:var(--gray); font-weight:700;">Adresse de destination</label><input type="text" id="input-addr" class="styled-input" placeholder="T..."></div>
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-top:20px; background:rgba(255,255,255,0.04); padding:14px; border-radius:12px; border: 1px solid var(--border);">
+                <span style="color:var(--gray)">Dispo: <b id="mini-solde" style="color:#fff">0 Ar</b></span>
+                <span id="calc-res" style="color:var(--yellow); font-weight:900;">0.00 TRX</span>
             </div>
-            <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Confirmer la transaction</button>
+            <button class="btn-valider" onclick="executeTrans()">Confirmer la Transaction</button>
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <b style="color:var(--gray); font-size:14px;">Activités récentes</b>
-            <small onclick="showPage('history')" style="color:var(--yellow); cursor:pointer; font-weight:700;">Tout voir</small>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <b style="color:var(--gray); font-size:14px; font-weight:700;">HISTORIQUE RÉCENT</b>
+            <small onclick="showPage('history')" style="color:var(--yellow); cursor:pointer; font-weight:800;">TOUT VOIR</small>
         </div>
         <table class="history-table"><tbody id="history-preview-body"></tbody></table>
     </div>
 
     <div id="page-history" style="display:none;">
-        <div class="scroll-filter">
-            <div class="filter-chip active" onclick="filterType('Tous', this)">Tous</div>
-            <div class="filter-chip" onclick="filterType('Envoyer', this)">Envoyer</div>
-            <div class="filter-chip" onclick="filterType('Recevoir', this)">Recevoir</div>
-            <div class="filter-chip" onclick="filterType('Dépôt', this)">Dépôt</div>
-            <div class="filter-chip" onclick="filterType('Retrait', this)">Retrait</div>
-        </div>
-        <div class="scroll-filter" id="month-picker-container"></div>
         <table class="history-table"><tbody id="history-full-body"></tbody></table>
     </div>
 </div>
@@ -159,64 +167,57 @@
     <div style="max-width:480px; margin:auto;">
         <div class="footer-grid">
             <div>
-                <b style="color:white; font-size:14px; display:block; margin-bottom:15px;">Informations</b>
+                <b style="color:#fff; font-size:14px; display:block; margin-bottom:18px; font-weight:800;">Ressources</b>
                 <a href="#" class="footer-link">Conditions d'utilisation</a>
                 <a href="#" class="footer-link">Politique de confidentialité</a>
-                <a href="#" class="footer-link">Politique de Cookies</a>
+                <a href="#" class="footer-link">Sécurité & Protection</a>
             </div>
             <div>
-                <b style="color:white; font-size:14px; display:block; margin-bottom:15px;">Support</b>
+                <b style="color:#fff; font-size:14px; display:block; margin-bottom:18px; font-weight:800;">Assistance</b>
                 <a href="#" class="footer-link"><i class="fa-brands fa-whatsapp"></i> WhatsApp Direct</a>
-                <a href="#" class="footer-link">Centre d'aide</a>
-                <label style="font-size:11px; color:var(--gray); display:block; margin-top:10px;">Langue :</label>
-                <select class="lang-select">
-                    <option value="fr">Français (FR)</option>
-                    <option value="mg">Malagasy (MG)</option>
-                </select>
+                <a href="#" class="footer-link">Centre de support</a>
+                <div class="lang-wrapper">Langue : 
+                    <select class="lang-select">
+                        <option value="fr">Français</option>
+                        <option value="mg">Malagasy</option>
+                    </select>
+                </div>
             </div>
         </div>
-        <div style="text-align:center; padding-top:20px; border-top:1px solid var(--border); font-size:11px; color:var(--gray);">
-            © 2026 TakaloCash Madagascar. Tous droits réservés.
+        <div style="text-align:center; padding-top:30px; border-top:1px solid var(--border); font-size:11px; color:var(--gray); opacity:0.6; letter-spacing:0.5px;">
+            © 2026 TAKALOCASH MG. PREMIUM FINTECH SOLUTION.
         </div>
     </div>
 </footer>
 
-<div id="modal-mobile" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:5000; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:var(--card); padding:30px; border-radius:28px; width:100%; max-width:340px; border:1px solid var(--border);">
-        <h3 id="mob-title" style="color:var(--yellow); margin-top:0;">Dépôt MM</h3>
-        <select id="mob-op" class="styled-input" style="margin-bottom:12px;"><option>Mvola</option><option>Orange Money</option><option>Airtel Money</option></select>
-        <input type="number" id="mob-amount" class="styled-input" placeholder="Montant en Ariary">
-        <input type="tel" id="mob-phone" class="styled-input" placeholder="Numéro de compte" style="margin-top:12px;">
-        <button class="btn-valider" onclick="executeMobile()">Valider le transfert</button>
-        <p onclick="document.getElementById('modal-mobile').style.display='none'" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:20px; font-size:13px;">Annuler</p>
+<div id="modal-mobile" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:5000; align-items:center; justify-content:center; padding:25px;">
+    <div style="background:var(--card); padding:35px; border-radius:32px; width:100%; max-width:350px; border:1px solid var(--border); box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
+        <h3 id="mob-title" style="color:var(--yellow); font-weight:900; font-size:24px; margin-top:0; margin-bottom:25px;">Dépôt</h3>
+        <select id="mob-op" class="styled-input"><option>Mvola</option><option>Orange Money</option><option>Airtel Money</option></select>
+        <input type="number" id="mob-amount" class="styled-input" placeholder="Montant en Ar" style="margin-top:15px;">
+        <input type="tel" id="mob-phone" class="styled-input" placeholder="Numéro de compte" style="margin-top:15px;">
+        <button class="btn-valider" onclick="executeMobile()">Valider le paiement</button>
+        <p onclick="document.getElementById('modal-mobile').style.display='none'" style="text-align:center; color:var(--gray); cursor:pointer; margin-top:25px; font-weight:600;">Annuler</p>
     </div>
 </div>
 
 <script>
 const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
-let currentUserId = null, currentMode = "Envoyer", allTransactions = [], userSolde = 0, currentFilter = "Tous", selectedMonth = null;
+let currentUserId = null, currentMode = "Envoyer", allTransactions = [], userSolde = 0;
 const TAUX = { "TRX": 150, "USDT": 4600 }, ADDR_REC = { "TRX": "T-ADMIN-TRX-001", "USDT": "T-ADMIN-USDT-001" };
-const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
 
 function toggleMenu(){ document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display=document.getElementById('sidebar').classList.contains('active')?'block':'none'; }
 
 async function handleLogin(){
     const e=document.getElementById('auth-email').value, p=document.getElementById('auth-password').value;
     const {error}=await supabaseClient.auth.signInWithPassword({email:e, password:p});
-    if(error) return alert("Identifiants incorrects !");
+    if(error) return alert("Email ou mot de passe incorrect.");
     initApp();
 }
 
 async function initApp(){
     const {data:{user}}=await supabaseClient.auth.getUser();
-    if(user){ 
-        currentUserId = user.id; 
-        document.getElementById('auth-container').style.display='none'; 
-        document.getElementById('main-app').style.display='block'; 
-        document.getElementById('nav-header').style.display='block';
-        document.getElementById('nav-footer').style.display='block';
-        fetchData(); 
-    }
+    if(user){ currentUserId = user.id; document.getElementById('auth-container').style.display='none'; document.getElementById('main-app').style.display='block'; document.getElementById('nav-header').style.display='block'; document.getElementById('nav-footer').style.display='block'; fetchData(); }
 }
 
 async function fetchData(){
@@ -224,7 +225,7 @@ async function fetchData(){
     if(u){ userSolde = u.solde; updateSoldeUI(); }
     const {data:ts}=await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at',{ascending:false});
     allTransactions = ts || [];
-    renderPreview(); renderFullHistory(); renderMonthPicker();
+    renderPreview(); renderFullHistory();
 }
 
 function updateSoldeUI(){
@@ -233,10 +234,7 @@ function updateSoldeUI(){
 }
 
 function switchMode(m){
-    currentMode = m;
-    document.getElementById('trans-title').innerText = m + " Crypto";
-    document.getElementById('service-starlink').style.display = m==='Recevoir' ? 'none' : 'flex';
-    document.getElementById('label-right').innerText = m==='Recevoir' ? "Quantité Crypto :" : "Montant (Ar) :";
+    currentMode = m; document.getElementById('trans-title').innerText = m + " Crypto";
     if(m==='Recevoir'){ document.getElementById('input-addr').value=ADDR_REC[document.getElementById('crypto-select').value]; document.getElementById('input-addr').readOnly=true; }
     else { document.getElementById('input-addr').value=""; document.getElementById('input-addr').readOnly=false; }
     updateCalc();
@@ -244,28 +242,32 @@ function switchMode(m){
 
 function updateCalc(){
     const cry = document.getElementById('crypto-select').value, val = parseFloat(document.getElementById('input-main').value) || 0;
-    if(currentMode === 'Envoyer'){ document.getElementById('calc-res').innerText = (val/TAUX[cry]).toFixed(2)+" "+cry; }
-    else { document.getElementById('calc-res').innerText = (val*TAUX[cry]).toLocaleString()+" Ar"; document.getElementById('input-addr').value=ADDR_REC[cry]; }
+    if(currentMode === 'Envoyer') document.getElementById('calc-res').innerText = (val/TAUX[cry]).toFixed(2)+" "+cry;
+    else document.getElementById('calc-res').innerText = (val*TAUX[cry]).toLocaleString()+" Ar";
 }
 
 async function executeTrans(){
     const val = parseFloat(document.getElementById('input-main').value);
     if(!val) return;
     const finalAr = currentMode === 'Envoyer' ? val : (val * TAUX[document.getElementById('crypto-select').value]);
-    if(currentMode === 'Envoyer' && userSolde < finalAr) return alert("Solde insuffisant !");
+    if(currentMode === 'Envoyer' && userSolde < finalAr) return alert("Solde insuffisant.");
     if(currentMode === 'Envoyer'){ userSolde -= finalAr; updateSoldeUI(); await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId); }
     await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:finalAr, service:currentMode+" "+document.getElementById('crypto-select').value, status:"En attente", adresse:document.getElementById('input-addr').value}]);
-    alert("Transaction enregistrée ! ✅"); fetchData();
+    alert("Transaction en cours de traitement ! ✅"); fetchData();
 }
 
-function openMobile(t){ document.getElementById('mob-title').innerText=t+" Mobile Money"; document.getElementById('modal-mobile').style.display='flex'; toggleMenu(); }
+function openMobile(t){ document.getElementById('mob-title').innerText=t; document.getElementById('modal-mobile').style.display='flex'; toggleMenu(); }
 
 async function executeMobile(){
     const am = parseFloat(document.getElementById('mob-amount').value);
+    const title = document.getElementById('mob-title').innerText;
     if(!am) return;
-    if(document.getElementById('mob-title').innerText==='Retrait MM' && userSolde < am) return alert("Solde insuffisant !");
-    if(document.getElementById('mob-title').innerText==='Retrait MM'){ userSolde -= am; updateSoldeUI(); await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId); }
-    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:am, service:document.getElementById('mob-title').innerText, status:"En attente", adresse:document.getElementById('mob-phone').value}]);
+    if(title === 'Retrait' || title === 'Retrait Mobile Money'){
+        if(userSolde < am) return alert("Solde insuffisant.");
+        userSolde -= am; updateSoldeUI();
+        await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId);
+    }
+    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:am, service:title, status:"En attente", adresse:document.getElementById('mob-phone').value}]);
     document.getElementById('modal-mobile').style.display='none'; fetchData();
 }
 
@@ -273,7 +275,7 @@ function showPage(p){
     document.getElementById('page-home').style.display = p==='home'?'block':'none';
     document.getElementById('page-history').style.display = p==='history'?'block':'none';
     if(p==='history'){
-        document.getElementById('header-left').innerHTML = `<i class="fa-solid fa-arrow-left" onclick="showPage('home')" style="color:var(--yellow); cursor:pointer; font-size:20px;"></i> &nbsp; <span style="font-size:18px;">Historique</span>`;
+        document.getElementById('header-left').innerHTML = `<i class="fa-solid fa-arrow-left" onclick="showPage('home')" style="color:var(--yellow); cursor:pointer; font-size:24px;"></i> &nbsp; <span style="font-size:20px;">Historique</span>`;
         if(document.getElementById('sidebar').classList.contains('active')) toggleMenu();
     } else {
         document.getElementById('header-left').innerHTML = `<span style="color:var(--yellow)">TAKALO</span>CASH`;
@@ -283,43 +285,16 @@ function showPage(p){
 function renderPreview(){
     const b = document.getElementById('history-preview-body'); b.innerHTML = "";
     allTransactions.slice(0, 4).forEach(t => {
-        const d = new Date(t.created_at);
-        b.innerHTML += `<tr>
-            <td><b style="font-size:14px;">${t.service}</b><br><small style="color:var(--gray)">${d.toLocaleDateString()} ${d.getHours()}:${d.getMinutes().toString().padStart(2,'0')}</small></td>
-            <td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td>
-        </tr>`;
+        b.innerHTML += `<tr><td style="font-weight:600; font-size:15px;">${t.service}</td><td style="text-align:right; font-weight:800; font-size:15px;">${t.montant.toLocaleString()} Ar</td></tr>`;
     });
 }
 
-function filterType(type, btn){
-    currentFilter = type;
-    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderFullHistory();
-}
-
-function renderMonthPicker(){
-    const cp = document.getElementById('month-picker-container');
-    cp.innerHTML = `<div class="filter-chip ${selectedMonth===null?'active':''}" onclick="filterMonth(null)">Tous</div>`;
-    const uniqueMonths = [...new Set(allTransactions.map(t => new Date(t.created_at).getMonth()))].sort((a,b)=>b-a);
-    uniqueMonths.forEach(m => { cp.innerHTML += `<div class="filter-chip ${selectedMonth===m?'active':''}" onclick="filterMonth(${m})">${months[m]}</div>`; });
-}
-
-function filterMonth(m){ selectedMonth = m; renderMonthPicker(); renderFullHistory(); }
-
 function renderFullHistory(){
     const b = document.getElementById('history-full-body'); b.innerHTML = "";
-    let filtered = allTransactions;
-    if(currentFilter !== 'Tous') filtered = filtered.filter(t => t.service.toLowerCase().includes(currentFilter.toLowerCase()));
-    if(selectedMonth !== null) filtered = filtered.filter(t => new Date(t.created_at).getMonth() === selectedMonth);
-    filtered.forEach(t => {
+    allTransactions.forEach(t => {
         const d = new Date(t.created_at);
-        const lera = d.getHours() + ":" + d.getMinutes().toString().padStart(2, '0');
         const st = t.status==='confirmé'?'var(--green)':'var(--yellow)';
-        b.innerHTML += `<tr>
-            <td><b>${t.service}</b><br><small style="color:var(--gray)">${d.toLocaleDateString()} &agrave; ${lera}</small></td>
-            <td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b><br><span class="status-badge" style="background:rgba(255,255,255,0.05); color:${st}">${t.status||'en attente'}</span></td>
-        </tr>`;
+        b.innerHTML += `<tr><td><b style="font-size:15px;">${t.service}</b><br><small style="color:var(--gray)">${d.toLocaleDateString()}</small></td><td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b><br><span class="status-badge" style="color:${st}">${t.status||'en attente'}</span></td></tr>`;
     });
 }
 
