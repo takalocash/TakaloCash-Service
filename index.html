@@ -12,62 +12,93 @@
             --bg: #0d1117; --card: #161b22; --yellow: #fcd535; --green: #2ebd85; 
             --red: #ff4d4d; --gray: #848e9c; --border: rgba(255,255,255,0.08);
             --grad-yellow: linear-gradient(90deg, #fcd535, #f7b500);
+            --grad-green: linear-gradient(90deg, #2ebd85, #1e9d6d);
         }
-        body { margin: 0; background: var(--bg); font-family: 'Inter', sans-serif; color: white; }
+        body { margin: 0; background: var(--bg); font-family: 'Inter', sans-serif; color: white; padding-bottom: 20px; }
         .container { max-width: 480px; margin: auto; padding: 15px; display: none; }
         
-        /* UI ELEMENTS */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
-        .solde-card { text-align: center; padding: 25px 0; background: radial-gradient(circle at top, #1c2128, var(--bg)); border-radius: 20px; }
-        .solde-amount { font-size: 34px; font-weight: 700; margin: 5px 0; }
-        .btn-action { border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .service-item { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .trans-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
-        .styled-input { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: white; width: 100%; box-sizing: border-box; outline: none; margin-top: 5px; }
-        .btn-valider { width: 100%; background: var(--grad-yellow); border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; color: black; margin-top: 15px; }
+        /* HEADER */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
+        .logo { font-weight: 800; font-size: 22px; cursor: pointer; }
+        .logo span { color: var(--yellow); }
 
-        /* SIDEBAR & MODAL */
-        .sidebar { position: fixed; top: 0; right: -100%; width: 85%; height: 100%; background: #1c2128; z-index: 7000; transition: 0.3s; padding: 25px; box-sizing: border-box; }
-        .sidebar.active { right: 0; }
-        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 6500; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 8000; align-items: center; justify-content: center; }
+        /* SOLDE CARD */
+        .solde-card { text-align: center; padding: 30px 0; background: radial-gradient(circle at top, #1c2128, var(--bg)); border-radius: 24px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .solde-amount { font-size: 38px; font-weight: 700; margin: 5px 0; letter-spacing: -1px; }
+
+        /* ACTION BUTTONS */
+        .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+        .btn-action { border: none; padding: 16px; border-radius: 14px; font-weight: 700; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; }
+        .btn-env { background: var(--grad-yellow); color: black; }
+        .btn-rec { background: var(--grad-green); color: white; }
+
+        /* SERVICES */
+        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .service-item { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .service-icon { width: 38px; height: 38px; border-radius: 50%; background: #000; display: flex; align-items: center; justify-content: center; color: var(--yellow); border: 1px solid var(--border); font-size: 14px; }
+
+        /* FORM BOX */
+        .trans-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 30px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .styled-input { background: #0d1117; border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: white; outline: none; width: 100%; box-sizing: border-box; font-size: 14px; }
+        .btn-valider { width: 100%; background: var(--grad-yellow); border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; color: black; margin-top: 10px; font-size: 16px; }
 
         /* HISTORY */
-        .month-picker { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-        .month-btn { background: var(--card); border: 1px solid var(--border); padding: 6px 12px; border-radius: 10px; font-size: 11px; white-space: nowrap; cursor: pointer; color: var(--gray); }
-        .month-btn.active { border-color: var(--yellow); color: var(--yellow); }
         .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .history-table td { padding: 12px 0; border-bottom: 1px solid var(--border); }
-        .status-badge { padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .history-table td { padding: 15px 0; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
         .status-confirme { color: var(--green); background: rgba(46, 189, 133, 0.1); }
         .status-attente { color: var(--yellow); background: rgba(252, 213, 53, 0.1); }
+        .status-annule { color: var(--red); background: rgba(255, 77, 77, 0.1); }
+
+        .month-picker { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0 20px 0; scrollbar-width: none; }
+        .month-btn { background: var(--card); border: 1px solid var(--border); padding: 8px 16px; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer; color: var(--gray); }
+        .month-btn.active { border-color: var(--yellow); color: var(--yellow); background: rgba(252, 213, 53, 0.05); }
+
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: 0; right: -100%; width: 85%; height: 100%; background: #1c2128; z-index: 7000; transition: 0.3s; padding: 25px; box-sizing: border-box; border-left: 1px solid var(--border); }
+        .sidebar.active { right: 0; }
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 6500; backdrop-filter: blur(2px); }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 8000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: var(--card); padding: 25px; border-radius: 24px; width: 100%; max-width: 340px; border: 1px solid var(--border); }
+
+        /* FOOTER */
+        .footer { border-top: 1px solid var(--border); padding: 25px 0; margin-top: 40px; font-size: 12px; }
+        .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .footer a { color: white; text-decoration: none; display: block; margin-bottom: 6px; opacity: 0.6; }
     </style>
 </head>
 <body>
 
 <div id="auth-container" style="position:fixed; inset:0; background:var(--bg); z-index:9000; display:flex; align-items:center; justify-content:center;">
-    <div style="background:var(--card); padding:30px; border-radius:20px; width:300px; text-align:center;">
-        <h2 style="color:var(--yellow)">TakaloCash</h2>
-        <input type="email" id="auth-email" class="styled-input" placeholder="Email">
-        <input type="password" id="auth-password" class="styled-input" placeholder="Mot de passe" style="margin-top:10px">
+    <div style="background:var(--card); padding:35px; border-radius:24px; width:300px; text-align:center; border:1px solid var(--border);">
+        <h2 style="color:var(--yellow); margin-bottom:25px;">TakaloCash</h2>
+        <input type="email" id="auth-email" class="styled-input" placeholder="Email" style="margin-bottom:12px">
+        <input type="password" id="auth-password" class="styled-input" placeholder="Mot de passe" style="margin-bottom:25px">
         <button class="btn-valider" onclick="handleLogin()">Connexion</button>
     </div>
 </div>
 
 <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
 <div class="sidebar" id="sidebar">
-    <h3 style="border-bottom:1px solid var(--border); padding-bottom:10px;">Menu</h3>
-    <div onclick="showPage('history')" style="padding:15px 0; cursor:pointer;"><i class="fa-solid fa-clock"></i> Historique Complet</div>
-    <div onclick="openMobile('Dépôt')" style="padding:15px 0; cursor:pointer;"><i class="fa-solid fa-plus-circle"></i> Dépôt MM</div>
-    <div onclick="openMobile('Retrait')" style="padding:15px 0; cursor:pointer;"><i class="fa-solid fa-minus-circle"></i> Retrait MM</div>
-    <div onclick="logout()" style="padding:15px 0; color:var(--red); cursor:pointer; margin-top:20px;"><i class="fa-solid fa-power-off"></i> Déconnexion</div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <h3 style="margin:0">Menu</h3>
+        <i class="fa-solid fa-xmark" onclick="toggleMenu()" style="font-size:24px; cursor:pointer;"></i>
+    </div>
+    <div onclick="showPage('history')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-clock-rotate-left"></i> &nbsp; Historique Complet</div>
+    <div onclick="openMobile('Dépôt')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-circle-plus"></i> &nbsp; Dépôt MM</div>
+    <div onclick="openMobile('Retrait')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-circle-minus"></i> &nbsp; Retrait MM</div>
+    <div onclick="logout()" style="padding:18px 0; color:var(--red); cursor:pointer; margin-top:20px;"><i class="fa-solid fa-power-off"></i> &nbsp; Déconnexion</div>
 </div>
 
 <div class="container" id="main-app">
     <div class="header">
-        <div id="header-left" style="font-weight:800; font-size:22px;"><span style="color:var(--yellow)">TC</span> TakaloCash</div>
-        <i class="fa-solid fa-bars" style="font-size:22px; cursor:pointer;" onclick="toggleMenu()"></i>
+        <div class="logo" id="header-logo" onclick="showPage('home')"><span>TC</span> TakaloCash</div>
+        <div style="display:flex; gap:18px; align-items:center;">
+            <i class="fa-solid fa-bars" style="font-size:24px; cursor:pointer; color:var(--yellow);" onclick="toggleMenu()"></i>
+        </div>
     </div>
 
     <div id="page-home">
@@ -76,67 +107,98 @@
             <h1 class="solde-amount" id="display-solde">0 Ar</h1>
         </div>
 
-        <div style="display:flex; gap:12px; margin:20px 0;">
-            <button class="btn-action" style="background:var(--grad-yellow); color:black;" onclick="switchMode('Envoyer')">Envoyer</button>
-            <button class="btn-action" style="background:var(--green); color:white;" onclick="switchMode('Recevoir')">Recevoir</button>
+        <div class="main-actions">
+            <button class="btn-action btn-env" onclick="switchMode('Envoyer')"><i class="fa-solid fa-paper-plane"></i> Envoyer</button>
+            <button class="btn-action btn-rec" onclick="switchMode('Recevoir')"><i class="fa-solid fa-qrcode"></i> Recevoir</button>
         </div>
 
         <div class="services-grid">
-            <div class="service-item"><b>Crypto</b></div>
-            <div class="service-item"><b>1xBet</b></div>
-            <div class="service-item"><b>Porte-feuille</b></div>
-            <div class="service-item" id="service-starlink"><b>Starlink</b></div>
+            <div class="service-item"><div class="service-icon"><i class="fa-solid fa-bitcoin-sign"></i></div><div><b>Crypto</b></div></div>
+            <div class="service-item"><div class="service-icon"><i class="fa-solid fa-wallet"></i></div><div><b>P. Feuille</b></div></div>
+            <div class="service-item"><div class="service-icon"><i class="fa-solid fa-gamepad"></i></div><div><b>1xBet</b></div></div>
+            <div class="service-item" id="service-starlink"><div class="service-icon"><i class="fa-solid fa-satellite"></i></div><div><b>Starlink</b></div></div>
         </div>
 
         <div class="trans-box">
-            <b id="trans-title" style="color:var(--yellow)">Envoyer Crypto</b>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:15px;">
-                <div><label style="font-size:11px; color:var(--gray)">Crypto :</label><select id="crypto-select" class="styled-input" onchange="updateCalc()"><option value="TRX">TRX</option><option value="USDT">USDT</option></select></div>
-                <div><label id="label-right" style="font-size:11px; color:var(--gray)">Montant (Ar) :</label><input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()"></div>
+            <b id="trans-title" style="color:var(--yellow); font-size:16px; display:block; margin-bottom:20px;">Envoyer Crypto</b>
+            <div class="form-row">
+                <div>
+                    <label style="font-size:11px; color:var(--gray); display:block; margin-bottom:5px;">Crypto :</label>
+                    <select id="crypto-select" class="styled-input" onchange="updateCalc()">
+                        <option value="TRX">TRX (TRC20)</option>
+                        <option value="USDT">USDT (TRC20)</option>
+                    </select>
+                </div>
+                <div>
+                    <label id="label-right" style="font-size:11px; color:var(--gray); display:block; margin-bottom:5px;">Montant (Ar) :</label>
+                    <input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()">
+                </div>
             </div>
-            <div style="margin-top:15px;"><label id="label-addr" style="font-size:11px; color:var(--gray)">Adresse :</label><input type="text" id="input-addr" class="styled-input"></div>
-            <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:10px;"><span style="color:var(--gray)">Solde: <b id="mini-solde">0 Ar</b></span><span id="calc-res" style="color:var(--yellow)">0.00 TRX</span></div>
+            <div style="margin-bottom:15px;">
+                <label id="label-addr" style="font-size:11px; color:var(--gray); display:block; margin-bottom:5px;">Adresse destinataire :</label>
+                <input type="text" id="input-addr" class="styled-input" placeholder="Saisir l'adresse">
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px;">
+                <span style="color:var(--gray)">Solde: <b id="mini-solde" style="color:white">0 Ar</b></span>
+                <span id="calc-res" style="color:var(--yellow); font-weight:700;">0.00 TRX</span>
+            </div>
             <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Valider</button>
         </div>
 
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><small style="color:var(--gray)">Activités récentes</small><small onclick="showPage('history')" style="color:var(--yellow); cursor:pointer;">Voir tout</small></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <small style="color:var(--gray); font-weight:600;">Activités récentes</small>
+            <small onclick="showPage('history')" style="color:var(--yellow); cursor:pointer; font-weight:600;">Voir tout</small>
+        </div>
         <table class="history-table"><tbody id="history-preview-body"></tbody></table>
     </div>
 
     <div id="page-history" style="display:none;">
-        <div class="month-picker" id="month-picker"></div>
+        <div class="month-picker" id="month-picker-container"></div>
         <table class="history-table"><tbody id="history-full-body"></tbody></table>
     </div>
 
-    <div style="border-top:1px solid var(--border); padding:20px 0; margin-top:30px; font-size:12px; display:grid; grid-template-columns:1fr 1fr;">
-        <div><b>Info</b><br><a href="#" style="color:white; opacity:0.6; text-decoration:none;">Conditions</a></div>
-        <div><b>Contact</b><br><a href="#" style="color:white; opacity:0.6; text-decoration:none;">WhatsApp</a></div>
+    <div class="footer">
+        <div class="footer-grid">
+            <div>
+                <b style="display:block; margin-bottom:10px; color:var(--gray);">Information</b>
+                <a href="#">Conditions d'utilisation</a>
+                <a href="#">Politique de confidentialité</a>
+            </div>
+            <div>
+                <b style="display:block; margin-bottom:10px; color:var(--gray);">Support</b>
+                <a href="#"><i class="fa-brands fa-whatsapp"></i> WhatsApp Chat</a>
+                <a href="#"><i class="fa-solid fa-envelope"></i> Email Support</a>
+            </div>
+        </div>
     </div>
 </div>
 
 <div id="modal-mobile" class="modal">
-    <div style="background:var(--card); padding:25px; border-radius:20px; width:85%; max-width:340px;">
-        <h3 id="mob-title" style="color:var(--yellow)">Dépôt MM</h3>
-        <input type="number" id="mob-amount" class="styled-input" placeholder="Montant Ar">
-        <input type="tel" id="mob-phone" class="styled-input" placeholder="Numéro" style="margin-top:10px;">
+    <div class="modal-content">
+        <h3 id="mob-title" style="color:var(--yellow); margin-top:0;">Dépôt MM</h3>
+        <select id="mob-op" class="styled-input" style="margin-bottom:12px;">
+            <option>Mvola</option><option>Orange Money</option><option>Airtel Money</option>
+        </select>
+        <input type="number" id="mob-amount" class="styled-input" placeholder="Montant Ar" style="margin-bottom:12px;">
+        <input type="tel" id="mob-phone" class="styled-input" placeholder="Numéro de téléphone" style="margin-bottom:20px;">
         <button class="btn-valider" onclick="executeMobile()">Valider</button>
-        <p onclick="closeModal()" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:15px;">Fermer</p>
+        <p onclick="closeModal()" style="text-align:center; cursor:pointer; color:var(--gray); font-size:13px; margin-top:15px;">Annuler</p>
     </div>
 </div>
 
 <script>
 const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
 let currentUserId = null, currentMode = "Envoyer", allTransactions = [], selectedMonth = null, userSolde = 0;
-const TAUX = { "TRX": 150, "USDT": 4600 }, ADDR_REC = { "TRX": "ADDR_TRX_TC", "USDT": "ADDR_USDT_TC" };
-const monthNames = ["Janoary", "Febroary", "Martsa", "Aprily", "May", "Jona", "Jolay", "Aogositra", "Septambra", "Oktobra", "Novambra", "Desambra"];
+const TAUX = { "TRX": 150, "USDT": 4600 }, ADDR_REC = { "TRX": "T-RECEIVE-TRX-ADDRESS", "USDT": "T-RECEIVE-USDT-ADDRESS" };
+const months = ["Janoary", "Febroary", "Martsa", "Aprily", "May", "Jona", "Jolay", "Aogositra", "Septambra", "Oktobra", "Novambra", "Desambra"];
 
 function toggleMenu(){ document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display=document.getElementById('sidebar').classList.contains('active')?'block':'none'; }
-function closeModal(){ document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
+function closeModal(){ document.getElementById('modal-mobile').style.display='none'; }
 
 async function handleLogin(){
     const e=document.getElementById('auth-email').value, p=document.getElementById('auth-password').value;
-    const {data, error}=await supabaseClient.auth.signInWithPassword({email:e, password:p});
-    if(error) return alert("Diso!");
+    const {error}=await supabaseClient.auth.signInWithPassword({email:e, password:p});
+    if(error) return alert("Email na mot de passe diso!");
     initApp();
 }
 
@@ -161,57 +223,72 @@ function updateSoldeUI(){
 function switchMode(m){
     currentMode = m;
     document.getElementById('trans-title').innerText = m + " Crypto";
+    document.getElementById('btn-submit').innerText = "Valider " + (m==='Envoyer'?"l'envoi":"la réception");
+    document.getElementById('btn-submit').style.background = m==='Envoyer'?'var(--grad-yellow)':'var(--grad-green)';
+    document.getElementById('btn-submit').style.color = m==='Envoyer'?'black':'white';
     document.getElementById('service-starlink').style.display = m==='Recevoir' ? 'none' : 'flex';
     document.getElementById('label-right').innerText = m==='Recevoir' ? "Quantité Crypto :" : "Montant (Ar) :";
     document.getElementById('label-addr').innerText = m==='Recevoir' ? "Adresse andraisana (TC) :" : "Adresse destinataire :";
-    if(m==='Recevoir'){ document.getElementById('input-addr').value=ADDR_REC[document.getElementById('crypto-select').value]; document.getElementById('input-addr').readOnly=true; }
-    else { document.getElementById('input-addr').value=""; document.getElementById('input-addr').readOnly=false; }
+    
+    if(m==='Recevoir'){ 
+        document.getElementById('input-addr').value=ADDR_REC[document.getElementById('crypto-select').value]; 
+        document.getElementById('input-addr').readOnly=true; 
+        document.getElementById('input-main').placeholder = "0.00";
+    } else { 
+        document.getElementById('input-addr').value=""; 
+        document.getElementById('input-addr').readOnly=false; 
+        document.getElementById('input-main').placeholder = "0";
+    }
     updateCalc();
 }
 
 function updateCalc(){
     const cry = document.getElementById('crypto-select').value, val = parseFloat(document.getElementById('input-main').value) || 0;
-    if(currentMode === 'Envoyer'){ document.getElementById('calc-res').innerText = (val/TAUX[cry]).toFixed(2)+" "+cry; }
-    else { document.getElementById('calc-res').innerText = (val*TAUX[cry]).toLocaleString()+" Ar"; document.getElementById('input-addr').value=ADDR_REC[cry]; }
+    if(currentMode === 'Envoyer'){ 
+        document.getElementById('calc-res').innerText = (val/TAUX[cry]).toFixed(2)+" "+cry; 
+    } else { 
+        document.getElementById('calc-res').innerText = (val*TAUX[cry]).toLocaleString()+" Ar"; 
+        document.getElementById('input-addr').value=ADDR_REC[cry];
+    }
 }
 
 async function executeTrans(){
     const val = parseFloat(document.getElementById('input-main').value);
-    if(!val) return alert("Banga!");
+    if(!val) return alert("Ampidiro ny vola!");
     const finalAr = currentMode === 'Envoyer' ? val : (val * TAUX[document.getElementById('crypto-select').value]);
-    
-    if(currentMode === 'Envoyer' && userSolde < finalAr) return alert("Tsy ampy ny volanao!");
+    if(currentMode === 'Envoyer' && userSolde < finalAr) return alert("Tsy ampy ny solde-nao!");
 
-    // Direct Deduct raha Envoyer
-    if(currentMode === 'Envoyer'){ userSolde -= finalAr; updateSoldeUI(); await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId); }
-
+    if(currentMode === 'Envoyer'){ 
+        userSolde -= finalAr; updateSoldeUI(); 
+        await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId); 
+    }
     await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:finalAr, service:currentMode+" "+document.getElementById('crypto-select').value, status:"En attente", adresse:document.getElementById('input-addr').value}]);
-    alert("Vita! ✅"); fetchData();
+    alert("Transaction voaray! ✅"); fetchData();
 }
 
-function openMobile(t){ document.getElementById('mob-title').innerText=t; document.getElementById('modal-mobile').style.display='flex'; toggleMenu(); }
+function openMobile(t){ document.getElementById('mob-title').innerText=t+" MM"; document.getElementById('modal-mobile').style.display='flex'; toggleMenu(); }
 
 async function executeMobile(){
     const am = parseFloat(document.getElementById('mob-amount').value);
-    if(!am) return;
-    if(document.getElementById('mob-title').innerText==='Retrait' && userSolde < am) return alert("Tsy ampy!");
+    if(!am) return alert("Fenoy ny montant!");
+    if(document.getElementById('mob-title').innerText==='Retrait MM' && userSolde < am) return alert("Tsy ampy ny solde!");
 
-    // Direct Deduct raha Retrait
-    if(document.getElementById('mob-title').innerText==='Retrait'){ userSolde -= am; updateSoldeUI(); await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId); }
-
-    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:am, service:document.getElementById('mob-title').innerText+" MM", status:"En attente", adresse:document.getElementById('mob-phone').value}]);
-    closeModal(); fetchData();
+    if(document.getElementById('mob-title').innerText==='Retrait MM'){ 
+        userSolde -= am; updateSoldeUI(); 
+        await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId); 
+    }
+    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:am, service:document.getElementById('mob-title').innerText, status:"En attente", adresse:document.getElementById('mob-phone').value}]);
+    closeModal(); alert("Vita! ✅"); fetchData();
 }
 
-// NAVIGATION & HISTORY
 function showPage(p){
     document.getElementById('page-home').style.display = p==='home'?'block':'none';
     document.getElementById('page-history').style.display = p==='history'?'block':'none';
     if(p==='history'){
-        document.getElementById('header-left').innerHTML = `<i class="fa-solid fa-arrow-left" onclick="showPage('home')" style="color:var(--yellow); cursor:pointer;"></i> Historique`;
+        document.getElementById('header-logo').innerHTML = `<i class="fa-solid fa-arrow-left" style="color:var(--yellow); font-size:20px;"></i> &nbsp; Historique`;
         renderMonthPicker();
     } else {
-        document.getElementById('header-left').innerHTML = `<span style="color:var(--yellow)">TC</span> TakaloCash`;
+        document.getElementById('header-logo').innerHTML = `<span>TC</span> TakaloCash`;
     }
     if(document.getElementById('sidebar').classList.contains('active')) toggleMenu();
 }
@@ -219,7 +296,12 @@ function showPage(p){
 function renderPreview(){
     const b = document.getElementById('history-preview-body'); b.innerHTML = "";
     allTransactions.slice(0, 3).forEach(t => {
-        b.innerHTML += `<tr><td><b>${t.service}</b></td><td style="text-align:right">${t.montant.toLocaleString()} Ar</td><td style="text-align:right"><span class="status-badge ${t.status==='confirmé'?'status-confirme':'status-attente'}">${t.status||'attente'}</span></td></tr>`;
+        const d = new Date(t.created_at);
+        b.innerHTML += `<tr>
+            <td><b>${t.service}</b><br><small style="color:var(--gray)">${d.toLocaleDateString()} &agrave; ${d.getHours()}:${d.getMinutes().toString().padStart(2,'0')}</small></td>
+            <td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td>
+            <td style="text-align:right"><span class="status-badge ${t.status==='confirmé'?'status-confirme':'status-attente'}">${t.status||'attente'}</span></td>
+        </tr>`;
     });
 }
 
@@ -227,16 +309,21 @@ function renderFullHistory(){
     const b = document.getElementById('history-full-body'); b.innerHTML = "";
     let filtered = allTransactions;
     if(selectedMonth !== null) filtered = filtered.filter(t => new Date(t.created_at).getMonth() === selectedMonth);
-    
     filtered.forEach(t => {
-        b.innerHTML += `<tr><td><b>${t.service}</b><br><small style="color:var(--gray)">${new Date(t.created_at).toLocaleDateString()}</small></td><td style="text-align:right">${t.montant.toLocaleString()} Ar</td><td style="text-align:right"><span class="status-badge ${t.status==='confirmé'?'status-confirme':'status-attente'}">${t.status||'attente'}</span></td></tr>`;
+        const d = new Date(t.created_at);
+        b.innerHTML += `<tr>
+            <td><b>${t.service}</b><br><small style="color:var(--gray)">${d.toLocaleDateString()} - ${d.getHours()}:${d.getMinutes().toString().padStart(2,'0')}</small></td>
+            <td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td>
+            <td style="text-align:right"><span class="status-badge ${t.status==='confirmé'?'status-confirme':(t.status==='annulé'?'status-annule':'status-attente')}">${t.status||'attente'}</span></td>
+        </tr>`;
     });
 }
 
 function renderMonthPicker(){
-    const cp = document.getElementById('month-picker'); cp.innerHTML = `<div class="month-btn ${selectedMonth===null?'active':''}" onclick="filterMonth(null)">Tontolo</div>`;
+    const cp = document.getElementById('month-picker-container'); 
+    cp.innerHTML = `<div class="month-btn ${selectedMonth===null?'active':''}" onclick="filterMonth(null)">Tontolo</div>`;
     const uniqueMonths = [...new Set(allTransactions.map(t => new Date(t.created_at).getMonth()))].sort((a,b)=>b-a);
-    uniqueMonths.forEach(m => { cp.innerHTML += `<div class="month-btn ${selectedMonth===m?'active':''}" onclick="filterMonth(${m})">${monthNames[m]}</div>`; });
+    uniqueMonths.forEach(m => { cp.innerHTML += `<div class="month-btn ${selectedMonth===m?'active':''}" onclick="filterMonth(${m})">${months[m]}</div>`; });
 }
 
 function filterMonth(m){ selectedMonth = m; renderMonthPicker(); renderFullHistory(); }
