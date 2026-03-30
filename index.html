@@ -3,159 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TakaloCash Pro</title>
+    <title>TakaloCash Pro v3</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { 
-            --bg-body: #0d1117; 
-            --bg-nav: #1c2128; /* Loko hafa ho an'ny lohany sy ny tongony */
-            --card: #161b22; --yellow: #fcd535; --green: #2ebd85; 
-            --red: #ff4d4d; --gray: #848e9c; --border: rgba(255,255,255,0.08);
-            --grad-yellow: linear-gradient(90deg, #fcd535, #f7b500);
+            --bg-body: #0d1117; --bg-nav: #161b22; --card: #1c2128;
+            --yellow: #fcd535; --green: #2ebd85; --red: #ff4d4d; 
+            --gray: #848e9c; --border: rgba(255,255,255,0.1);
+            --grad-yellow: linear-gradient(135deg, #fcd535, #f7b500);
         }
-        body { margin: 0; background: var(--bg-body); font-family: 'Inter', sans-serif; color: white; }
+        body { margin: 0; background: var(--bg-body); font-family: 'Inter', sans-serif; color: white; overflow-x: hidden; }
         
-        /* HEADER & FOOTER CONTRAST */
-        .header-nav { background: var(--bg-nav); padding: 15px 20px; border-bottom: 1px solid var(--border); }
-        .footer-nav { background: var(--bg-nav); padding: 25px 20px; border-top: 1px solid var(--border); margin-top: 40px; }
+        /* HEADER & FOOTER */
+        header { background: var(--bg-nav); padding: 18px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
+        footer { background: var(--bg-nav); padding: 30px 20px; border-top: 1px solid var(--border); margin-top: 50px; }
         
-        .container { max-width: 480px; margin: auto; padding: 20px; display: none; min-height: 80vh; }
+        .container { max-width: 480px; margin: auto; padding: 15px; display: none; }
         
-        /* UI ELEMENTS */
-        .solde-card { text-align: center; padding: 30px 0; background: radial-gradient(circle at top, #1c2128, var(--bg-body)); border-radius: 24px; margin-bottom: 20px; border: 1px solid var(--border); }
-        .solde-amount { font-size: 36px; font-weight: 700; margin: 5px 0; }
-        
-        .btn-action { border: none; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .service-item { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        
-        /* FORM */
-        .trans-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
-        .styled-input { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: white; width: 100%; box-sizing: border-box; outline: none; margin-top: 5px; }
-        .btn-valider { width: 100%; background: var(--grad-yellow); border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; color: black; margin-top: 15px; }
+        /* CARDS & UI */
+        .solde-card { text-align: center; padding: 35px 20px; background: radial-gradient(circle at top right, #1c2128, #0d1117); border-radius: 28px; margin-bottom: 25px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .solde-amount { font-size: 38px; font-weight: 800; margin: 8px 0; letter-spacing: -1px; }
 
-        /* FILTER TABS (5 OPTIONS) */
-        .filter-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; margin-bottom: 15px; }
-        .tab-btn { background: var(--card); border: 1px solid var(--border); padding: 8px 15px; border-radius: 20px; font-size: 11px; white-space: nowrap; cursor: pointer; color: var(--gray); font-weight: 600; }
-        .tab-btn.active { background: var(--yellow); color: black; border-color: var(--yellow); }
+        .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .btn-action { border: none; padding: 18px; border-radius: 16px; font-weight: 700; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        .btn-env { background: var(--grad-yellow); color: black; }
+        .btn-rec { background: var(--green); color: white; }
 
-        /* HISTORY TABLE */
-        .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .history-table td { padding: 12px 0; border-bottom: 1px solid var(--border); }
-        .status-badge { padding: 3px 8px; border-radius: 5px; font-size: 9px; font-weight: 800; }
+        /* SERVICES GRID WITH LOGOS */
+        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .service-item { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 18px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; }
+        .service-item:active { transform: scale(0.96); }
+        .icon-box { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: #000; border: 1px solid var(--border); }
+        
+        /* FORMS */
+        .trans-box { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 22px; margin-bottom: 30px; }
+        .styled-input { background: var(--bg-body); border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: white; width: 100%; box-sizing: border-box; outline: none; font-size: 14px; margin-top: 6px; }
+        .btn-valider { width: 100%; background: var(--grad-yellow); border: none; padding: 18px; border-radius: 14px; font-weight: 800; cursor: pointer; color: black; margin-top: 15px; font-size: 16px; }
+
+        /* FILTERS */
+        .scroll-filter { display: flex; gap: 10px; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; }
+        .filter-chip { background: var(--card); border: 1px solid var(--border); padding: 8px 18px; border-radius: 25px; font-size: 12px; white-space: nowrap; cursor: pointer; color: var(--gray); font-weight: 600; }
+        .filter-chip.active { background: var(--yellow); color: black; border-color: var(--yellow); }
+
+        /* HISTORY */
+        .history-table { width: 100%; border-collapse: collapse; }
+        .history-table td { padding: 16px 0; border-bottom: 1px solid var(--border); }
+        .status-badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
 
         /* SIDEBAR */
-        .sidebar { position: fixed; top: 0; right: -100%; width: 85%; height: 100%; background: var(--bg-nav); z-index: 7000; transition: 0.3s; padding: 25px; box-sizing: border-box; }
+        .sidebar { position: fixed; top: 0; right: -100%; width: 85%; height: 100%; background: var(--bg-nav); z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px; box-sizing: border-box; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
         .sidebar.active { right: 0; }
-        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 6500; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 8000; align-items: center; justify-content: center; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1500; backdrop-filter: blur(4px); }
     </style>
 </head>
 <body>
 
-<div class="header-nav" id="main-header" style="display:none;">
+<header id="nav-header" style="display:none;">
     <div style="max-width:480px; margin:auto; display:flex; justify-content:space-between; align-items:center;">
-        <div id="header-logo" style="font-weight:800; font-size:22px; cursor:pointer;" onclick="showPage('home')"><span style="color:var(--yellow)">TC</span> TakaloCash</div>
-        <i class="fa-solid fa-bars-staggered" style="font-size:24px; cursor:pointer; color:var(--yellow);" onclick="toggleMenu()"></i>
+        <div style="font-weight:900; font-size:24px; letter-spacing:-1px;" onclick="showPage('home')"><span style="color:var(--yellow)">TAKALO</span>CASH</div>
+        <i class="fa-solid fa-bars-staggered" style="font-size:26px; cursor:pointer; color:var(--yellow);" onclick="toggleMenu()"></i>
+    </div>
+</header>
+
+<div id="auth-container" style="position:fixed; inset:0; background:var(--bg-body); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:var(--card); padding:40px 30px; border-radius:30px; width:100%; max-width:320px; text-align:center; border:1px solid var(--border);">
+        <h1 style="color:var(--yellow); font-weight:900; margin-bottom:30px;">TC Login</h1>
+        <input type="email" id="auth-email" class="styled-input" placeholder="Email mpiasa">
+        <input type="password" id="auth-password" class="styled-input" placeholder="Mot de passe" style="margin-top:15px">
+        <button class="btn-valider" onclick="handleLogin()">Hiditra ao amin'ny Dashboard</button>
     </div>
 </div>
 
-<div id="auth-container" style="position:fixed; inset:0; background:var(--bg-body); z-index:9000; display:flex; align-items:center; justify-content:center;">
-    <div style="background:var(--card); padding:30px; border-radius:24px; width:300px; text-align:center; border:1px solid var(--border);">
-        <h2 style="color:var(--yellow)">TakaloCash</h2>
-        <input type="email" id="auth-email" class="styled-input" placeholder="Email">
-        <input type="password" id="auth-password" class="styled-input" placeholder="Mot de passe" style="margin-top:10px">
-        <button class="btn-valider" onclick="handleLogin()">Miditra</button>
-    </div>
-</div>
-
-<div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 <div class="sidebar" id="sidebar">
-    <h3 style="border-bottom:1px solid var(--border); padding-bottom:15px;">Menu</h3>
-    <div onclick="showPage('history')" style="padding:15px 0; cursor:pointer;"><i class="fa-solid fa-history"></i> Historique Complet</div>
-    <div onclick="openMobile('Dépôt')" style="padding:15px 0; cursor:pointer;"><i class="fa-solid fa-arrow-down"></i> Dépôt MM</div>
-    <div onclick="openMobile('Retrait')" style="padding:15px 0; cursor:pointer;"><i class="fa-solid fa-arrow-up"></i> Retrait MM</div>
-    <div onclick="logout()" style="padding:15px 0; color:var(--red); cursor:pointer; margin-top:20px;"><i class="fa-solid fa-power-off"></i> Hivoaka</div>
+    <h2 style="color:var(--yellow); margin-bottom:40px;">Menu</h2>
+    <div onclick="showPage('history')" style="padding:20px 0; border-bottom:1px solid var(--border); cursor:pointer; font-weight:600;"><i class="fa-solid fa-clock-rotate-left"></i> &nbsp; Historique feno</div>
+    <div onclick="openMobile('Dépôt')" style="padding:20px 0; border-bottom:1px solid var(--border); cursor:pointer; font-weight:600;"><i class="fa-solid fa-building-columns"></i> &nbsp; Dépôt MM</div>
+    <div onclick="openMobile('Retrait')" style="padding:20px 0; border-bottom:1px solid var(--border); cursor:pointer; font-weight:600;"><i class="fa-solid fa-money-bill-transfer"></i> &nbsp; Retrait MM</div>
+    <div onclick="logout()" style="padding:20px 0; color:var(--red); cursor:pointer; margin-top:40px; font-weight:700;"><i class="fa-solid fa-power-off"></i> &nbsp; Hivoaka ny kaonty</div>
 </div>
 
 <div class="container" id="main-app">
     <div id="page-home">
         <div class="solde-card">
-            <div style="color:var(--gray); font-size:14px;">Solde disponible</div>
+            <div style="color:var(--gray); font-size:13px; font-weight:600; text-transform:uppercase;">Solde Actuel</div>
             <h1 class="solde-amount" id="display-solde">0 Ar</h1>
         </div>
 
-        <div style="display:flex; gap:12px; margin:20px 0;">
-            <button class="btn-action" style="background:var(--grad-yellow); color:black;" onclick="switchMode('Envoyer')">Envoyer</button>
-            <button class="btn-action" style="background:var(--green); color:white;" onclick="switchMode('Recevoir')">Recevoir</button>
+        <div class="main-actions">
+            <button class="btn-action btn-env" onclick="switchMode('Envoyer')"><i class="fa-solid fa-arrow-up-from-bracket"></i> Envoyer</button>
+            <button class="btn-action btn-rec" onclick="switchMode('Recevoir')"><i class="fa-solid fa-arrow-down-to-bracket"></i> Recevoir</button>
         </div>
 
         <div class="services-grid">
-            <div class="service-item"><b>Crypto</b></div>
-            <div class="service-item"><b>1xBet</b></div>
-            <div class="service-item"><b>Wallet</b></div>
-            <div class="service-item" id="service-starlink"><b>Starlink</b></div>
+            <div class="service-item">
+                <div class="icon-box" style="color:#f3ba2f;"><i class="fa-solid fa-brands fa-bitcoin"></i></div>
+                <div><b style="font-size:14px;">Crypto</b></div>
+            </div>
+            <div class="service-item">
+                <div class="icon-box" style="color:#8132ad;"><i class="fa-solid fa-wallet"></i></div>
+                <div><b style="font-size:14px;">Wallet</b></div>
+            </div>
+            <div class="service-item">
+                <div class="icon-box" style="color:#00a3da; background:white; padding:5px;"><img src="https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg" width="25"></div>
+                <div><b style="font-size:14px;">1xBet</b></div>
+            </div>
+            <div class="service-item" id="service-starlink">
+                <div class="icon-box" style="color:white;"><i class="fa-solid fa-satellite-dish"></i></div>
+                <div><b style="font-size:14px;">Starlink</b></div>
+            </div>
         </div>
 
         <div class="trans-box">
-            <b id="trans-title" style="color:var(--yellow)">Envoyer Crypto</b>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:15px;">
-                <div><label style="font-size:11px; color:var(--gray)">Crypto :</label><select id="crypto-select" class="styled-input" onchange="updateCalc()"><option value="TRX">TRX</option><option value="USDT">USDT</option></select></div>
-                <div><label id="label-right" style="font-size:11px; color:var(--gray)">Montant :</label><input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <b id="trans-title" style="color:var(--yellow); font-size:18px;">Envoyer Crypto</b>
+                <i class="fa-solid fa-shield-halved" style="color:var(--green)"></i>
             </div>
-            <div style="margin-top:15px;"><label id="label-addr" style="font-size:11px; color:var(--gray)">Adresse :</label><input type="text" id="input-addr" class="styled-input"></div>
-            <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:10px;"><span style="color:var(--gray)">Solde: <b id="mini-solde">0 Ar</b></span><span id="calc-res" style="color:var(--yellow)">0.00 TRX</span></div>
-            <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Valider</button>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div><label style="font-size:11px; color:var(--gray)">Asset :</label>
+                    <select id="crypto-select" class="styled-input" onchange="updateCalc()"><option value="TRX">TRX (TRC20)</option><option value="USDT">USDT (TRC20)</option></select>
+                </div>
+                <div><label id="label-right" style="font-size:11px; color:var(--gray)">Montant (Ar) :</label><input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()"></div>
+            </div>
+            <div style="margin-top:20px;"><label id="label-addr" style="font-size:11px; color:var(--gray)">Destination Address :</label><input type="text" id="input-addr" class="styled-input" placeholder="T..."></div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:15px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;">
+                <span style="color:var(--gray)">Solde: <b id="mini-solde" style="color:white">0 Ar</b></span>
+                <span id="calc-res" style="color:var(--yellow); font-weight:800;">0.00 TRX</span>
+            </div>
+            <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Vérifier et Valider</button>
         </div>
 
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><small style="color:var(--gray)">Activités récentes</small><small onclick="showPage('history')" style="color:var(--yellow); cursor:pointer;">Voir tout</small></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <b style="color:var(--gray); font-size:14px;">Derniers mouvements</b>
+            <small onclick="showPage('history')" style="color:var(--yellow); cursor:pointer; font-weight:700;">Tout voir</small>
+        </div>
         <table class="history-table"><tbody id="history-preview-body"></tbody></table>
     </div>
 
     <div id="page-history" style="display:none;">
-        <div class="filter-tabs">
-            <div class="tab-btn active" onclick="filterType('Tous', this)">Tous</div>
-            <div class="tab-btn" onclick="filterType('Envoyer', this)">Envoyer</div>
-            <div class="tab-btn" onclick="filterType('Recevoir', this)">Recevoir</div>
-            <div class="tab-btn" onclick="filterType('Dépôt', this)">Dépôt</div>
-            <div class="tab-btn" onclick="filterType('Retrait', this)">Retrait</div>
+        <div style="margin-bottom:20px;">
+            <small style="color:var(--gray); display:block; margin-bottom:8px;">Filtre par type :</small>
+            <div class="scroll-filter">
+                <div class="filter-chip active" onclick="filterType('Tous', this)">Tous</div>
+                <div class="filter-chip" onclick="filterType('Envoyer', this)">Envoyer</div>
+                <div class="filter-chip" onclick="filterType('Recevoir', this)">Recevoir</div>
+                <div class="filter-chip" onclick="filterType('Dépôt', this)">Dépôt</div>
+                <div class="filter-chip" onclick="filterType('Retrait', this)">Retrait</div>
+            </div>
+            
+            <small style="color:var(--gray); display:block; margin-bottom:8px; margin-top:10px;">Filtre par volana :</small>
+            <div class="scroll-filter" id="month-picker-container"></div>
         </div>
         <table class="history-table"><tbody id="history-full-body"></tbody></table>
     </div>
 </div>
 
-<div class="footer-nav" id="main-footer" style="display:none;">
-    <div style="max-width:480px; margin:auto; display:grid; grid-template-columns:1fr 1fr; font-size:12px; gap:20px;">
-        <div><b>Information</b><br><a href="#" style="color:white; opacity:0.6; text-decoration:none; display:block; margin-top:5px;">Conditions d'utilisation</a></div>
-        <div><b>Contact</b><br><a href="#" style="color:white; opacity:0.6; text-decoration:none; display:block; margin-top:5px;">WhatsApp Support</a></div>
+<footer id="nav-footer" style="display:none;">
+    <div style="max-width:480px; margin:auto;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">
+            <div><b style="color:white; font-size:14px; display:block; margin-bottom:15px;">TakaloCash</b><a href="#" style="color:var(--gray); text-decoration:none; display:block; margin-bottom:8px; font-size:12px;">Conditions</a><a href="#" style="color:var(--gray); text-decoration:none; display:block; font-size:12px;">Confidentialité</a></div>
+            <div><b style="color:white; font-size:14px; display:block; margin-bottom:15px;">Aide & Support</b><a href="#" style="color:var(--yellow); text-decoration:none; display:block; font-size:12px;"><i class="fa-brands fa-whatsapp"></i> WhatsApp Direct</a></div>
+        </div>
+        <div style="text-align:center; margin-top:40px; font-size:11px; color:var(--gray); opacity:0.5;">© 2026 TakaloCash MG. Professional Fintech Interface.</div>
     </div>
-    <div style="text-align:center; margin-top:20px; font-size:10px; color:var(--gray);">© 2026 TakaloCash Madagascar</div>
-</div>
+</footer>
 
-<div id="modal-mobile" class="modal">
-    <div style="background:var(--card); padding:25px; border-radius:24px; width:85%; max-width:340px; border:1px solid var(--border);">
-        <h3 id="mob-title" style="color:var(--yellow)">Dépôt MM</h3>
+<div id="modal-mobile" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:5000; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:var(--card); padding:30px; border-radius:28px; width:100%; max-width:340px; border:1px solid var(--border);">
+        <h3 id="mob-title" style="color:var(--yellow); margin-top:0;">Dépôt MM</h3>
+        <select id="mob-op" class="styled-input" style="margin-bottom:12px;"><option>Mvola</option><option>Orange Money</option><option>Airtel Money</option></select>
         <input type="number" id="mob-amount" class="styled-input" placeholder="Montant Ar">
-        <input type="tel" id="mob-phone" class="styled-input" placeholder="Numéro finday" style="margin-top:10px;">
-        <button class="btn-valider" onclick="executeMobile()">Hanamarina</button>
-        <p onclick="closeModal()" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:15px; font-size:13px;">Haverina</p>
+        <input type="tel" id="mob-phone" class="styled-input" placeholder="Numéro de compte" style="margin-top:12px;">
+        <button class="btn-valider" onclick="executeMobile()">Valider le transfert</button>
+        <p onclick="document.getElementById('modal-mobile').style.display='none'" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:20px; font-size:13px;">Haverina aloha</p>
     </div>
 </div>
 
 <script>
 const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
-let currentUserId = null, currentMode = "Envoyer", allTransactions = [], userSolde = 0, currentFilter = "Tous";
-const TAUX = { "TRX": 150, "USDT": 4600 }, ADDR_REC = { "TRX": "T-REC-TRX-ADD", "USDT": "T-REC-USDT-ADD" };
+let currentUserId = null, currentMode = "Envoyer", allTransactions = [], userSolde = 0, currentFilter = "Tous", selectedMonth = null;
+const TAUX = { "TRX": 150, "USDT": 4600 }, ADDR_REC = { "TRX": "T-ADMIN-TRX-001", "USDT": "T-ADMIN-USDT-001" };
+const months = ["Janoary", "Febroary", "Martsa", "Aprily", "May", "Jona", "Jolay", "Aogositra", "Septambra", "Oktobra", "Novambra", "Desambra"];
 
 function toggleMenu(){ document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display=document.getElementById('sidebar').classList.contains('active')?'block':'none'; }
-function closeModal(){ document.getElementById('modal-mobile').style.display='none'; }
 
 async function handleLogin(){
     const e=document.getElementById('auth-email').value, p=document.getElementById('auth-password').value;
     const {error}=await supabaseClient.auth.signInWithPassword({email:e, password:p});
-    if(error) return alert("Diso fidirana!");
+    if(error) return alert("Tsy nahomby!");
     initApp();
 }
 
@@ -165,8 +202,8 @@ async function initApp(){
         currentUserId = user.id; 
         document.getElementById('auth-container').style.display='none'; 
         document.getElementById('main-app').style.display='block'; 
-        document.getElementById('main-header').style.display='block'; 
-        document.getElementById('main-footer').style.display='block'; 
+        document.getElementById('nav-header').style.display='block';
+        document.getElementById('nav-footer').style.display='block';
         fetchData(); 
     }
 }
@@ -176,7 +213,7 @@ async function fetchData(){
     if(u){ userSolde = u.solde; updateSoldeUI(); }
     const {data:ts}=await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at',{ascending:false});
     allTransactions = ts || [];
-    renderPreview(); renderFullHistory();
+    renderPreview(); renderFullHistory(); renderMonthPicker();
 }
 
 function updateSoldeUI(){
@@ -202,76 +239,85 @@ function updateCalc(){
 
 async function executeTrans(){
     const val = parseFloat(document.getElementById('input-main').value);
-    if(!val) return alert("Banga!");
+    if(!val) return;
     const finalAr = currentMode === 'Envoyer' ? val : (val * TAUX[document.getElementById('crypto-select').value]);
-    
-    if(currentMode === 'Envoyer' && userSolde < finalAr) return alert("Tsy ampy solde!");
+    if(currentMode === 'Envoyer' && userSolde < finalAr) return alert("Tsy ampy ny solde!");
 
     if(currentMode === 'Envoyer'){ 
         userSolde -= finalAr; updateSoldeUI(); 
         await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId); 
     }
-
     await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:finalAr, service:currentMode+" "+document.getElementById('crypto-select').value, status:"En attente", adresse:document.getElementById('input-addr').value}]);
-    alert("Voaray! ✅"); fetchData();
+    alert("Vita! ✅"); fetchData();
 }
 
-function openMobile(t){ document.getElementById('mob-title').innerText=t; document.getElementById('modal-mobile').style.display='flex'; toggleMenu(); }
+function openMobile(t){ document.getElementById('mob-title').innerText=t+" MM"; document.getElementById('modal-mobile').style.display='flex'; toggleMenu(); }
 
 async function executeMobile(){
     const am = parseFloat(document.getElementById('mob-amount').value);
     if(!am) return;
-    if(document.getElementById('mob-title').innerText==='Retrait' && userSolde < am) return alert("Tsy ampy!");
+    if(document.getElementById('mob-title').innerText==='Retrait MM' && userSolde < am) return alert("Tsy ampy!");
 
-    if(document.getElementById('mob-title').innerText==='Retrait'){ 
+    if(document.getElementById('mob-title').innerText==='Retrait MM'){ 
         userSolde -= am; updateSoldeUI(); 
         await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId); 
     }
-
-    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:am, service:document.getElementById('mob-title').innerText+" MM", status:"En attente", adresse:document.getElementById('mob-phone').value}]);
-    closeModal(); fetchData();
+    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:am, service:document.getElementById('mob-title').innerText, status:"En attente", adresse:document.getElementById('mob-phone').value}]);
+    document.getElementById('modal-mobile').style.display='none'; fetchData();
 }
 
 function showPage(p){
     document.getElementById('page-home').style.display = p==='home'?'block':'none';
     document.getElementById('page-history').style.display = p==='history'?'block':'none';
     if(p==='history'){
-        document.getElementById('header-logo').innerHTML = `<i class="fa-solid fa-chevron-left" onclick="showPage('home')" style="color:var(--yellow); cursor:pointer;"></i> Historique`;
+        document.getElementById('header-logo').innerHTML = `<i class="fa-solid fa-arrow-left" onclick="showPage('home')" style="color:var(--yellow); cursor:pointer;"></i> Historique`;
     } else {
-        document.getElementById('header-logo').innerHTML = `<span style="color:var(--yellow)">TC</span> TakaloCash`;
+        document.getElementById('header-logo').innerHTML = `<span style="color:var(--yellow)">TAKALO</span>CASH`;
     }
     if(document.getElementById('sidebar').classList.contains('active')) toggleMenu();
 }
 
 function renderPreview(){
     const b = document.getElementById('history-preview-body'); b.innerHTML = "";
-    allTransactions.slice(0, 3).forEach(t => {
+    allTransactions.slice(0, 4).forEach(t => {
         const d = new Date(t.created_at);
-        b.innerHTML += `<tr><td><b>${t.service}</b><br><small style="color:var(--gray)">${d.toLocaleDateString()} ${d.getHours()}:${d.getMinutes()}</small></td><td style="text-align:right">${t.montant.toLocaleString()} Ar</td></tr>`;
+        b.innerHTML += `<tr>
+            <td><b style="font-size:14px;">${t.service}</b><br><small style="color:var(--gray)">${d.toLocaleDateString()} ${d.getHours()}:${d.getMinutes().toString().padStart(2,'0')}</small></td>
+            <td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td>
+        </tr>`;
     });
 }
 
 function filterType(type, btn){
     currentFilter = type;
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     renderFullHistory();
 }
 
+function renderMonthPicker(){
+    const cp = document.getElementById('month-picker-container');
+    cp.innerHTML = `<div class="filter-chip ${selectedMonth===null?'active':''}" onclick="filterMonth(null)">Tontolo</div>`;
+    const uniqueMonths = [...new Set(allTransactions.map(t => new Date(t.created_at).getMonth()))].sort((a,b)=>b-a);
+    uniqueMonths.forEach(m => {
+        cp.innerHTML += `<div class="filter-chip ${selectedMonth===m?'active':''}" onclick="filterMonth(${m})">${months[m]}</div>`;
+    });
+}
+
+function filterMonth(m){ selectedMonth = m; renderMonthPicker(); renderFullHistory(); }
+
 function renderFullHistory(){
     const b = document.getElementById('history-full-body'); b.innerHTML = "";
     let filtered = allTransactions;
-    if(currentFilter !== 'Tous') {
-        filtered = allTransactions.filter(t => t.service.toLowerCase().includes(currentFilter.toLowerCase()));
-    }
+    if(currentFilter !== 'Tous') filtered = filtered.filter(t => t.service.toLowerCase().includes(currentFilter.toLowerCase()));
+    if(selectedMonth !== null) filtered = filtered.filter(t => new Date(t.created_at).getMonth() === selectedMonth);
     
     filtered.forEach(t => {
         const d = new Date(t.created_at);
-        const lera = d.getHours() + ":" + d.getMinutes().toString().padStart(2, '0');
+        const st = t.status==='confirmé'?'var(--green)':'var(--yellow)';
         b.innerHTML += `<tr>
-            <td><b>${t.service}</b><br><small style="color:var(--gray)">${d.toLocaleDateString()} &agrave; ${lera}</small></td>
-            <td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td>
-            <td style="text-align:right"><span class="status-badge ${t.status==='confirmé'?'status-confirme':'status-attente'}" style="background:rgba(255,255,255,0.05); color:${t.status==='confirmé'?'var(--green)':'var(--yellow)'}">${t.status||'attente'}</span></td>
+            <td><b>${t.service}</b><br><small style="color:var(--gray)">${d.toLocaleDateString()} - ${d.getHours()}:${d.getMinutes().toString().padStart(2,'0')}</small></td>
+            <td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b><br><span class="status-badge" style="background:rgba(255,255,255,0.05); color:${st}">${t.status||'attente'}</span></td>
         </tr>`;
     });
 }
