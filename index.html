@@ -95,21 +95,34 @@ header i:active {
 </div>
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 <div class="sidebar" id="sidebar">
-    <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px; padding-bottom:20px; border-bottom:1px solid var(--border);">
-        <img id="sidebar-avatar" src="https://via.placeholder.com/150" 
-             style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid var(--yellow);">
-        <div style="text-align:left;">
-            <div style="font-weight:bold; font-size:16px;">Julio Landry</div>
-            <div style="font-size:11px; color:var(--yellow); font-weight:600;">ID: TC-882910</div>
-        </div>
-        <i class="fa-solid fa-xmark" onclick="toggleMenu()" style="font-size:24px; margin-left:auto;"></i>
-    </div>
+    <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px; padding-bottom:20px; border-bottom:1px solid var(--border);">
+        <img id="sidebar-avatar" src="https://via.placeholder.com/150" 
+             style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid var(--yellow);">
+        <div style="text-align:left;">
+            <div style="font-weight:bold; font-size:16px;">Julio Landry</div>
+            <div style="font-size:11px; color:var(--yellow); font-weight:600;">ID: TC-882910</div>
+        </div>
+        <i class="fa-solid fa-xmark" onclick="toggleMenu()" style="font-size:24px; margin-left:auto; cursor:pointer;"></i>
+    </div>
 
-    <div onclick="showPage('history')" style="padding:20px 0; border-bottom:1px solid var(--border); cursor:pointer;">
-        <i class="fa-solid fa-clock-rotate-left"></i> &nbsp; Historique complet
-    </div>
-    ...
+    <div class="sidebar-menu">
+        <div onclick="showPage('history')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:center; gap:15px;">
+            <i class="fa-solid fa-clock-rotate-left" style="color:var(--yellow); width:20px;"></i> Historique complet
+        </div>
+        <div onclick="openMobile('Dépôt')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:center; gap:15px;">
+            <i class="fa-solid fa-plus-circle" style="color:var(--green); width:20px;"></i> Dépôt Mobile Money
+        </div>
+        <div onclick="openMobile('Retrait')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:center; gap:15px;">
+            <i class="fa-solid fa-minus-circle" style="color:var(--red); width:20px;"></i> Retrait Mobile Money
+        </div>
+        
+        <div onclick="logout()" style="padding:20px 0; color:var(--red); cursor:pointer; margin-top:40px; font-weight:800; display:flex; align-items:center; gap:15px;">
+            <i class="fa-solid fa-power-off"></i> Déconnexion
+        </div>
+    </div>
+</div>
 <div onclick="showPage('profile')" style="cursor:pointer; display: flex; align-items: center;">
     <img id="user-avatar-nav" src="https://via.placeholder.com/150" 
          style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1px solid var(--yellow);">
@@ -454,6 +467,42 @@ async function executeMobile(){ /* mitovy amin'ny executeTrans */ }
 function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
 
 initApp();
+  async function executeMobile(){
+    const val = parseFloat(document.getElementById('mob-amount').value);
+    const phone = document.getElementById('mob-phone').value;
+    const type = document.getElementById('mob-title').innerText; // "Dépôt MM" na "Retrait MM"
+
+    if(!val || val <= 0 || !phone) return alert("Fenoy tsara ny banga!");
+
+    // Raha Retrait, jereo raha ampy ny volany
+    if(type.includes("Retrait") && userSolde < val) {
+        return alert("Tsy ampy ny solde-nao!");
+    }
+
+    try {
+        // Ampiditra ao amin'ny Transactions
+        await supabaseClient.from('transactions').insert([{
+            user_id: currentUserId,
+            montant: val,
+            service: type,
+            status: "En attente",
+            adresse: phone
+        }]);
+
+        // Raha retrait dia analana avy hatrany ny solde
+        if(type.includes("Retrait")) {
+            userSolde -= val;
+            await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId);
+            updateSoldeUI();
+        }
+
+        alert("Fangatahana voaray! ✅");
+        document.getElementById('modal-mobile').style.display='none';
+        fetchData(); // Refresh history
+    } catch(err) {
+        alert("Nisy fahadisoana!");
+    }
+}
 </script>
 </body>
 </html>
