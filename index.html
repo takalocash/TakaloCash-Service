@@ -105,22 +105,37 @@
             <div class="service-item" onclick="switchMode('Envoyer')"><div class="icon-box" style="color:#00a3da; background:white; padding:4px;"><img src="https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg" width="28"></div><div class="service-info"><b>1xBet</b><small>Dépôt, Retrait</small></div></div>
             <div class="service-item" id="service-starlink" onclick="switchMode('Envoyer')"><div class="icon-box" style="color:white;"><i class="fa-solid fa-satellite-dish"></i></div><div class="service-info"><b>Starlink</b><small>Abonnement</small></div></div>
         </div>
-
-        <div class="trans-box">
-            <b id="trans-title" style="color:var(--yellow); font-size:18px; display:block; margin-bottom:20px;">Envoyer Crypto</b>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                <div><label style="font-size:11px; color:var(--gray)">Asset :</label>
-                    <select id="crypto-select" class="styled-input" onchange="updateCalc()"><option value="TRX">TRX (TRC20)</option><option value="USDT">USDT (TRC20)</option></select>
-                </div>
-                <div><label id="label-right" style="font-size:11px; color:var(--gray)">Montant (Ar) :</label><input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()"></div>
-            </div>
-            <div style="margin-top:20px;"><label id="label-addr" style="font-size:11px; color:var(--gray)">Adresse destinataire :</label><input type="text" id="input-addr" class="styled-input" placeholder="Saisir l'adresse"></div>
-            <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:15px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;">
-                <span style="color:var(--gray)">Solde: <b id="mini-solde" style="color:white">0 Ar</b></span>
-                <span id="calc-res" style="color:var(--yellow); font-weight:800;">0.00 TRX</span>
-            </div>
-            <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Confirmer</button>
+        
+   <div class="trans-box">
+    <b id="trans-title" style="color:var(--yellow); font-size:18px; display:block; margin-bottom:20px;">Envoyer Crypto</b>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+        <div>
+            <label style="font-size:11px; color:var(--gray)">Asset :</label>
+            <select id="crypto-select" class="styled-input" onchange="updateCalc()">
+                <option value="TRX">TRX (TRC20)</option>
+                <option value="USDT">USDT (TRC20)</option>
+            </select>
         </div>
+        <div>
+            <label id="label-amount" style="font-size:11px; color:var(--gray)">Montant (Ar) :</label>
+            <input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()">
+        </div>
+      </div>
+
+    <div style="margin-top:20px;">
+        <label id="label-addr-text" style="font-size:11px; color:var(--gray)">Adresse destinataire :</label>
+        <div style="position:relative; display:flex; align-items:center;">
+            <input type="text" id="input-addr" class="styled-input" style="padding-right:45px;" placeholder="Saisir l'adresse">
+            <i class="fa-solid fa-copy" id="copy-btn" onclick="copyAddress()" style="position:absolute; right:12px; top:18px; color:var(--yellow); cursor:pointer; font-size:18px; display:none;"></i>
+        </div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:15px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;">
+        <span style="color:var(--gray)">Total :</span>
+        <span id="calc-res" style="color:var(--yellow); font-weight:800;">0.00 TRX</span>
+    </div>
+    <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Confirmer</button>
+</div>
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <b style="color:var(--gray); font-size:14px;">Activités récentes</b>
@@ -179,8 +194,12 @@
 
 <script>
 const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
-let currentUserId = null, userSolde = 0, allTransactions = [], currentFilter = "Tous", selectedMonth = null;
-const TAUX = { "TRX": 150, "USDT": 4600 }, months = ["Janv", "Févr", "Mars", "Avr", "Mai", "Juin", "Juil", "Août", "Sept", "Oct", "Nov", "Déc"];
+let currentUserId = null, userSolde = 0, allTransactions = [], currentFilter = "Tous", selectedMonth = null, currentMode = "Envoyer";
+
+// 1. IRETO NY TAHA SY ADIRESY RECEPTION (Afaka ovainao eto)
+const TAUX = { "TRX": 150, "USDT": 4600 };
+const ADDR_RECEPT = { "TRX": "T-ADIRESY-TRX-AO-AMINAO", "USDT": "T-ADIRESY-USDT-AO-AMINAO" };
+const months = ["Janv", "Févr", "Mars", "Avr", "Mai", "Juin", "Juil", "Août", "Sept", "Oct", "Nov", "Déc"];
 
 function toggleMenu(){ document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display=document.getElementById('sidebar').classList.contains('active')?'block':'none'; }
 
@@ -209,23 +228,67 @@ function updateSoldeUI(){
     document.getElementById('mini-solde').innerText = userSolde.toLocaleString()+" Ar";
 }
 
+// 2. FONCTION SWITCHMODE NOHAVAOZINA
 function switchMode(m){
-    currentMode = m; document.getElementById('trans-title').innerText = m + " Crypto";
+    currentMode = m; 
+    document.getElementById('trans-title').innerText = m + " Crypto";
     document.getElementById('service-starlink').style.display = m==='Recevoir' ? 'none' : 'flex';
+    
+    const inputAddr = document.getElementById('input-addr');
+    const asset = document.getElementById('crypto-select').value;
+    const labelRight = document.getElementById('label-right');
+
+    if(m === 'Recevoir') {
+        if(labelRight) labelRight.innerText = "Quantité Crypto :";
+        inputAddr.value = ADDR_RECEPT[asset];
+        inputAddr.readOnly = true;
+        if(document.getElementById('copy-btn')) document.getElementById('copy-btn').style.display = "block";
+    } else {
+        if(labelRight) labelRight.innerText = "Montant (Ar) :";
+        inputAddr.value = "";
+        inputAddr.readOnly = false;
+        if(document.getElementById('copy-btn')) document.getElementById('copy-btn').style.display = "none";
+    }
     updateCalc();
 }
 
+// 3. FONCTION UPDATECALC NOHAVAOZINA
 function updateCalc(){
-    const cry = document.getElementById('crypto-select').value, val = parseFloat(document.getElementById('input-main').value) || 0;
-    document.getElementById('calc-res').innerText = (val/TAUX[cry]).toFixed(2)+" "+cry;
+    const cry = document.getElementById('crypto-select').value;
+    const val = parseFloat(document.getElementById('input-main').value) || 0;
+    const resDisplay = document.getElementById('calc-res');
+
+    if(currentMode === 'Envoyer') {
+        const res = (val / TAUX[cry]).toFixed(2);
+        resDisplay.innerText = res + " " + cry;
+    } else {
+        const res = (val * TAUX[cry]).toLocaleString();
+        resDisplay.innerText = res + " Ar";
+        document.getElementById('input-addr').value = ADDR_RECEPT[cry];
+    }
 }
 
+// 4. FONCTION EXECUTETRANS NOHAVAOZINA
 async function executeTrans(){
     const val = parseFloat(document.getElementById('input-main').value);
-    if(!val || userSolde < val) return alert("Vérifiez le montant ou solde !");
-    userSolde -= val; updateSoldeUI();
-    await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId);
-    await supabaseClient.from('transactions').insert([{user_id:currentUserId, montant:val, service:document.getElementById('trans-title').innerText, status:"En attente", adresse:document.getElementById('input-addr').value}]);
+    const cry = document.getElementById('crypto-select').value;
+    if(!val) return alert("Veuillez entrer un montant");
+
+    const finalAr = currentMode === 'Envoyer' ? val : (val * TAUX[cry]);
+
+    if(currentMode === 'Envoyer'){
+        if(userSolde < finalAr) return alert("Solde insuffisant !");
+        userSolde -= finalAr; updateSoldeUI();
+        await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId);
+    }
+    
+    await supabaseClient.from('transactions').insert([{
+        user_id:currentUserId, 
+        montant:finalAr, 
+        service:currentMode+" "+cry, 
+        status:"En attente", 
+        adresse:document.getElementById('input-addr').value
+    }]);
     alert("Enregistré ! ✅"); fetchData();
 }
 
@@ -256,6 +319,7 @@ function filterType(type, btn){
 
 function renderMonthPicker(){
     const container = document.getElementById('month-filter-container');
+    if(!container) return;
     container.innerHTML = `<div class="filter-chip ${selectedMonth===null?'active':''}" onclick="filterMonth(null, this)">Tous</div>`;
     const unique = [...new Set(allTransactions.map(t => new Date(t.created_at).getMonth()))].sort((a,b)=>b-a);
     unique.forEach(m => { container.innerHTML += `<div class="filter-chip" onclick="filterMonth(${m}, this)">${months[m]}</div>`; });
@@ -269,7 +333,7 @@ function filterMonth(m, btn){
 }
 
 function renderFullHistory(){
-    const b = document.getElementById('history-full-body'); b.innerHTML = "";
+    const b = document.getElementById('history-full-body'); if(!b) return; b.innerHTML = "";
     let filtered = allTransactions;
     if(currentFilter !== 'Tous') filtered = filtered.filter(t => t.service.includes(currentFilter));
     if(selectedMonth !== null) filtered = filtered.filter(t => new Date(t.created_at).getMonth() === selectedMonth);
@@ -279,8 +343,15 @@ function renderFullHistory(){
     });
 }
 
+function copyAddress() {
+    const addrInput = document.getElementById('input-addr');
+    addrInput.select();
+    navigator.clipboard.writeText(addrInput.value);
+    alert("Adresse copiée !");
+}
+
 function openMobile(t){ document.getElementById('mob-title').innerText=t+" MM"; document.getElementById('modal-mobile').style.display='flex'; toggleMenu(); }
-async function executeMobile(){ /* mitovy amin'ny executeTrans ny logique solde */ }
+async function executeMobile(){ /* mitovy amin'ny executeTrans */ }
 function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
 initApp();
 </script>
