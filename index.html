@@ -96,9 +96,24 @@ header i:active {
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 <div class="sidebar" id="sidebar">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-        <h2 style="color:var(--yellow); margin:0;">Menu</h2>
-        <i class="fa-solid fa-xmark" onclick="toggleMenu()" style="font-size:24px;"></i>
+    <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px; padding-bottom:20px; border-bottom:1px solid var(--border);">
+        <img id="sidebar-avatar" src="https://via.placeholder.com/150" 
+             style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid var(--yellow);">
+        <div style="text-align:left;">
+            <div style="font-weight:bold; font-size:16px;">Julio Landry</div>
+            <div style="font-size:11px; color:var(--yellow); font-weight:600;">ID: TC-882910</div>
+        </div>
+        <i class="fa-solid fa-xmark" onclick="toggleMenu()" style="font-size:24px; margin-left:auto;"></i>
+    </div>
+
+    <div onclick="showPage('history')" style="padding:20px 0; border-bottom:1px solid var(--border); cursor:pointer;">
+        <i class="fa-solid fa-clock-rotate-left"></i> &nbsp; Historique complet
+    </div>
+    ...
+<div onclick="showPage('profile')" style="cursor:pointer; display: flex; align-items: center;">
+    <img id="user-avatar-nav" src="https://via.placeholder.com/150" 
+         style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1px solid var(--yellow);">
+</div>
     </div>
     <div onclick="showPage('history')" style="padding:20px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-clock-rotate-left"></i> &nbsp; Historique complet</div>
     <div onclick="openMobile('Dépôt')" style="padding:20px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-plus-circle"></i> &nbsp; Dépôt MM</div>
