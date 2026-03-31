@@ -116,10 +116,13 @@
                 <option value="USDT">USDT (TRC20)</option>
             </select>
         </div>
-        <div>
-            <label id="label-amount" style="font-size:11px; color:var(--gray)">Montant (Ar) :</label>
-            <input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()">
-        </div>
+    <div>
+    <label id="label-right" style="font-size:11px; color:var(--gray)">Montant (Ar) :</label>
+    <div style="position:relative; display:flex; align-items:center;">
+        <input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()" style="padding-right:45px;">
+        <span id="unit-suffix" style="position:absolute; right:12px; color:var(--gray); font-size:12px; font-weight:700; pointer-events:none;">Ar</span>
+      </div>
+    </div>
       </div>
 
     <div style="margin-top:20px;">
@@ -229,39 +232,47 @@ function updateSoldeUI(){
 }
 
 // 2. FONCTION SWITCHMODE NOHAVAOZINA
-function switchMode(m){
-    currentMode = m; 
+function switchMode(m) {
+    currentMode = m;
     document.getElementById('trans-title').innerText = m + " Crypto";
-    document.getElementById('service-starlink').style.display = m==='Recevoir' ? 'none' : 'flex';
-    
+    document.getElementById('service-starlink').style.display = m === 'Recevoir' ? 'none' : 'flex';
+
     const inputAddr = document.getElementById('input-addr');
     const asset = document.getElementById('crypto-select').value;
     const labelRight = document.getElementById('label-right');
+    const unitSuffix = document.getElementById('unit-suffix');
 
-    if(m === 'Recevoir') {
-        if(labelRight) labelRight.innerText = "Quantité Crypto :";
+    if (m === 'Recevoir') {
+        if (labelRight) labelRight.innerText = "Quantité Crypto :";
+        if (unitSuffix) unitSuffix.innerText = asset; // Ohatra: TRX
         inputAddr.value = ADDR_RECEPT[asset];
         inputAddr.readOnly = true;
-        if(document.getElementById('copy-btn')) document.getElementById('copy-btn').style.display = "block";
+        if (document.getElementById('copy-btn')) document.getElementById('copy-btn').style.display = "block";
     } else {
-        if(labelRight) labelRight.innerText = "Montant (Ar) :";
+        if (labelRight) labelRight.innerText = "Montant (Ar) :";
+        if (unitSuffix) unitSuffix.innerText = "Ar";
         inputAddr.value = "";
         inputAddr.readOnly = false;
-        if(document.getElementById('copy-btn')) document.getElementById('copy-btn').style.display = "none";
+        if (document.getElementById('copy-btn')) document.getElementById('copy-btn').style.display = "none";
     }
     updateCalc();
 }
 
 // 3. FONCTION UPDATECALC NOHAVAOZINA
-function updateCalc(){
+function updateCalc() {
     const cry = document.getElementById('crypto-select').value;
     const val = parseFloat(document.getElementById('input-main').value) || 0;
     const resDisplay = document.getElementById('calc-res');
+    const unitSuffix = document.getElementById('unit-suffix');
 
-    if(currentMode === 'Envoyer') {
+    if (currentMode === 'Envoyer') {
+        // Avy amin'ny Ariary mankany amin'ny Crypto
+        if (unitSuffix) unitSuffix.innerText = "Ar";
         const res = (val / TAUX[cry]).toFixed(2);
         resDisplay.innerText = res + " " + cry;
     } else {
+        // Avy amin'ny Crypto mankany amin'ny Ariary
+        if (unitSuffix) unitSuffix.innerText = cry; // Lasa TRX na USDT ny suffix
         const res = (val * TAUX[cry]).toLocaleString();
         resDisplay.innerText = res + " Ar";
         document.getElementById('input-addr').value = ADDR_RECEPT[cry];
