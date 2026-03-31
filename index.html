@@ -55,14 +55,33 @@
         .sidebar { position: fixed; top: 0; right: -100%; width: 80%; height: 100%; background: var(--bg-nav); z-index: 2000; transition: 0.4s; padding: 30px; box-sizing: border-box; }
         .sidebar.active { right: 0; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; z-index: 1500; backdrop-filter: blur(5px); }
+  header i {
+    transition: 0.2s;
+}
+header i:active {
+    transform: scale(0.9);
+    color: var(--yellow) !important;
+}
     </style>
 </head>
 <body>
 
 <header id="nav-header" style="display:none;">
     <div style="max-width:480px; margin:auto; display:flex; justify-content:space-between; align-items:center;">
-        <div id="header-left" style="font-weight:900; font-size:24px; letter-spacing:-1px;" onclick="showPage('home')"><span style="color:var(--yellow)">TAKALO</span>CASH</div>
-        <i class="fa-solid fa-bars-staggered" style="font-size:26px; cursor:pointer; color:var(--yellow);" onclick="toggleMenu()"></i>
+        <div id="header-left" style="font-weight:900; font-size:22px; letter-spacing:-1px; cursor:pointer;" onclick="showPage('home')">
+            <span style="color:var(--yellow)">TAKALO</span>CASH
+        </div>
+
+        <div style="display:flex; align-items:center; gap:18px;">
+            <div style="position:relative; cursor:pointer;">
+                <i class="fa-solid fa-bell" style="font-size:20px; color:var(--gray);"></i>
+                <span style="position:absolute; top:-2px; right:-2px; width:8px; height:8px; background:var(--red); border-radius:50%; border:2px solid var(--bg-nav);"></span>
+            </div>
+
+            <i class="fa-solid fa-circle-user" style="font-size:22px; color:var(--gray); cursor:pointer;" onclick="alert('Hidirana amin\'ny Paramètre de compte...')"></i>
+
+            <i class="fa-solid fa-bars-staggered" style="font-size:24px; cursor:pointer; color:var(--yellow);" onclick="toggleMenu()"></i>
+        </div>
     </div>
 </header>
 
