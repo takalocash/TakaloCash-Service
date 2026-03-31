@@ -14,25 +14,22 @@
             --gray: #848e9c; --border: rgba(255,255,255,0.1);
             --grad-yellow: linear-gradient(135deg, #fcd535, #f7b500);
         }
-        body { margin: 0; background: var(--bg-body); font-family: 'Inter', sans-serif; color: white; overflow-x: hidden; }
+        body { margin: 0; background: var(--bg-body); font-family: 'Inter', sans-serif; color: white; overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
         
         /* HEADER */
         header { background: var(--bg-nav); padding: 15px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
-        header i { transition: 0.2s; cursor: pointer; }
-        header i:active { transform: scale(0.9); color: var(--yellow) !important; }
-
-        .container { max-width: 480px; margin: auto; padding: 15px; display: none; }
+        .container { max-width: 480px; margin: auto; padding: 15px; flex: 1; width: 100%; box-sizing: border-box; }
         
-        /* SOLDE CARD */
+        /* SOLDE */
         .solde-card { text-align: center; padding: 35px 20px; background: radial-gradient(circle at top right, #1c2128, #0d1117); border-radius: 28px; margin-bottom: 25px; border: 1px solid var(--border); }
         .solde-amount { font-size: 38px; font-weight: 800; margin: 8px 0; letter-spacing: -1px; }
 
-        /* ACTIONS & SERVICES */
+        /* GRID & BUTTONS */
         .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
         .btn-action { border: none; padding: 18px; border-radius: 16px; font-weight: 700; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; }
-        .btn-action:active { transform: scale(0.95); }
         .btn-env { background: var(--grad-yellow); color: black; }
         .btn-rec { background: var(--green); color: white; }
+        .btn-action:active { transform: scale(0.95); }
 
         .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
         .service-item { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 18px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
@@ -43,46 +40,43 @@
         .styled-input { background: var(--bg-body); border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: white; width: 100%; box-sizing: border-box; outline: none; font-size: 14px; margin-top: 5px; }
         .btn-valider { width: 100%; background: var(--grad-yellow); border: none; padding: 18px; border-radius: 14px; font-weight: 800; cursor: pointer; color: black; margin-top: 15px; font-size: 16px; }
 
-        /* HISTORY */
-        .history-table { width: 100%; border-collapse: collapse; }
-        .history-table td { padding: 16px 0; border-bottom: 1px solid var(--border); }
-        .scroll-filter { display: flex; gap: 10px; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; }
+        /* HISTORY FILTERS */
+        .scroll-filter { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
         .filter-chip { background: var(--card); border: 1px solid var(--border); padding: 8px 18px; border-radius: 25px; font-size: 11px; white-space: nowrap; cursor: pointer; color: var(--gray); font-weight: 600; }
         .filter-chip.active { background: var(--yellow); color: black; border-color: var(--yellow); }
 
-        /* SIDEBAR & OVERLAY */
+        .history-table { width: 100%; border-collapse: collapse; }
+        .history-table td { padding: 16px 0; border-bottom: 1px solid var(--border); }
+
+        /* SIDEBAR */
         .sidebar { position: fixed; top: 0; right: -100%; width: 80%; height: 100%; background: var(--bg-nav); z-index: 2000; transition: 0.4s; padding: 30px; box-sizing: border-box; border-left: 1px solid var(--border); }
         .sidebar.active { right: 0; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; z-index: 1500; backdrop-filter: blur(5px); }
+
+        /* FOOTER */
+        footer { background: var(--bg-nav); padding: 30px 20px; border-top: 1px solid var(--border); margin-top: auto; }
     </style>
 </head>
 <body>
 
 <header id="nav-header" style="display:none;">
     <div style="max-width:480px; margin:auto; display:flex; justify-content:space-between; align-items:center;">
-        <div id="header-left" style="font-weight:900; font-size:22px; letter-spacing:-1px; cursor:pointer;" onclick="showPage('home')">
+        <div id="header-left" style="font-weight:900; font-size:22px; cursor:pointer;" onclick="showPage('home')">
             <span style="color:var(--yellow)">TAKALO</span>CASH
         </div>
-
         <div style="display:flex; align-items:center; gap:18px;">
-            <div style="position:relative; cursor:pointer;">
-                <i class="fa-solid fa-bell" style="font-size:20px; color:var(--gray);"></i>
-                <span style="position:absolute; top:-2px; right:-2px; width:8px; height:8px; background:var(--red); border-radius:50%; border:2px solid var(--bg-nav);"></span>
-            </div>
-            
-            <div onclick="showPage('profile')" style="cursor:pointer; display: flex; align-items: center;">
+            <div onclick="showPage('profile')" style="cursor:pointer;">
                 <img id="user-avatar-nav" src="https://via.placeholder.com/150" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1px solid var(--yellow);">
             </div>
-
-            <i class="fa-solid fa-bars-staggered" style="font-size:24px; color:var(--yellow);" onclick="toggleMenu()"></i>
+            <i class="fa-solid fa-bars-staggered" style="font-size:24px; color:var(--yellow); cursor:pointer;" onclick="toggleMenu()"></i>
         </div>
     </div>
 </header>
 
 <div id="auth-container" style="position:fixed; inset:0; background:var(--bg-body); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;">
     <div style="background:var(--card); padding:40px 30px; border-radius:30px; width:100%; max-width:320px; text-align:center; border:1px solid var(--border);">
-        <h1 style="color:var(--yellow); font-weight:900; margin-bottom:30px;">Connexion</h1>
-        <input type="email" id="auth-email" class="styled-input" placeholder="Adresse Email">
+        <h1 style="color:var(--yellow); font-weight:900;">Connexion</h1>
+        <input type="email" id="auth-email" class="styled-input" placeholder="Email">
         <input type="password" id="auth-password" class="styled-input" placeholder="Mot de passe" style="margin-top:15px">
         <button class="btn-valider" onclick="handleLogin()">Se connecter</button>
     </div>
@@ -93,30 +87,21 @@
     <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px; padding-bottom:20px; border-bottom:1px solid var(--border);">
         <img id="sidebar-avatar" src="https://via.placeholder.com/150" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid var(--yellow);">
         <div style="text-align:left;">
-            <div style="font-weight:bold; font-size:16px;" id="user-name-sidebar">Julio Landry</div>
-            <div style="font-size:11px; color:var(--yellow); font-weight:600;" id="user-id-sidebar">ID: TC-882910</div>
+            <div style="font-weight:bold; font-size:16px;">Julio Landry</div>
+            <div style="font-size:11px; color:var(--yellow);">ID: TC-882910</div>
         </div>
         <i class="fa-solid fa-xmark" onclick="toggleMenu()" style="font-size:24px; margin-left:auto; cursor:pointer;"></i>
     </div>
-
-    <div onclick="showPage('history')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer;">
-        <i class="fa-solid fa-clock-rotate-left"></i> &nbsp; Historique complet
-    </div>
-    <div onclick="openMobile('Dépôt')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer;">
-        <i class="fa-solid fa-plus-circle"></i> &nbsp; Dépôt MM
-    </div>
-    <div onclick="openMobile('Retrait')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer;">
-        <i class="fa-solid fa-minus-circle"></i> &nbsp; Retrait MM
-    </div>
-    <div onclick="logout()" style="padding:20px 0; color:var(--red); cursor:pointer; margin-top:40px; font-weight:bold;">
-        <i class="fa-solid fa-power-off"></i> &nbsp; Déconnexion
-    </div>
+    <div onclick="showPage('history')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-clock-rotate-left"></i> &nbsp; Historique</div>
+    <div onclick="openMobile('Dépôt')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-plus-circle"></i> &nbsp; Dépôt MM</div>
+    <div onclick="openMobile('Retrait')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-minus-circle"></i> &nbsp; Retrait MM</div>
+    <div onclick="logout()" style="padding:20px 0; color:var(--red); cursor:pointer; margin-top:40px;"><i class="fa-solid fa-power-off"></i> &nbsp; Déconnexion</div>
 </div>
 
-<div class="container" id="main-app">
+<div class="container" id="main-app" style="display:none;">
     <div id="page-home">
         <div class="solde-card">
-            <div style="color:var(--gray); font-size:13px; font-weight:600; text-transform:uppercase;">Solde Disponible</div>
+            <div style="color:var(--gray); font-size:12px; font-weight:600;">SOLDE DISPONIBLE</div>
             <h1 class="solde-amount" id="display-solde">0 Ar</h1>
         </div>
 
@@ -125,67 +110,47 @@
             <button class="btn-action btn-rec" onclick="switchMode('Recevoir')"><i class="fa-solid fa-qrcode"></i> Recevoir</button>
         </div>
 
-        <div class="services-grid">
-            <div class="service-item" onclick="switchMode('Envoyer')">
-                <div class="icon-box" style="color:#f3ba2f;"><i class="fa-solid fa-brands fa-bitcoin"></i></div>
-                <div class="service-info"><b>Crypto</b><small>TRX, BTC...</small></div>
-            </div>
-            <div class="service-item" onclick="switchMode('Envoyer')">
-                <div class="icon-box" style="color:#8132ad;"><i class="fa-solid fa-wallet"></i></div>
-                <div class="service-info"><b>E-Wallet</b><small>Skrill, Neteller</small></div>
-            </div>
-        </div>
-
         <div class="trans-box">
-            <b id="trans-title" style="color:var(--yellow); font-size:18px; display:block; margin-bottom:20px;">Envoyer Crypto</b>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+            <b id="trans-title" style="color:var(--yellow); font-size:18px;">Envoyer Crypto</b>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:15px;">
                 <div>
                     <label style="font-size:11px; color:var(--gray)">Asset :</label>
-                    <div style="display:flex; align-items:center; gap:10px; margin-top:5px;">
-                        <img id="asset-img" src="https://cryptologos.cc/logos/tron-trx-logo.svg?v=025" width="28">
-                        <select id="crypto-select" class="styled-input" style="margin-top:0; flex:1;" onchange="updateIcon(); updateCalc();">
-                            <option value="TRX">TRX (TRC20)</option>
-                            <option value="USDT">USDT (TRC20)</option>
-                            <option value="1XBET">1xBet</option>
-                        </select>
-                    </div>
+                    <select id="crypto-select" class="styled-input" onchange="updateIcon(); updateCalc();">
+                        <option value="TRX">TRX (TRC20)</option>
+                        <option value="USDT">USDT (TRC20)</option>
+                        <option value="1XBET">1xBet</option>
+                    </select>
                 </div>
                 <div>
                     <label id="label-right" style="font-size:11px; color:var(--gray)">Montant (Ar) :</label>
-                    <div style="position:relative;">
-                        <input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()">
-                        <span id="unit-suffix" style="position:absolute; right:12px; top:18px; color:var(--gray); font-size:12px; font-weight:700;">Ar</span>
-                    </div>
+                    <input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()">
                 </div>
             </div>
-
-            <div style="margin-top:20px;">
-                <label id="label-addr-text" style="font-size:11px; color:var(--gray)">Adresse destinataire :</label>
-                <div style="position:relative;">
-                    <input type="text" id="input-addr" class="styled-input" placeholder="Saisir l'adresse">
-                    <i class="fa-solid fa-copy" id="copy-btn" onclick="copyAddress()" style="position:absolute; right:12px; top:18px; color:var(--yellow); cursor:pointer; display:none;"></i>
-                </div>
+            <div style="margin-top:15px;">
+                <label id="label-addr-text" style="font-size:11px; color:var(--gray)">Adresse / ID :</label>
+                <input type="text" id="input-addr" class="styled-input" placeholder="Saisir ici...">
             </div>
-
-            <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:15px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;">
-                <span style="color:var(--gray)">Total :</span>
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-top:15px; background:rgba(255,255,255,0.05); padding:12px; border-radius:10px;">
+                <span style="color:var(--gray)">Total à recevoir :</span>
                 <span id="calc-res" style="color:var(--yellow); font-weight:800;">0.00 TRX</span>
             </div>
-            <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Confirmer</button>
+            <button class="btn-valider" onclick="executeTrans()">Confirmer la transaction</button>
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
             <b style="color:var(--gray); font-size:14px;">Activités récentes</b>
-            <small onclick="showPage('history')" style="color:var(--yellow); cursor:pointer; font-weight:700;">Tout voir</small>
+            <small onclick="showPage('history')" style="color:var(--yellow); cursor:pointer;">Tout voir</small>
         </div>
         <table class="history-table"><tbody id="history-preview-body"></tbody></table>
     </div>
 
     <div id="page-history" style="display:none;">
-        <div class="scroll-filter" id="type-filter">
+        <div class="scroll-filter">
             <div class="filter-chip active" onclick="filterType('Tous', this)">Tous</div>
             <div class="filter-chip" onclick="filterType('Envoyer', this)">Envoyer</div>
             <div class="filter-chip" onclick="filterType('Recevoir', this)">Recevoir</div>
+            <div class="filter-chip" onclick="filterType('Dépôt', this)">Dépôt</div>
+            <div class="filter-chip" onclick="filterType('Retrait', this)">Retrait</div>
         </div>
         <table class="history-table"><tbody id="history-full-body"></tbody></table>
     </div>
@@ -193,38 +158,54 @@
 
 <footer>
     <div style="max-width:480px; margin:auto; text-align:center; font-size:11px; color:var(--gray);">
-        © 2026 TakaloCash Madagascar. Tous droits réservés.
+        <div style="margin-bottom:10px;">
+            <a href="#" style="color:var(--gray); text-decoration:none; margin:0 10px;">Aide</a>
+            <a href="#" style="color:var(--gray); text-decoration:none; margin:0 10px;">Contact</a>
+            <a href="#" style="color:var(--gray); text-decoration:none; margin:0 10px;">WhatsApp</a>
+        </div>
+        © 2026 TakaloCash Madagascar.
     </div>
 </footer>
 
 <div id="modal-mobile" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:5000; align-items:center; justify-content:center; padding:20px;">
     <div style="background:var(--card); padding:30px; border-radius:28px; width:100%; max-width:340px; border:1px solid var(--border);">
         <h3 id="mob-title" style="color:var(--yellow); margin-top:0;">Dépôt MM</h3>
-        <input type="number" id="mob-amount" class="styled-input" placeholder="Montant en Ar">
-        <input type="tel" id="mob-phone" class="styled-input" placeholder="Numéro de compte" style="margin-top:12px;">
+        <input type="number" id="mob-amount" class="styled-input" placeholder="Montant Ar">
+        <input type="tel" id="mob-phone" class="styled-input" placeholder="Numéro de téléphone" style="margin-top:12px;">
         <button class="btn-valider" onclick="executeMobile()">Valider</button>
         <p onclick="document.getElementById('modal-mobile').style.display='none'" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:20px;">Annuler</p>
     </div>
 </div>
 
 <script>
-// CONFIG SUPABASE
+// --- CONFIG & DATA ---
 const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
 
 let currentUserId = null, userSolde = 0, allTransactions = [], currentMode = "Envoyer";
 const TAUX = { "TRX": 150, "USDT": 4600, "1XBET": 1 };
-const ADDR_RECEPT = { "TRX": "T-ADIRESY-TRX-ANAO", "USDT": "T-ADIRESY-USDT-ANAO", "1XBET": "ID-1XBET-ANAO" };
+const ADDR_RECEPT = { "TRX": "T-REC-TRX-123", "USDT": "T-REC-USDT-456", "1XBET": "ID-1XBET-789" };
 
+// --- NAVIGATION ---
 function toggleMenu(){ 
-    document.getElementById('sidebar').classList.toggle('active'); 
-    document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none'; 
+    const s = document.getElementById('sidebar');
+    const o = document.getElementById('overlay');
+    s.classList.toggle('active');
+    o.style.display = s.classList.contains('active') ? 'block' : 'none';
 }
 
+function showPage(p){
+    document.getElementById('page-home').style.display = p==='home'?'block':'none';
+    document.getElementById('page-history').style.display = p==='history'?'block':'none';
+    const head = document.getElementById('header-left');
+    head.innerHTML = p==='history' ? `<i class="fa-solid fa-arrow-left" onclick="showPage('home')" style="color:var(--yellow)"></i> &nbsp; Historique` : `<span style="color:var(--yellow)">TAKALO</span>CASH`;
+    if(document.getElementById('sidebar').classList.contains('active')) toggleMenu();
+}
+
+// --- AUTH & DATA FETCH ---
 async function handleLogin(){
-    const e = document.getElementById('auth-email').value;
-    const p = document.getElementById('auth-password').value;
+    const e = document.getElementById('auth-email').value, p = document.getElementById('auth-password').value;
     const {error} = await supabaseClient.auth.signInWithPassword({email:e, password:p});
-    if(error) return alert("Erreur d'authentification !");
+    if(error) return alert("Email na teny miafina diso!");
     initApp();
 }
 
@@ -251,72 +232,105 @@ async function fetchData(){
 
 function updateSoldeUI(){ document.getElementById('display-solde').innerText = userSolde.toLocaleString()+" Ar"; }
 
-function showPage(p){
-    document.getElementById('page-home').style.display = p==='home'?'block':'none';
-    document.getElementById('page-history').style.display = p==='history'?'block':'none';
-    if(p==='history'){
-        document.getElementById('header-left').innerHTML = `<i class="fa-solid fa-arrow-left" onclick="showPage('home')" style="color:var(--yellow);"></i> &nbsp; Historique`;
-    } else {
-        document.getElementById('header-left').innerHTML = `<span style="color:var(--yellow)">TAKALO</span>CASH`;
-    }
-    if(document.getElementById('sidebar').classList.contains('active')) toggleMenu();
-}
-
+// --- LOGIQUE TRANSACTION CRYPTO ---
 function switchMode(m) {
     currentMode = m;
     document.getElementById('trans-title').innerText = m + " Crypto";
-    const asset = document.getElementById('crypto-select').value;
-    if (m === 'Recevoir') {
-        document.getElementById('label-right').innerText = "Quantité Crypto :";
-        document.getElementById('unit-suffix').innerText = asset;
-        document.getElementById('input-addr').value = ADDR_RECEPT[asset];
-        document.getElementById('copy-btn').style.display = "block";
-    } else {
-        document.getElementById('label-right').innerText = "Montant (Ar) :";
-        document.getElementById('unit-suffix').innerText = "Ar";
-        document.getElementById('input-addr').value = "";
-        document.getElementById('copy-btn').style.display = "none";
-    }
+    const cry = document.getElementById('crypto-select').value;
+    document.getElementById('label-right').innerText = m === 'Recevoir' ? "Quantité Crypto :" : "Montant (Ar) :";
+    document.getElementById('input-addr').value = m === 'Recevoir' ? ADDR_RECEPT[cry] : "";
     updateCalc();
 }
 
 function updateCalc() {
     const cry = document.getElementById('crypto-select').value;
     const val = parseFloat(document.getElementById('input-main').value) || 0;
-    const resDisplay = document.getElementById('calc-res');
-    if (currentMode === 'Envoyer') {
-        resDisplay.innerText = (val / TAUX[cry]).toFixed(2) + " " + cry;
-    } else {
-        resDisplay.innerText = (val * TAUX[cry]).toLocaleString() + " Ar";
-    }
-}
-
-function updateIcon() {
-    const val = document.getElementById('crypto-select').value;
-    const img = document.getElementById('asset-img');
-    if (val === 'TRX') img.src = "https://cryptologos.cc/logos/tron-trx-logo.svg?v=025";
-    else if (val === 'USDT') img.src = "https://cryptologos.cc/logos/tether-usdt-logo.svg?v=025";
-    else img.src = "https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg";
+    const res = document.getElementById('calc-res');
+    if (currentMode === 'Envoyer') res.innerText = (val / TAUX[cry]).toFixed(2) + " " + cry;
+    else res.innerText = (val * TAUX[cry]).toLocaleString() + " Ar";
 }
 
 async function executeTrans(){
     const val = parseFloat(document.getElementById('input-main').value);
-    if(!val || val <= 0) return alert("Montant invalide");
-    alert("Transaction enregistrée !");
+    const cry = document.getElementById('crypto-select').value;
+    if(!val || val <= 0) return alert("Ampidiro ny montant!");
+
+    const montantAr = currentMode === 'Envoyer' ? val : (val * TAUX[cry]);
+
+    // RAHA ENVOYER: Tsy maintsy ampy ny solde
+    if(currentMode === 'Envoyer'){
+        if(userSolde < montantAr) return alert("Tsy ampy ny solde-nao!");
+        userSolde -= montantAr;
+        await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId);
+    }
+
+    await supabaseClient.from('transactions').insert([{
+        user_id: currentUserId, montant: montantAr, service: currentMode + " " + cry, status: "En attente"
+    }]);
+
+    alert("Transaction voaray! ✅");
     fetchData();
+}
+
+// --- LOGIQUE MOBILE MONEY (Dépôt/Retrait) ---
+function openMobile(t){ 
+    document.getElementById('mob-title').innerText = t + " MM"; 
+    document.getElementById('modal-mobile').style.display='flex'; 
+    toggleMenu(); 
+}
+
+async function executeMobile(){
+    const val = parseFloat(document.getElementById('mob-amount').value);
+    const type = document.getElementById('mob-title').innerText; // "Dépôt MM" na "Retrait MM"
+    if(!val || val <= 0) return alert("Ampidiro ny montant!");
+
+    if(type.includes("Retrait")){
+        if(userSolde < val) return alert("Tsy ampy ny solde-nao!");
+        userSolde -= val;
+    } else {
+        // Dépôt: Miandry confirmation vao mitombo ny solde (eto dia ataontsika en attente fotsiny)
+    }
+
+    await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId);
+    await supabaseClient.from('transactions').insert([{
+        user_id: currentUserId, montant: val, service: type, status: "En attente"
+    }]);
+
+    document.getElementById('modal-mobile').style.display='none';
+    alert("Fangatahana voaray! ✅");
+    fetchData();
+}
+
+// --- SIVANA HISTORIQUE ---
+function filterType(type, btn){
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    renderFullHistory(type);
+}
+
+function renderFullHistory(filter = "Tous"){
+    const b = document.getElementById('history-full-body');
+    let data = allTransactions;
+    if(filter !== "Tous") data = allTransactions.filter(t => t.service.includes(filter));
+    
+    b.innerHTML = data.map(t => `
+        <tr>
+            <td><b>${t.service}</b><br><small style="color:var(--gray)">${new Date(t.created_at).toLocaleDateString()}</small></td>
+            <td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b><br><small style="color:var(--yellow)">${t.status}</small></td>
+        </tr>
+    `).join('');
 }
 
 function renderPreview(){
     const b = document.getElementById('history-preview-body');
-    b.innerHTML = allTransactions.slice(0, 3).map(t => `<tr><td><b>${t.service}</b></td><td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td></tr>`).join('');
+    b.innerHTML = allTransactions.slice(0, 3).map(t => `
+        <tr>
+            <td><b>${t.service}</b></td>
+            <td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td>
+        </tr>
+    `).join('');
 }
 
-function renderFullHistory(){
-    const b = document.getElementById('history-full-body');
-    b.innerHTML = allTransactions.map(t => `<tr><td><b>${t.service}</b></td><td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td></tr>`).join('');
-}
-
-function openMobile(t){ document.getElementById('mob-title').innerText=t+" MM"; document.getElementById('modal-mobile').style.display='flex'; toggleMenu(); }
 function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
 
 initApp();
