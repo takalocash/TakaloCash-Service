@@ -124,17 +124,35 @@ header i:active {
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 <div class="sidebar" id="sidebar">
-    <div class="sidebar-profile">
+    <div style="text-align: center; padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--border);">
         <div style="text-align: right; margin-bottom: -10px;">
             <i class="fa-solid fa-xmark" onclick="toggleMenu()" style="font-size:20px; cursor:pointer; color:var(--gray);"></i>
         </div>
-        <img src="https://via.placeholder.com/70" class="profile-pic-large" id="side-pp">
-        <div style="font-size: 11px; color: var(--yellow); margin-bottom: 5px;">ID: <span id="side-id">...</span></div>
-        <b id="side-name" style="display:block; font-size:15px;">Mpanjifa</b>
-        <small id="side-phone" style="color:var(--gray); font-size:12px;">+261 -- -- --- --</small>
+        
+        <img src="https://via.placeholder.com/70" id="side-pp" style="width:70px; height:70px; border-radius:50%; border:2px solid var(--yellow); object-fit:cover; margin-bottom:10px;">
+        
+        <div style="font-size: 11px; color: var(--yellow); background: rgba(252,213,53,0.1); padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 10px;">
+            ID: <span id="side-id">TK-0000</span>
+        </div>
+
+        <b id="side-name" style="display:block; font-size:16px; margin-bottom: 2px;">Mpanjifa</b>
+        <span id="side-email" style="display:block; font-size:12px; color:var(--gray);">email@example.com</span>
+        <span id="side-phone" style="display:block; font-size:12px; color:var(--gray); margin-top: 2px;">+261 -- -- --- --</span>
     </div>
-    
+
+    <div onclick="showPage('history')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;">
+        <i class="fa-solid fa-clock-rotate-left"></i> &nbsp; Historique
     </div>
+    <div onclick="openMobile('Dépôt')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;">
+        <i class="fa-solid fa-plus-circle" style="color:var(--green)"></i> &nbsp; Dépôt MM
+    </div>
+    <div onclick="openMobile('Retrait')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;">
+        <i class="fa-solid fa-minus-circle" style="color:var(--red)"></i> &nbsp; Retrait MM
+    </div>
+    <div onclick="logout()" style="padding:20px 0; color:var(--red); cursor:pointer; margin-top:20px;">
+        <i class="fa-solid fa-power-off"></i> &nbsp; Déconnexion
+    </div>
+</div>
 
 <div class="container" id="main-app">
     <div id="page-home">
@@ -274,34 +292,35 @@ async function initApp(){
 
 async function fetchData(){
     try {
-        // 1. Alaina ny mombamomba ny mpampiasa (Solde, Anarana, Sary, sns)
+        // 1. Sintonina ny mombamomba ny mpampiasa rehetra (*)
         const { data: u, error: uError } = await supabaseClient
             .from('users')
-            .select('*') // 'select(*)' mba hahazoana ny profil rehetra
+            .select('*') 
             .eq('id', currentUserId)
             .single();
 
         if(uError) throw uError;
 
         if(u){ 
+            // Solde
             userSolde = u.solde; 
             updateSoldeUI(); 
             
-            // --- FANAMBOARANA NY PROFIL (Header & Sidebar) ---
+            // Sary (Avatar) - raha tsy misy dia mampiasa placeholder
             const profileImg = u.avatar_url || "https://via.placeholder.com/100";
             
-            // Fanovana ny sary
+            // Fanavaozana ny sary eo amin'ny Header sy Sidebar
             if(document.getElementById('header-pp')) document.getElementById('header-pp').src = profileImg;
             if(document.getElementById('side-pp')) document.getElementById('side-pp').src = profileImg;
             
-            // Fanovana ny soratra ao amin'ny Sidebar
+            // Fanavaozana ny soratra ao amin'ny Sidebar (Profil Section)
             if(document.getElementById('side-name')) document.getElementById('side-name').innerText = u.full_name || "Mpanjifa";
             if(document.getElementById('side-id')) document.getElementById('side-id').innerText = u.takalo_id || "TK-" + u.id.substring(0,4);
             if(document.getElementById('side-phone')) document.getElementById('side-phone').innerText = u.phone || "Tsy misy laharana";
             if(document.getElementById('side-email')) document.getElementById('side-email').innerText = u.email;
         }
         
-        // 2. Alaina ny transactions rehetra
+        // 2. Sintonina ny Transactions
         const { data: ts, error: tError } = await supabaseClient
             .from('transactions')
             .select('*')
@@ -311,7 +330,7 @@ async function fetchData(){
         if(tError) throw tError;
         allTransactions = ts || [];
         
-        // 3. Alefa ny fampisehoana (Rendering)
+        // 3. Alefa ny fampisehoana (Display)
         renderPreview(); 
         renderFullHistory(); 
         renderMonthPicker();
