@@ -106,39 +106,39 @@
             <div class="service-item" id="service-starlink" onclick="switchMode('Envoyer')"><div class="icon-box" style="color:white;"><i class="fa-solid fa-satellite-dish"></i></div><div class="service-info"><b>Starlink</b><small>Abonnement</small></div></div>
         </div>
         
-   <div class="trans-box">
-    <b id="trans-title" style="color:var(--yellow); font-size:18px; display:block; margin-bottom:20px;">Envoyer Crypto</b>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-        <div>
-            <label style="font-size:11px; color:var(--gray)">Asset :</label>
-            <select id="crypto-select" class="styled-input" onchange="updateCalc()">
-                <option value="TRX">TRX (TRC20)</option>
-                <option value="USDT">USDT (TRC20)</option>
-            </select>
-        </div>
-    <div>
-    <label id="label-right" style="font-size:11px; color:var(--gray)">Montant (Ar) :</label>
-    <div style="position:relative; display:flex; align-items:center;">
-        <input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()" style="padding-right:45px;">
-        <span id="unit-suffix" style="position:absolute; right:12px; color:var(--gray); font-size:12px; font-weight:700; pointer-events:none;">Ar</span>
-      </div>
-    </div>
-      </div>
+        <div class="trans-box">
+            <b id="trans-title" style="color:var(--yellow); font-size:18px; display:block; margin-bottom:20px;">Envoyer Crypto</b>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div>
+                    <label style="font-size:11px; color:var(--gray)">Asset :</label>
+                    <select id="crypto-select" class="styled-input" onchange="updateCalc()">
+                        <option value="TRX">TRX (TRC20)</option>
+                        <option value="USDT">USDT (TRC20)</option>
+                    </select>
+                </div>
+                <div>
+                    <label id="label-right" style="font-size:11px; color:var(--gray)">Montant (Ar) :</label>
+                    <div style="position:relative; display:flex; align-items:center;">
+                        <input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()" style="padding-right:45px;">
+                        <span id="unit-suffix" style="position:absolute; right:12px; color:var(--gray); font-size:12px; font-weight:700; pointer-events:none;">Ar</span>
+                    </div>
+                </div>
+            </div>
 
-    <div style="margin-top:20px;">
-        <label id="label-addr-text" style="font-size:11px; color:var(--gray)">Adresse destinataire :</label>
-        <div style="position:relative; display:flex; align-items:center;">
-            <input type="text" id="input-addr" class="styled-input" style="padding-right:45px;" placeholder="Saisir l'adresse">
-            <i class="fa-solid fa-copy" id="copy-btn" onclick="copyAddress()" style="position:absolute; right:12px; top:18px; color:var(--yellow); cursor:pointer; font-size:18px; display:none;"></i>
-        </div>
-    </div>
+            <div style="margin-top:20px;">
+                <label id="label-addr-text" style="font-size:11px; color:var(--gray)">Adresse destinataire :</label>
+                <div style="position:relative; display:flex; align-items:center;">
+                    <input type="text" id="input-addr" class="styled-input" style="padding-right:45px;" placeholder="Saisir l'adresse">
+                    <i class="fa-solid fa-copy" id="copy-btn" onclick="copyAddress()" style="position:absolute; right:12px; top:18px; color:var(--yellow); cursor:pointer; font-size:18px; display:none;"></i>
+                </div>
+            </div>
 
-    <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:15px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;">
-        <span style="color:var(--gray)">Total :</span>
-        <span id="calc-res" style="color:var(--yellow); font-weight:800;">0.00 TRX</span>
-    </div>
-    <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Confirmer</button>
-</div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:15px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;">
+                <span style="color:var(--gray)">Total :</span>
+                <span id="calc-res" style="color:var(--yellow); font-weight:800;">0.00 TRX</span>
+            </div>
+            <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Confirmer</button>
+        </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <b style="color:var(--gray); font-size:14px;">Activités récentes</b>
@@ -199,7 +199,6 @@
 const supabaseClient = supabase.createClient("https://nyeopreahmajoisartoz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA");
 let currentUserId = null, userSolde = 0, allTransactions = [], currentFilter = "Tous", selectedMonth = null, currentMode = "Envoyer";
 
-// 1. IRETO NY TAHA SY ADIRESY RECEPTION (Afaka ovainao eto)
 const TAUX = { "TRX": 150, "USDT": 4600 };
 const ADDR_RECEPT = { "TRX": "T-ADIRESY-TRX-AO-AMINAO", "USDT": "T-ADIRESY-USDT-AO-AMINAO" };
 const months = ["Janv", "Févr", "Mars", "Avr", "Mai", "Juin", "Juil", "Août", "Sept", "Oct", "Nov", "Déc"];
@@ -209,29 +208,44 @@ function toggleMenu(){ document.getElementById('sidebar').classList.toggle('acti
 async function handleLogin(){
     const e=document.getElementById('auth-email').value, p=document.getElementById('auth-password').value;
     const {error}=await supabaseClient.auth.signInWithPassword({email:e, password:p});
-    if(error) return alert("Erreur !");
+    if(error) return alert("Erreur d'authentification !");
     initApp();
 }
 
 async function initApp(){
     const {data:{user}}=await supabaseClient.auth.getUser();
-    if(user){ currentUserId = user.id; document.getElementById('auth-container').style.display='none'; document.getElementById('main-app').style.display='block'; document.getElementById('nav-header').style.display='block'; fetchData(); }
+    if(user){ 
+        currentUserId = user.id; 
+        document.getElementById('auth-container').style.display='none'; 
+        document.getElementById('main-app').style.display='block'; 
+        document.getElementById('nav-header').style.display='block'; 
+        fetchData(); 
+    }
 }
 
 async function fetchData(){
-    const {data:u}=await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
-    if(u){ userSolde = u.solde; updateSoldeUI(); }
-    const {data:ts}=await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at',{ascending:false});
-    allTransactions = ts || [];
-    renderPreview(); renderFullHistory(); renderMonthPicker();
+    try {
+        const {data:u}=await supabaseClient.from('users').select('solde').eq('id', currentUserId).single();
+        if(u){ userSolde = u.solde; updateSoldeUI(); }
+        
+        const {data:ts, error} = await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at',{ascending:false});
+        if(error) console.error(error);
+        allTransactions = ts || [];
+        
+        renderPreview(); 
+        renderFullHistory(); 
+        renderMonthPicker();
+    } catch(err) {
+        console.error("Erreur fetchData:", err);
+    }
 }
 
 function updateSoldeUI(){
     document.getElementById('display-solde').innerText = userSolde.toLocaleString()+" Ar";
-    document.getElementById('mini-solde').innerText = userSolde.toLocaleString()+" Ar";
+    const miniSolde = document.getElementById('mini-solde');
+    if(miniSolde) miniSolde.innerText = userSolde.toLocaleString()+" Ar";
 }
 
-// 2. FONCTION SWITCHMODE NOHAVAOZINA
 function switchMode(m) {
     currentMode = m;
     document.getElementById('trans-title').innerText = m + " Crypto";
@@ -241,24 +255,24 @@ function switchMode(m) {
     const asset = document.getElementById('crypto-select').value;
     const labelRight = document.getElementById('label-right');
     const unitSuffix = document.getElementById('unit-suffix');
+    const copyBtn = document.getElementById('copy-btn');
 
     if (m === 'Recevoir') {
         if (labelRight) labelRight.innerText = "Quantité Crypto :";
-        if (unitSuffix) unitSuffix.innerText = asset; // Ohatra: TRX
+        if (unitSuffix) unitSuffix.innerText = asset;
         inputAddr.value = ADDR_RECEPT[asset];
         inputAddr.readOnly = true;
-        if (document.getElementById('copy-btn')) document.getElementById('copy-btn').style.display = "block";
+        if (copyBtn) copyBtn.style.display = "block";
     } else {
         if (labelRight) labelRight.innerText = "Montant (Ar) :";
         if (unitSuffix) unitSuffix.innerText = "Ar";
         inputAddr.value = "";
         inputAddr.readOnly = false;
-        if (document.getElementById('copy-btn')) document.getElementById('copy-btn').style.display = "none";
+        if (copyBtn) copyBtn.style.display = "none";
     }
     updateCalc();
 }
 
-// 3. FONCTION UPDATECALC NOHAVAOZINA
 function updateCalc() {
     const cry = document.getElementById('crypto-select').value;
     const val = parseFloat(document.getElementById('input-main').value) || 0;
@@ -266,41 +280,56 @@ function updateCalc() {
     const unitSuffix = document.getElementById('unit-suffix');
 
     if (currentMode === 'Envoyer') {
-        // Avy amin'ny Ariary mankany amin'ny Crypto
         if (unitSuffix) unitSuffix.innerText = "Ar";
         const res = (val / TAUX[cry]).toFixed(2);
         resDisplay.innerText = res + " " + cry;
     } else {
-        // Avy amin'ny Crypto mankany amin'ny Ariary
-        if (unitSuffix) unitSuffix.innerText = cry; // Lasa TRX na USDT ny suffix
+        if (unitSuffix) unitSuffix.innerText = cry;
         const res = (val * TAUX[cry]).toLocaleString();
         resDisplay.innerText = res + " Ar";
         document.getElementById('input-addr').value = ADDR_RECEPT[cry];
     }
 }
 
-// 4. FONCTION EXECUTETRANS NOHAVAOZINA
 async function executeTrans(){
-    const val = parseFloat(document.getElementById('input-main').value);
-    const cry = document.getElementById('crypto-select').value;
-    if(!val) return alert("Veuillez entrer un montant");
+    try {
+        const valInput = document.getElementById('input-main');
+        const addrInput = document.getElementById('input-addr');
+        const val = parseFloat(valInput.value);
+        const cry = document.getElementById('crypto-select').value;
+        
+        if(!val || val <= 0) return alert("Veuillez entrer un montant valide !");
 
-    const finalAr = currentMode === 'Envoyer' ? val : (val * TAUX[cry]);
+        const finalAr = currentMode === 'Envoyer' ? val : (val * TAUX[cry]);
 
-    if(currentMode === 'Envoyer'){
-        if(userSolde < finalAr) return alert("Solde insuffisant !");
-        userSolde -= finalAr; updateSoldeUI();
-        await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId);
+        if(currentMode === 'Envoyer'){
+            if(userSolde < finalAr) return alert("Solde insuffisant !");
+            userSolde -= finalAr; 
+            updateSoldeUI();
+            await supabaseClient.from('users').update({solde: userSolde}).eq('id', currentUserId);
+        }
+        
+        await supabaseClient.from('transactions').insert([{
+            user_id: currentUserId, 
+            montant: finalAr, 
+            service: currentMode + " " + cry, 
+            status: "En attente", 
+            adresse: addrInput.value || "Non spécifié"
+        }]);
+        
+        alert("Enregistré ! ✅"); 
+        valInput.value = ""; // Fafana ny case mba hadio
+        if(currentMode === 'Recevoir') {
+            addrInput.value = ADDR_RECEPT[cry];
+        } else {
+            addrInput.value = "";
+        }
+        updateCalc();
+        fetchData();
+    } catch (err) {
+        alert("Une erreur est survenue !");
+        console.error(err);
     }
-    
-    await supabaseClient.from('transactions').insert([{
-        user_id:currentUserId, 
-        montant:finalAr, 
-        service:currentMode+" "+cry, 
-        status:"En attente", 
-        adresse:document.getElementById('input-addr').value
-    }]);
-    alert("Enregistré ! ✅"); fetchData();
 }
 
 function showPage(p){
@@ -315,9 +344,11 @@ function showPage(p){
 }
 
 function renderPreview(){
-    const b = document.getElementById('history-preview-body'); b.innerHTML = "";
+    const b = document.getElementById('history-preview-body'); 
+    if(!b) return;
+    b.innerHTML = "";
     allTransactions.slice(0, 4).forEach(t => {
-        b.innerHTML += `<tr><td><b>${t.service}</b><br><small>${new Date(t.created_at).toLocaleDateString()}</small></td><td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td></tr>`;
+        b.innerHTML += `<tr><td><b>${t.service}</b><br><small style="color:var(--gray)">${new Date(t.created_at).toLocaleDateString('fr-FR')}</small></td><td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td></tr>`;
     });
 }
 
@@ -344,13 +375,15 @@ function filterMonth(m, btn){
 }
 
 function renderFullHistory(){
-    const b = document.getElementById('history-full-body'); if(!b) return; b.innerHTML = "";
+    const b = document.getElementById('history-full-body'); 
+    if(!b) return;
+    b.innerHTML = "";
     let filtered = allTransactions;
     if(currentFilter !== 'Tous') filtered = filtered.filter(t => t.service.includes(currentFilter));
     if(selectedMonth !== null) filtered = filtered.filter(t => new Date(t.created_at).getMonth() === selectedMonth);
     filtered.forEach(t => {
         const st = t.status==='confirmé'?'var(--green)':'var(--yellow)';
-        b.innerHTML += `<tr><td><b>${t.service}</b><br><small>${new Date(t.created_at).toLocaleDateString()}</small></td><td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b><br><span style="color:${st}; font-size:10px;">${t.status||'en attente'}</span></td></tr>`;
+        b.innerHTML += `<tr><td><b>${t.service}</b><br><small style="color:var(--gray)">${new Date(t.created_at).toLocaleDateString('fr-FR')}</small></td><td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b><br><span style="color:${st}; font-size:10px; font-weight:700;">${t.status||'en attente'}</span></td></tr>`;
     });
 }
 
@@ -364,6 +397,7 @@ function copyAddress() {
 function openMobile(t){ document.getElementById('mob-title').innerText=t+" MM"; document.getElementById('modal-mobile').style.display='flex'; toggleMenu(); }
 async function executeMobile(){ /* mitovy amin'ny executeTrans */ }
 function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
+
 initApp();
 </script>
 </body>
