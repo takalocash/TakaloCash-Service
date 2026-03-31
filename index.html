@@ -343,15 +343,6 @@ function showPage(p){
     }
 }
 
-function renderPreview(){
-    const b = document.getElementById('history-preview-body'); 
-    if(!b) return;
-    b.innerHTML = "";
-    allTransactions.slice(0, 4).forEach(t => {
-        b.innerHTML += `<tr><td><b>${t.service}</b><br><small style="color:var(--gray)">${new Date(t.created_at).toLocaleDateString('fr-FR')}</small></td><td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td></tr>`;
-    });
-}
-
 function filterType(type, btn){
     currentFilter = type;
     document.querySelectorAll('#type-filter .filter-chip').forEach(b => b.classList.remove('active'));
@@ -374,6 +365,18 @@ function filterMonth(m, btn){
     renderFullHistory();
 }
 
+function renderPreview(){
+    const b = document.getElementById('history-preview-body'); 
+    if(!b) return;
+    b.innerHTML = "";
+    allTransactions.slice(0, 4).forEach(t => {
+        const d = new Date(t.created_at);
+        const dateStr = d.toLocaleDateString('fr-FR') + " à " + d.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+        
+        b.innerHTML += `<tr><td><b>${t.service}</b><br><small style="color:var(--gray)">${dateStr}</small></td><td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b></td></tr>`;
+    });
+}
+
 function renderFullHistory(){
     const b = document.getElementById('history-full-body'); 
     if(!b) return;
@@ -382,8 +385,11 @@ function renderFullHistory(){
     if(currentFilter !== 'Tous') filtered = filtered.filter(t => t.service.includes(currentFilter));
     if(selectedMonth !== null) filtered = filtered.filter(t => new Date(t.created_at).getMonth() === selectedMonth);
     filtered.forEach(t => {
-        const st = t.status==='confirmé'?'var(--green)':'var(--yellow)';
-        b.innerHTML += `<tr><td><b>${t.service}</b><br><small style="color:var(--gray)">${new Date(t.created_at).toLocaleDateString('fr-FR')}</small></td><td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b><br><span style="color:${st}; font-size:10px; font-weight:700;">${t.status||'en attente'}</span></td></tr>`;
+        const d = new Date(t.created_at);
+        const dateStr = d.toLocaleDateString('fr-FR') + " à " + d.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+        const st = t.status === 'confirmé' ? 'var(--green)' : 'var(--yellow)';
+        
+        b.innerHTML += `<tr><td><b>${t.service}</b><br><small style="color:var(--gray)">${dateStr}</small></td><td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b><br><span style="color:${st}; font-size:10px; font-weight:700;">${t.status||'en attente'}</span></td></tr>`;
     });
 }
 
