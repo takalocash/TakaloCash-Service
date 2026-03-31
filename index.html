@@ -55,6 +55,13 @@
         .sidebar { position: fixed; top: 0; right: -100%; width: 80%; height: 100%; background: var(--bg-nav); z-index: 2000; transition: 0.4s; padding: 30px; box-sizing: border-box; }
         .sidebar.active { right: 0; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; z-index: 1500; backdrop-filter: blur(5px); }
+        header i {
+    transition: 0.2s;
+}
+header i:active {
+    transform: scale(0.9);
+    color: var(--yellow) !important;
+}
     </style>
 </head>
 <body>
