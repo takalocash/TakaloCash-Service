@@ -95,7 +95,7 @@ header i:active {
 </div>
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
-<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
 <div class="sidebar" id="sidebar">
     <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px; padding-bottom:20px; border-bottom:1px solid var(--border);">
         <img id="sidebar-avatar" src="https://via.placeholder.com/150" 
@@ -108,32 +108,23 @@ header i:active {
     </div>
 
     <div class="sidebar-menu">
-        <div onclick="showPage('history')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:center; gap:15px;">
+        <div onclick="showPage('history')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:center; gap:12px;">
             <i class="fa-solid fa-clock-rotate-left" style="color:var(--yellow); width:20px;"></i> Historique complet
         </div>
-        <div onclick="openMobile('Dépôt')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:center; gap:15px;">
-            <i class="fa-solid fa-plus-circle" style="color:var(--green); width:20px;"></i> Dépôt Mobile Money
+        <div onclick="openMobile('Dépôt')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:center; gap:12px;">
+            <i class="fa-solid fa-plus-circle" style="color:var(--green); width:20px;"></i> Dépôt MM
         </div>
-        <div onclick="openMobile('Retrait')" style="padding:18px 0; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:center; gap:15px;">
-            <i class="fa-solid fa-minus-circle" style="color:var(--red); width:20px;"></i> Retrait Mobile Money
+        <div onclick="openMobile('Retrait')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:center; gap:12px;">
+            <i class="fa-solid fa-minus-circle" style="color:var(--red); width:20px;"></i> Retrait MM
         </div>
         
-        <div onclick="logout()" style="padding:20px 0; color:var(--red); cursor:pointer; margin-top:40px; font-weight:800; display:flex; align-items:center; gap:15px;">
-            <i class="fa-solid fa-power-off"></i> Déconnexion
+        <div onclick="logout()" style="padding:15px 0; color:var(--red); cursor:pointer; margin-top:30px; display:flex; align-items:center; gap:12px;">
+            <i class="fa-solid fa-power-off"></i> <b>Déconnexion</b>
         </div>
     </div>
 </div>
-<div onclick="showPage('profile')" style="cursor:pointer; display: flex; align-items: center;">
-    <img id="user-avatar-nav" src="https://via.placeholder.com/150" 
-         style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1px solid var(--yellow);">
-</div>
-    </div>
-    <div onclick="showPage('history')" style="padding:20px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-clock-rotate-left"></i> &nbsp; Historique complet</div>
-    <div onclick="openMobile('Dépôt')" style="padding:20px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-plus-circle"></i> &nbsp; Dépôt MM</div>
-    <div onclick="openMobile('Retrait')" style="padding:20px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-minus-circle"></i> &nbsp; Retrait MM</div>
-    <div onclick="logout()" style="padding:20px 0; color:var(--red); cursor:pointer; margin-top:40px;"><i class="fa-solid fa-power-off"></i> &nbsp; Déconnexion</div>
-</div>
 
+<div class="container" id="main-app">
 <div class="container" id="main-app">
     <div id="page-home">
         <div class="solde-card">
