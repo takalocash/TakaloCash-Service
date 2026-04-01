@@ -124,21 +124,12 @@ header i:active {
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 <div class="sidebar" id="sidebar">
-    <div style="text-align: center; padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--border);">
-        <div style="text-align: right; margin-bottom: -10px;">
-            <i class="fa-solid fa-xmark" onclick="toggleMenu()" style="font-size:20px; cursor:pointer; color:var(--gray);"></i>
-        </div>
-        
-        <img src="https://via.placeholder.com/70" id="side-pp" style="width:70px; height:70px; border-radius:50%; border:2px solid var(--yellow); object-fit:cover; margin-bottom:10px;">
-        <img src="..." id="side-pp" class="profile-pic-large" onclick="openEditProfile()" style="cursor:pointer;" title="Modifier le profil">
-        
-        <div style="font-size: 11px; color: var(--yellow); background: rgba(252,213,53,0.1); padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 10px;">
-            ID: <span id="side-id">TK-0000</span>
-        </div>
+    <div style="text-align: right; margin-bottom: 20px;">
+        <i class="fa-solid fa-xmark" onclick="toggleMenu()" style="font-size:20px; cursor:pointer; color:var(--gray);"></i>
+    </div>
 
-        <b id="side-name" style="display:block; font-size:16px; margin-bottom: 2px;">Mpanjifa</b>
-        <span id="side-email" style="display:block; font-size:12px; color:var(--gray);">email@example.com</span>
-        <span id="side-phone" style="display:block; font-size:12px; color:var(--gray); margin-top: 2px;">+261 -- -- --- --</span>
+    <div onclick="openEditProfile()" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer; display: flex; align-items: center; gap: 12px; color: var(--yellow);">
+        <i class="fa-solid fa-user-gear"></i> <b>Mon Profil</b>
     </div>
 
     <div onclick="showPage('history')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;">
@@ -200,6 +191,40 @@ header i:active {
                     <i class="fa-solid fa-copy" id="copy-btn" onclick="copyAddress()" style="position:absolute; right:12px; top:18px; color:var(--yellow); cursor:pointer; font-size:18px; display:none;"></i>
                 </div>
             </div>
+
+            <div id="modal-profile" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:6000; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(10px);">
+    <div style="background:var(--card); padding:25px; border-radius:24px; width:100%; max-width:340px; border:1px solid var(--border); text-align:center;">
+        
+        <h3 style="color:var(--yellow); margin-top:0;">Profil Utilisateur</h3>
+
+        <div style="position: relative; display: inline-block; margin-bottom: 15px;">
+            <img src="https://via.placeholder.com/100" id="modal-pp-view" style="width:100px; height:100px; border-radius:50%; border:3px solid var(--yellow); object-fit:cover;">
+            <label for="edit-avatar-file" style="position:absolute; bottom:5px; right:0; background:var(--yellow); color:black; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border:3px solid var(--card);">
+                <i class="fa-solid fa-camera"></i>
+            </label>
+            <input type="file" id="edit-avatar-file" accept="image/*" style="display:none;" onchange="previewImage(this)">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <b id="modal-name-view" style="font-size:18px; display:block;">---</b>
+            <small id="modal-id-view" style="color:var(--yellow);">ID: TK-0000</small>
+        </div>
+
+        <div style="text-align:left;">
+            <label style="font-size:11px; color:var(--gray)">Anarana feno :</label>
+            <input type="text" id="edit-name" class="styled-input" style="margin-bottom:10px;">
+            
+            <label style="font-size:11px; color:var(--gray)">Email :</label>
+            <input type="email" id="edit-email" class="styled-input" style="margin-bottom:10px;">
+            
+            <label style="font-size:11px; color:var(--gray)">Laharana finday :</label>
+            <input type="tel" id="edit-phone" class="styled-input">
+        </div>
+
+        <button class="btn-valider" id="btn-update" onclick="updateProfile()" style="margin-top:20px;">Tehirizina ny fanovana</button>
+        <p onclick="document.getElementById('modal-profile').style.display='none'" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:15px; font-size:13px;">Hidio</p>
+    </div>
+</div>
 
             <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:15px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;">
                 <span style="color:var(--gray)">Total :</span>
@@ -523,12 +548,33 @@ function openMobile(t){ document.getElementById('mob-title').innerText=t+" MM"; 
 async function executeMobile(){ /* mitovy amin'ny executeTrans */ }
 function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
     
-// 1. Manokatra ny modal sy mameno ny input amin'ny sanda efa misy
+// 1. Rehefa manokatra profil
 function openEditProfile() {
+    // Hameno ny Modal amin'ny daty efa misy
+    document.getElementById('modal-pp-view').src = document.getElementById('header-pp').src;
+    document.getElementById('modal-name-view').innerText = document.getElementById('side-name').innerText;
+    document.getElementById('modal-id-view').innerText = document.getElementById('side-id').innerText;
+    
     document.getElementById('edit-name').value = document.getElementById('side-name').innerText;
     document.getElementById('edit-phone').value = document.getElementById('side-phone').innerText;
-    document.getElementById('edit-avatar').value = document.getElementById('side-pp').src;
+    document.getElementById('edit-email').value = document.getElementById('side-email').innerText;
+    
+    // Asehoy ny modal
     document.getElementById('modal-profile').style.display = 'flex';
+    
+    // Akatony ny sidebar raha misokatra
+    if(document.getElementById('sidebar').classList.contains('active')) toggleMenu();
+}
+
+// 2. Preview sary eo no ho eo rehefa mifidy ao amin'ny galerie
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('modal-pp-view').src = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
 }
 
 // 2. Mandefa ny fanovana any amin'ny Supabase
