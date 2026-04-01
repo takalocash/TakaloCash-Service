@@ -101,14 +101,13 @@ header i:active {
         <i class="fa-solid fa-bell" style="font-size:20px; color:var(--gray);"></i>
         <span style="position:absolute; top:-2px; right:-2px; width:8px; height:8px; background:var(--red); border-radius:50%; border:2px solid var(--bg-nav);"></span>
     </div>
+<img src="https://via.placeholder.com/32" 
+     id="header-pp" 
+     class="header-avatar" 
+     onclick="openEditProfile()" 
+     style="width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--yellow); object-fit: cover; cursor: pointer;">
 
-    <img src="https://via.placeholder.com/32" 
-         id="header-pp" 
-         class="header-avatar" 
-         onclick="toggleMenu()" 
-         style="width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--yellow); object-fit: cover; cursor: pointer;">
-
-    <i class="fa-solid fa-bars-staggered" style="font-size:24px; cursor:pointer; color:var(--yellow);" onclick="toggleMenu()"></i>
+<i class="fa-solid fa-bars-staggered" style="font-size:24px; cursor:pointer; color:var(--yellow);" onclick="toggleMenu()"></i>
 </div>
     </div>
 </header>
@@ -548,22 +547,32 @@ function openMobile(t){ document.getElementById('mob-title').innerText=t+" MM"; 
 async function executeMobile(){ /* mitovy amin'ny executeTrans */ }
 function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
     
-// 1. Rehefa manokatra profil
 function openEditProfile() {
-    // Hameno ny Modal amin'ny daty efa misy
-    document.getElementById('modal-pp-view').src = document.getElementById('header-pp').src;
-    document.getElementById('modal-name-view').innerText = document.getElementById('side-name').innerText;
-    document.getElementById('modal-id-view').innerText = document.getElementById('side-id').innerText;
-    
-    document.getElementById('edit-name').value = document.getElementById('side-name').innerText;
-    document.getElementById('edit-phone').value = document.getElementById('side-phone').innerText;
-    document.getElementById('edit-email').value = document.getElementById('side-email').innerText;
-    
-    // Asehoy ny modal
+    // 1. Fakana ny sanda farany avy amin'ny Variables na UI
+    const currentImg = document.getElementById('header-pp').src;
+    const currentName = document.getElementById('side-name').innerText;
+    const currentEmail = document.getElementById('side-email').innerText;
+    const currentPhone = document.getElementById('side-phone').innerText;
+    const currentID = document.getElementById('side-id').innerText;
+
+    // 2. Famenoana ny Modal (Display)
+    document.getElementById('modal-pp-view').src = currentImg;
+    document.getElementById('modal-name-view').innerText = currentName;
+    document.getElementById('modal-id-view').innerText = currentID;
+
+    // 3. Famenoana ny Input (ho an'ny fanovana)
+    document.getElementById('edit-name').value = currentName === "Mpanjifa" ? "" : currentName;
+    document.getElementById('edit-email').value = currentEmail === "email@example.com" ? "" : currentEmail;
+    document.getElementById('edit-phone').value = currentPhone === "Tsy misy laharana" ? "" : currentPhone;
+
+    // 4. Asehoy ny Modal
     document.getElementById('modal-profile').style.display = 'flex';
-    
-    // Akatony ny sidebar raha misokatra
-    if(document.getElementById('sidebar').classList.contains('active')) toggleMenu();
+
+    // 5. Akatony ny Sidebar raha sendra misokatra izy
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar.classList.contains('active')) {
+        toggleMenu();
+    }
 }
 
 // 2. Preview sary eo no ho eo rehefa mifidy ao amin'ny galerie
