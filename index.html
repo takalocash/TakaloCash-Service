@@ -130,6 +130,7 @@ header i:active {
         </div>
         
         <img src="https://via.placeholder.com/70" id="side-pp" style="width:70px; height:70px; border-radius:50%; border:2px solid var(--yellow); object-fit:cover; margin-bottom:10px;">
+        <img src="..." id="side-pp" class="profile-pic-large" onclick="openEditProfile()" style="cursor:pointer;" title="Modifier le profil">
         
         <div style="font-size: 11px; color: var(--yellow); background: rgba(252,213,53,0.1); padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 10px;">
             ID: <span id="side-id">TK-0000</span>
@@ -224,6 +225,24 @@ header i:active {
         </div>
         <div class="scroll-filter" id="month-filter-container"></div>
         <table class="history-table"><tbody id="history-full-body"></tbody></table>
+    </div>
+</div>
+    
+    <div id="modal-profile" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:6000; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:var(--card); padding:25px; border-radius:20px; width:100%; max-width:340px; border:1px solid var(--border);">
+        <h3 style="color:var(--yellow); margin-top:0;">Modifier Profil</h3>
+        
+        <label style="font-size:11px; color:var(--gray)">Anarana feno :</label>
+        <input type="text" id="edit-name" class="styled-input" placeholder="Anarana feno">
+        
+        <label style="font-size:11px; color:var(--gray); margin-top:10px; display:block;">Laharana finday :</label>
+        <input type="tel" id="edit-phone" class="styled-input" placeholder="+26134...">
+        
+        <label style="font-size:11px; color:var(--gray); margin-top:10px; display:block;">URL Sary (Lien) :</label>
+        <input type="text" id="edit-avatar" class="styled-input" placeholder="https://...">
+
+        <button class="btn-valider" id="btn-update" onclick="updateProfile()">Tehirizina ny fanovana</button>
+        <p onclick="document.getElementById('modal-profile').style.display='none'" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:15px; font-size:13px;">Annuler</p>
     </div>
 </div>
 
@@ -503,7 +522,47 @@ function copyAddress() {
 function openMobile(t){ document.getElementById('mob-title').innerText=t+" MM"; document.getElementById('modal-mobile').style.display='flex'; toggleMenu(); }
 async function executeMobile(){ /* mitovy amin'ny executeTrans */ }
 function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
+    
+// 1. Manokatra ny modal sy mameno ny input amin'ny sanda efa misy
+function openEditProfile() {
+    document.getElementById('edit-name').value = document.getElementById('side-name').innerText;
+    document.getElementById('edit-phone').value = document.getElementById('side-phone').innerText;
+    document.getElementById('edit-avatar').value = document.getElementById('side-pp').src;
+    document.getElementById('modal-profile').style.display = 'flex';
+}
 
+// 2. Mandefa ny fanovana any amin'ny Supabase
+async function updateProfile() {
+    const btn = document.getElementById('btn-update');
+    const newName = document.getElementById('edit-name').value;
+    const newPhone = document.getElementById('edit-phone').value;
+    const newAvatar = document.getElementById('edit-avatar').value;
+
+    btn.innerText = "Andraso kely...";
+    btn.disabled = true;
+
+    try {
+        const { error } = await supabaseClient
+            .from('users')
+            .update({ 
+                full_name: newName, 
+                phone: newPhone, 
+                avatar_url: newAvatar 
+            })
+            .eq('id', currentUserId);
+
+        if (error) throw error;
+
+        alert("Voatahiry ny fanovana! ✅");
+        document.getElementById('modal-profile').style.display = 'none';
+        fetchData(); // Averina sintonina ny data vaovao
+    } catch (err) {
+        alert("Nisy olana: " + err.message);
+    } finally {
+        btn.innerText = "Tehirizina ny fanovana";
+        btn.disabled = false;
+    }
+}
 initApp();
 </script>
 </body>
