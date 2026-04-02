@@ -191,55 +191,12 @@ header i:active {
                 </div>
             </div>
 
-            <div id="modal-profile" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:6000; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(10px);">
-    <div style="background:var(--card); padding:25px; border-radius:24px; width:100%; max-width:340px; border:1px solid var(--border); text-align:center;">
-        
-        <h3 style="color:var(--yellow); margin-top:0;">Profil Utilisateur</h3>
-
-        <div style="position: relative; display: inline-block; margin-bottom: 15px;">
-            <img src="https://via.placeholder.com/100" id="modal-pp-view" style="width:100px; height:100px; border-radius:50%; border:3px solid var(--yellow); object-fit:cover;">
-            <label for="edit-avatar-file" style="position:absolute; bottom:5px; right:0; background:var(--yellow); color:black; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border:3px solid var(--card);">
-                <i class="fa-solid fa-camera"></i>
-            </label>
-            <input type="file" id="edit-avatar-file" accept="image/*" style="display:none;" onchange="previewImage(this)">
-        </div>
-
-        <div style="margin-bottom: 20px;">
-            <b id="modal-name-view" style="font-size:18px; display:block;">---</b>
-            <small id="modal-id-view" style="color:var(--yellow);">ID: TK-0000</small>
-        </div>
-
-        <div style="text-align:left;">
-            <label style="font-size:11px; color:var(--gray)">Anarana feno :</label>
-            <input type="text" id="edit-name" class="styled-input" style="margin-bottom:10px;">
-            
-            <label style="font-size:11px; color:var(--gray)">Email :</label>
-            <input type="email" id="edit-email" class="styled-input" style="margin-bottom:10px;">
-            
-            <label style="font-size:11px; color:var(--gray)">Laharana finday :</label>
-            <input type="tel" id="edit-phone" class="styled-input">
-        </div>
-
-        <button class="btn-valider" id="btn-update" onclick="updateProfile()" style="margin-top:20px;">Tehirizina ny fanovana</button>
-        <p onclick="document.getElementById('modal-profile').style.display='none'" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:15px; font-size:13px;">Hidio</p>
-    </div>
-</div>
-
-            <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:15px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;">
-                <span style="color:var(--gray)">Total :</span>
-                <span id="calc-res" style="color:var(--yellow); font-weight:800;">0.00 TRX</span>
-            </div>
-            <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Confirmer</button>
-        </div>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <b style="color:var(--gray); font-size:14px;">Activités récentes</b>
             <small onclick="showPage('history')" style="color:var(--yellow); cursor:pointer; font-weight:700;">Tout voir</small>
         </div>
         <table class="history-table"><tbody id="history-preview-body"></tbody></table>
-    </div>
-
-    <div id="page-history" style="display:none;">
+    </div> <div id="page-history" style="display:none;">
         <div class="scroll-filter" id="type-filter">
             <div class="filter-chip active" onclick="filterType('Tous', this)">Tous</div>
             <div class="filter-chip" onclick="filterType('Envoyer', this)">Envoyer</div>
@@ -250,23 +207,34 @@ header i:active {
         <div class="scroll-filter" id="month-filter-container"></div>
         <table class="history-table"><tbody id="history-full-body"></tbody></table>
     </div>
-</div>
-    
-    <div id="modal-profile" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:6000; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:var(--card); padding:25px; border-radius:20px; width:100%; max-width:340px; border:1px solid var(--border);">
-        <h3 style="color:var(--yellow); margin-top:0;">Modifier Profil</h3>
+</div> <div id="modal-profile" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9999; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(10px);">
+    <div style="background:var(--card); padding:25px; border-radius:24px; width:100%; max-width:340px; border:1px solid var(--border); text-align:center;">
+        <h3 style="color:var(--yellow); margin-top:0;">Profil Utilisateur</h3>
         
-        <label style="font-size:11px; color:var(--gray)">Anarana feno :</label>
-        <input type="text" id="edit-name" class="styled-input" placeholder="Anarana feno">
-        
-        <label style="font-size:11px; color:var(--gray); margin-top:10px; display:block;">Laharana finday :</label>
-        <input type="tel" id="edit-phone" class="styled-input" placeholder="+26134...">
-        
-        <label style="font-size:11px; color:var(--gray); margin-top:10px; display:block;">URL Sary (Lien) :</label>
-        <input type="text" id="edit-avatar" class="styled-input" placeholder="https://...">
+        <div style="position: relative; display: inline-block; margin-bottom: 15px;">
+            <img src="https://via.placeholder.com/100" id="modal-pp-view" style="width:100px; height:100px; border-radius:50%; border:3px solid var(--yellow); object-fit:cover;">
+            <label for="edit-avatar-file" style="position:absolute; bottom:5px; right:0; background:var(--yellow); color:black; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border:3px solid var(--card);">
+                <i class="fa-solid fa-camera"></i>
+            </label>
+            <input type="file" id="edit-avatar-file" accept="image/*" style="display:none;" onchange="previewImage(this)">
+        </div>
 
-        <button class="btn-valider" id="btn-update" onclick="updateProfile()">Tehirizina ny fanovana</button>
-        <p onclick="document.getElementById('modal-profile').style.display='none'" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:15px; font-size:13px;">Annuler</p>
+        <div style="margin-bottom: 20px;">
+            <b id="modal-name-view" style="font-size:18px; display:block;">Mpanjifa</b>
+            <small id="modal-id-view" style="color:var(--yellow);">ID: TK-0000</small>
+        </div>
+
+        <div style="text-align:left;">
+            <label style="font-size:11px; color:var(--gray)">Anarana feno :</label>
+            <input type="text" id="edit-name" class="styled-input" style="margin-bottom:10px;">
+            <label style="font-size:11px; color:var(--gray)">Email :</label>
+            <input type="email" id="edit-email" class="styled-input" style="margin-bottom:10px;">
+            <label style="font-size:11px; color:var(--gray)">Laharana finday :</label>
+            <input type="tel" id="edit-phone" class="styled-input">
+        </div>
+
+        <button class="btn-valider" id="btn-update-profile" onclick="updateProfile()" style="margin-top:20px;">Tehirizina</button>
+        <p onclick="document.getElementById('modal-profile').style.display='none'" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:15px; font-size:13px;">Hidio</p>
     </div>
 </div>
 
@@ -377,10 +345,17 @@ async function fetchData(){
         renderPreview(); 
         renderFullHistory(); 
         renderMonthPicker();
-
+ 
+<div style="display:none;">
+    <span id="side-name">Mpanjifa</span>
+    <span id="side-id">TK-0000</span>
+    <span id="side-email">email@example.com</span>
+    <span id="side-phone">Tsy misy laharana</span>
+</div>
+        
     } catch(err) {
         console.error("Erreur fetchData:", err);
-    }
+    } 
 }
 
 function updateSoldeUI(){
@@ -547,35 +522,37 @@ function openMobile(t){ document.getElementById('mob-title').innerText=t+" MM"; 
 async function executeMobile(){ /* mitovy amin'ny executeTrans */ }
 function logout(){ supabaseClient.auth.signOut().then(()=>location.reload()); }
     
+    function openEditProfile() {
+    // 1. Manokatra ny Modal Profil
 function openEditProfile() {
-    // 1. Fakana ny sanda farany avy amin'ny Variables na UI
-    const currentImg = document.getElementById('header-pp').src;
-    const currentName = document.getElementById('side-name').innerText;
-    const currentEmail = document.getElementById('side-email').innerText;
-    const currentPhone = document.getElementById('side-phone').innerText;
-    const currentID = document.getElementById('side-id').innerText;
+    try {
+        const img = document.getElementById('header-pp').src;
+        // Ampiasao ny innerText avy amin'ireo span miafina ao amin'ny Sidebar
+        const name = document.getElementById('side-name').innerText;
+        const email = document.getElementById('side-email').innerText;
+        const phone = document.getElementById('side-phone').innerText;
+        const idUser = document.getElementById('side-id').innerText;
 
-    // 2. Famenoana ny Modal (Display)
-    document.getElementById('modal-pp-view').src = currentImg;
-    document.getElementById('modal-name-view').innerText = currentName;
-    document.getElementById('modal-id-view').innerText = currentID;
+        document.getElementById('modal-pp-view').src = img;
+        document.getElementById('modal-name-view').innerText = name;
+        document.getElementById('modal-id-view').innerText = idUser;
 
-    // 3. Famenoana ny Input (ho an'ny fanovana)
-    document.getElementById('edit-name').value = currentName === "Mpanjifa" ? "" : currentName;
-    document.getElementById('edit-email').value = currentEmail === "email@example.com" ? "" : currentEmail;
-    document.getElementById('edit-phone').value = currentPhone === "Tsy misy laharana" ? "" : currentPhone;
+        document.getElementById('edit-name').value = (name === "Mpanjifa") ? "" : name;
+        document.getElementById('edit-email').value = (email === "email@example.com") ? "" : email;
+        document.getElementById('edit-phone').value = (phone === "Tsy misy laharana") ? "" : phone;
 
-    // 4. Asehoy ny Modal
-    document.getElementById('modal-profile').style.display = 'flex';
+        document.getElementById('modal-profile').style.display = 'flex';
 
-    // 5. Akatony ny Sidebar raha sendra misokatra izy
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar.classList.contains('active')) {
-        toggleMenu();
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar.classList.contains('active')) {
+            toggleMenu();
+        }
+    } catch (err) {
+        console.error("Erreur openEditProfile:", err);
     }
 }
 
-// 2. Preview sary eo no ho eo rehefa mifidy ao amin'ny galerie
+// 2. Preview sary rehefa mifidy sary vaovao
 function previewImage(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -586,23 +563,45 @@ function previewImage(input) {
     }
 }
 
-// 2. Mandefa ny fanovana any amin'ny Supabase
+// 3. Mandefa ny fanovana any amin'ny Supabase
 async function updateProfile() {
-    const btn = document.getElementById('btn-update');
+    const btn = document.getElementById('btn-update-profile'); // Hamarino fa mitovy amin'ny HTML
     const newName = document.getElementById('edit-name').value;
     const newPhone = document.getElementById('edit-phone').value;
-    const newAvatar = document.getElementById('edit-avatar').value;
+    const fileInput = document.getElementById('edit-avatar-file');
 
     btn.innerText = "Andraso kely...";
     btn.disabled = true;
 
     try {
+        let avatarUrl = document.getElementById('modal-pp-view').src;
+
+        // Raha nifidy sary vaovao ny mpanjifa (File Upload)
+        if (fileInput.files && fileInput.files[0]) {
+            const file = fileInput.files[0];
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${currentUserId}-${Math.random()}.${fileExt}`;
+            const filePath = `avatars/${fileName}`;
+
+            let { error: uploadError } = await supabaseClient.storage
+                .from('profiles') // Hamarino raha misy ity bucket ity ao amin'ny Supabase
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: publicData } = supabaseClient.storage
+                .from('profiles')
+                .getPublicUrl(filePath);
+            
+            avatarUrl = publicData.publicUrl;
+        }
+
         const { error } = await supabaseClient
             .from('users')
             .update({ 
                 full_name: newName, 
                 phone: newPhone, 
-                avatar_url: newAvatar 
+                avatar_url: avatarUrl 
             })
             .eq('id', currentUserId);
 
@@ -610,14 +609,17 @@ async function updateProfile() {
 
         alert("Voatahiry ny fanovana! ✅");
         document.getElementById('modal-profile').style.display = 'none';
-        fetchData(); // Averina sintonina ny data vaovao
+        fetchData(); 
     } catch (err) {
         alert("Nisy olana: " + err.message);
+        console.error(err);
     } finally {
         btn.innerText = "Tehirizina ny fanovana";
         btn.disabled = false;
     }
 }
+
+initApp();
 initApp();
 </script>
 </body>
