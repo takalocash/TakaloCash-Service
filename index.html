@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TakaloCash Premium - Final Version</title>
+    <title>TakaloCash Premium - Official Edition</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
             --grad-yellow: linear-gradient(135deg, #fcd535, #f7b500);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
             margin: 0; 
@@ -32,7 +32,7 @@
             overflow-x: hidden; 
         }
 
-        /* ─── AUTH INTERFACE ─── */
+        /* --- AUTH SYSTEM STYLE --- */
         #auth-container {
             position: fixed;
             inset: 0;
@@ -50,28 +50,28 @@
             padding: 35px 25px;
             border-radius: 30px;
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             text-align: center;
             border: 1px solid var(--border);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        .auth-box h1 { color: var(--yellow); font-weight: 900; margin-bottom: 10px; font-size: 26px; }
-        .auth-box p.subtitle { color: var(--gray); font-size: 13px; margin-bottom: 25px; }
+        .auth-box h1 { color: var(--yellow); font-weight: 900; margin-bottom: 25px; font-size: 26px; }
 
         .styled-input {
             background: var(--bg-body);
             border: 1px solid var(--border);
             border-radius: 14px;
-            padding: 16px;
+            padding: 15px;
             color: white;
             width: 100%;
+            outline: none;
             font-size: 14px;
             margin-top: 12px;
             transition: 0.3s;
         }
 
-        .styled-input:focus { border-color: var(--yellow); box-shadow: 0 0 10px rgba(252, 213, 53, 0.2); }
+        .styled-input:focus { border-color: var(--yellow); }
 
         .btn-valider {
             width: 100%;
@@ -87,7 +87,7 @@
             transition: 0.2s;
         }
 
-        .btn-valider:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-valider:active { transform: scale(0.98); }
 
         .auth-link {
             color: var(--yellow);
@@ -96,9 +96,10 @@
             font-weight: 600;
             margin-top: 15px;
             display: inline-block;
+            text-decoration: none;
         }
 
-        /* ─── APP HEADER ─── */
+        /* --- APP INTERFACE --- */
         header { 
             background: var(--bg-nav); 
             padding: 15px 20px; 
@@ -109,57 +110,69 @@
             display: none; 
         }
 
-        /* ─── MAIN CONTENT ─── */
         .container { max-width: 480px; margin: auto; padding: 15px; display: none; }
 
         .solde-card {
             text-align: center;
-            padding: 40px 20px;
+            padding: 35px 20px;
             background: radial-gradient(circle at top right, #1c2128, #0d1117);
-            border-radius: 30px;
+            border-radius: 28px;
             margin-bottom: 25px;
             border: 1px solid var(--border);
-            position: relative;
-            overflow: hidden;
         }
 
-        .solde-amount { font-size: 42px; font-weight: 800; margin: 10px 0; letter-spacing: -1px; }
+        .solde-amount { font-size: 38px; font-weight: 800; margin: 8px 0; letter-spacing: -1px; }
 
         .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
         .btn-action { 
-            border: none; padding: 20px; border-radius: 20px; font-weight: 700; 
+            border: none; padding: 18px; border-radius: 18px; font-weight: 700; 
             cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; 
         }
         .btn-env { background: var(--grad-yellow); color: black; }
         .btn-rec { background: var(--green); color: white; }
 
-        .trans-box { 
-            background: var(--card); border: 1px solid var(--border); 
-            border-radius: 28px; padding: 25px; margin-bottom: 30px; 
+        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
+        .service-item { 
+            background: var(--card); border: 1px solid var(--border); padding: 15px; 
+            border-radius: 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; 
+        }
+        .icon-box { 
+            width: 44px; height: 44px; border-radius: 12px; display: flex; 
+            align-items: center; justify-content: center; font-size: 22px; 
+            background: #000; border: 1px solid var(--border); flex-shrink: 0; 
         }
 
-        /* ─── SIDEBAR ─── */
+        .trans-box { 
+            background: var(--card); border: 1px solid var(--border); 
+            border-radius: 24px; padding: 22px; margin-bottom: 30px; 
+        }
+
+        /* --- SIDEBAR & MODAL --- */
         .sidebar { 
-            position: fixed; top: 0; right: -100%; width: 85%; max-width: 320px; 
+            position: fixed; top: 0; right: -100%; width: 80%; max-width: 300px; 
             height: 100%; background: var(--bg-nav); z-index: 6000; 
             transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px; 
         }
         .sidebar.active { right: 0; }
         .overlay { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
-            display: none; z-index: 5500; backdrop-filter: blur(5px); 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            display: none; z-index: 5500; backdrop-filter: blur(4px); 
         }
 
-        /* ─── MODAL ─── */
         .modal { 
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); 
             z-index: 7000; align-items: center; justify-content: center; padding: 20px; 
         }
 
-        .history-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 0; border-bottom: 1px solid var(--border);
+        .history-table { width: 100%; border-collapse: collapse; }
+        .history-table td { padding: 15px 0; border-bottom: 1px solid var(--border); }
+
+        .filter-chip {
+            background: var(--card); border: 1px solid var(--border);
+            padding: 8px 18px; border-radius: 20px; font-size: 12px;
+            cursor: pointer; color: var(--gray); white-space: nowrap;
         }
+        .filter-chip.active { background: var(--yellow); color: black; border-color: var(--yellow); }
     </style>
 </head>
 <body>
@@ -167,57 +180,71 @@
 <div id="auth-container">
     <div class="auth-box" id="login-form">
         <h1>Connexion</h1>
-        <p class="subtitle">Tia faly mandray anao indray!</p>
         <input type="email" id="login-email" class="styled-input" placeholder="Adresse Email">
         <input type="password" id="login-pass" class="styled-input" placeholder="Mot de passe">
-        <div style="text-align: right;"><span class="auth-link" style="color: var(--gray);" onclick="showAuth('forgot')">Mot de passe oublié ?</span></div>
-        <button class="btn-valider" id="btn-login" onclick="handleLogin()">Se connecter</button>
-        <p style="font-size: 13px; color: var(--gray); margin-top: 25px;">Tsy mbola manana kaonty? <span class="auth-link" onclick="showAuth('signup')">S'inscrire</span></p>
+        <div style="text-align: right;">
+            <span class="auth-link" style="color: var(--gray);" onclick="showAuth('forgot')">Mot de passe oublié ?</span>
+        </div>
+        <button class="btn-valider" onclick="handleLogin()">Se connecter</button>
+        <p style="font-size: 13px; color: var(--gray); margin-top: 25px;">
+            Tsy mbola manana kaonty? <span class="auth-link" onclick="showAuth('signup')">S'inscrire</span>
+        </p>
     </div>
 
     <div class="auth-box" id="signup-form" style="display: none;">
         <h1>Inscription</h1>
-        <p class="subtitle">Fenoy ireto manaraka ireto raha hisoratra anarana.</p>
         <input type="text" id="reg-name" class="styled-input" placeholder="Anarana feno">
-        <input type="tel" id="reg-phone" class="styled-input" placeholder="Laharana finday">
+        <input type="tel" id="reg-phone" class="styled-input" placeholder="Numéro Téléphone (ex: 034...)">
         <input type="email" id="reg-email" class="styled-input" placeholder="Adresse Email">
         <input type="password" id="reg-pass" class="styled-input" placeholder="Mot de passe">
         <input type="password" id="reg-confirm" class="styled-input" placeholder="Hamafiso ny mot de passe">
-        <button class="btn-valider" id="btn-signup" onclick="handleSignUp()">Hamorona kaonty</button>
-        <p class="auth-link" onclick="showAuth('login')">Efa manana kaonty? Midira eto</p>
+        <button class="btn-valider" onclick="handleSignUp()">S'inscrire maintenant</button>
+        <p style="font-size: 13px; color: var(--gray); margin-top: 25px;">
+            Efa manana kaonty? <span class="auth-link" onclick="showAuth('login')">Se connecter</span>
+        </p>
     </div>
 
     <div class="auth-box" id="forgot-form" style="display: none;">
         <h1>Récupération</h1>
-        <p class="subtitle">Handefa lien any amin'ny email-nao izahay.</p>
+        <p style="font-size: 13px; color: var(--gray); margin-bottom: 20px;">Ampidiro ny email anao hamerenana ny mot de passe.</p>
         <input type="email" id="forgot-email" class="styled-input" placeholder="Adresse Email">
-        <button class="btn-valider" id="btn-forgot" onclick="handleForgot()">Handefa lien</button>
+        <button class="btn-valider" onclick="handleForgot()">Handefa lien</button>
         <p class="auth-link" onclick="showAuth('login')">Hiverina hiditra</p>
-    </div>
-
-    <div class="auth-box" id="reset-form" style="display: none;">
-        <h1>Nouveau Mot de passe</h1>
-        <p class="subtitle">Ampidiro ny teny miafina vaovao ho an'ny kaontinao.</p>
-        <input type="password" id="new-pass" class="styled-input" placeholder="Mot de passe vaovao">
-        <input type="password" id="new-confirm" class="styled-input" placeholder="Hamafiso indray">
-        <button class="btn-valider" id="btn-reset" onclick="handleUpdatePassword()">Hanova mot de passe</button>
     </div>
 </div>
 
 <header id="nav-header">
     <div style="max-width:480px; margin:auto; display:flex; justify-content:space-between; align-items:center;">
-        <div style="font-weight:900; font-size:22px; cursor:pointer;" onclick="showPage('home')"><span style="color:var(--yellow)">TAKALO</span>CASH</div>
-        <div style="display:flex; align-items:center; gap:12px;">
+        <div style="font-weight:900; font-size:22px; cursor:pointer;" onclick="showPage('home')">
+            <span style="color:var(--yellow)">TAKALO</span>CASH
+        </div>
+        <div style="display:flex; align-items:center; gap:15px;">
             <img id="header-avatar" src="https://via.placeholder.com/35" onclick="openProfile()" style="width:35px; height:35px; border-radius:50%; border:2px solid var(--yellow); cursor:pointer; object-fit:cover;">
             <i class="fa-solid fa-bars-staggered" style="font-size:22px; cursor:pointer; color:var(--yellow);" onclick="toggleSidebar()"></i>
         </div>
     </div>
 </header>
 
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+<div class="sidebar" id="sidebar">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:30px; padding-bottom:20px; border-bottom:1px solid var(--border);">
+        <img id="side-avatar" src="https://via.placeholder.com/50" style="width:50px; height:50px; border-radius:50%; border:2px solid var(--yellow); object-fit:cover;">
+        <div>
+            <div id="side-full-name" style="font-weight:bold; font-size:16px;">Chargement...</div>
+            <div id="side-tk-id" style="font-size:12px; color:var(--yellow); font-weight:800;">ID: TK-0000</div>
+        </div>
+    </div>
+    <div onclick="showPage('history')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-clock-rotate-left"></i> &nbsp; Historique</div>
+    <div onclick="openMobile('Dépôt')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-plus-circle"></i> &nbsp; Dépôt Mobile</div>
+    <div onclick="openMobile('Retrait')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-minus-circle"></i> &nbsp; Retrait Mobile</div>
+    <div onclick="logout()" style="padding:15px 0; color:var(--red); cursor:pointer; margin-top:40px;"><i class="fa-solid fa-power-off"></i> &nbsp; Déconnexion</div>
+</div>
+
 <div class="container" id="main-app">
+    
     <div id="page-home">
         <div class="solde-card">
-            <div style="color:var(--gray); font-size:12px; font-weight:600; text-transform:uppercase;">Solde Actuel</div>
+            <div style="color:var(--gray); font-size:12px; font-weight:600; text-transform:uppercase;">Solde Disponible</div>
             <h1 class="solde-amount" id="display-solde">0 Ar</h1>
         </div>
 
@@ -226,75 +253,112 @@
             <button class="btn-action btn-rec" onclick="switchMode('Recevoir')"><i class="fa-solid fa-qrcode"></i> Recevoir</button>
         </div>
 
+        <div class="services-grid">
+            <div class="service-item" onclick="switchMode('Envoyer')"><div class="icon-box" style="color:#f3ba2f;"><i class="fa-brands fa-bitcoin"></i></div><b>Crypto</b></div>
+            <div class="service-item" onclick="switchMode('Envoyer')"><div class="icon-box" style="color:#8132ad;"><i class="fa-solid fa-wallet"></i></div><b>Wallet</b></div>
+            <div class="service-item" onclick="switchMode('Envoyer')"><div class="icon-box" style="background:#fff;"><img src="https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg" width="25"></div><b>1xBet</b></div>
+            <div class="service-item" onclick="switchMode('Envoyer')"><div class="icon-box" style="color:white;"><i class="fa-solid fa-satellite-dish"></i></div><b>Starlink</b></div>
+        </div>
+
         <div class="trans-box">
             <b id="trans-title" style="color:var(--yellow); font-size:17px; display:block; margin-bottom:15px;">Envoyer Crypto</b>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                 <div>
-                    <label style="font-size:11px; color:var(--gray)">Crypto-monnaie :</label>
-                    <select id="crypto-select" class="styled-input" style="margin-top:5px;" onchange="updateCalc()">
-                        <option value="TRX">TRX (TRC20)</option>
-                        <option value="USDT">USDT (TRC20)</option>
-                        <option value="1XBET">1xBet</option>
-                    </select>
+                    <label style="font-size:11px; color:var(--gray)">Asset :</label>
+                    <div style="display:flex; align-items:center; gap:8px; margin-top:5px;">
+                        <img id="asset-img" src="https://cryptologos.cc/logos/tron-trx-logo.svg" width="22">
+                        <select id="crypto-select" class="styled-input" style="margin-top:0; padding:10px;" onchange="updateIcon(); updateCalc();">
+                            <option value="TRX">TRX (TRC20)</option>
+                            <option value="USDT">USDT (TRC20)</option>
+                            <option value="1XBET">1xBet Account</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
-                    <label id="label-amount" style="font-size:11px; color:var(--gray)">Montant (Ar) :</label>
-                    <input type="number" id="input-main" class="styled-input" style="margin-top:5px;" placeholder="0" oninput="updateCalc()">
+                    <label id="label-right" style="font-size:11px; color:var(--gray)">Montant (Ar) :</label>
+                    <div style="position:relative;">
+                        <input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()">
+                        <span id="unit-suffix" style="position:absolute; right:12px; top:12px; color:var(--gray); font-size:12px; font-weight:bold;">Ar</span>
+                    </div>
                 </div>
             </div>
             <div style="margin-top:15px;">
-                <label style="font-size:11px; color:var(--gray)">Coordonnées du destinataire :</label>
-                <input type="text" id="input-addr" class="styled-input" placeholder="Adresse wallet na ID 1xBet">
+                <label style="font-size:11px; color:var(--gray)">Adresse / ID destinataire :</label>
+                <div style="position:relative; display:flex; align-items:center;">
+                    <input type="text" id="input-addr" class="styled-input" placeholder="Saisir l'adresse">
+                    <i class="fa-solid fa-copy" id="copy-btn" onclick="copyText()" style="position:absolute; right:12px; top:18px; color:var(--yellow); cursor:pointer; display:none;"></i>
+                </div>
             </div>
-            <div style="display:flex; justify-content:space-between; font-size:12px; margin-top:20px; background:rgba(255,255,255,0.05); padding:15px; border-radius:15px;">
-                <span style="color:var(--gray)">Valeur estimée :</span>
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-top:15px; background:rgba(255,255,255,0.03); padding:12px; border-radius:12px;">
+                <span style="color:var(--gray)">Équivalent :</span>
                 <span id="calc-res" style="color:var(--yellow); font-weight:800;">0.00 TRX</span>
             </div>
-            <button class="btn-valider" id="btn-confirm" onclick="executeTrans()">Hanamarina ny fifanakalozana</button>
+            <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Confirmer</button>
         </div>
-    </div>
-</div>
 
-<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-<div class="sidebar" id="sidebar">
-    <div style="text-align:center; margin-bottom:40px; padding-bottom:20px; border-bottom:1px solid var(--border);">
-        <img id="side-avatar" src="https://via.placeholder.com/70" style="width:70px; height:70px; border-radius:50%; border:3px solid var(--yellow); object-fit:cover;">
-        <div id="side-name" style="font-weight:800; font-size:18px; margin-top:12px;">---</div>
-        <div id="side-tk-id" style="color:var(--yellow); font-size:13px; font-weight:bold; margin-top:5px;">ID: TK-0000</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <b style="color:var(--gray); font-size:13px;">Transactions récentes</b>
+            <small onclick="showPage('history')" style="color:var(--yellow); cursor:pointer; font-weight:bold;">Tout voir</small>
+        </div>
+        <table class="history-table"><tbody id="preview-history-body"></tbody></table>
     </div>
-    <div onclick="openProfile()" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-user-gear"></i> &nbsp; Mon Profil</div>
-    <div onclick="logout()" style="padding:15px 0; color:var(--red); cursor:pointer; margin-top:30px;"><i class="fa-solid fa-power-off"></i> &nbsp; Déconnexion</div>
+
+    <div id="page-history" style="display:none;">
+        <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:15px;" id="history-filters">
+            <div class="filter-chip active" onclick="filterHistory('Tous', this)">Tous</div>
+            <div class="filter-chip" onclick="filterHistory('Envoyer', this)">Envoyer</div>
+            <div class="filter-chip" onclick="filterHistory('Recevoir', this)">Recevoir</div>
+            <div class="filter-chip" onclick="filterHistory('Dépôt', this)">Dépôt</div>
+        </div>
+        <table class="history-table"><tbody id="full-history-body"></tbody></table>
+    </div>
 </div>
 
 <div id="modal-profile" class="modal">
-    <div class="auth-box">
-        <h3 style="color:var(--yellow); margin-top:0;">Fanovana mombamomba</h3>
-        <input type="text" id="edit-name" class="styled-input" placeholder="Anarana vaovao">
-        <input type="tel" id="edit-phone" class="styled-input" placeholder="Laharana vaovao">
-        <button class="btn-valider" onclick="updateProfile()">Tehirizina</button>
-        <p onclick="closeModal('modal-profile')" style="color:var(--gray); cursor:pointer; margin-top:15px; font-size:13px;">Hakatona</p>
+    <div style="background:var(--card); padding:25px; border-radius:28px; width:100%; max-width:350px; border:1px solid var(--border); text-align:center;">
+        <h3 style="color:var(--yellow); margin-top:0;">Paramètres du Profil</h3>
+        
+        <div style="position:relative; display:inline-block; margin-bottom:20px;">
+            <img id="modal-pp-view" src="https://via.placeholder.com/100" style="width:100px; height:100px; border-radius:50%; border:3px solid var(--yellow); object-fit:cover;">
+            <label for="file-pp" style="position:absolute; bottom:5px; right:0; background:var(--yellow); color:black; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border:3px solid var(--card);">
+                <i class="fa-solid fa-camera" style="font-size:14px;"></i>
+            </label>
+            <input type="file" id="file-pp" accept="image/*" style="display:none;" onchange="previewImage(this)">
+        </div>
+
+        <div style="text-align:left;">
+            <label style="font-size:11px; color:var(--gray)">Anarana feno :</label>
+            <input type="text" id="edit-full-name" class="styled-input" style="margin-bottom:15px;">
+            <label style="font-size:11px; color:var(--gray)">Laharana finday :</label>
+            <input type="tel" id="edit-phone" class="styled-input">
+        </div>
+
+        <button class="btn-valider" onclick="updateProfile()">Tehirizina ny fanovana</button>
+        <p onclick="closeProfile()" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:15px; font-size:13px;">Hakatona</p>
     </div>
 </div>
 
 <script>
-    // ─── SUPABASE INITIALIZATION ───
+    // --- SUPABASE CONFIG ---
     const _URL = "https://nyeopreahmajoisartoz.supabase.co";
     const _KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA";
     const supabaseClient = supabase.createClient(_URL, _KEY);
 
-    let currentUserId = null, userData = null, currentMode = "Envoyer";
-    const TAUX = { "TRX": 150, "USDT": 4600, "1XBET": 1 };
+    let currentUserId = null;
+    let userData = null;
+    let allTransactions = [];
+    let currentMode = "Envoyer";
 
-    // ─── AUTHENTICATION LOGIC ───
+    const TAUX = { "TRX": 150, "USDT": 4600, "1XBET": 1 };
+    const ADDR_RECEPT = { "TRX": "T-RECEIVE-TRX-ADDRESS", "USDT": "T-RECEIVE-USDT-ADDRESS", "1XBET": "ID-1XBET-OFFICIAL" };
+
+    // --- AUTH LOGIC ---
     function showAuth(mode) {
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('signup-form').style.display = 'none';
-        document.getElementById('forgot-form').style.display = 'none';
-        document.getElementById('reset-form').style.display = 'none';
-        document.getElementById(mode + '-form').style.display = 'block';
+        document.getElementById('login-form').style.display = mode === 'login' ? 'block' : 'none';
+        document.getElementById('signup-form').style.display = mode === 'signup' ? 'block' : 'none';
+        document.getElementById('forgot-form').style.display = mode === 'forgot' ? 'block' : 'none';
     }
 
-    // SIGN UP WITH LOOP CHECK ID
     async function handleSignUp() {
         const name = document.getElementById('reg-name').value;
         const phone = document.getElementById('reg-phone').value;
@@ -302,85 +366,48 @@
         const pass = document.getElementById('reg-pass').value;
         const conf = document.getElementById('reg-confirm').value;
 
-        if (!name || !email || !pass) return alert("Fenoy daholo ny banga!");
-        if (pass !== conf) return alert("Tsy mitovy ny mot de passe!");
+        if(!name || !phone || !email || !pass) return alert("Fenoy daholo ny banga!");
+        if(pass !== conf) return alert("Tsy mitovy ny teny miafina!");
 
-        const btn = document.getElementById('btn-signup');
-        btn.disabled = true; btn.innerText = "Andraso kely...";
+        // Generer ID TK (ex: TK-1234)
+        const tkId = "TK-" + Math.floor(1000 + Math.random() * 9000);
 
-        try {
-            // Logic Unique ID TK
-            let tkId = "";
-            let isUnique = false;
-            while (!isUnique) {
-                const testId = "TK-" + Math.floor(1000 + Math.random() * 9000);
-                const { data } = await supabaseClient.from('users').select('tk_id').eq('tk_id', testId);
-                if (data && data.length === 0) {
-                    tkId = testId;
-                    isUnique = true;
-                }
-            }
+        const { data, error } = await supabaseClient.auth.signUp({ email, password: pass });
+        if(error) return alert(error.message);
 
-            const { data: auth, error: authErr } = await supabaseClient.auth.signUp({ email, password: pass });
-            if (authErr) throw authErr;
-
-            if (auth.user) {
-                const { error: dbErr } = await supabaseClient.from('users').insert([{
-                    id: auth.user.id,
-                    full_name: name,
-                    phone: phone,
-                    email: email,
-                    tk_id: tkId,
-                    solde: 0
-                }]);
-                if (dbErr) throw dbErr;
-                alert("Kaonty voaforona! Ny ID-nao dia: " + tkId);
-                showAuth('login');
-            }
-        } catch (e) { alert("Olana: " + e.message); }
-        finally { btn.disabled = false; btn.innerText = "Hamorona kaonty"; }
+        if(data.user) {
+            await supabaseClient.from('users').insert([{
+                id: data.user.id,
+                full_name: name,
+                phone: phone,
+                email: email,
+                tk_id: tkId,
+                solde: 0
+            }]);
+            alert("Vita! Afaka miditra ianao izao.");
+            showAuth('login');
+        }
     }
 
     async function handleLogin() {
         const email = document.getElementById('login-email').value;
         const pass = document.getElementById('login-pass').value;
-        const btn = document.getElementById('btn-login');
-        btn.disabled = true;
-
         const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-        if (error) { alert("Email na mot de passe diso!"); btn.disabled = false; }
-        else { initApp(); }
+        if(error) return alert("Email na mot de passe diso!");
+        initApp();
     }
 
-    // FORGOT PASSWORD
     async function handleForgot() {
         const email = document.getElementById('forgot-email').value;
-        if (!email) return alert("Ampidiro ny email!");
-        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
-        if (error) alert(error.message);
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+        if(error) alert(error.message);
         else alert("Lien nalefa any amin'ny email-nao!");
     }
 
-    // DETECT PASSWORD RECOVERY
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-        if (event === "PASSWORD_RECOVERY") {
-            showAuth('reset');
-        }
-    });
-
-    async function handleUpdatePassword() {
-        const p1 = document.getElementById('new-pass').value;
-        const p2 = document.getElementById('new-confirm').value;
-        if (p1 !== p2) return alert("Tsy mitovy ny teny miafina!");
-        const { error } = await supabaseClient.auth.updateUser({ password: p1 });
-        if (error) alert(error.message);
-        else { alert("Mot de passe voasolo!"); location.reload(); }
-    }
-
-    // ─── APP LOGIC ───
+    // --- APP LOGIC ---
     async function initApp() {
         const { data: { user } } = await supabaseClient.auth.getUser();
-        if (user) {
+        if(user) {
             currentUserId = user.id;
             document.getElementById('auth-container').style.display = 'none';
             document.getElementById('nav-header').style.display = 'block';
@@ -391,76 +418,145 @@
 
     async function fetchData() {
         const { data: u } = await supabaseClient.from('users').select('*').eq('id', currentUserId).single();
-        if (u) {
+        if(u) {
             userData = u;
             document.getElementById('display-solde').innerText = (u.solde || 0).toLocaleString() + " Ar";
-            document.getElementById('side-name').innerText = u.full_name;
+            document.getElementById('side-full-name').innerText = u.full_name;
             document.getElementById('side-tk-id').innerText = "ID: " + u.tk_id;
             document.getElementById('header-avatar').src = u.avatar_url || "https://via.placeholder.com/35";
-            document.getElementById('side-avatar').src = u.avatar_url || "https://via.placeholder.com/70";
+            document.getElementById('side-avatar').src = u.avatar_url || "https://via.placeholder.com/50";
         }
+
+        const { data: ts } = await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at', {ascending: false});
+        allTransactions = ts || [];
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const preview = document.getElementById('preview-history-body');
+        const full = document.getElementById('full-history-body');
+        
+        const generateRow = (t) => {
+            const date = new Date(t.created_at).toLocaleDateString('fr-FR');
+            const color = t.status === 'confirmé' ? 'var(--green)' : 'var(--yellow)';
+            return `<tr>
+                <td><b>${t.service}</b><br><small style="color:var(--gray)">${date}</small></td>
+                <td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b><br><span style="color:${color}; font-size:10px;">${t.status}</span></td>
+            </tr>`;
+        };
+
+        preview.innerHTML = allTransactions.slice(0, 5).map(generateRow).join('');
+        full.innerHTML = allTransactions.map(generateRow).join('');
+    }
+
+    // --- UI HELPERS ---
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('active');
+        document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+    }
+
+    function showPage(p) {
+        document.getElementById('page-home').style.display = p === 'home' ? 'block' : 'none';
+        document.getElementById('page-history').style.display = p === 'history' ? 'block' : 'none';
+        if(p === 'history') toggleSidebar();
+    }
+
+    function switchMode(m) {
+        currentMode = m;
+        document.getElementById('trans-title').innerText = m + " Crypto";
+        const asset = document.getElementById('crypto-select').value;
+        const unit = document.getElementById('unit-suffix');
+        const addr = document.getElementById('input-addr');
+
+        if(m === 'Recevoir') {
+            unit.innerText = asset;
+            addr.value = ADDR_RECEPT[asset];
+            addr.readOnly = true;
+            document.getElementById('copy-btn').style.display = 'block';
+        } else {
+            unit.innerText = "Ar";
+            addr.value = "";
+            addr.readOnly = false;
+            document.getElementById('copy-btn').style.display = 'none';
+        }
+        updateCalc();
     }
 
     function updateCalc() {
         const cry = document.getElementById('crypto-select').value;
         const val = parseFloat(document.getElementById('input-main').value) || 0;
         const res = document.getElementById('calc-res');
-        if (currentMode === 'Envoyer') res.innerText = (val / TAUX[cry]).toFixed(2) + " " + cry;
+        if(currentMode === 'Envoyer') res.innerText = (val / TAUX[cry]).toFixed(2) + " " + cry;
         else res.innerText = (val * TAUX[cry]).toLocaleString() + " Ar";
     }
 
-    function switchMode(m) {
-        currentMode = m;
-        document.getElementById('trans-title').innerText = m + " Crypto";
-        document.getElementById('label-amount').innerText = m === "Envoyer" ? "Montant (Ar) :" : "Quantité Crypto :";
+    function updateIcon() {
+        const cry = document.getElementById('crypto-select').value;
+        const img = document.getElementById('asset-img');
+        if(cry === 'TRX') img.src = "https://cryptologos.cc/logos/tron-trx-logo.svg";
+        else if(cry === 'USDT') img.src = "https://cryptologos.cc/logos/tether-usdt-logo.svg";
+        else img.src = "https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg";
         updateCalc();
     }
 
     async function executeTrans() {
-        const amount = parseFloat(document.getElementById('input-main').value);
-        if (!amount || amount <= 0) return alert("Ampidiro ny montant!");
-
-        const cry = document.getElementById('crypto-select').value;
-        const arValue = currentMode === 'Envoyer' ? amount : (amount * TAUX[cry]);
-
-        if (currentMode === 'Envoyer' && arValue > userData.solde) return alert("Tsy ampy ny solde-nao!");
+        const val = parseFloat(document.getElementById('input-main').value);
+        if(!val || val <= 0) return alert("Ampidiro ny montant!");
+        
+        const arAmount = currentMode === 'Envoyer' ? val : (val * TAUX[document.getElementById('crypto-select').value]);
+        if(currentMode === 'Envoyer' && arAmount > userData.solde) return alert("Tsy ampy ny solde!");
 
         const { error } = await supabaseClient.from('transactions').insert([{
             user_id: currentUserId,
-            montant: arValue,
-            service: currentMode + " " + cry,
+            montant: arAmount,
+            service: currentMode + " " + document.getElementById('crypto-select').value,
             status: "En attente",
             adresse: document.getElementById('input-addr').value
         }]);
 
-        if (!error) {
-            if (currentMode === 'Envoyer') {
-                await supabaseClient.from('users').update({ solde: userData.solde - arValue }).eq('id', currentUserId);
-            }
-            alert("Transaction voaray! Andraso ny fanamarinana.");
-            fetchData();
+        if(!error && currentMode === 'Envoyer') {
+            await supabaseClient.from('users').update({ solde: userData.solde - arAmount }).eq('id', currentUserId);
         }
+        alert("Transaction voaray! ✅");
+        fetchData();
     }
 
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('active');
-        document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
-    }
-
+    // --- PROFIL LOGIC ---
     function openProfile() {
-        document.getElementById('edit-name').value = userData.full_name;
+        document.getElementById('edit-full-name').value = userData.full_name;
         document.getElementById('edit-phone').value = userData.phone;
+        document.getElementById('modal-pp-view').src = userData.avatar_url || "https://via.placeholder.com/100";
         document.getElementById('modal-profile').style.display = 'flex';
     }
 
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function closeProfile() { document.getElementById('modal-profile').style.display = 'none'; }
+
+    function previewImage(input) {
+        if(input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => document.getElementById('modal-pp-view').src = e.target.result;
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 
     async function updateProfile() {
-        const n = document.getElementById('edit-name').value;
-        const p = document.getElementById('edit-phone').value;
-        await supabaseClient.from('users').update({ full_name: n, phone: p }).eq('id', currentUserId);
-        alert("Profil voavaozina!");
-        closeModal('modal-profile');
+        const newName = document.getElementById('edit-full-name').value;
+        const newPhone = document.getElementById('edit-phone').value;
+        const fileInput = document.getElementById('file-pp');
+        
+        let avatarUrl = userData.avatar_url;
+
+        if(fileInput.files[0]) {
+            const file = fileInput.files[0];
+            const path = `avatars/${currentUserId}-${Date.now()}`;
+            await supabaseClient.storage.from('profiles').upload(path, file);
+            const { data } = supabaseClient.storage.from('profiles').getPublicUrl(path);
+            avatarUrl = data.publicUrl;
+        }
+
+        await supabaseClient.from('users').update({ full_name: newName, phone: newPhone, avatar_url: avatarUrl }).eq('id', currentUserId);
+        alert("Profil voavaozina! ✅");
+        closeProfile();
         fetchData();
     }
 
