@@ -539,6 +539,64 @@
         }
     }
 
+    async function handleForgot() {
+    const email = document.getElementById('forgot-email').value;
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.href, // Hiverina amin'ny site-nao ilay olona
+    });
+
+    if (error) alert("Misy olana: " + error.message);
+    else alert("Lien recovery efa nalefa any amin'ny email-nao!");
+}
+
+    // Detection an'ilay link avy any amin'ny email
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (event === "PASSWORD_RECOVERY") {
+        // Asehoy ny formulaire hanovana mot de passe (ohatra: reset-form)
+        showAuth('reset'); 
+    }
+});
+
+// Function hamonjena ilay mot de passe vaovao
+async function handleUpdatePassword() {
+    const newPass = document.getElementById('new-pass').value;
+    const { error } = await supabaseClient.auth.updateUser({ password: newPass });
+
+    if (error) alert("Tsy voasolo: " + error.message);
+    else {
+        alert("Vita! Voasolo ny teny miafina.");
+        location.reload();
+    }
+}
+
+    // Rehefa azo ny 'userData' avy amin'ny Supabase
+if (userData) {
+    // Manova ny soratra fandraisana (ohatra ao amin'ny sidebar na header)
+    const welcomeText = document.getElementById('welcome-msg');
+    if (welcomeText) {
+        welcomeText.innerText = `Manahoana, ${userData.full_name}!`;
+    }
+    
+    // Fanampiny: Update avatar raha misy
+    document.getElementById('side-avatar').src = userData.avatar_url || "default-avatar.png";
+}
+
+    async function updateProfile() {
+    const newName = document.getElementById('edit-full-name').value;
+    const newPhone = document.getElementById('edit-phone').value;
+
+    const { error } = await supabaseClient
+        .from('users')
+        .update({ full_name: newName, phone: newPhone })
+        .eq('id', currentUserId);
+
+    if (error) alert("Tsy voatahiry ny fanovana");
+    else {
+        alert("Profil voavaozina! ✅");
+        fetchData(); // Averina alaina ny data vaovao
+    }
+}
+
     async function updateProfile() {
         const newName = document.getElementById('edit-full-name').value;
         const newPhone = document.getElementById('edit-phone').value;
