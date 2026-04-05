@@ -512,55 +512,62 @@
     }
 
     async function executeTrans() {
-        const val = parseFloat(document.getElementById('input-main').value);
-        const addr = document.getElementById('input-addr').value;
-        const asset = document.getElementById('crypto-select').value;
-        const btn = document.getElementById('btn-submit');
-
-        if(!val || val <= 0) return alert("Ampidiro ny montant!");
-        if(!addr) return alert("Ampidiro ny adresse/laharana!");
-
-        // Kajy ny montant ho Ar
-        const arAmount = (currentMode === 'Recevoir') ? (val * TAUX[asset]) : val;
-        
-        // Fanamarinana solde
-        if((currentMode === 'Envoyer' || currentMode === 'Retrait') && arAmount > userData.solde) {
-            return alert("Tsy ampy ny solde-nao!");
-        }
-
-        btn.disabled = true;
-        btn.innerText = "eo am-pandefasana...";
-
-        try {
-            // 1. Insert transaction
-            const { error: txError } = await supabaseClient.from('transactions').insert([{
-                user_id: currentUserId,
-                montant: arAmount,
-                service: currentMode + " " + (currentMode.includes('Mobile') ? "Mobile" : asset),
-                status: "En attente",
-                adresse: addr
-            }]);
-
-            if (txError) throw txError;
-
-            // 2. Raha Envoyer na Retrait dia analana ny solde
-            if (currentMode === 'Envoyer' || currentMode === 'Retrait') {
-                const { error: upError } = await supabaseClient.from('users')
-                    .update({ solde: userData.solde - arAmount })
-                    .eq('id', currentUserId);
-                if (upError) throw upError;
-            }
-
-            alert("Transaction voaray! ✅ Handraso ny fanamarinana.");
-            document.getElementById('input-main').value = "";
-            fetchData();
-        } catch (err) {
-            alert("Nisy olana: " + err.message);
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Confirmer";
-        }
+    // 1. Hamarinina aloha raha efa tafiditra ny User Data
+    if (!userData) {
+        alert("Mbola eo am-paka ny mombamomba anao ny system, andraso kely...");
+        return;
     }
+
+    const val = parseFloat(document.getElementById('input-main').value);
+    const addr = document.getElementById('input-addr').value;
+    const asset = document.getElementById('crypto-select').value;
+    const btn = document.getElementById('btn-submit');
+
+    if(!val || val <= 0) return alert("Ampidiro ny montant!");
+    if(!addr) return alert("Ampidiro ny adresse/laharana!");
+
+    // Kajy ny montant ho Ar
+    const arAmount = (currentMode === 'Recevoir') ? (val * TAUX[asset]) : val;
+    
+    // 2. Fanamarinana solde (Efa azo antoka fa misy ny userData eto)
+    if((currentMode === 'Envoyer' || currentMode === 'Retrait') && arAmount > userData.solde) {
+        return alert("Tsy ampy ny solde-nao! (Solde: " + userData.solde + " Ar)");
+    }
+
+    btn.disabled = true;
+    btn.innerText = "eo am-pandefasana...";
+
+    try {
+        // 3. Insert transaction
+        const { error: txError } = await supabaseClient.from('transactions').insert([{
+            user_id: currentUserId,
+            montant: arAmount,
+            service: currentMode + " " + (currentMode.includes('Mobile') ? "Mobile" : asset),
+            status: "En attente",
+            adresse: addr
+        }]);
+
+        if (txError) throw txError;
+
+        // 4. Raha Envoyer na Retrait dia analana ny solde (Update Database)
+        if (currentMode === 'Envoyer' || currentMode === 'Retrait') {
+            const { error: upError } = await supabaseClient.from('users')
+                .update({ solde: userData.solde - arAmount })
+                .eq('id', currentUserId);
+            if (upError) throw upError;
+        }
+
+        alert("Transaction voaray! ✅ Handraso ny fanamarinana.");
+        document.getElementById('input-main').value = "";
+        fetchData(); // Ity no manavao ny display solde eo amin'ny ecran
+    } catch (err) {
+        console.error("Error Detail:", err); // Jereo eto ny antony raha tsy mandeha
+        alert("Nisy olana: " + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Confirmer";
+    }
+}
 
     function logout() { supabaseClient.auth.signOut().then(() => location.reload()); }
     function previewImage(input) {
