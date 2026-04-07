@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mg">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -188,29 +188,29 @@
         </div>
         <button class="btn-valider" onclick="handleLogin()">Se connecter</button>
         <p style="font-size: 13px; color: var(--gray); margin-top: 25px;">
-            Tsy mbola manana kaonty? <span class="auth-link" onclick="showAuth('signup')">S'inscrire</span>
+            Vous n'avez pas de compte ? <span class="auth-link" onclick="showAuth('signup')">S'inscrire</span>
         </p>
     </div>
 
     <div class="auth-box" id="signup-form" style="display: none;">
         <h1>Inscription</h1>
-        <input type="text" id="reg-name" class="styled-input" placeholder="Anarana feno">
-        <input type="tel" id="reg-phone" class="styled-input" placeholder="Numéro Téléphone (ex: 034...)">
+        <input type="text" id="reg-name" class="styled-input" placeholder="Nom complet">
+        <input type="tel" id="reg-phone" class="styled-input" placeholder="Numéro de Téléphone (ex: 034...)">
         <input type="email" id="reg-email" class="styled-input" placeholder="Adresse Email">
         <input type="password" id="reg-pass" class="styled-input" placeholder="Mot de passe">
-        <input type="password" id="reg-confirm" class="styled-input" placeholder="Hamafiso ny mot de passe">
+        <input type="password" id="reg-confirm" class="styled-input" placeholder="Confirmez le mot de passe">
         <button class="btn-valider" onclick="handleSignUp()">S'inscrire maintenant</button>
         <p style="font-size: 13px; color: var(--gray); margin-top: 25px;">
-            Efa manana kaonty? <span class="auth-link" onclick="showAuth('login')">Se connecter</span>
+            Déjà inscrit ? <span class="auth-link" onclick="showAuth('login')">Se connecter</span>
         </p>
     </div>
 
     <div class="auth-box" id="forgot-form" style="display: none;">
         <h1>Récupération</h1>
-        <p style="font-size: 13px; color: var(--gray); margin-bottom: 20px;">Ampidiro ny email anao hamerenana ny mot de passe.</p>
+        <p style="font-size: 13px; color: var(--gray); margin-bottom: 20px;">Entrez votre email pour réinitialiser votre mot de passe.</p>
         <input type="email" id="forgot-email" class="styled-input" placeholder="Adresse Email">
-        <button class="btn-valider" onclick="handleForgot()">Handefa lien</button>
-        <p class="auth-link" onclick="showAuth('login')">Hiverina hiditra</p>
+        <button class="btn-valider" onclick="handleForgot()">Envoyer le lien</button>
+        <p class="auth-link" onclick="showAuth('login')">Retour à la connexion</p>
     </div>
 </div>
 
@@ -265,13 +265,13 @@
             <b id="trans-title" style="color:var(--yellow); font-size:17px; display:block; margin-bottom:15px;">Envoyer Crypto</b>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                 <div id="crypto-select-container">
-                    <label style="font-size:11px; color:var(--gray)">Asset :</label>
+                    <label style="font-size:11px; color:var(--gray)">Actif :</label>
                     <div style="display:flex; align-items:center; gap:8px; margin-top:5px;">
                         <img id="asset-img" src="https://cryptologos.cc/logos/tron-trx-logo.svg" width="22">
                         <select id="crypto-select" class="styled-input" style="margin-top:0; padding:10px;" onchange="updateIcon(); updateCalc();">
                             <option value="TRX">TRX (TRC20)</option>
                             <option value="USDT">USDT (TRC20)</option>
-                            <option value="1XBET">1xBet Account</option>
+                            <option value="1XBET">Compte 1xBet</option>
                         </select>
                     </div>
                 </div>
@@ -299,7 +299,7 @@
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <b style="color:var(--gray); font-size:13px;">Transactions récentes</b>
-            <small onclick="showPage('history')" style="color:var(--yellow); cursor:pointer; font-weight:bold;">Tout voir</small>
+            <small onclick="showPage('history')" style="color:var(--yellow); cursor:pointer; font-weight:bold;">Voir tout</small>
         </div>
         <table class="history-table"><tbody id="preview-history-body"></tbody></table>
     </div>
@@ -328,14 +328,14 @@
         </div>
 
         <div style="text-align:left;">
-            <label style="font-size:11px; color:var(--gray)">Anarana feno :</label>
+            <label style="font-size:11px; color:var(--gray)">Nom complet :</label>
             <input type="text" id="edit-full-name" class="styled-input" style="margin-bottom:15px;">
-            <label style="font-size:11px; color:var(--gray)">Laharana finday :</label>
+            <label style="font-size:11px; color:var(--gray)">Numéro de téléphone :</label>
             <input type="tel" id="edit-phone" class="styled-input">
         </div>
 
-        <button class="btn-valider" onclick="updateProfile()">Tehirizina ny fanovana</button>
-        <p onclick="closeProfile()" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:15px; font-size:13px;">Hakatona</p>
+        <button class="btn-valider" onclick="updateProfile()">Enregistrer les modifications</button>
+        <p onclick="closeProfile()" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:15px; font-size:13px;">Fermer</p>
     </div>
 </div>
 
@@ -361,51 +361,48 @@
     }
 
     async function handleSignUp() {
-    const name = document.getElementById('reg-name').value.trim();
-    const phone = document.getElementById('reg-phone').value.trim();
-    const email = document.getElementById('reg-email').value.trim();
-    const pass = document.getElementById('reg-pass').value;
+        const name = document.getElementById('reg-name').value.trim();
+        const phone = document.getElementById('reg-phone').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const pass = document.getElementById('reg-pass').value;
 
-    if (!name || !phone || !email || !pass) return alert("Fenoy daholo ny banga!");
+        if (!name || !phone || !email || !pass) return alert("Veuillez remplir tous les champs !");
 
-    // 1. Mamorona TK-ID avy hatrany (Tsy miandry database)
-    const tkId = "TK-" + Math.floor(1000 + Math.random() * 9000);
+        const tkId = "TK-" + Math.floor(1000 + Math.random() * 9000);
 
-    try {
-        // 2. SignUp (Ity no ampahany mety ela raha ratsy ny internet)
-        const { data: authData, error: authError } = await supabaseClient.auth.signUp({ 
-            email, 
-            password: pass 
-        });
+        try {
+            const { data: authData, error: authError } = await supabaseClient.auth.signUp({ 
+                email, 
+                password: pass 
+            });
 
-        if (authError) throw authError;
+            if (authError) throw authError;
 
-        if (authData.user) {
-            // 3. Insert miaraka amin'ny TK-ID efa vonona
-            const { error: dbError } = await supabaseClient.from('users').insert([{
-                id: authData.user.id, 
-                full_name: name, 
-                phone: phone, 
-                email: email, 
-                tk_id: tkId, 
-                solde: 0
-            }]);
+            if (authData.user) {
+                const { error: dbError } = await supabaseClient.from('users').insert([{
+                    id: authData.user.id, 
+                    full_name: name, 
+                    phone: phone, 
+                    email: email, 
+                    tk_id: tkId, 
+                    solde: 0
+                }]);
 
-            if (dbError) throw dbError;
-            
-            alert("Kaonty voatomboka! ID-nao: " + tkId);
-            showAuth('login');
+                if (dbError) throw dbError;
+                
+                alert("Compte créé avec succès ! Votre ID : " + tkId);
+                showAuth('login');
+            }
+        } catch (err) { 
+            alert("Erreur : " + err.message); 
         }
-    } catch (err) { 
-        alert("Nisy olana: " + err.message); 
     }
-}
 
     async function handleLogin() {
         const email = document.getElementById('login-email').value;
         const pass = document.getElementById('login-pass').value;
         const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-        if(error) return alert("Email na mot de passe diso!");
+        if(error) return alert("Email ou mot de passe incorrect !");
         initApp();
     }
 
@@ -527,64 +524,60 @@
     }
 
     async function executeTrans() {
-    // 1. Hamarinina aloha raha efa tafiditra ny User Data
-    if (!userData) {
-        alert("Mbola eo am-paka ny mombamomba anao ny system, andraso kely...");
-        return;
-    }
-
-    const val = parseFloat(document.getElementById('input-main').value);
-    const addr = document.getElementById('input-addr').value;
-    const asset = document.getElementById('crypto-select').value;
-    const btn = document.getElementById('btn-submit');
-
-    if(!val || val <= 0) return alert("Ampidiro ny montant!");
-    if(!addr) return alert("Ampidiro ny adresse/laharana!");
-
-    // Kajy ny montant ho Ar
-    const arAmount = (currentMode === 'Recevoir') ? (val * TAUX[asset]) : val;
-    
-    // 2. Fanamarinana solde (Efa azo antoka fa misy ny userData eto)
-    if((currentMode === 'Envoyer' || currentMode === 'Retrait') && arAmount > userData.solde) {
-        return alert("Tsy ampy ny solde-nao! (Solde: " + userData.solde + " Ar)");
-    }
-
-    btn.disabled = true;
-    btn.innerText = "eo am-pandefasana...";
-
-    try {
-        // 3. Insert transaction
-        const { error: txError } = await supabaseClient.from('transactions').insert([{
-            user_id: currentUserId,
-            montant: arAmount,
-            service: currentMode + " " + (currentMode.includes('Mobile') ? "Mobile" : asset),
-            status: "En attente",
-            adresse: addr
-        }]);
-
-        if (txError) throw txError;
-
-        // 4. Raha Envoyer na Retrait dia analana ny solde (Update Database)
-        if (currentMode === 'Envoyer' || currentMode === 'Retrait') {
-            const { error: upError } = await supabaseClient.from('users')
-                .update({ solde: userData.solde - arAmount })
-                .eq('id', currentUserId);
-            if (upError) throw upError;
+        if (!userData) {
+            alert("Chargement de vos données en cours, veuillez patienter...");
+            return;
         }
 
-        alert("Transaction voaray! ✅ Handraso ny fanamarinana.");
-        document.getElementById('input-main').value = "";
-        fetchData(); // Ity no manavao ny display solde eo amin'ny ecran
-    } catch (err) {
-        console.error("Error Detail:", err); // Jereo eto ny antony raha tsy mandeha
-        alert("Nisy olana: " + err.message);
-    } finally {
-        btn.disabled = false;
-        btn.innerText = "Confirmer";
+        const val = parseFloat(document.getElementById('input-main').value);
+        const addr = document.getElementById('input-addr').value;
+        const asset = document.getElementById('crypto-select').value;
+        const btn = document.getElementById('btn-submit');
+
+        if(!val || val <= 0) return alert("Veuillez entrer un montant !");
+        if(!addr) return alert("Veuillez entrer l'adresse ou le numéro !");
+
+        const arAmount = (currentMode === 'Recevoir') ? (val * TAUX[asset]) : val;
+        
+        if((currentMode === 'Envoyer' || currentMode === 'Retrait') && arAmount > userData.solde) {
+            return alert("Solde insuffisant ! (Solde : " + userData.solde + " Ar)");
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Envoi en cours...";
+
+        try {
+            const { error: txError } = await supabaseClient.from('transactions').insert([{
+                user_id: currentUserId,
+                montant: arAmount,
+                service: currentMode + " " + (currentMode.includes('Mobile') ? "Mobile" : asset),
+                status: "En attente",
+                adresse: addr
+            }]);
+
+            if (txError) throw txError;
+
+            if (currentMode === 'Envoyer' || currentMode === 'Retrait') {
+                const { error: upError } = await supabaseClient.from('users')
+                    .update({ solde: userData.solde - arAmount })
+                    .eq('id', currentUserId);
+                if (upError) throw upError;
+            }
+
+            alert("Transaction enregistrée ! ✅ En attente de confirmation.");
+            document.getElementById('input-main').value = "";
+            fetchData(); 
+        } catch (err) {
+            console.error("Détails de l'erreur :", err);
+            alert("Une erreur est survenue : " + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Confirmer";
+        }
     }
-}
 
     function logout() { supabaseClient.auth.signOut().then(() => location.reload()); }
+    
     function previewImage(input) {
         if(input.files && input.files[0]) {
             const reader = new FileReader();
@@ -606,7 +599,14 @@
         const newPhone = document.getElementById('edit-phone').value;
         const { error } = await supabaseClient.from('users').update({ full_name: newName, phone: newPhone }).eq('id', currentUserId);
         if(error) alert(error.message);
-        else { alert("Profil voavao!"); closeProfile(); fetchData(); }
+        else { alert("Profil mis à jour !"); closeProfile(); fetchData(); }
+    }
+
+    function copyText() {
+        const addrInput = document.getElementById('input-addr');
+        addrInput.select();
+        document.execCommand("copy");
+        alert("Adresse copiée dans le presse-papier !");
     }
 
     initApp();
