@@ -168,6 +168,42 @@
         .history-table { width: 100%; border-collapse: collapse; }
         .history-table td { padding: 15px 0; border-bottom: 1px solid var(--border); }
 
+.month-header {
+    background: #f8f9fa;
+    padding: 8px 15px;
+    font-weight: bold;
+    font-size: 13px;
+    color: #777;
+    margin-top: 15px;
+    border-radius: 5px;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.history-service {
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.history-time {
+    font-size: 12px;
+    color: #999;
+}
+
+.amount-red { color: #ff4d4d; font-weight: bold; }
+.amount-green { color: #27ae60; font-weight: bold; }
+
+.filter-chip.active {
+    background: #007bff; /* Na ny lokon'ny App-nao */
+    color: white;
+}
+        
         .filter-chip {
             background: var(--card); border: 1px solid var(--border);
             padding: 8px 18px; border-radius: 20px; font-size: 12px;
@@ -318,16 +354,17 @@
         </div>
         <table class="history-table"><tbody id="preview-history-body"></tbody></table>
     </div>
-
-    <div id="page-history" style="display:none;">
-        <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:15px;" id="history-filters">
-            <div class="filter-chip active" onclick="filterHistory('Tous', this)">Tous</div>
-            <div class="filter-chip" onclick="filterHistory('Envoyer', this)">Envoyer</div>
-            <div class="filter-chip" onclick="filterHistory('Recevoir', this)">Recevoir</div>
-            <div class="filter-chip" onclick="filterHistory('Dépôt', this)">Dépôt</div>
-        </div>
-        <table class="history-table"><tbody id="full-history-body"></tbody></table>
+<div id="page-history" style="display:none;">
+    <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:15px;" id="history-filters">
+        <div class="filter-chip active" onclick="filterHistory('Tous', this)">Tous</div>
+        <div class="filter-chip" onclick="filterHistory('Envoyer', this)">Envoyer</div>
+        <div class="filter-chip" onclick="filterHistory('Retrait', this)">Retrait</div> <div class="filter-chip" onclick="filterHistory('Dépôt', this)">Dépôt</div>
+        <div class="filter-chip" onclick="filterHistory('Recevoir', this)">Recevoir</div>
     </div>
+
+    <div id="full-history-container">
+        </div>
+</div>
 </div>
 
 <div id="modal-profile" class="modal">
@@ -457,22 +494,74 @@
         renderHistory();
     }
 
-    function renderHistory() {
-        const preview = document.getElementById('preview-history-body');
-        const full = document.getElementById('full-history-body');
-        const generateRow = (t) => {
-            const date = new Date(t.created_at).toLocaleDateString('fr-FR');
-            let color = 'var(--yellow)';
-            if(t.status === 'confirmé') color = 'var(--green)';
-            if(t.status === 'rejeté') color = 'var(--red)';
-            return `<tr>
-                <td><b>${t.service}</b><br><small style="color:var(--gray)">${date}</small></td>
-                <td style="text-align:right"><b>${t.montant.toLocaleString()} Ar</b><br><span style="color:${color}; font-size:10px;">${t.status}</span></td>
-            </tr>`;
-        };
-        preview.innerHTML = allTransactions.slice(0, 5).map(generateRow).join('');
-        full.innerHTML = allTransactions.map(generateRow).join('');
+let allTransactions = []; // Tahiry ho an'ny transactions rehetra
+
+async function loadHistory() {
+    const { data, error } = await supabaseClient
+        .from('transactions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (!error) {
+        allTransactions = data;
+        renderHistory(allTransactions); // Mampiseho azy voalohany
     }
+}
+
+function filterHistory(type, element) {
+    // Manova ny lokon'ny bokotra voatsindry
+    document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+
+    if (type === 'Tous') {
+        renderHistory(allTransactions);
+    } else {
+        const filtered = allTransactions.filter(t => 
+            t.service.toLowerCase().includes(type.toLowerCase())
+        );
+        renderHistory(filtered);
+    }
+}
+
+function renderHistory(transactions) {
+    const container = document.getElementById('full-history-container');
+    container.innerHTML = '';
+
+    // 1. Mizara ny transactions isam-bolana
+    const groups = transactions.reduce((acc, t) => {
+        const d = new Date(t.created_at);
+        const moisAnnee = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+        if (!acc[moisAnnee]) acc[moisAnnee] = [];
+        acc[moisAnnee].push(t);
+        return acc;
+    }, {});
+
+    // 2. Mampiseho azy eo amin'ny écran
+    for (const mois in groups) {
+        // Lohatenin'ny volana
+        container.innerHTML += `<div class="month-header">${mois.toUpperCase()}</div>`;
+
+        groups[mois].forEach(t => {
+            const dateObj = new Date(t.created_at);
+            const ora = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            
+            // Raha Envoyer na Retrait dia asiana loko mena, raha hafa dia maitso
+            const isNegative = t.service.toLowerCase().includes('envoyer') || t.service.toLowerCase().includes('retrait');
+
+            container.innerHTML += `
+                <div class="history-item">
+                    <div class="history-info">
+                        <div class="history-service">${t.service}</div>
+                        <div class="history-time">${ora}</div>
+                    </div>
+                    <div class="history-amount ${isNegative ? 'amount-red' : 'amount-green'}">
+                        ${isNegative ? '-' : '+'}${t.montant.toLocaleString()} Ar
+                    </div>
+                </div>
+            `;
+        });
+    }
+}
 
     // --- UI ACTIONS ---
     function toggleSidebar() {
