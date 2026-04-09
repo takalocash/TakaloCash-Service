@@ -196,6 +196,17 @@
     color: #999;
 }
 
+        #page-history h2 {
+    color: white;
+}
+
+/* Rehefa tsindriana ilay bokotra retour dia misy effet kely */
+div[onclick="showPage('home')"]:active {
+    transform: scale(0.9);
+    background: var(--bg-nav);
+    transition: 0.2s;
+}
+
 .amount-red { color: #ff4d4d; font-weight: bold; }
 .amount-green { color: #27ae60; font-weight: bold; }
 
@@ -355,12 +366,23 @@
         <table class="history-table"><tbody id="preview-history-body"></tbody></table>
     </div>
 <div id="page-history" style="display:none;">
+    <div style="display:flex; align-items:center; gap:15px; padding:10px 0 20px 0;">
+        <div onclick="showPage('home')" style="cursor:pointer; width:40px; height:40px; background:var(--card); border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center;">
+            <i class="fas fa-arrow-left" style="color:var(--yellow); font-size:18px;"></i>
+        </div>
+        <h2 style="margin:0; font-size:20px; font-weight:800; letter-spacing:-0.5px;">Historique</h2>
+    </div>
+
     <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:15px;" id="history-filters">
         <div class="filter-chip active" onclick="filterHistory('Tous', this)">Tous</div>
         <div class="filter-chip" onclick="filterHistory('Envoyer', this)">Envoyer</div>
-        <div class="filter-chip" onclick="filterHistory('Retrait', this)">Retrait</div> <div class="filter-chip" onclick="filterHistory('Dépôt', this)">Dépôt</div>
+        <div class="filter-chip" onclick="filterHistory('Retrait', this)">Retrait</div>
+        <div class="filter-chip" onclick="filterHistory('Dépôt', this)">Dépôt</div>
         <div class="filter-chip" onclick="filterHistory('Recevoir', this)">Recevoir</div>
     </div>
+
+    <div id="full-history-body"></div> 
+</div>
 
     <div id="full-history-container">
         </div>
@@ -589,11 +611,25 @@ function renderHistory(dataToRender = allTransactions) {
     }
 
     function showPage(p) {
-        document.getElementById('page-home').style.display = p === 'home' ? 'block' : 'none';
-        document.getElementById('page-history').style.display = p === 'history' ? 'block' : 'none';
-        if(p === 'history') toggleSidebar();
-    }
+    // 1. Asehoy na afeno ny pejy mifanaraka amin'ny "p"
+    document.getElementById('page-home').style.display = (p === 'home') ? 'block' : 'none';
+    document.getElementById('page-history').style.display = (p === 'history') ? 'block' : 'none';
 
+    // 2. Raha mankany amin'ny History ny mpampiasa
+    if (p === 'history') {
+        // Refresh ny lisitra mba hiseho ny fizarana isam-bolana sy ny daty
+        renderHistory(allTransactions);
+
+        // Akatony ny sidebar RAHA toa ka misokatra izy (ohatra: avy any amin'ny menu)
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && sidebar.classList.contains('active')) {
+            toggleSidebar();
+        }
+    }
+    
+    // 3. Avereno any ambony indrindra ny scroll (mba tsy hitoetra any ambany ny pejy vaovao)
+    window.scrollTo(0, 0);
+}
     function switchMode(m) {
         currentMode = m;
         document.getElementById('trans-title').innerText = m + " Crypto";
