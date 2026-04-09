@@ -577,6 +577,63 @@ function renderHistory(dataToRender = allTransactions) {
         fullContainer.innerHTML = '';
         
         const data = dataToRender || [];
+function renderHistory(dataToRender = allTransactions) {
+    // 1. Hamarino tsara ny ID: 
+    // preview-history-body (eo amin'ny Accueil)
+    // full-history-container (ao amin'ny pejy History)
+    const fullContainer = document.getElementById('full-history-container');
+    const previewContainer = document.getElementById('preview-history-body');
+
+    // 2. Function hamoronana ny HTML isaky ny andalana
+    const generateHTML = (t) => {
+        try {
+            const dateObj = new Date(t.created_at);
+            
+            // Fisehon'ny Ora (14:30)
+            const ora = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            
+            // Fisehon'ny Daty kely (09 avr.)
+            const datyKely = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+            
+            const isNegative = t.service.toLowerCase().includes('envoyer') || t.service.toLowerCase().includes('retrait');
+            
+            let colorStatus = 'var(--yellow)';
+            if(t.status === 'confirmé') colorStatus = 'var(--green)';
+            if(t.status === 'rejeté') colorStatus = 'var(--red)';
+
+            return `
+                <div class="history-item">
+                    <div class="history-info">
+                        <div class="history-service">${t.service}</div>
+                        <div class="history-time">
+                            <span style="color:var(--yellow); font-weight:600;">${datyKely}</span> • ${ora} 
+                            <span style="margin-left:8px; color:${colorStatus}; font-size:10px; border:1px solid ${colorStatus}; padding:1px 4px; border-radius:4px; text-transform:uppercase; font-weight:700;">
+                                ${t.status}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="history-amount ${isNegative ? 'amount-red' : 'amount-green'}" style="text-align:right;">
+                        <span style="font-size:16px;">${isNegative ? '-' : '+'}${t.montant.toLocaleString()}</span>
+                        <span style="font-size:10px; margin-left:2px;">Ar</span>
+                    </div>
+                </div>`;
+        } catch (e) {
+            console.error("Error generating row:", e);
+            return ""; 
+        }
+    };
+
+    // 3. PREVIEW (Home Page) - 3 transactions ihany no aseho
+    if(previewContainer) {
+        // Ampiasaina ny 'allTransactions' (original) fa tsy ny 'dataToRender' (filtered)
+        previewContainer.innerHTML = allTransactions.slice(0, 3).map(generateHTML).join('');
+    }
+
+    // 4. FULL HISTORY (Page History) - Miovaova araka ny sivana (filter)
+    if(fullContainer) {
+        fullContainer.innerHTML = '';
+        
+        const data = dataToRender || [];
         
         if (data.length === 0) {
             fullContainer.innerHTML = '<div style="text-align:center; padding:40px; color:var(--gray);">Aucune transaction</div>';
