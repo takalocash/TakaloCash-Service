@@ -381,11 +381,7 @@ div[onclick="showPage('home')"]:active {
         <div class="filter-chip" onclick="filterHistory('Recevoir', this)">Recevoir</div>
     </div>
 
-    <div id="full-history-body"></div> 
-</div>
-
-    <div id="full-history-container">
-        </div>
+    <div id="full-history-container"></div> 
 </div>
 </div>
 
@@ -524,7 +520,7 @@ function renderHistory(dataToRender = allTransactions) {
     const fullContainer = document.getElementById('full-history-container');
     const previewContainer = document.getElementById('preview-history-body');
 
-    // 1. Function iray hamoronana ny HTML isaky ny andalana
+    // 1. Function hamoronana ny HTML isaky ny andalana
     const generateHTML = (t) => {
         try {
             const dateObj = new Date(t.created_at);
@@ -555,28 +551,21 @@ function renderHistory(dataToRender = allTransactions) {
         } catch (e) { return ""; }
     };
 
-    // --- LOGIQUE IF / ELSE ---
+    // 2. MAMENO NY PREVIEW (Accueil) - 3 ihany foana
+    if (previewContainer) {
+        // AllTransactions foana no ampiasaina eto fa tsy ilay dataToRender (filtered)
+        previewContainer.innerHTML = allTransactions.slice(0, 3).map(generateHTML).join('');
+    }
 
-    // A. RAHA EO AMIN'NY ACCUEIL IANAO (page-home no hita)
-    if (document.getElementById('page-home').style.display !== 'none') {
-        if (previewContainer) {
-            previewContainer.innerHTML = allTransactions.slice(0, 3).map(generateHTML).join('');
-        }
-        // Fafana ny ao amin'ny Full History raha toa ka mipoitra eo ambany
-        if (fullContainer) fullContainer.innerHTML = ''; 
-    } 
-    
-    // B. RAHA ANY AMIN'NY PEJY HISTORY IANAO (page-history no hita)
-    else {
-        if (fullContainer) {
-            fullContainer.innerHTML = '';
-            const data = dataToRender || [];
-            
-            if (data.length === 0) {
-                fullContainer.innerHTML = '<p style="text-align:center; padding:30px; color:var(--gray);">Aucune transaction</p>';
-                return;
-            }
+    // 3. MAMENO NY FULL HISTORY (Pejy History)
+    if (fullContainer) {
+        fullContainer.innerHTML = ''; // Diovina aloha
+        const data = dataToRender || [];
 
+        if (data.length === 0) {
+            fullContainer.innerHTML = '<p style="text-align:center; padding:30px; color:var(--gray);">Aucune transaction</p>';
+        } else {
+            // Grouping by month
             const groups = data.reduce((acc, t) => {
                 const d = new Date(t.created_at);
                 const moisAnnee = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
@@ -593,24 +582,23 @@ function renderHistory(dataToRender = allTransactions) {
     }
 }
     
-    function showPage(p) {
-    // 1. Asehoy na afeno ny pejy mifanaraka amin'ny "p"
-    document.getElementById('page-home').style.display = (p === 'home') ? 'block' : 'none';
-    document.getElementById('page-history').style.display = (p === 'history') ? 'block' : 'none';
+function showPage(p) {
+    // Afeno daholo aloha
+    document.getElementById('page-home').style.display = 'none';
+    document.getElementById('page-history').style.display = 'none';
 
-    // 2. Raha mankany amin'ny History ny mpampiasa
-    if (p === 'history') {
-        // Refresh ny lisitra mba hiseho ny fizarana isam-bolana sy ny daty
-        renderHistory(allTransactions);
-
-        // Akatony ny sidebar RAHA toa ka misokatra izy (ohatra: avy any amin'ny menu)
+    // Asehoy izay nangatahina
+    if (p === 'home') {
+        document.getElementById('page-home').style.display = 'block';
+        renderHistory(allTransactions); // Mba hanavao ilay 3 preview
+    } else if (p === 'history') {
+        document.getElementById('page-history').style.display = 'block';
+        renderHistory(allTransactions); // Mba hanavao ilay full list
+        
+        // Akatony ny sidebar raha misokatra
         const sidebar = document.getElementById('sidebar');
-        if (sidebar && sidebar.classList.contains('active')) {
-            toggleSidebar();
-        }
+        if (sidebar && sidebar.classList.contains('active')) toggleSidebar();
     }
-    
-    // 3. Avereno any ambony indrindra ny scroll (mba tsy hitoetra any ambany ny pejy vaovao)
     window.scrollTo(0, 0);
 }
     function switchMode(m) {
