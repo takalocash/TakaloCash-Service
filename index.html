@@ -425,7 +425,7 @@ div[onclick="showPage('home')"]:active {
 <script>
     // --- SUPABASE CONFIG ---
     const _URL = "https://nyeopreahmajoisartoz.supabase.co";
-    const _KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."; // Ataovy azo antoka fa marina
+    const _KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA";
     const supabaseClient = supabase.createClient(_URL, _KEY);
 
     let currentUserId = null;
@@ -450,20 +450,35 @@ div[onclick="showPage('home')"]:active {
         const pass = document.getElementById('reg-pass').value;
 
         if (!name || !phone || !email || !pass) return alert("Veuillez remplir tous les champs !");
+
         const tkId = "TK-" + Math.floor(1000 + Math.random() * 9000);
 
         try {
-            const { data: authData, error: authError } = await supabaseClient.auth.signUp({ email, password: pass });
+            const { data: authData, error: authError } = await supabaseClient.auth.signUp({ 
+                email, 
+                password: pass 
+            });
+
             if (authError) throw authError;
+
             if (authData.user) {
                 const { error: dbError } = await supabaseClient.from('users').insert([{
-                    id: authData.user.id, full_name: name, phone: phone, email: email, tk_id: tkId, solde: 0
+                    id: authData.user.id, 
+                    full_name: name, 
+                    phone: phone, 
+                    email: email, 
+                    tk_id: tkId, 
+                    solde: 0
                 }]);
+
                 if (dbError) throw dbError;
+                
                 alert("Compte créé avec succès ! Votre ID : " + tkId);
                 showAuth('login');
             }
-        } catch (err) { alert("Erreur : " + err.message); }
+        } catch (err) { 
+            alert("Erreur : " + err.message); 
+        }
     }
 
     async function handleLogin() {
@@ -486,8 +501,7 @@ div[onclick="showPage('home')"]:active {
         }
     }
 
-    async function fetchData() {
-        // 1. Fetch User Data
+ async function fetchData() {
         const { data: u } = await supabaseClient.from('users').select('*').eq('id', currentUserId).single();
         if(u) {
             userData = u;
@@ -498,99 +512,349 @@ div[onclick="showPage('home')"]:active {
             document.getElementById('side-avatar').src = u.avatar_url || "https://via.placeholder.com/50";
         }
         
-        // 2. Fetch Transactions
         const { data: ts } = await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at', {ascending: false});
         allTransactions = ts || [];
         
-        // 3. UI Update
+        // Eto no miantso ny fampisehoana ny tantara
         renderHistory(allTransactions);
-        fetchNotifications();
+        fetchNotifications(); // Nampiana eto mba handeha ny notif
     }
 
-    // --- HISTORY RENDERING (Feno ary voahitsy) ---
-    function renderHistory(dataToRender = allTransactions) {
-        const fullContainer = document.getElementById('full-history-container');
-        const previewContainer = document.getElementById('preview-history-body');
+function renderHistory(dataToRender = allTransactions) {
+    // 1. Hamarino tsara ny ID: 
+    // preview-history-body (eo amin'ny Accueil)
+    // full-history-container (ao amin'ny pejy History)
+    const fullContainer = document.getElementById('full-history-container');
+    const previewContainer = document.getElementById('preview-history-body');
 
-        const generateHTML = (t) => {
-            try {
-                const dateObj = new Date(t.created_at);
-                const ora = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-                const datyKely = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
-                const isNegative = t.service.toLowerCase().includes('envoyer') || t.service.toLowerCase().includes('retrait');
-                
-                let colorStatus = 'var(--yellow)';
-                if(t.status === 'confirmé') colorStatus = 'var(--green)';
-                if(t.status === 'rejeté') colorStatus = 'var(--red)';
+    // 2. Function hamoronana ny HTML isaky ny andalana
+    const generateHTML = (t) => {
+        try {
+            const dateObj = new Date(t.created_at);
+            
+            // Fisehon'ny Ora (14:30)
+            const ora = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            
+            // Fisehon'ny Daty kely (09 avr.)
+            const datyKely = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+            
+            const isNegative = t.service.toLowerCase().includes('envoyer') || t.service.toLowerCase().includes('retrait');
+            
+            let colorStatus = 'var(--yellow)';
+            if(t.status === 'confirmé') colorStatus = 'var(--green)';
+            if(t.status === 'rejeté') colorStatus = 'var(--red)';
 
-                return `
-                    <div class="history-item">
-                        <div class="history-info">
-                            <div class="history-service">${t.service}</div>
-                            <div class="history-time">
-                                <span style="color:var(--yellow); font-weight:600;">${datyKely}</span> • ${ora} 
-                                <span style="margin-left:8px; color:${colorStatus}; font-size:10px; border:1px solid ${colorStatus}; padding:1px 4px; border-radius:4px; text-transform:uppercase; font-weight:700;">
-                                    ${t.status}
-                                </span>
-                            </div>
+            return `
+                <div class="history-item">
+                    <div class="history-info">
+                        <div class="history-service">${t.service}</div>
+                        <div class="history-time">
+                            <span style="color:var(--yellow); font-weight:600;">${datyKely}</span> • ${ora} 
+                            <span style="margin-left:8px; color:${colorStatus}; font-size:10px; border:1px solid ${colorStatus}; padding:1px 4px; border-radius:4px; text-transform:uppercase; font-weight:700;">
+                                ${t.status}
+                            </span>
                         </div>
-                        <div class="history-amount ${isNegative ? 'amount-red' : 'amount-green'}" style="text-align:right;">
-                            <span style="font-size:16px;">${isNegative ? '-' : '+'}${t.montant.toLocaleString()}</span>
-                            <span style="font-size:10px; margin-left:2px;">Ar</span>
-                        </div>
-                    </div>`;
-            } catch (e) { return ""; }
-        };
+                    </div>
+                    <div class="history-amount ${isNegative ? 'amount-red' : 'amount-green'}" style="text-align:right;">
+                        <span style="font-size:16px;">${isNegative ? '-' : '+'}${t.montant.toLocaleString()}</span>
+                        <span style="font-size:10px; margin-left:2px;">Ar</span>
+                    </div>
+                </div>`;
+        } catch (e) {
+            console.error("Error generating row:", e);
+            return ""; 
+        }
+    };
 
-        if(previewContainer) {
-            previewContainer.innerHTML = allTransactions.slice(0, 3).map(generateHTML).join('');
+    // 3. PREVIEW (Home Page) - 3 transactions ihany no aseho
+    if(previewContainer) {
+        // Ampiasaina ny 'allTransactions' (original) fa tsy ny 'dataToRender' (filtered)
+        previewContainer.innerHTML = allTransactions.slice(0, 3).map(generateHTML).join('');
+    }
+
+    // 4. FULL HISTORY (Page History) - Miovaova araka ny sivana (filter)
+    if(fullContainer) {
+        fullContainer.innerHTML = '';
+        
+        const data = dataToRender || [];
+        
+        if (data.length === 0) {
+            fullContainer.innerHTML = '<div style="text-align:center; padding:40px; color:var(--gray);">Aucune transaction</div>';
+            return;
         }
 
-        if(fullContainer) {
-            fullContainer.innerHTML = '';
-            const data = dataToRender || [];
-            if (data.length === 0) {
-                fullContainer.innerHTML = '<p style="text-align:center; padding:20px; color:var(--gray);">Aucune transaction</p>';
-                return;
-            }
-            const groups = data.reduce((acc, t) => {
-                const d = new Date(t.created_at);
-                const moisAnnee = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-                if (!acc[moisAnnee]) acc[moisAnnee] = [];
-                acc[moisAnnee].push(t);
-                return acc;
-            }, {});
-            for (const mois in groups) {
-                fullContainer.innerHTML += `<div class="month-header" style="padding:15px 0 10px 0; color:var(--gray); font-size:12px; font-weight:bold; border-bottom:1px solid var(--border); margin-bottom:10px;">${mois.toUpperCase()}</div>`;
-                fullContainer.innerHTML += groups[mois].map(generateHTML).join('');
-            }
+        const groups = data.reduce((acc, t) => {
+            const d = new Date(t.created_at);
+            const moisAnnee = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+            if (!acc[moisAnnee]) acc[moisAnnee] = [];
+            acc[moisAnnee].push(t);
+            return acc;
+        }, {});
+
+        for (const mois in groups) {
+            fullContainer.innerHTML += `<div class="month-header" style="padding: 15px 0 10px 0; color: var(--gray); font-size: 12px; font-weight: bold; border-bottom: 1px solid var(--border); margin-bottom: 10px;">${mois.toUpperCase()}</div>`;
+            fullContainer.innerHTML += groups[mois].map(generateHTML).join('');
         }
     }
+}
 
-    // --- Ny ambiny amin'ny UI Actions ---
-    function filterHistory(type, element) {
-        document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
-        if(element) element.classList.add('active');
-        if (type === 'Tous') renderHistory(allTransactions);
-        else renderHistory(allTransactions.filter(t => t.service.toLowerCase().includes(type.toLowerCase())));
+function filterHistory(type, element) {
+    // Manova ny lokon'ny bokotra voatsindry (Filter Chips)
+    document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
+    if(element) element.classList.add('active');
+
+    if (type === 'Tous') {
+        renderHistory(allTransactions);
+    } else {
+        const filtered = allTransactions.filter(t => 
+            t.service.toLowerCase().includes(type.toLowerCase())
+        );
+        renderHistory(filtered);
     }
+}
 
+    // --- UI ACTIONS ---
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('active');
         document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
     }
 
     function showPage(p) {
-        document.getElementById('page-home').style.display = (p === 'home') ? 'block' : 'none';
-        document.getElementById('page-history').style.display = (p === 'history') ? 'block' : 'none';
-        if (p === 'history') renderHistory(allTransactions);
+    // 1. Asehoy na afeno ny pejy mifanaraka amin'ny "p"
+    document.getElementById('page-home').style.display = (p === 'home') ? 'block' : 'none';
+    document.getElementById('page-history').style.display = (p === 'history') ? 'block' : 'none';
+
+    // 2. Raha mankany amin'ny History ny mpampiasa
+    if (p === 'history') {
+        // Refresh ny lisitra mba hiseho ny fizarana isam-bolana sy ny daty
+        renderHistory(allTransactions);
+
+        // Akatony ny sidebar RAHA toa ka misokatra izy (ohatra: avy any amin'ny menu)
         const sidebar = document.getElementById('sidebar');
-        if (sidebar && sidebar.classList.contains('active')) toggleSidebar();
-        window.scrollTo(0, 0);
+        if (sidebar && sidebar.classList.contains('active')) {
+            toggleSidebar();
+        }
+    }
+    
+    // 3. Avereno any ambony indrindra ny scroll (mba tsy hitoetra any ambany ny pejy vaovao)
+    window.scrollTo(0, 0);
+}
+    function switchMode(m) {
+        currentMode = m;
+        document.getElementById('trans-title').innerText = m + " Crypto";
+        document.getElementById('crypto-select-container').style.display = 'block';
+        document.getElementById('label-right').innerText = "Montant (Ar) :";
+        document.getElementById('unit-suffix').innerText = "Ar";
+        document.getElementById('label-addr').innerText = "Adresse / ID destinataire :";
+        
+        const asset = document.getElementById('crypto-select').value;
+        const addr = document.getElementById('input-addr');
+        if(m === 'Recevoir') {
+            document.getElementById('unit-suffix').innerText = asset;
+            document.getElementById('label-right').innerText = `Montant (${asset}) :`;
+            addr.value = ADDR_RECEPT[asset];
+            addr.readOnly = true;
+            document.getElementById('copy-btn').style.display = 'block';
+        } else {
+            addr.value = "";
+            addr.readOnly = false;
+            document.getElementById('copy-btn').style.display = 'none';
+        }
+        updateCalc();
     }
 
-    // --- Ampidiro eto ny function switchMode, executeTrans, fetchNotifications, sns... ---
-    // (Mitovy amin'ilay anao teo ihany fa ataovy azo antoka fa tsy misy double)
+    function openMobile(mode) {
+        currentMode = mode;
+        toggleSidebar();
+        document.getElementById('trans-title').innerText = mode + " Mobile Money";
+        document.getElementById('crypto-select-container').style.display = 'none';
+        document.getElementById('label-right').innerText = "Montant (Ar) :";
+        document.getElementById('unit-suffix').innerText = "Ar";
+        document.getElementById('label-addr').innerText = "Numéro Mobile (Airtel, Orange, MVola) :";
+        document.getElementById('input-addr').value = "";
+        document.getElementById('input-addr').readOnly = false;
+        document.getElementById('copy-btn').style.display = 'none';
+        updateCalc();
+    }
+
+    function updateCalc() {
+        const cry = document.getElementById('crypto-select').value;
+        const val = parseFloat(document.getElementById('input-main').value) || 0;
+        const res = document.getElementById('calc-res');
+        
+        if (currentMode.includes('Dépôt') || currentMode.includes('Retrait')) {
+            document.getElementById('calc-container').style.display = 'none';
+        } else {
+            document.getElementById('calc-container').style.display = 'flex';
+            if (currentMode === 'Envoyer') res.innerText = (val / TAUX[cry]).toFixed(2) + " " + cry;
+            else res.innerText = (val * TAUX[cry]).toLocaleString() + " Ar";
+        }
+    }
+
+    function updateIcon() {
+        const cry = document.getElementById('crypto-select').value;
+        const img = document.getElementById('asset-img');
+        if(cry === 'TRX') img.src = "https://cryptologos.cc/logos/tron-trx-logo.svg";
+        else if(cry === 'USDT') img.src = "https://cryptologos.cc/logos/tether-usdt-logo.svg";
+        else img.src = "https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg";
+        updateCalc();
+    }
+
+    async function executeTrans() {
+        if (!userData) {
+            alert("Chargement de vos données en cours, veuillez patienter...");
+            return;
+        }
+
+        const val = parseFloat(document.getElementById('input-main').value);
+        const addr = document.getElementById('input-addr').value;
+        const asset = document.getElementById('crypto-select').value;
+        const btn = document.getElementById('btn-submit');
+
+        if(!val || val <= 0) return alert("Veuillez entrer un montant !");
+        if(!addr) return alert("Veuillez entrer l'adresse ou le numéro !");
+
+        const arAmount = (currentMode === 'Recevoir') ? (val * TAUX[asset]) : val;
+        
+        if((currentMode === 'Envoyer' || currentMode === 'Retrait') && arAmount > userData.solde) {
+            return alert("Solde insuffisant ! (Solde : " + userData.solde + " Ar)");
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Envoi en cours...";
+
+        try {
+            const { error: txError } = await supabaseClient.from('transactions').insert([{
+                user_id: currentUserId,
+                montant: arAmount,
+                service: currentMode + " " + (currentMode.includes('Mobile') ? "Mobile" : asset),
+                status: "En attente",
+                adresse: addr
+            }]);
+
+            if (txError) throw txError;
+
+            if (currentMode === 'Envoyer' || currentMode === 'Retrait') {
+                const { error: upError } = await supabaseClient.from('users')
+                    .update({ solde: userData.solde - arAmount })
+                    .eq('id', currentUserId);
+                if (upError) throw upError;
+            }
+
+            alert("Transaction enregistrée ! ✅ En attente de confirmation.");
+            document.getElementById('input-main').value = "";
+            fetchData(); 
+        } catch (err) {
+            console.error("Détails de l'erreur :", err);
+            alert("Une erreur est survenue : " + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Confirmer";
+        }
+    }
+
+    function logout() { supabaseClient.auth.signOut().then(() => location.reload()); }
+    
+    function previewImage(input) {
+        if(input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => document.getElementById('modal-pp-view').src = e.target.result;
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function openProfile() {
+        document.getElementById('edit-full-name').value = userData.full_name;
+        document.getElementById('edit-phone').value = userData.phone;
+        document.getElementById('modal-pp-view').src = userData.avatar_url || "https://via.placeholder.com/100";
+        document.getElementById('modal-profile').style.display = 'flex';
+    }
+    function closeProfile() { document.getElementById('modal-profile').style.display = 'none'; }
+
+    async function updateProfile() {
+        const newName = document.getElementById('edit-full-name').value;
+        const newPhone = document.getElementById('edit-phone').value;
+        const { error } = await supabaseClient.from('users').update({ full_name: newName, phone: newPhone }).eq('id', currentUserId);
+        if(error) alert(error.message);
+        else { alert("Profil mis à jour !"); closeProfile(); fetchData(); }
+    }
+
+    function copyText() {
+        const addrInput = document.getElementById('input-addr');
+        addrInput.select();
+        document.execCommand("copy");
+        alert("Adresse copiée dans le presse-papier !");
+    }
+
+    async function fetchNotifications() {
+    const { data: notifs, error } = await supabaseClient
+        .from('notifications')
+        .select('*')
+        .eq('user_id', currentUserId)
+        .order('created_at', { ascending: false });
+
+    if (notifs) {
+        const list = document.getElementById('notif-list');
+        const countBadge = document.getElementById('notif-count');
+        const unreadCount = notifs.filter(n => !n.is_read).length;
+
+        if (unreadCount > 0) {
+            countBadge.innerText = unreadCount;
+            countBadge.style.display = 'block';
+        } else {
+            countBadge.style.display = 'none';
+        }
+
+        list.innerHTML = notifs.length ? notifs.map(n => `
+            <div class="notif-item ${n.is_read ? '' : 'unread'}">
+                <b style="color:var(--yellow)">${n.title}</b><br>
+                <span style="color:var(--gray); font-size:12px;">${n.message}</span><br>
+                <small style="font-size:10px; color:rgba(255,255,255,0.3)">${new Date(n.created_at).toLocaleString()}</small>
+            </div>
+        `).join('') : '<p style="text-align:center; padding:20px; color:var(--gray);">Aucune notification</p>';
+    }
+}
+
+function goToFullHistory() {
+    // 1. Sokafy ny pejy History (mampiasa ilay function showPage efa anananao)
+    showPage('history');
+
+    // 2. Akatony ny Sidebar raha sendra misokatra izy
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && sidebar.classList.contains('active')) {
+        toggleSidebar(); 
+    }
+
+    // 3. Ataovy "Active" ny sivana "Tous" ao amin'ny pejy History
+    const chips = document.querySelectorAll('#history-filters .filter-chip');
+    chips.forEach(chip => {
+        chip.classList.remove('active');
+        if (chip.innerText === 'Tous') {
+            chip.classList.add('active');
+        }
+    });
+
+    // 4. Avereno asiana refresh ny data mba hiseho tsara
+    renderHistory(allTransactions);
+    
+    // 5. Ampidino kely ny pejy ho any ambony indrindra (Scroll to top)
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+function toggleNotif() {
+    const panel = document.getElementById('notif-panel');
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    if (panel.style.display === 'block') fetchNotifications();
+}
+
+async function markAllRead() {
+    await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUserId);
+    fetchNotifications();
+}
+
+// Ampio ao anatin'ny fetchData() ity:
+// fetchNotifications();
 
     initApp();
 </script>
