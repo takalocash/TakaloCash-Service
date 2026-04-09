@@ -381,7 +381,12 @@ div[onclick="showPage('home')"]:active {
         <div class="filter-chip" onclick="filterHistory('Recevoir', this)">Recevoir</div>
     </div>
 
-    <div id="full-history-container"></div> 
+    <div id="full-history-body"></div> 
+    
+    <div id="full-history-container">
+        </div>
+</div>
+
 </div>
 </div>
 
@@ -516,16 +521,25 @@ div[onclick="showPage('home')"]:active {
         fetchNotifications(); // Nampiana eto mba handeha ny notif
     }
 
+
 function renderHistory(dataToRender = allTransactions) {
+    // 1. Hamarino tsara ny ID: 
+    // preview-history-body (eo amin'ny Accueil)
+    // full-history-container (ao amin'ny pejy History)
     const fullContainer = document.getElementById('full-history-container');
     const previewContainer = document.getElementById('preview-history-body');
 
-    // 1. Function hamoronana ny HTML isaky ny andalana
+    // 2. Function hamoronana ny HTML isaky ny andalana
     const generateHTML = (t) => {
         try {
             const dateObj = new Date(t.created_at);
+            
+            // Fisehon'ny Ora (14:30)
             const ora = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            
+            // Fisehon'ny Daty kely (09 avr.)
             const datyKely = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+            
             const isNegative = t.service.toLowerCase().includes('envoyer') || t.service.toLowerCase().includes('retrait');
             
             let colorStatus = 'var(--yellow)';
@@ -548,57 +562,83 @@ function renderHistory(dataToRender = allTransactions) {
                         <span style="font-size:10px; margin-left:2px;">Ar</span>
                     </div>
                 </div>`;
-        } catch (e) { return ""; }
+        } catch (e) {
+            console.error("Error generating row:", e);
+            return ""; 
+        }
     };
 
-    // 2. MAMENO NY PREVIEW (Accueil) - 3 ihany foana
-    if (previewContainer) {
-        // AllTransactions foana no ampiasaina eto fa tsy ilay dataToRender (filtered)
+    // 3. PREVIEW (Home Page) - 3 transactions ihany no aseho
+    if(previewContainer) {
+        // Ampiasaina ny 'allTransactions' (original) fa tsy ny 'dataToRender' (filtered)
         previewContainer.innerHTML = allTransactions.slice(0, 3).map(generateHTML).join('');
     }
 
-    // 3. MAMENO NY FULL HISTORY (Pejy History)
-    if (fullContainer) {
-        fullContainer.innerHTML = ''; // Diovina aloha
+    // 4. FULL HISTORY (Page History) - Miovaova araka ny sivana (filter)
+    if(fullContainer) {
+        fullContainer.innerHTML = '';
+        
         const data = dataToRender || [];
-
+        
         if (data.length === 0) {
-            fullContainer.innerHTML = '<p style="text-align:center; padding:30px; color:var(--gray);">Aucune transaction</p>';
-        } else {
-            // Grouping by month
-            const groups = data.reduce((acc, t) => {
-                const d = new Date(t.created_at);
-                const moisAnnee = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-                if (!acc[moisAnnee]) acc[moisAnnee] = [];
-                acc[moisAnnee].push(t);
-                return acc;
-            }, {});
+            fullContainer.innerHTML = '<div style="text-align:center; padding:40px; color:var(--gray);">Aucune transaction</div>';
+            return;
+        }
 
-            for (const mois in groups) {
-                fullContainer.innerHTML += `<div class="month-header" style="padding:15px 0 10px 0; color:var(--gray); font-size:12px; font-weight:bold; border-bottom:1px solid var(--border); margin-bottom:10px;">${mois.toUpperCase()}</div>`;
-                fullContainer.innerHTML += groups[mois].map(generateHTML).join('');
-            }
+        const groups = data.reduce((acc, t) => {
+            const d = new Date(t.created_at);
+            const moisAnnee = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+            if (!acc[moisAnnee]) acc[moisAnnee] = [];
+            acc[moisAnnee].push(t);
+            return acc;
+        }, {});
+
+        for (const mois in groups) {
+            fullContainer.innerHTML += `<div class="month-header" style="padding: 15px 0 10px 0; color: var(--gray); font-size: 12px; font-weight: bold; border-bottom: 1px solid var(--border); margin-bottom: 10px;">${mois.toUpperCase()}</div>`;
+            fullContainer.innerHTML += groups[mois].map(generateHTML).join('');
         }
     }
 }
-    
-function showPage(p) {
-    // Afeno daholo aloha
-    document.getElementById('page-home').style.display = 'none';
-    document.getElementById('page-history').style.display = 'none';
 
-    // Asehoy izay nangatahina
-    if (p === 'home') {
-        document.getElementById('page-home').style.display = 'block';
-        renderHistory(allTransactions); // Mba hanavao ilay 3 preview
-    } else if (p === 'history') {
-        document.getElementById('page-history').style.display = 'block';
-        renderHistory(allTransactions); // Mba hanavao ilay full list
-        
-        // Akatony ny sidebar raha misokatra
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar && sidebar.classList.contains('active')) toggleSidebar();
+function filterHistory(type, element) {
+    // Manova ny lokon'ny bokotra voatsindry (Filter Chips)
+    document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
+    if(element) element.classList.add('active');
+
+    if (type === 'Tous') {
+        renderHistory(allTransactions);
+    } else {
+        const filtered = allTransactions.filter(t => 
+            t.service.toLowerCase().includes(type.toLowerCase())
+        );
+        renderHistory(filtered);
     }
+}
+
+    // --- UI ACTIONS ---
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('active');
+        document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+    }
+
+    function showPage(p) {
+    // 1. Asehoy na afeno ny pejy mifanaraka amin'ny "p"
+    document.getElementById('page-home').style.display = (p === 'home') ? 'block' : 'none';
+    document.getElementById('page-history').style.display = (p === 'history') ? 'block' : 'none';
+
+    // 2. Raha mankany amin'ny History ny mpampiasa
+    if (p === 'history') {
+        // Refresh ny lisitra mba hiseho ny fizarana isam-bolana sy ny daty
+        renderHistory(allTransactions);
+
+        // Akatony ny sidebar RAHA toa ka misokatra izy (ohatra: avy any amin'ny menu)
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && sidebar.classList.contains('active')) {
+            toggleSidebar();
+        }
+    }
+    
+    // 3. Avereno any ambony indrindra ny scroll (mba tsy hitoetra any ambany ny pejy vaovao)
     window.scrollTo(0, 0);
 }
     function switchMode(m) {
