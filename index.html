@@ -348,10 +348,10 @@
             <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Confirmer</button>
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <b style="color:var(--gray); font-size:13px;">Transactions récentes</b>
-            <small onclick="showPage('history')" style="color:var(--yellow); cursor:pointer; font-weight:bold;">Voir tout</small>
-        </div>
+         <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h3 style="font-size:16px;">Historique</h3>
+    <span onclick="goToFullHistory()" style="color:var(--yellow); font-size:13px; cursor:pointer;">Tous</span>
+</div>
         <table class="history-table"><tbody id="preview-history-body"></tbody></table>
     </div>
 <div id="page-history" style="display:none;">
@@ -769,6 +769,33 @@ function renderHistory(dataToRender = allTransactions) {
         `).join('') : '<p style="text-align:center; padding:20px; color:var(--gray);">Aucune notification</p>';
     }
 }
+
+function goToFullHistory() {
+    // 1. Sokafy ny pejy History (mampiasa ilay function showPage efa anananao)
+    showPage('history');
+
+    // 2. Akatony ny Sidebar raha sendra misokatra izy
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && sidebar.classList.contains('active')) {
+        toggleSidebar(); 
+    }
+
+    // 3. Ataovy "Active" ny sivana "Tous" ao amin'ny pejy History
+    const chips = document.querySelectorAll('#history-filters .filter-chip');
+    chips.forEach(chip => {
+        chip.classList.remove('active');
+        if (chip.innerText === 'Tous') {
+            chip.classList.add('active');
+        }
+    });
+
+    // 4. Avereno asiana refresh ny data mba hiseho tsara
+    renderHistory(allTransactions);
+    
+    // 5. Ampidino kely ny pejy ho any ambony indrindra (Scroll to top)
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 
 function toggleNotif() {
     const panel = document.getElementById('notif-panel');
