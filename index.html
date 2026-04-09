@@ -479,7 +479,7 @@
         }
     }
 
-    async function fetchData() {
+ async function fetchData() {
         const { data: u } = await supabaseClient.from('users').select('*').eq('id', currentUserId).single();
         if(u) {
             userData = u;
@@ -489,79 +489,78 @@
             document.getElementById('header-avatar').src = u.avatar_url || "https://via.placeholder.com/35";
             document.getElementById('side-avatar').src = u.avatar_url || "https://via.placeholder.com/50";
         }
+        
         const { data: ts } = await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at', {ascending: false});
         allTransactions = ts || [];
-        renderHistory();
-    }
-
-let allTransactions = []; // Tahiry ho an'ny transactions rehetra
-
-async function loadHistory() {
-    const { data, error } = await supabaseClient
-        .from('transactions')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-    if (!error) {
-        allTransactions = data;
-        renderHistory(allTransactions); // Mampiseho azy voalohany
-    }
-}
-
-function filterHistory(type, element) {
-    // Manova ny lokon'ny bokotra voatsindry
-    document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
-    element.classList.add('active');
-
-    if (type === 'Tous') {
+        
+        // Eto no miantso ny fampisehoana ny tantara
         renderHistory(allTransactions);
-    } else {
-        const filtered = allTransactions.filter(t => 
-            t.service.toLowerCase().includes(type.toLowerCase())
-        );
-        renderHistory(filtered);
+        fetchNotifications(); // Nampiana eto mba handeha ny notif
     }
-}
 
-function renderHistory(transactions) {
-    const container = document.getElementById('full-history-container');
-    container.innerHTML = '';
+    // Ity function ity dia mampiseho na ny kely (Home) na ny lehibe (History Page)
+    function renderHistory(dataToRender) {
+        const fullContainer = document.getElementById('full-history-container');
+        const previewContainer = document.getElementById('preview-history-body'); // Hamarino raha misy io ID io ao amin'ny HTML-nao
 
-    // 1. Mizara ny transactions isam-bolana
-    const groups = transactions.reduce((acc, t) => {
-        const d = new Date(t.created_at);
-        const moisAnnee = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-        if (!acc[moisAnnee]) acc[moisAnnee] = [];
-        acc[moisAnnee].push(t);
-        return acc;
-    }, {});
-
-    // 2. Mampiseho azy eo amin'ny écran
-    for (const mois in groups) {
-        // Lohatenin'ny volana
-        container.innerHTML += `<div class="month-header">${mois.toUpperCase()}</div>`;
-
-        groups[mois].forEach(t => {
+        // 1. Function iray hamoronana ny HTML isaky ny andalana
+        const generateHTML = (t) => {
             const dateObj = new Date(t.created_at);
             const ora = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-            
-            // Raha Envoyer na Retrait dia asiana loko mena, raha hafa dia maitso
             const isNegative = t.service.toLowerCase().includes('envoyer') || t.service.toLowerCase().includes('retrait');
+            
+            let colorStatus = 'var(--yellow)';
+            if(t.status === 'confirmé') colorStatus = 'var(--green)';
+            if(t.status === 'rejeté') colorStatus = 'var(--red)';
 
-            container.innerHTML += `
+            return `
                 <div class="history-item">
                     <div class="history-info">
                         <div class="history-service">${t.service}</div>
-                        <div class="history-time">${ora}</div>
+                        <div class="history-time">${ora} - <span style="color:${colorStatus}">${t.status}</span></div>
                     </div>
                     <div class="history-amount ${isNegative ? 'amount-red' : 'amount-green'}">
                         ${isNegative ? '-' : '+'}${t.montant.toLocaleString()} Ar
                     </div>
-                </div>
-            `;
-        });
+                </div>`;
+        };
+
+        // 2. Preview ho an'ny Home Page (5 fotsiny)
+        if(previewContainer) {
+            previewContainer.innerHTML = allTransactions.slice(0, 5).map(generateHTML).join('');
+        }
+
+        // 3. Full History miaraka amin'ny Section isam-bolana
+        if(fullContainer) {
+            fullContainer.innerHTML = '';
+            const groups = dataToRender.reduce((acc, t) => {
+                const d = new Date(t.created_at);
+                const moisAnnee = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+                if (!acc[moisAnnee]) acc[moisAnnee] = [];
+                acc[moisAnnee].push(t);
+                return acc;
+            }, {});
+
+            for (const mois in groups) {
+                fullContainer.innerHTML += `<div class="month-header">${mois.toUpperCase()}</div>`;
+                fullContainer.innerHTML += groups[mois].map(generateHTML).join('');
+            }
+        }
     }
-}
+
+    function filterHistory(type, element) {
+        document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+
+        if (type === 'Tous') {
+            renderHistory(allTransactions);
+        } else {
+            const filtered = allTransactions.filter(t => 
+                t.service.toLowerCase().includes(type.toLowerCase())
+            );
+            renderHistory(filtered);
+        }
+    }
 
     // --- UI ACTIONS ---
     function toggleSidebar() {
