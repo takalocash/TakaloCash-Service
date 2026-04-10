@@ -709,57 +709,79 @@ function filterHistory(type, element) {
     }
 
     async function executeTrans() {
-        if (!userData) {
-            alert("Chargement de vos données en cours, veuillez patienter...");
-            return;
-        }
+    if (!userData) {
+        alert("Chargement de vos données en cours, veuillez patienter...");
+        return;
+    }
 
-        const val = parseFloat(document.getElementById('input-main').value);
-        const addr = document.getElementById('input-addr').value;
-        const asset = document.getElementById('crypto-select').value;
-        const btn = document.getElementById('btn-submit');
+    const val = parseFloat(document.getElementById('input-main').value);
+    const addr = document.getElementById('input-addr').value;
+    const asset = document.getElementById('crypto-select').value;
+    const btn = document.getElementById('btn-submit');
 
-        if(!val || val <= 0) return alert("Veuillez entrer un montant !");
-        if(!addr) return alert("Veuillez entrer l'adresse ou le numéro !");
+    // 1. Fakana ny anarana feno (Bitcoin (BTC), sns)
+    const fullAssetName = cryptoNames[asset] || asset;
+    const serviceName = currentMode + " " + (currentMode.includes('Mobile') ? "Mobile" : fullAssetName);
 
-        const arAmount = (currentMode === 'Recevoir') ? (val * TAUX[asset]) : val;
-        
-        if((currentMode === 'Envoyer' || currentMode === 'Retrait') && arAmount > userData.solde) {
-            return alert("Solde insuffisant ! (Solde : " + userData.solde + " Ar)");
-        }
+    if(!val || val <= 0) return alert("Veuillez entrer un montant !");
+    if(!addr) return alert("Veuillez entrer l'adresse ou le numéro !");
 
-        btn.disabled = true;
-        btn.innerText = "Envoi en cours...";
+    const arAmount = (currentMode === 'Recevoir') ? (val * TAUX[asset]) : val;
+    
+    if((currentMode === 'Envoyer' || currentMode === 'Retrait') && arAmount > userData.solde) {
+        return alert("Solde insuffisant ! (Solde : " + userData.solde.toLocaleString() + " Ar)");
+    }
 
-        try {
-            const { error: txError } = await supabaseClient.from('transactions').insert([{
+    btn.disabled = true;
+    btn.innerText = "Traitement en cours...";
+
+    try {
+        // 2. Insert Transaction + Maka ny data nivoaka (.select().single())
+        const { data: newTx, error: txError } = await supabaseClient
+            .from('transactions')
+            .insert([{
                 user_id: currentUserId,
                 montant: arAmount,
-                service: currentMode + " " + (currentMode.includes('Mobile') ? "Mobile" : asset),
+                service: serviceName,
                 status: "En attente",
                 adresse: addr
-            }]);
+            }])
+            .select()
+            .single();
 
-            if (txError) throw txError;
+        if (txError) throw txError;
 
-            if (currentMode === 'Envoyer' || currentMode === 'Retrait') {
-                const { error: upError } = await supabaseClient.from('users')
-                    .update({ solde: userData.solde - arAmount })
-                    .eq('id', currentUserId);
-                if (upError) throw upError;
-            }
-
-            alert("Transaction enregistrée ! ✅ En attente de confirmation.");
-            document.getElementById('input-main').value = "";
-            fetchData(); 
-        } catch (err) {
-            console.error("Détails de l'erreur :", err);
-            alert("Une erreur est survenue : " + err.message);
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Confirmer";
+        // 3. Update Solde raha nivoaka ny vola
+        if (currentMode === 'Envoyer' || currentMode === 'Retrait') {
+            const { error: upError } = await supabaseClient
+                .from('users')
+                .update({ solde: userData.solde - arAmount })
+                .eq('id', currentUserId);
+            if (upError) throw upError;
         }
+
+        // 4. Mamorona Notification amin'ny teny frantsay miaraka amin'ny Reference
+        const refLink = newTx.reference ? ` (Réf: ${newTx.reference})` : "";
+        await supabaseClient.from('notifications').insert([{
+            user_id: currentUserId,
+            title: "Transaction Enregistrée",
+            message: `Votre demande de ${serviceName.toLowerCase()} a été reçue avec succès.${refLink}`,
+            reference: newTx.reference, // Raha misy column reference ny table notifications-nao
+            is_read: false
+        }]);
+
+        alert("Transaction enregistrée ! ✅\nConsultez vos notifications pour le suivi.");
+        document.getElementById('input-main').value = "";
+        fetchData(); 
+
+    } catch (err) {
+        console.error("Détails de l'erreur :", err);
+        alert("Une erreur est survenue : " + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Confirmer";
     }
+}
 
     function logout() { supabaseClient.auth.signOut().then(() => location.reload()); }
     
