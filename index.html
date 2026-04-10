@@ -548,15 +548,21 @@ function renderHistory(dataToRender = allTransactions) {
 
             return `
                 <div class="history-item">
-                    <div class="history-info">
-                        <div class="history-service">${t.service}</div>
-                        <div class="history-time">
-                            <span style="color:var(--yellow); font-weight:600;">${datyKely}</span> • ${ora} 
-                            <span style="margin-left:8px; color:${colorStatus}; font-size:10px; border:1px solid ${colorStatus}; padding:1px 4px; border-radius:4px; text-transform:uppercase; font-weight:700;">
-                                ${t.status}
-                            </span>
-                        </div>
-                    </div>
+    <div class="history-info">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <div class="history-service">${t.service}</div>
+            <span style="font-size:10px; color:var(--gray); background:rgba(255,255,255,0.05); padding:2px 5px; border-radius:4px; font-family:monospace;">
+                #${t.reference || '00000000'}
+            </span>
+        </div>
+        <div class="history-time">
+            <span style="color:var(--yellow); font-weight:600;">${datyKely}</span> • ${ora} 
+            <span style="margin-left:8px; color:${colorStatus}; font-size:10px; border:1px solid ${colorStatus}; padding:1px 4px; border-radius:4px; text-transform:uppercase; font-weight:700;">
+                ${t.status}
+            </span>
+        </div>
+    </div>
+    ...
                     <div class="history-amount ${isNegative ? 'amount-red' : 'amount-green'}" style="text-align:right;">
                         <span style="font-size:16px;">${isNegative ? '-' : '+'}${t.montant.toLocaleString()}</span>
                         <span style="font-size:10px; margin-left:2px;">Ar</span>
