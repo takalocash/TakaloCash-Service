@@ -272,27 +272,30 @@ div[onclick="showPage('home')"]:active {
     </div>
 </div>
 
-<header id="nav-header" style="display:none; padding: 10px 20px; background: #121212; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; width: 100%; box-sizing: border-box;">
+<header id="nav-header" style="display:none; padding: 10px 20px; background: #121212; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000;">
     <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
+        <h1 onclick="showPage('home')" style="margin: 0; font-size: 20px; font-weight: 900; color: var(--yellow); cursor: pointer;">TAKALOCASH</h1>
         
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <i class="fas fa-bars" onclick="toggleSidebar()" style="font-size: 20px; color: white; cursor: pointer;"></i>
-            <h1 onclick="showPage('home')" style="margin: 0; font-size: 20px; font-weight: 900; color: var(--yellow); cursor: pointer; letter-spacing: -1px;">
-                TAKALOCASH
-            </h1>
-        </div>
-
         <div style="display: flex; align-items: center; gap: 18px;">
-            <div style="position: relative; cursor: pointer; display: flex; align-items: center;" onclick="toggleNotif()">
+            <div style="position: relative; cursor: pointer;" onclick="toggleNotif()">
                 <i class="fas fa-bell" style="font-size: 19px; color: white;"></i>
-                <span id="notif-count" style="display: none; position: absolute; top: -7px; right: -7px; background: var(--red); color: white; font-size: 9px; padding: 2px 5px; border-radius: 10px; font-weight: 800; border: 2px solid #121212;">0</span>
+                <span id="notif-count" style="display: none; position: absolute; top: -7px; right: -7px; background: var(--red); color: white; font-size: 9px; padding: 2px 5px; border-radius: 10px;">0</span>
             </div>
-
-            <img id="header-avatar" onclick="openProfile()" src="https://via.placeholder.com/35" 
-                 style="width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--yellow); cursor: pointer; object-fit: cover;">
+            <i class="fas fa-bars" onclick="toggleSidebar()" style="font-size: 20px; color: white; cursor: pointer;"></i>
         </div>
     </div>
 </header>
+
+<div class="action-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 20px;">
+    <div class="action-card" onclick="openMobile('Dépôt')" style="background: var(--card-bg); padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; border: 1px solid var(--border);">
+        <i class="fas fa-plus-circle" style="color: var(--green); font-size: 24px; margin-bottom: 10px;"></i>
+        <div style="font-weight: 600; font-size: 14px;">Dépôt</div>
+    </div>
+    <div class="action-card" onclick="openMobile('Retrait')" style="background: var(--card-bg); padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; border: 1px solid var(--border);">
+        <i class="fas fa-minus-circle" style="color: var(--red); font-size: 24px; margin-bottom: 10px;"></i>
+        <div style="font-weight: 600; font-size: 14px;">Retrait</div>
+    </div>
+</div>
 
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 <div class="sidebar" id="sidebar">
