@@ -272,81 +272,43 @@ div[onclick="showPage('home')"]:active {
     </div>
 </div>
 
-<header id="nav-header" style="display:none; padding: 12px 20px; background: #121212; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000;">
+<header id="nav-header" style="display:none; padding: 10px 20px; background: #121212; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; width: 100%; box-sizing: border-box;">
     <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
         
         <div style="display: flex; align-items: center; gap: 15px;">
-            <i class="fas fa-bars" onclick="toggleSidebar()" style="font-size: 22px; color: white; cursor: pointer;"></i>
-            <h1 onclick="showPage('home')" style="margin: 0; font-size: 20px; font-weight: 900; color: var(--yellow); cursor: pointer;">TAKALOCASH</h1>
+            <i class="fas fa-bars" onclick="toggleSidebar()" style="font-size: 20px; color: white; cursor: pointer;"></i>
+            <h1 onclick="showPage('home')" style="margin: 0; font-size: 20px; font-weight: 900; color: var(--yellow); cursor: pointer; letter-spacing: -1px;">
+                TAKALOCASH
+            </h1>
         </div>
 
         <div style="display: flex; align-items: center; gap: 18px;">
-            <div style="position: relative; cursor: pointer;" onclick="toggleNotif()">
-                <i class="fas fa-bell" style="font-size: 20px; color: white;"></i>
-                <span id="notif-count" style="display: none; position: absolute; top: -7px; right: -7px; background: var(--red); color: white; font-size: 9px; padding: 2px 5px; border-radius: 10px; border: 2px solid #121212;">0</span>
+            <div style="position: relative; cursor: pointer; display: flex; align-items: center;" onclick="toggleNotif()">
+                <i class="fas fa-bell" style="font-size: 19px; color: white;"></i>
+                <span id="notif-count" style="display: none; position: absolute; top: -7px; right: -7px; background: var(--red); color: white; font-size: 9px; padding: 2px 5px; border-radius: 10px; font-weight: 800; border: 2px solid #121212;">0</span>
             </div>
-            
+
             <img id="header-avatar" onclick="openProfile()" src="https://via.placeholder.com/35" 
                  style="width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--yellow); cursor: pointer; object-fit: cover;">
         </div>
     </div>
 </header>
 
-<div class="action-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 20px;">
-    <div class="action-card" onclick="openMobile('Dépôt')" style="background: var(--card-bg); padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; border: 1px solid var(--border);">
-        <i class="fas fa-plus-circle" style="color: var(--green); font-size: 24px; margin-bottom: 10px;"></i>
-        <div style="font-weight: 600; font-size: 14px;">Dépôt</div>
-    </div>
-    <div class="action-card" onclick="openMobile('Retrait')" style="background: var(--card-bg); padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; border: 1px solid var(--border);">
-        <i class="fas fa-minus-circle" style="color: var(--red); font-size: 24px; margin-bottom: 10px;"></i>
-        <div style="font-weight: 600; font-size: 14px;">Retrait</div>
-    </div>
-</div>
-
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-<div id="sidebar" style="position: fixed; top: 0; right: -280px; width: 280px; height: 100%; background: #121212; z-index: 2000; transition: 0.3s ease; padding: 25px 20px; box-sizing: border-box; box-shadow: -5px 0 20px rgba(0,0,0,0.5);">
-    
-    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-        <span style="font-weight: 800; color: var(--yellow);">MENU</span>
-        <i class="fas fa-times" onclick="toggleSidebar()" style="cursor: pointer; color: var(--gray);"></i>
-    </div>
-
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-        <div onclick="openProfile(); toggleSidebar();" style="padding: 12px; cursor: pointer; border-radius: 10px; background: rgba(255,255,255,0.03); display: flex; align-items: center;">
-            <i class="fas fa-user-circle" style="width: 25px; color: var(--yellow);"></i> Profil
-        </div>
-
-        <div onclick="showPage('history')" style="padding: 12px; cursor: pointer; border-radius: 10px; background: rgba(255,255,255,0.03); display: flex; align-items: center;">
-            <i class="fas fa-history" style="width: 25px; color: var(--yellow);"></i> Historique
-        </div>
-
-        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin: 10px 0;">
-
-        <div onclick="openMobile('Dépôt')" style="padding: 15px; cursor: pointer; border-radius: 12px; background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.2); color: #2ecc71; display: flex; align-items: center;">
-            <i class="fas fa-plus-circle" style="width: 25px;"></i> <b>Dépôt Mobile</b>
-        </div>
-
-        <div onclick="openMobile('Retrait')" style="padding: 15px; cursor: pointer; border-radius: 12px; background: rgba(231, 76, 60, 0.1); border: 1px solid rgba(231, 76, 60, 0.2); color: #e74c3c; display: flex; align-items: center;">
-            <i class="fas fa-minus-circle" style="width: 25px;"></i> <b>Retrait Mobile</b>
-        </div>
-
-        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin: 10px 0;">
-
-        <div onclick="alert('Les taux sont mis à jour quotidiennement.')" style="padding: 12px; cursor: pointer; border-radius: 10px; color: var(--gray); display: flex; align-items: center;">
-            <i class="fas fa-chart-line" style="width: 25px;"></i> Taux du jour
-        </div>
-
-        <div onclick="alert('Paramètres bientôt disponibles')" style="padding: 12px; cursor: pointer; border-radius: 10px; color: var(--gray); display: flex; align-items: center;">
-            <i class="fas fa-cog" style="width: 25px;"></i> Paramètres
+<div class="sidebar" id="sidebar">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:30px; padding-bottom:20px; border-bottom:1px solid var(--border);">
+        <img id="side-avatar" src="https://via.placeholder.com/50" style="width:50px; height:50px; border-radius:50%; border:2px solid var(--yellow); object-fit:cover;">
+        <div>
+            <div id="side-full-name" style="font-weight:bold; font-size:16px;">Chargement...</div>
+            <div id="side-tk-id" style="font-size:12px; color:var(--yellow); font-weight:800;">ID: TK-0000</div>
         </div>
     </div>
-
-    <div onclick="logout()" style="position: absolute; bottom: 30px; left: 20px; color: var(--red); cursor: pointer; font-weight: 600; font-size: 14px;">
-        <i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i> Déconnexion
-    </div>
+    <div onclick="showPage('history')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-clock-rotate-left"></i> &nbsp; Historique</div>
+    <div onclick="openMobile('Dépôt')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-plus-circle"></i> &nbsp; Dépôt Mobile</div>
+    <div onclick="openMobile('Retrait')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-minus-circle"></i> &nbsp; Retrait Mobile</div>
+    <div onclick="logout()" style="padding:15px 0; color:var(--red); cursor:pointer; margin-top:40px;"><i class="fa-solid fa-power-off"></i> &nbsp; Déconnexion</div>
 </div>
 
-    
 <div class="container" id="main-app">
     
     <div id="page-home">
@@ -662,67 +624,69 @@ function filterHistory(type, element) {
     }
 }
 
-// --- UI ACTIONS ---
-
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    if (!sidebar || !overlay) return;
-
-    sidebar.classList.toggle('active');
-    overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
-}
-
-function showPage(p) {
-    const homePage = document.getElementById('page-home');
-    const historyPage = document.getElementById('page-history');
-
-    if (homePage && historyPage) {
-        homePage.style.display = (p === 'home') ? 'block' : 'none';
-        historyPage.style.display = (p === 'history') ? 'block' : 'none';
+    // --- UI ACTIONS ---
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('active');
+        document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
     }
 
+    function showPage(p) {
+    // 1. Asehoy na afeno ny pejy mifanaraka amin'ny "p"
+    document.getElementById('page-home').style.display = (p === 'home') ? 'block' : 'none';
+    document.getElementById('page-history').style.display = (p === 'history') ? 'block' : 'none';
+
+    // 2. Raha mankany amin'ny History ny mpampiasa
     if (p === 'history') {
+        // Refresh ny lisitra mba hiseho ny fizarana isam-bolana sy ny daty
         renderHistory(allTransactions);
-    }
 
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar && sidebar.classList.contains('active')) {
-        toggleSidebar();
+        // Akatony ny sidebar RAHA toa ka misokatra izy (ohatra: avy any amin'ny menu)
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && sidebar.classList.contains('active')) {
+            toggleSidebar();
+        }
     }
-
+    
+    // 3. Avereno any ambony indrindra ny scroll (mba tsy hitoetra any ambany ny pejy vaovao)
     window.scrollTo(0, 0);
 }
+    function switchMode(m) {
+        currentMode = m;
+        document.getElementById('trans-title').innerText = m + " Crypto";
+        document.getElementById('crypto-select-container').style.display = 'block';
+        document.getElementById('label-right').innerText = "Montant (Ar) :";
+        document.getElementById('unit-suffix').innerText = "Ar";
+        document.getElementById('label-addr').innerText = "Adresse / ID destinataire :";
+        
+        const asset = document.getElementById('crypto-select').value;
+        const addr = document.getElementById('input-addr');
+        if(m === 'Recevoir') {
+            document.getElementById('unit-suffix').innerText = asset;
+            document.getElementById('label-right').innerText = `Montant (${asset}) :`;
+            addr.value = ADDR_RECEPT[asset];
+            addr.readOnly = true;
+            document.getElementById('copy-btn').style.display = 'block';
+        } else {
+            addr.value = "";
+            addr.readOnly = false;
+            document.getElementById('copy-btn').style.display = 'none';
+        }
+        updateCalc();
+    }
 
-// ETO NO NALANA ILAY SYNTAX ERROR SY ILAY OPENPROFILE VOALOHANY
-
-function switchMode(m) {
-    currentMode = m;
-    document.getElementById('trans-title').innerText = m + " Crypto";
-    document.getElementById('crypto-select-container').style.display = 'block';
-    // ... (tohizo ny ambiny amin'ny kaody switchMode-nao)
-}
-
-function openMobile(mode) {
-    // 1. TENA ILAINA: Miverina amin'ny pejy misy ny formulaire (Home)
-    showPage('home'); 
-    
-    currentMode = mode;
-    document.getElementById('trans-title').innerText = mode + " Mobile Money";
-    document.getElementById('crypto-select-container').style.display = 'none';
-    document.getElementById('label-right').innerText = "Montant (Ar) :";
-    document.getElementById('unit-suffix').innerText = "Ar";
-    document.getElementById('label-addr').innerText = "Numéro Mobile (Airtel, Orange, MVola) :";
-    document.getElementById('input-addr').value = "";
-    document.getElementById('input-addr').readOnly = false;
-    document.getElementById('copy-btn').style.display = 'none';
-    
-    // Akatony ny sidebar raha misokatra
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar && sidebar.classList.contains('active')) toggleSidebar();
-    
-    updateCalc();
-}
+    function openMobile(mode) {
+        currentMode = mode;
+        toggleSidebar();
+        document.getElementById('trans-title').innerText = mode + " Mobile Money";
+        document.getElementById('crypto-select-container').style.display = 'none';
+        document.getElementById('label-right').innerText = "Montant (Ar) :";
+        document.getElementById('unit-suffix').innerText = "Ar";
+        document.getElementById('label-addr').innerText = "Numéro Mobile (Airtel, Orange, MVola) :";
+        document.getElementById('input-addr').value = "";
+        document.getElementById('input-addr').readOnly = false;
+        document.getElementById('copy-btn').style.display = 'none';
+        updateCalc();
+    }
 
     function updateCalc() {
         const cry = document.getElementById('crypto-select').value;
@@ -909,6 +873,9 @@ async function markAllRead() {
     await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUserId);
     fetchNotifications();
 }
+
+// Ampio ao anatin'ny fetchData() ity:
+// fetchNotifications();
 
     initApp();
 </script>
