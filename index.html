@@ -668,6 +668,9 @@ function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
     
+    // Jerena raha misy ilay sidebar sy overlay vao miasa
+    if (!sidebar || !overlay) return;
+
     // Ampiana na esorina ny class 'active'
     sidebar.classList.toggle('active');
     
@@ -677,27 +680,34 @@ function toggleSidebar() {
 
 function showPage(p) {
     // 1. Asehoy na afeno ny pejy mifanaraka amin'ny "p"
-    document.getElementById('page-home').style.display = (p === 'home') ? 'block' : 'none';
-    document.getElementById('page-history').style.display = (p === 'history') ? 'block' : 'none';
+    const homePage = document.getElementById('page-home');
+    const historyPage = document.getElementById('page-history');
+
+    if (homePage && historyPage) {
+        homePage.style.display = (p === 'home') ? 'block' : 'none';
+        historyPage.style.display = (p === 'history') ? 'block' : 'none';
+    }
 
     // 2. Refresh ny History raha io no fidina
     if (p === 'history') {
-        renderHistory(allTransactions);
+        // Ataovy azo antoka fa efa voafaritra any ambony ny allTransactions
+        if (typeof renderHistory === "function") {
+            renderHistory(allTransactions);
+        }
     }
 
-    // 3. Akatony FOANA ny sidebar rehefa misy pejy voafidy (na Home na History)
+    // 3. Akatony FOANA ny sidebar rehefa mifidy pejy
     const sidebar = document.getElementById('sidebar');
-    if (sidebar.classList.contains('active')) {
+    if (sidebar && sidebar.classList.contains('active')) {
         toggleSidebar();
     }
 
-    // Miverina any an-tampony ny scroll
+    // 4. Miverina any an-tampony ny scroll
     window.scrollTo(0, 0);
 }
 
-// Function fanampiny ho an'ilay Avatar (raha mbola tsy manana ianao)
+// Function ho an'ny Avatar
 function openProfile() {
-    // Ity indray dia mandefa mivantana any amin'ny pejy profil na alert aloha
     alert("Pejy Profil: Eo am-panamboarana...");
 }
     
