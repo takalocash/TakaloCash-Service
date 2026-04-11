@@ -667,19 +667,13 @@ function filterHistory(type, element) {
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
-    
-    // Jerena raha misy ilay sidebar sy overlay vao miasa
     if (!sidebar || !overlay) return;
 
-    // Ampiana na esorina ny class 'active'
     sidebar.classList.toggle('active');
-    
-    // Asehoy na afeno ny overlay
     overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
 }
 
 function showPage(p) {
-    // 1. Asehoy na afeno ny pejy mifanaraka amin'ny "p"
     const homePage = document.getElementById('page-home');
     const historyPage = document.getElementById('page-history');
 
@@ -688,69 +682,47 @@ function showPage(p) {
         historyPage.style.display = (p === 'history') ? 'block' : 'none';
     }
 
-    // 2. Refresh ny History raha io no fidina
     if (p === 'history') {
-        // Ataovy azo antoka fa efa voafaritra any ambony ny allTransactions
-        if (typeof renderHistory === "function") {
-            renderHistory(allTransactions);
-        }
+        renderHistory(allTransactions);
     }
 
-    // 3. Akatony FOANA ny sidebar rehefa mifidy pejy
     const sidebar = document.getElementById('sidebar');
     if (sidebar && sidebar.classList.contains('active')) {
         toggleSidebar();
     }
 
-    // 4. Miverina any an-tampony ny scroll
     window.scrollTo(0, 0);
 }
 
-// Function ho an'ny Avatar
-function openProfile() {
-    alert("Pejy Profil: Eo am-panamboarana...");
+// ETO NO NALANA ILAY SYNTAX ERROR SY ILAY OPENPROFILE VOALOHANY
+
+function switchMode(m) {
+    currentMode = m;
+    document.getElementById('trans-title').innerText = m + " Crypto";
+    document.getElementById('crypto-select-container').style.display = 'block';
+    // ... (tohizo ny ambiny amin'ny kaody switchMode-nao)
 }
+
+function openMobile(mode) {
+    // 1. TENA ILAINA: Miverina amin'ny pejy misy ny formulaire (Home)
+    showPage('home'); 
     
-    // 3. Avereno any ambony indrindra ny scroll (mba tsy hitoetra any ambany ny pejy vaovao)
-    window.scrollTo(0, 0);
+    currentMode = mode;
+    document.getElementById('trans-title').innerText = mode + " Mobile Money";
+    document.getElementById('crypto-select-container').style.display = 'none';
+    document.getElementById('label-right').innerText = "Montant (Ar) :";
+    document.getElementById('unit-suffix').innerText = "Ar";
+    document.getElementById('label-addr').innerText = "Numéro Mobile (Airtel, Orange, MVola) :";
+    document.getElementById('input-addr').value = "";
+    document.getElementById('input-addr').readOnly = false;
+    document.getElementById('copy-btn').style.display = 'none';
+    
+    // Akatony ny sidebar raha misokatra
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && sidebar.classList.contains('active')) toggleSidebar();
+    
+    updateCalc();
 }
-    function switchMode(m) {
-        currentMode = m;
-        document.getElementById('trans-title').innerText = m + " Crypto";
-        document.getElementById('crypto-select-container').style.display = 'block';
-        document.getElementById('label-right').innerText = "Montant (Ar) :";
-        document.getElementById('unit-suffix').innerText = "Ar";
-        document.getElementById('label-addr').innerText = "Adresse / ID destinataire :";
-        
-        const asset = document.getElementById('crypto-select').value;
-        const addr = document.getElementById('input-addr');
-        if(m === 'Recevoir') {
-            document.getElementById('unit-suffix').innerText = asset;
-            document.getElementById('label-right').innerText = `Montant (${asset}) :`;
-            addr.value = ADDR_RECEPT[asset];
-            addr.readOnly = true;
-            document.getElementById('copy-btn').style.display = 'block';
-        } else {
-            addr.value = "";
-            addr.readOnly = false;
-            document.getElementById('copy-btn').style.display = 'none';
-        }
-        updateCalc();
-    }
-
-    function openMobile(mode) {
-        currentMode = mode;
-        toggleSidebar();
-        document.getElementById('trans-title').innerText = mode + " Mobile Money";
-        document.getElementById('crypto-select-container').style.display = 'none';
-        document.getElementById('label-right').innerText = "Montant (Ar) :";
-        document.getElementById('unit-suffix').innerText = "Ar";
-        document.getElementById('label-addr').innerText = "Numéro Mobile (Airtel, Orange, MVola) :";
-        document.getElementById('input-addr').value = "";
-        document.getElementById('input-addr').readOnly = false;
-        document.getElementById('copy-btn').style.display = 'none';
-        updateCalc();
-    }
 
     function updateCalc() {
         const cry = document.getElementById('crypto-select').value;
