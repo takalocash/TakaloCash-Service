@@ -909,29 +909,46 @@ async function markAllRead() {
 }
 
     function selectCategory(category) {
-  // 1. Mitady ny bokotra rehetra manana class 'btn-category'
-  const allButtons = document.querySelectorAll('.btn-category');
+  // 1. Alaina ny bokotra rehetra
+  const buttons = document.querySelectorAll('.category-card'); // Ataovy azo antoka fa io ny class ampiasainao
   
-  // 2. Esory ny loko mavo amin'ny bokotra rehetra aloha
-  allButtons.forEach(btn => {
-    btn.style.backgroundColor = "#1a1a1a"; // Loko maty
+  buttons.forEach(btn => {
+    // Averina amin'ny loko maizina (Default)
+    btn.style.backgroundColor = "#1c1c1e"; 
     btn.style.color = "white";
+    btn.classList.remove('active-selection');
   });
 
-  // 3. Omeo loko mavo ilay bokotra vao nokitihina
-  const selectedBtn = document.getElementById('btn-' + category);
-  selectedBtn.style.backgroundColor = "#FFD700"; // Jaune TakaloCash
-  selectedBtn.style.color = "black";
+  // 2. Jerena raha misy ilay bokotra vao voakitika
+  const targetBtn = document.getElementById('btn-' + category);
+  if (targetBtn) {
+    targetBtn.style.backgroundColor = "#FFD700"; // Jaune TakaloCash
+    targetBtn.style.color = "black";
+    targetBtn.classList.add('active-selection');
+  }
 
-  // 4. Ovaina ny soratra eo amin'ny bokotra fandraisana (Action Button)
+  // 3. Ovaina ny soratra sy ny safidy (Logic switch)
   const actionBtn = document.getElementById('main-action-text');
-  
-  if (category === '1xbet') {
-    actionBtn.innerText = 'Dépôt / Retrait';
-  } else if (category === 'starlink') {
-    actionBtn.innerText = 'Abonnement';
-  } else {
-    actionBtn.innerText = 'Envoyer / Recevoir';
+  const currencyLabel = document.getElementById('currency-label');
+
+  if (actionBtn) {
+    switch(category) {
+      case '1xbet':
+        actionBtn.innerText = "Dépôt / Retrait 1xBet";
+        if(currencyLabel) currencyLabel.innerText = "Compte 1xBet";
+        break;
+      case 'wallet':
+        actionBtn.innerText = "Transférer Wallet";
+        if(currencyLabel) currencyLabel.innerText = "Service (PayPal, Skrill...)";
+        break;
+      case 'starlink':
+        actionBtn.innerText = "Payer Abonnement";
+        if(currencyLabel) currencyLabel.innerText = "Forfait Starlink";
+        break;
+      default:
+        actionBtn.innerText = "Envoyer / Recevoir";
+        if(currencyLabel) currencyLabel.innerText = "Actif (Crypto)";
+    }
   }
 }
 
