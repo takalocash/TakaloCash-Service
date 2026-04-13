@@ -745,75 +745,10 @@ function filterHistory(type, element) {
         updateCalc();
     }
 
-    async function executeTrans() {
-    if (!userData) return alert("Chargement...");
-
-    const val = parseFloat(document.getElementById('input-main').value);
-    const addr = document.getElementById('input-addr').value;
-    const asset = document.getElementById('crypto-select').value;
-    const btn = document.getElementById('btn-submit');
-
-    const fullAssetName = cryptoNames[asset] || asset;
-    const serviceName = currentMode + " " + (currentMode.includes('Mobile') ? "Mobile" : fullAssetName);
-
-    if(!val || val <= 0) return alert("Veuillez entrer un montant valide !");
-    if(!addr) return alert("Veuillez entrer l'adresse de destination !");
-
-    const arAmount = (currentMode === 'Recevoir') ? (val * TAUX[asset]) : val;
-    
-    if((currentMode === 'Envoyer' || currentMode === 'Retrait') && arAmount > userData.solde) {
-        return alert("Solde insuffisant !");
-    }
-
-    btn.disabled = true;
-    btn.innerText = "Traitement...";
-
-const asset = (currentMode === '1XBET' || currentMode === 'Wallet' || currentMode === 'Abonnement') 
+    const asset = (currentMode === '1XBET' || currentMode === 'Wallet' || currentMode === 'Abonnement') 
               ? currentMode 
               : document.getElementById('crypto-select').value;
 
-    try {
-        // 1. Insert Transaction
-        const { data: newTx, error: txError } = await supabaseClient
-            .from('transactions')
-            .insert([{
-                user_id: currentUserId,
-                montant: arAmount,
-                service: serviceName,
-                status: "En attente",
-                adresse: addr
-            }])
-            .select()
-            .single();
-
-        if (txError) throw txError;
-
-        // 2. Update Solde (raha andefasana vola)
-        if (currentMode === 'Envoyer' || currentMode === 'Retrait') {
-            await supabaseClient.from('users').update({ solde: userData.solde - arAmount }).eq('id', currentUserId);
-        }
-
-        // 3. Notification amin'ny teny Frantsay + Reference
-        const refTag = newTx.reference ? ` (Réf: ${newTx.reference})` : "";
-        
-        await supabaseClient.from('notifications').insert([{
-            user_id: currentUserId,
-            title: "Transaction Enregistrée",
-            message: `Votre demande de ${currentMode.toLowerCase()} pour ${fullAssetName} a été bien reçue.${refTag}`,
-            is_read: false
-        }]);
-
-        alert("Succès ! Votre transaction est en cours de validation.");
-        document.getElementById('input-main').value = "";
-        fetchData(); 
-
-    } catch (err) {
-        alert("Erreur: " + err.message);
-    } finally {
-        btn.disabled = false;
-        btn.innerText = "Confirmer";
-    }
-}
     function logout() { supabaseClient.auth.signOut().then(() => location.reload()); }
     
     function previewImage(input) {
