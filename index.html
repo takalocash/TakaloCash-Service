@@ -768,6 +768,10 @@ function filterHistory(type, element) {
     btn.disabled = true;
     btn.innerText = "Traitement...";
 
+const asset = (currentMode === '1XBET' || currentMode === 'Wallet' || currentMode === 'Abonnement') 
+              ? currentMode 
+              : document.getElementById('crypto-select').value;
+
     try {
         // 1. Insert Transaction
         const { data: newTx, error: txError } = await supabaseClient
@@ -909,47 +913,57 @@ async function markAllRead() {
 }
 
     function selectCategory(category) {
-  // 1. Alaina ny bokotra rehetra
-  const buttons = document.querySelectorAll('.category-card'); // Ataovy azo antoka fa io ny class ampiasainao
-  
-  buttons.forEach(btn => {
-    // Averina amin'ny loko maizina (Default)
-    btn.style.backgroundColor = "#1c1c1e"; 
-    btn.style.color = "white";
-    btn.classList.remove('active-selection');
-  });
+    // 1. Manova ny bika (UI)
+    const buttons = document.querySelectorAll('.category-card');
+    buttons.forEach(btn => {
+        btn.style.backgroundColor = "#1c1c1e"; 
+        btn.style.color = "white";
+    });
 
-  // 2. Jerena raha misy ilay bokotra vao voakitika
-  const targetBtn = document.getElementById('btn-' + category);
-  if (targetBtn) {
-    targetBtn.style.backgroundColor = "#FFD700"; // Jaune TakaloCash
-    targetBtn.style.color = "black";
-    targetBtn.classList.add('active-selection');
-  }
-
-  // 3. Ovaina ny soratra sy ny safidy (Logic switch)
-  const actionBtn = document.getElementById('main-action-text');
-  const currencyLabel = document.getElementById('currency-label');
-
-  if (actionBtn) {
-    switch(category) {
-      case '1xbet':
-        actionBtn.innerText = "Dépôt / Retrait 1xBet";
-        if(currencyLabel) currencyLabel.innerText = "Compte 1xBet";
-        break;
-      case 'wallet':
-        actionBtn.innerText = "Transférer Wallet";
-        if(currencyLabel) currencyLabel.innerText = "Service (PayPal, Skrill...)";
-        break;
-      case 'starlink':
-        actionBtn.innerText = "Payer Abonnement";
-        if(currencyLabel) currencyLabel.innerText = "Forfait Starlink";
-        break;
-      default:
-        actionBtn.innerText = "Envoyer / Recevoir";
-        if(currencyLabel) currencyLabel.innerText = "Actif (Crypto)";
+    const targetBtn = document.getElementById('btn-' + category);
+    if (targetBtn) {
+        targetBtn.style.backgroundColor = "#FFD700"; 
+        targetBtn.style.color = "black";
     }
-  }
+
+    // 2. LOGIC: Ovaina ny Mode sy ny karazana transaction
+    const actionBtn = document.getElementById('btn-submit'); // Ny bokotra Confirmer
+    const inputAddr = document.getElementById('input-addr');
+    const cryptoSelect = document.getElementById('crypto-select-container');
+
+    // Mba tsy hidina any amin'ny historique ny pejy
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    switch(category) {
+        case '1xbet':
+            currentMode = "1XBET";
+            document.getElementById('trans-title').innerText = "Service 1xBet";
+            document.getElementById('label-addr').innerText = "ID Joueur 1xBet :";
+            cryptoSelect.style.display = 'none'; // Afeno ny safidy BTC/USDT
+            break;
+            
+        case 'wallet':
+            currentMode = "Wallet";
+            document.getElementById('trans-title').innerText = "Transfert Wallet";
+            document.getElementById('label-addr').innerText = "Email ou ID (PayPal/Skrill) :";
+            cryptoSelect.style.display = 'none';
+            break;
+
+        case 'starlink':
+            currentMode = "Abonnement";
+            document.getElementById('trans-title').innerText = "Abonnement Starlink";
+            document.getElementById('label-addr').innerText = "Numéro de compte / Email :";
+            cryptoSelect.style.display = 'none';
+            break;
+
+        default: // Crypto (Default)
+            currentMode = "Envoyer";
+            document.getElementById('trans-title').innerText = "Envoyer Crypto";
+            document.getElementById('label-addr').innerText = "Adresse de destination :";
+            cryptoSelect.style.display = 'block';
+    }
+    
+    updateCalc(); // Havaozina ny kajy
 }
 
 // Ampio ao anatin'ny fetchData() ity:
