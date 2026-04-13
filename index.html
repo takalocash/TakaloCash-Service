@@ -473,8 +473,8 @@ div[onclick="showPage('home')"]:active {
     let currentUserId = null;
     let userData = null;
     let allTransactions = [];
-    let currentMode = "Envoyer";
-
+    let currentMode = "Crypto";    // Efa Crypto izy eto
+    let currentAction = "Envoyer"; // Ampio ity andalana ity
     const TAUX = { "TRX": 150, "USDT": 4600, "1XBET": 1 };
     const ADDR_RECEPT = { "TRX": "T-RECEIVE-TRX-ADDRESS", "USDT": "T-RECEIVE-USDT-ADDRESS", "1XBET": "ID-1XBET-OFFICIAL" };
     const cryptoNames = {
@@ -962,22 +962,24 @@ function addOptions(selectElement, optionsArray) {
         selectElement.add(option);
     });
 }
-
-    function switchAction(action) {
-    currentAction = action; // 'Envoyer' na 'Recevoir'
+function switchAction(action) {
+    currentAction = action; 
     
     const copyBtn = document.getElementById('copy-btn');
     const inputAddr = document.getElementById('input-addr');
+    const cryptoSelect = document.getElementById('crypto-select');
 
     if (action === 'Recevoir') {
         inputAddr.readOnly = true;
-        copyBtn.style.display = 'block';
-        // Eto ianao no mametraka ny adresse-nao handraisana vola
-        inputAddr.value = "ADRESSE_NAO_ETOPREFIXE_" + document.getElementById('crypto-select').value;
+        if(copyBtn) copyBtn.style.display = 'block';
+        
+        // Fisorohana error raha mbola tsy feno ny select
+        const assetVal = cryptoSelect ? cryptoSelect.value : "";
+        inputAddr.value = "ADRESSE_" + assetVal; 
     } else {
         inputAddr.readOnly = false;
         inputAddr.value = "";
-        copyBtn.style.display = 'none';
+        if(copyBtn) copyBtn.style.display = 'none';
     }
 }
     
