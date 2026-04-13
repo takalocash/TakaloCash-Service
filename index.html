@@ -214,7 +214,23 @@ div[onclick="showPage('home')"]:active {
     background: #007bff; /* Na ny lokon'ny App-nao */
     color: white;
 }
-        
+
+        /* Bokotra mahazatra */
+.btn-category {
+  background-color: #1a1a1a; /* Mainty/Grey */
+  color: white;
+  padding: 15px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Bokotra rehefa voafidy (Jaune) */
+.btn-category.active {
+  background-color: #FFD700; /* Loko mavo (Gold/Jaune) */
+  color: black;
+  font-weight: bold;
+}
         .filter-chip {
             background: var(--card); border: 1px solid var(--border);
             padding: 8px 18px; border-radius: 20px; font-size: 12px;
@@ -427,6 +443,24 @@ div[onclick="showPage('home')"]:active {
     </div>
     <div id="notif-list">
         </div>
+</div>
+
+    <div class="category-grid">
+  <button id="btn-crypto" class="btn-category active" onclick="selectCategory('crypto')">
+    Crypto
+  </button>
+  
+  <button id="btn-wallet" class="btn-category" onclick="selectCategory('wallet')">
+    Wallet
+  </button>
+  
+  <button id="btn-1xbet" class="btn-category" onclick="selectCategory('1xbet')">
+    1xBet
+  </button>
+</div>
+
+<div id="action-section" style="margin-top: 20px;">
+  <button id="main-action-btn" class="btn-category active">Envoyer</button>
 </div>
 
 <script>
@@ -872,6 +906,33 @@ function toggleNotif() {
 async function markAllRead() {
     await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUserId);
     fetchNotifications();
+}
+
+    function selectCategory(category) {
+  // 1. Mitady ny bokotra rehetra manana class 'btn-category'
+  const allButtons = document.querySelectorAll('.btn-category');
+  
+  // 2. Esory ny loko mavo amin'ny bokotra rehetra aloha
+  allButtons.forEach(btn => {
+    btn.style.backgroundColor = "#1a1a1a"; // Loko maty
+    btn.style.color = "white";
+  });
+
+  // 3. Omeo loko mavo ilay bokotra vao nokitihina
+  const selectedBtn = document.getElementById('btn-' + category);
+  selectedBtn.style.backgroundColor = "#FFD700"; // Jaune TakaloCash
+  selectedBtn.style.color = "black";
+
+  // 4. Ovaina ny soratra eo amin'ny bokotra fandraisana (Action Button)
+  const actionBtn = document.getElementById('main-action-text');
+  
+  if (category === '1xbet') {
+    actionBtn.innerText = 'Dépôt / Retrait';
+  } else if (category === 'starlink') {
+    actionBtn.innerText = 'Abonnement';
+  } else {
+    actionBtn.innerText = 'Envoyer / Recevoir';
+  }
 }
 
 // Ampio ao anatin'ny fetchData() ity:
