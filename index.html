@@ -339,12 +339,23 @@ div[onclick="showPage('home')"]:active {
         </div>
 
         <div class="services-grid">
-            <div class="service-item" onclick="switchMode('Envoyer')"><div class="icon-box" style="color:#f3ba2f;"><i class="fa-brands fa-bitcoin"></i></div><b>Crypto</b></div>
-            <div class="service-item" onclick="switchMode('Envoyer')"><div class="icon-box" style="color:#8132ad;"><i class="fa-solid fa-wallet"></i></div><b>Wallet</b></div>
-            <div class="service-item" onclick="switchMode('Envoyer')"><div class="icon-box" style="background:#fff;"><img src="https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg" width="25"></div><b>1xBet</b></div>
-            <div class="service-item" onclick="switchMode('Envoyer')"><div class="icon-box" style="color:white;"><i class="fa-solid fa-satellite-dish"></i></div><b>Starlink</b></div>
-        </div>
-
+    <div class="service-item" id="btn-crypto" onclick="selectCategory('crypto')">
+        <div class="icon-box" style="color:#f3ba2f;"><i class="fa-brands fa-bitcoin"></i></div>
+        <b>Crypto</b>
+    </div>
+    <div class="service-item" id="btn-wallet" onclick="selectCategory('wallet')">
+        <div class="icon-box" style="color:#8132ad;"><i class="fa-solid fa-wallet"></i></div>
+        <b>Wallet</b>
+    </div>
+    <div class="service-item" id="btn-1xbet" onclick="selectCategory('1xbet')">
+        <div class="icon-box" style="background:#fff;"><img src="https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg" width="25"></div>
+        <b>1xBet</b>
+    </div>
+    <div class="service-item" id="btn-starlink" onclick="selectCategory('starlink')">
+        <div class="icon-box" style="color:white;"><i class="fa-solid fa-satellite-dish"></i></div>
+        <b>Starlink</b>
+    </div>
+</div>
         <div class="trans-box">
             <b id="trans-title" style="color:var(--yellow); font-size:17px; display:block; margin-bottom:15px;">Envoyer Crypto</b>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
@@ -847,6 +858,14 @@ async function markAllRead() {
     fetchNotifications();
 }
 
+    async function handleForgot() {
+    const email = document.getElementById('forgot-email').value;
+    if(!email) return alert("Ampidiro ny email-nao!");
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+    if(error) alert(error.message);
+    else alert("Efa nalefa any amin'ny mailakao ny toromarika!");
+}
+    
     function selectCategory(category) {
     // 1. Manova ny bika (UI)
     const buttons = document.querySelectorAll('.category-card');
