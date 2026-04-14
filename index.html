@@ -248,6 +248,14 @@ div[onclick="showPage('home')"]:active {
     padding: 15px; border-bottom: 1px solid var(--border); font-size: 13px;
 }
 .notif-item.unread { background: rgba(252, 213, 53, 0.05); }
+
+        #page-home {
+    display: block; /* Hita maso ny Home */
+}
+
+#page-history {
+    display: none; /* Afenina ny History amin'ny voalohany */
+}
     </style>
 </head>
 <body>
@@ -680,25 +688,27 @@ function filterHistory(type, element) {
     const historyPage = document.getElementById('page-history');
 
     if (p === 'home') {
-        homePage.style.display = 'block';
-        historyPage.style.display = 'none';
+        // Asehoy ny Home, afeno ny History
+        homePage.style.setProperty('display', 'block', 'important');
+        historyPage.style.setProperty('display', 'none', 'important');
     } 
     else if (p === 'history') {
-        homePage.style.display = 'none';
-        historyPage.style.display = 'block';
+        // Afeno ny Home, asehoy ny History
+        homePage.style.setProperty('display', 'none', 'important');
+        historyPage.style.setProperty('display', 'block', 'important');
         
-        // Rehefa mifindra pejy dia averina render ny tantara feno
+        // Refresh ny data ao anaty history
         renderHistory(allTransactions);
         
-        // Akatony ny sidebar raha sendra misokatra
+        // Akatony ny sidebar raha sendra misokatra izy
         const sidebar = document.getElementById('sidebar');
         if (sidebar && sidebar.classList.contains('active')) {
             toggleSidebar();
         }
     }
     
-    // Averina any ambony indrindra ny scroll
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Averina any ambony indrindra ny scroll isaky ny miova pejy
+    window.scrollTo(0, 0);
 }
 
     function switchMode(m) {
