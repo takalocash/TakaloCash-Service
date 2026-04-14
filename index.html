@@ -572,14 +572,20 @@ div[onclick="showPage('home')"]:active {
 function renderHistory(dataToRender = allTransactions) {
     const fullContainer = document.getElementById('full-history-container');
     const previewContainer = document.getElementById('preview-history-body');
+    const historyPage = document.getElementById('page-history');
 
+    // 1. Function mpanampy hamoronana ny HTML isaky ny andalana
     const generateHTML = (t) => {
         try {
             const dateObj = new Date(t.created_at);
             const ora = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
             const datyKely = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
             
-            const isNegative = t.service.toLowerCase().includes('envoyer') || t.service.toLowerCase().includes('retrait');
+            // Fantarina raha Envoyer/Retrait (Mena) na Recevoir/Depot (Maitso)
+            const serviceName = t.service.toLowerCase();
+            const isNegative = serviceName.includes('envoyer') || 
+                               serviceName.includes('retrait') || 
+                               serviceName.includes('abonnement');
             
             let colorStatus = 'var(--yellow)';
             if(t.status === 'confirmé') colorStatus = 'var(--green)';
@@ -612,23 +618,24 @@ function renderHistory(dataToRender = allTransactions) {
         }
     };
 
-    // 3. PREVIEW (Home Page) - 3 transactions ihany no aseho
-    if(previewContainer) {
-        // Ampiasaina ny 'allTransactions' (original) fa tsy ny 'dataToRender' (filtered)
+    // 2. PREVIEW (Home Page) - 3 farany ihany no aseho foana
+    if (previewContainer) {
         previewContainer.innerHTML = allTransactions.slice(0, 3).map(generateHTML).join('');
     }
 
-    // 4. FULL HISTORY (Page History) - Miovaova araka ny sivana (filter)
-    if(fullContainer) {
+    // 3. FULL HISTORY (Page History)
+    // Tsy mandeha ity raha tsy hita (visible) ny pejy History
+    if (fullContainer && historyPage && historyPage.style.display !== 'none') {
         fullContainer.innerHTML = '';
         
         const data = dataToRender || [];
         
         if (data.length === 0) {
-            fullContainer.innerHTML = '<div style="text-align:center; padding:40px; color:var(--gray);">Aucune transaction</div>';
+            fullContainer.innerHTML = '<div style="text-align:center; padding:40px; color:var(--gray);">Aucune transaction trouvée</div>';
             return;
         }
 
+        // Fitambarana isam-bolana (Grouping by Month)
         const groups = data.reduce((acc, t) => {
             const d = new Date(t.created_at);
             const moisAnnee = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
@@ -638,7 +645,10 @@ function renderHistory(dataToRender = allTransactions) {
         }, {});
 
         for (const mois in groups) {
-            fullContainer.innerHTML += `<div class="month-header" style="padding: 15px 0 10px 0; color: var(--gray); font-size: 12px; font-weight: bold; border-bottom: 1px solid var(--border); margin-bottom: 10px;">${mois.toUpperCase()}</div>`;
+            fullContainer.innerHTML += `
+                <div class="month-header" style="padding: 15px 0 10px 0; color: var(--gray); font-size: 11px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; letter-spacing: 1px;">
+                    ${mois.toUpperCase()}
+                </div>`;
             fullContainer.innerHTML += groups[mois].map(generateHTML).join('');
         }
     }
