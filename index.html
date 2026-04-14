@@ -746,9 +746,6 @@ function filterHistory(type, element) {
         updateCalc();
     }
 
-    const asset = (currentMode === '1XBET' || currentMode === 'Wallet' || currentMode === 'Abonnement') 
-              ? currentMode 
-              : document.getElementById('crypto-select').value;
 
     function logout() { supabaseClient.auth.signOut().then(() => location.reload()); }
     
@@ -855,7 +852,6 @@ async function markAllRead() {
     if(error) alert(error.message);
     else alert("Efa nalefa any amin'ny mailakao ny toromarika!");
 }
-    let currentMode = "Crypto"; // Variable hitahirizana ny sokajy voafidy
 
 function selectCategory(category) {
     // 1. UI: Esory ny loko mavo (active) amin'ny service-item rehetra
