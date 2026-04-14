@@ -946,6 +946,7 @@ function selectCategory(category) {
     // Havaozina ny sary kely (icon) sy ny kajy (calcul)
     if (typeof updateIcon === "function") updateIcon();
     if (typeof updateCalc === "function") updateCalc();
+
 }
 
 // Function mpanampy: Manampy safidy (options) ao anaty select
@@ -959,24 +960,50 @@ function addOptions(selectElement, optionsArray) {
     });
 }
 function switchAction(action) {
-    currentAction = action; 
+    currentAction = action; // 'Envoyer' na 'Recevoir'
     
-    const copyBtn = document.getElementById('copy-btn');
+    const transTitle = document.getElementById('trans-title');
+    const labelAddr = document.getElementById('label-addr');
     const inputAddr = document.getElementById('input-addr');
-    const cryptoSelect = document.getElementById('crypto-select');
+    const copyBtn = document.getElementById('copy-btn');
 
+    // 1. Manova ny Lohateny arakaraka ny Sokajy sy ny Hetsika (Action)
+    if (currentMode === "Crypto") {
+        transTitle.innerText = action + " Crypto";
+    } 
+    else if (currentMode === "Wallet") {
+        transTitle.innerText = action + " Wallets";
+    } 
+    else if (currentMode === "Betting") {
+        // Raha Betting: Envoyer -> Depot, Recevoir -> Retrait
+        transTitle.innerText = (action === "Envoyer") ? "Dépôt Betting" : "Retrait Betting";
+    } 
+    else if (currentMode === "Abonnement") {
+        transTitlet = "Abonnement Service";
+    }
+
+    // 2. Logic ho an'ny Adresse sy ny Copy Button
     if (action === 'Recevoir') {
         inputAddr.readOnly = true;
         if(copyBtn) copyBtn.style.display = 'block';
+        labelAddr.innerText = "Votre adresse de réception :";
         
-        // Fisorohana error raha mbola tsy feno ny select
-        const assetVal = cryptoSelect ? cryptoSelect.value : "";
-        inputAddr.value = "ADRESSE_" + assetVal; 
+        const assetVal = document.getElementById('crypto-select') ? document.getElementById('crypto-select').value : "";
+        inputAddr.value = "ADRESSE_NAO_" + assetVal; 
     } else {
         inputAddr.readOnly = false;
         inputAddr.value = "";
         if(copyBtn) copyBtn.style.display = 'none';
+        
+        // Averina ny Label fampidirana adresse mahazatra
+        if (currentMode === "Crypto") labelAddr.innerText = "Adresse de destination :";
+        else if (currentMode === "Betting") labelAddr.innerText = "ID Joueur (Compte) :";
+        else labelAddr.innerText = "Email ou ID Portefeuille :";
     }
+
+    // Manova loko ny bokotra Envoyer/Recevoir
+    document.getElementById('main-env-btn').classList.toggle('active', action === 'Envoyer');
+    document.getElementById('main-rec-btn').classList.toggle('active', action === 'Recevoir');
 }
     
 // Ampio ao anatin'ny fetchData() ity:
