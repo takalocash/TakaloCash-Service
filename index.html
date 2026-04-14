@@ -666,25 +666,31 @@ function filterHistory(type, element) {
     }
 
     function showPage(p) {
-    // 1. Asehoy na afeno ny pejy mifanaraka amin'ny "p"
-    document.getElementById('page-home').style.display = (p === 'home') ? 'block' : 'none';
-    document.getElementById('page-history').style.display = (p === 'history') ? 'block' : 'none';
+    const homePage = document.getElementById('page-home');
+    const historyPage = document.getElementById('page-history');
 
-    // 2. Raha mankany amin'ny History ny mpampiasa
-    if (p === 'history') {
-        // Refresh ny lisitra mba hiseho ny fizarana isam-bolana sy ny daty
+    if (p === 'home') {
+        homePage.style.display = 'block';
+        historyPage.style.display = 'none';
+    } 
+    else if (p === 'history') {
+        homePage.style.display = 'none';
+        historyPage.style.display = 'block';
+        
+        // Rehefa mifindra pejy dia averina render ny tantara feno
         renderHistory(allTransactions);
-
-        // Akatony ny sidebar RAHA toa ka misokatra izy (ohatra: avy any amin'ny menu)
+        
+        // Akatony ny sidebar raha sendra misokatra
         const sidebar = document.getElementById('sidebar');
         if (sidebar && sidebar.classList.contains('active')) {
             toggleSidebar();
         }
     }
     
-    // 3. Avereno any ambony indrindra ny scroll (mba tsy hitoetra any ambany ny pejy vaovao)
-    window.scrollTo(0, 0);
+    // Averina any ambony indrindra ny scroll
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
     function switchMode(m) {
         currentMode = m;
         document.getElementById('trans-title').innerText = m + " Crypto";
