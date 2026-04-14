@@ -430,8 +430,6 @@ div[onclick="showPage('home')"]:active {
         <div class="filter-chip" onclick="filterHistory('Recevoir', this)">Recevoir</div>
     </div>
 
-    <div id="full-history-body"></div> 
-    
     <div id="full-history-container">
         </div>
 </div>
@@ -633,8 +631,7 @@ function renderHistory(dataToRender = allTransactions) {
 
     // 3. FULL HISTORY (Page History)
     // Tsy mandeha ity raha tsy hita (visible) ny pejy History
-    if (fullContainer && historyPage && historyPage.style.display !== 'none') {
-        fullContainer.innerHTML = '';
+    if (fullContainer)
         
         const data = dataToRender || [];
         
@@ -683,31 +680,23 @@ function filterHistory(type, element) {
         document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
     }
 
-    function showPage(p) {
+function showPage(p) {
     const homePage = document.getElementById('page-home');
     const historyPage = document.getElementById('page-history');
 
+    homePage.style.display = 'none';
+    historyPage.style.display = 'none';
+
     if (p === 'home') {
-        // Asehoy ny Home, afeno ny History
-        homePage.style.setProperty('display', 'block', 'important');
-        historyPage.style.setProperty('display', 'none', 'important');
-    } 
-    else if (p === 'history') {
-        // Afeno ny Home, asehoy ny History
-        homePage.style.setProperty('display', 'none', 'important');
-        historyPage.style.setProperty('display', 'block', 'important');
-        
-        // Refresh ny data ao anaty history
-        renderHistory(allTransactions);
-        
-        // Akatony ny sidebar raha sendra misokatra izy
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar && sidebar.classList.contains('active')) {
-            toggleSidebar();
-        }
+        homePage.style.display = 'block';
+    } else if (p === 'history') {
+        historyPage.style.display = 'block';
+        renderHistory(allTransactions); // IMPORTANT
     }
     
-    // Averina any ambony indrindra ny scroll isaky ny miova pejy
+const sidebar = document.getElementById('sidebar');
+        if (sidebar && sidebar.classList.contains('active')) {
+            toggleSidebar();
     window.scrollTo(0, 0);
 }
 
