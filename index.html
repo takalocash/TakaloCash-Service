@@ -1020,13 +1020,17 @@
     }
 
     function addOptions(selectElement, optionsArray) {
-        if (!selectElement) return;
-        optionsArray.forEach(opt => {
-            const option = document.createElement('option');
-            option.value = opt.val;
-            option.text  = opt.txt;
-            selectElement.add(option);
-        });
+    if (!selectElement) return; // Fisorohana error raha tsy hita ilay select
+    
+    // Diovina aloha ilay lisitra taloha
+    selectElement.innerHTML = ""; 
+    
+    optionsArray.forEach(opt => {
+        let option = document.createElement('option');
+        option.value = opt.val;
+        option.text = opt.txt;
+        selectElement.add(option);
+    });
     }
 
     // =====================================================
