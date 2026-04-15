@@ -168,69 +168,39 @@
         .history-table { width: 100%; border-collapse: collapse; }
         .history-table td { padding: 15px 0; border-bottom: 1px solid var(--border); }
 
-.month-header {
-    background: #f8f9fa;
-    padding: 8px 15px;
-    font-weight: bold;
-    font-size: 13px;
-    color: #777;
-    margin-top: 15px;
-    border-radius: 5px;
-}
+        .month-header {
+            padding: 15px 0 10px 0;
+            color: var(--gray);
+            font-size: 11px;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
 
-.history-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-}
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
 
-.history-service {
-    font-weight: 500;
-    font-size: 15px;
-}
+        .history-service {
+            font-weight: 500;
+            font-size: 15px;
+        }
 
-.history-time {
-    font-size: 12px;
-    color: #999;
-}
+        .history-time {
+            font-size: 12px;
+            color: #999;
+        }
 
-        #page-history h2 {
-    color: white;
-}
+        #page-history h2 { color: white; }
 
-/* Rehefa tsindriana ilay bokotra retour dia misy effet kely */
-div[onclick="showPage('home')"]:active {
-    transform: scale(0.9);
-    background: var(--bg-nav);
-    transition: 0.2s;
-}
+        .amount-red { color: #ff4d4d; font-weight: bold; }
+        .amount-green { color: #27ae60; font-weight: bold; }
 
-.amount-red { color: #ff4d4d; font-weight: bold; }
-.amount-green { color: #27ae60; font-weight: bold; }
-
-.filter-chip.active {
-    background: #007bff; /* Na ny lokon'ny App-nao */
-    color: white;
-}
-
-        /* Bokotra mahazatra */
-.btn-category {
-  background-color: #1a1a1a; /* Mainty/Grey */
-  color: white;
-  padding: 15px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-}
-
-/* Bokotra rehefa voafidy (Jaune) */
-.btn-category.active {
-  background-color: #FFD700; /* Loko mavo (Gold/Jaune) */
-  color: black;
-  font-weight: bold;
-}
         .filter-chip {
             background: var(--card); border: 1px solid var(--border);
             padding: 8px 18px; border-radius: 20px; font-size: 12px;
@@ -239,27 +209,25 @@ div[onclick="showPage('home')"]:active {
         .filter-chip.active { background: var(--yellow); color: black; border-color: var(--yellow); }
 
         #notif-panel {
-    position: fixed; top: 70px; right: 20px; width: 300px; 
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 20px; display: none; z-index: 8000;
-    max-height: 400px; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-.notif-item {
-    padding: 15px; border-bottom: 1px solid var(--border); font-size: 13px;
-}
-.notif-item.unread { background: rgba(252, 213, 53, 0.05); }
+            position: fixed; top: 70px; right: 20px; width: 300px; 
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 20px; display: none; z-index: 8000;
+            max-height: 400px; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .notif-item {
+            padding: 15px; border-bottom: 1px solid var(--border); font-size: 13px;
+        }
+        .notif-item.unread { background: rgba(252, 213, 53, 0.05); }
 
-        #page-home {
-    display: block; /* Hita maso ny Home */
-}
-
-#page-history {
-    display: none; /* Afenina ny History amin'ny voalohany */
-}
+        #page-home { display: block; }
+        #page-history { display: none; }
     </style>
 </head>
 <body>
 
+<!-- ============================
+     AUTH CONTAINER
+     ============================ -->
 <div id="auth-container">
     <div class="auth-box" id="login-form">
         <h1>Connexion</h1>
@@ -296,6 +264,9 @@ div[onclick="showPage('home')"]:active {
     </div>
 </div>
 
+<!-- ============================
+     HEADER / NAV
+     ============================ -->
 <header id="nav-header" style="display:none; padding: 10px 20px; background: #121212; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; width: 100%; box-sizing: border-box;">
     <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
         
@@ -318,6 +289,9 @@ div[onclick="showPage('home')"]:active {
     </div>
 </header>
 
+<!-- ============================
+     SIDEBAR & OVERLAY
+     ============================ -->
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 <div class="sidebar" id="sidebar">
     <div style="display:flex; align-items:center; gap:12px; margin-bottom:30px; padding-bottom:20px; border-bottom:1px solid var(--border);">
@@ -333,45 +307,55 @@ div[onclick="showPage('home')"]:active {
     <div onclick="logout()" style="padding:15px 0; color:var(--red); cursor:pointer; margin-top:40px;"><i class="fa-solid fa-power-off"></i> &nbsp; Déconnexion</div>
 </div>
 
+<!-- ============================
+     MAIN APP
+     ============================ -->
 <div class="container" id="main-app">
-    
+
+    <!-- PAGE : HOME -->
     <div id="page-home">
-    <div class="solde-card">
-        <div style="color:var(--gray); font-size:12px; font-weight:600; text-transform:uppercase;">Solde Disponible</div>
-        <h1 class="solde-amount" id="display-solde">0 Ar</h1>
-    </div>
 
-    <div class="services-grid">
-        <div class="service-item active" id="btn-crypto" onclick="selectCategory('crypto')">
-            <div class="icon-box" style="color:#f3ba2f;"><i class="fa-solid fa-coins"></i></div>
-            <b>Crypto</b>
+        <!-- Solde -->
+        <div class="solde-card">
+            <div style="color:var(--gray); font-size:12px; font-weight:600; text-transform:uppercase;">Solde Disponible</div>
+            <h1 class="solde-amount" id="display-solde">0 Ar</h1>
         </div>
-        <div class="service-item" id="btn-wallet" onclick="selectCategory('wallet')">
-            <div class="icon-box" style="color:#8132ad;"><i class="fa-solid fa-wallet"></i></div>
-            <b>Wallets</b>
-        </div>
-        <div class="service-item" id="btn-betting" onclick="selectCategory('betting')">
-            <div class="icon-box" style="color:#2ebd85;"><i class="fa-solid fa-gamepad"></i></div>
-            <b>Betting</b>
-        </div>
-        <div class="service-item" id="btn-abonnement" onclick="selectCategory('abonnement')">
-            <div class="icon-box" style="color:#ff4d4d;"><i class="fa-solid fa-tv"></i></div>
-            <b>Abonnement</b>
-        </div>
-    </div>
 
-    <div class="main-actions">
-        <button class="btn-action btn-env" id="main-env-btn" onclick="switchAction('Envoyer')">
-            <i class="fa-solid fa-paper-plane"></i> Envoyer
-        </button>
-        <button class="btn-action btn-rec" id="main-rec-btn" onclick="switchAction('Recevoir')">
-            <i class="fa-solid fa-qrcode"></i> Recevoir
-        </button>
-    </div>
-
-    <div class="trans-box">
+        <!-- Catégories de services -->
+        <div class="services-grid">
+            <div class="service-item active" id="btn-crypto" onclick="selectCategory('crypto')">
+                <div class="icon-box" style="color:#f3ba2f;"><i class="fa-solid fa-coins"></i></div>
+                <b>Crypto</b>
+            </div>
+            <div class="service-item" id="btn-wallet" onclick="selectCategory('wallet')">
+                <div class="icon-box" style="color:#8132ad;"><i class="fa-solid fa-wallet"></i></div>
+                <b>Wallets</b>
+            </div>
+            <div class="service-item" id="btn-betting" onclick="selectCategory('betting')">
+                <div class="icon-box" style="color:#2ebd85;"><i class="fa-solid fa-gamepad"></i></div>
+                <b>Betting</b>
+            </div>
+            <div class="service-item" id="btn-abonnement" onclick="selectCategory('abonnement')">
+                <div class="icon-box" style="color:#ff4d4d;"><i class="fa-solid fa-tv"></i></div>
+                <b>Abonnement</b>
+            </div>
         </div>
-</div>
+
+        <!-- Actions principales Envoyer / Recevoir -->
+        <div class="main-actions">
+            <button class="btn-action btn-env" id="main-env-btn" onclick="switchAction('Envoyer')">
+                <i class="fa-solid fa-paper-plane"></i> Envoyer
+            </button>
+            <button class="btn-action btn-rec" id="main-rec-btn" onclick="switchAction('Recevoir')">
+                <i class="fa-solid fa-qrcode"></i> Recevoir
+            </button>
+        </div>
+
+        <!-- =====================================================
+             FIX #5 — Le formulaire trans-box est maintenant
+             correctement placé DANS #page-home (l'ancien
+             trans-box vide a été supprimé).
+             ===================================================== -->
         <div class="trans-box">
             <b id="trans-title" style="color:var(--yellow); font-size:17px; display:block; margin-bottom:15px;">Envoyer Crypto</b>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
@@ -408,35 +392,43 @@ div[onclick="showPage('home')"]:active {
             <button class="btn-valider" id="btn-submit" onclick="executeTrans()">Confirmer</button>
         </div>
 
-         <div style="display:flex; justify-content:space-between; align-items:center;">
-    <h3 style="font-size:16px;">Historique</h3>
-    <span onclick="goToFullHistory()" style="color:var(--yellow); font-size:13px; cursor:pointer;">Tous</span>
-</div>
+        <!-- Aperçu de l'historique -->
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="font-size:16px;">Historique</h3>
+            <span onclick="goToFullHistory()" style="color:var(--yellow); font-size:13px; cursor:pointer;">Tous</span>
+        </div>
         <table class="history-table"><tbody id="preview-history-body"></tbody></table>
+
     </div>
-<div id="page-history" style="display:none;">
-    <div style="display:flex; align-items:center; gap:15px; padding:10px 0 20px 0;">
-        <div onclick="showPage('home')" style="cursor:pointer; width:40px; height:40px; background:var(--card); border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center;">
-            <i class="fas fa-arrow-left" style="color:var(--yellow); font-size:18px;"></i>
+    <!-- FIN PAGE HOME -->
+
+    <!-- PAGE : HISTORY -->
+    <div id="page-history" style="display:none;">
+        <div style="display:flex; align-items:center; gap:15px; padding:10px 0 20px 0;">
+            <div onclick="showPage('home')" style="cursor:pointer; width:40px; height:40px; background:var(--card); border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-arrow-left" style="color:var(--yellow); font-size:18px;"></i>
+            </div>
+            <h2 style="margin:0; font-size:20px; font-weight:800; letter-spacing:-0.5px;">Historique</h2>
         </div>
-        <h2 style="margin:0; font-size:20px; font-weight:800; letter-spacing:-0.5px;">Historique</h2>
-    </div>
 
-    <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:15px;" id="history-filters">
-        <div class="filter-chip active" onclick="filterHistory('Tous', this)">Tous</div>
-        <div class="filter-chip" onclick="filterHistory('Envoyer', this)">Envoyer</div>
-        <div class="filter-chip" onclick="filterHistory('Retrait', this)">Retrait</div>
-        <div class="filter-chip" onclick="filterHistory('Dépôt', this)">Dépôt</div>
-        <div class="filter-chip" onclick="filterHistory('Recevoir', this)">Recevoir</div>
-    </div>
-
-    <div id="full-history-container">
+        <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:15px;" id="history-filters">
+            <div class="filter-chip active" onclick="filterHistory('Tous', this)">Tous</div>
+            <div class="filter-chip" onclick="filterHistory('Envoyer', this)">Envoyer</div>
+            <div class="filter-chip" onclick="filterHistory('Retrait', this)">Retrait</div>
+            <div class="filter-chip" onclick="filterHistory('Dépôt', this)">Dépôt</div>
+            <div class="filter-chip" onclick="filterHistory('Recevoir', this)">Recevoir</div>
         </div>
-</div>
+
+        <div id="full-history-container"></div>
+    </div>
+    <!-- FIN PAGE HISTORY -->
 
 </div>
-</div>
+<!-- FIN MAIN APP -->
 
+<!-- ============================
+     MODAL PROFIL
+     ============================ -->
 <div id="modal-profile" class="modal">
     <div style="background:var(--card); padding:25px; border-radius:28px; width:100%; max-width:350px; border:1px solid var(--border); text-align:center;">
         <h3 style="color:var(--yellow); margin-top:0;">Paramètres du Profil</h3>
@@ -461,17 +453,27 @@ div[onclick="showPage('home')"]:active {
     </div>
 </div>
 
-    <div id="notif-panel">
+<!-- ============================
+     PANEL NOTIFICATIONS
+     ============================ -->
+<div id="notif-panel">
     <div style="padding:15px; font-weight:bold; border-bottom:1px solid var(--border); display:flex; justify-content:space-between;">
         Notifications
         <small style="color:var(--yellow); cursor:pointer;" onclick="markAllRead()">Tout lire</small>
     </div>
-    <div id="notif-list">
-        </div>
-    </div>
+    <div id="notif-list"></div>
+</div>
 
+<!-- ============================
+     JAVASCRIPT
+     ============================ -->
 <script>
-    // --- SUPABASE CONFIG ---
+    // =====================================================
+    // SUPABASE CONFIG
+    // CONSEIL #8 : La clé anon est publique par design mais
+    // veillez à activer les Row Level Security (RLS) sur
+    // toutes vos tables dans le dashboard Supabase.
+    // =====================================================
     const _URL = "https://nyeopreahmajoisartoz.supabase.co";
     const _KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA";
     const supabaseClient = supabase.createClient(_URL, _KEY);
@@ -479,74 +481,108 @@ div[onclick="showPage('home')"]:active {
     let currentUserId = null;
     let userData = null;
     let allTransactions = [];
-    let currentMode = "Crypto";    // Efa Crypto izy eto
-    let currentAction = "Envoyer"; // Ampio ity andalana ity
-    const TAUX = { "TRX": 150, "USDT": 4600, "1XBET": 1 };
-    const ADDR_RECEPT = { "TRX": "T-RECEIVE-TRX-ADDRESS", "USDT": "T-RECEIVE-USDT-ADDRESS", "1XBET": "ID-1XBET-OFFICIAL" };
+    let currentMode = "Crypto";
+    let currentAction = "Envoyer";
+
+    // =====================================================
+    // FIX #4 — TAUX complété avec tous les actifs utilisés
+    // dans selectCategory() : BTC, wallets, betting, abonnements.
+    // =====================================================
+    const TAUX = {
+        "TRX": 150,
+        "USDT": 4600,
+        "1XBET": 1,
+        "BTC": 150000000,
+        "PAYPAL": 4600,
+        "SKRILL": 4600,
+        "PAYEER": 4600,
+        "BET365": 1,
+        "MELBET": 1,
+        "NETFLIX": 1,
+        "STARLINK": 1,
+        "FACEBOOK": 1
+    };
+
+    const ADDR_RECEPT = {
+        "TRX": "T-RECEIVE-TRX-ADDRESS",
+        "USDT": "T-RECEIVE-USDT-ADDRESS",
+        "1XBET": "ID-1XBET-OFFICIAL"
+    };
+
     const cryptoNames = {
-    "TRX": "Tron (TRX)",
-    "USDT": "Tether (USDT)",
-    "1XBET": "1XBet (Bonus/Deposit)",
-    "BTC": "Bitcoin (BTC)"
-};
-    
-    // --- AUTH LOGIC ---
+        "TRX": "Tron (TRX)",
+        "USDT": "Tether (USDT)",
+        "1XBET": "1XBet (Bonus/Deposit)",
+        "BTC": "Bitcoin (BTC)"
+    };
+
+    // =====================================================
+    // AUTH LOGIC
+    // =====================================================
     function showAuth(mode) {
-        document.getElementById('login-form').style.display = mode === 'login' ? 'block' : 'none';
+        document.getElementById('login-form').style.display  = mode === 'login'  ? 'block' : 'none';
         document.getElementById('signup-form').style.display = mode === 'signup' ? 'block' : 'none';
         document.getElementById('forgot-form').style.display = mode === 'forgot' ? 'block' : 'none';
     }
 
     async function handleSignUp() {
-        const name = document.getElementById('reg-name').value.trim();
-        const phone = document.getElementById('reg-phone').value.trim();
-        const email = document.getElementById('reg-email').value.trim();
-        const pass = document.getElementById('reg-pass').value;
+        const name    = document.getElementById('reg-name').value.trim();
+        const phone   = document.getElementById('reg-phone').value.trim();
+        const email   = document.getElementById('reg-email').value.trim();
+        const pass    = document.getElementById('reg-pass').value;
+
+        // FIX #7 — Vérification de la confirmation du mot de passe
+        const confirm = document.getElementById('reg-confirm').value;
+        if (pass !== confirm) return alert("Les mots de passe ne correspondent pas !");
 
         if (!name || !phone || !email || !pass) return alert("Veuillez remplir tous les champs !");
 
         const tkId = "TK-" + Math.floor(1000 + Math.random() * 9000);
 
         try {
-            const { data: authData, error: authError } = await supabaseClient.auth.signUp({ 
-                email, 
-                password: pass 
-            });
-
+            const { data: authData, error: authError } = await supabaseClient.auth.signUp({ email, password: pass });
             if (authError) throw authError;
 
             if (authData.user) {
                 const { error: dbError } = await supabaseClient.from('users').insert([{
-                    id: authData.user.id, 
-                    full_name: name, 
-                    phone: phone, 
-                    email: email, 
-                    tk_id: tkId, 
+                    id: authData.user.id,
+                    full_name: name,
+                    phone: phone,
+                    email: email,
+                    tk_id: tkId,
                     solde: 0
                 }]);
-
                 if (dbError) throw dbError;
-                
                 alert("Compte créé avec succès ! Votre ID : " + tkId);
                 showAuth('login');
             }
-        } catch (err) { 
-            alert("Erreur : " + err.message); 
+        } catch (err) {
+            alert("Erreur : " + err.message);
         }
     }
 
     async function handleLogin() {
         const email = document.getElementById('login-email').value;
-        const pass = document.getElementById('login-pass').value;
+        const pass  = document.getElementById('login-pass').value;
         const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-        if(error) return alert("Email ou mot de passe incorrect !");
+        if (error) return alert("Email ou mot de passe incorrect !");
         initApp();
     }
 
-    // --- APP LOGIC ---
+    async function handleForgot() {
+        const email = document.getElementById('forgot-email').value;
+        if (!email) return alert("Ampidiro ny email-nao!");
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+        if (error) alert(error.message);
+        else alert("Efa nalefa any amin'ny mailakao ny toromarika!");
+    }
+
+    // =====================================================
+    // APP INIT & DATA
+    // =====================================================
     async function initApp() {
         const { data: { user } } = await supabaseClient.auth.getUser();
-        if(user) {
+        if (user) {
             currentUserId = user.id;
             document.getElementById('auth-container').style.display = 'none';
             document.getElementById('nav-header').style.display = 'block';
@@ -555,150 +591,164 @@ div[onclick="showPage('home')"]:active {
         }
     }
 
- async function fetchData() {
+    async function fetchData() {
         const { data: u } = await supabaseClient.from('users').select('*').eq('id', currentUserId).single();
-        if(u) {
+        if (u) {
             userData = u;
             document.getElementById('display-solde').innerText = (u.solde || 0).toLocaleString() + " Ar";
             document.getElementById('side-full-name').innerText = u.full_name;
             document.getElementById('side-tk-id').innerText = "ID: " + u.tk_id;
             document.getElementById('header-avatar').src = u.avatar_url || "https://via.placeholder.com/35";
-            document.getElementById('side-avatar').src = u.avatar_url || "https://via.placeholder.com/50";
+            document.getElementById('side-avatar').src   = u.avatar_url || "https://via.placeholder.com/50";
         }
-        
-        const { data: ts } = await supabaseClient.from('transactions').select('*').eq('user_id', currentUserId).order('created_at', {ascending: false});
+
+        const { data: ts } = await supabaseClient
+            .from('transactions').select('*')
+            .eq('user_id', currentUserId)
+            .order('created_at', { ascending: false });
+
         allTransactions = ts || [];
-        
-        // Eto no miantso ny fampisehoana ny tantara
         renderHistory(allTransactions);
-        fetchNotifications(); // Nampiana eto mba handeha ny notif
+        fetchNotifications();
     }
 
+    // =====================================================
+    // RENDER HISTORY
+    // FIX #1 — Accolade { manquante après if(fullContainer)
+    // corrigée : tout le bloc est maintenant bien délimité.
+    // =====================================================
+    function renderHistory(dataToRender = allTransactions) {
+        const fullContainer    = document.getElementById('full-history-container');
+        const previewContainer = document.getElementById('preview-history-body');
 
-function renderHistory(dataToRender = allTransactions) {
-    const fullContainer = document.getElementById('full-history-container');
-    const previewContainer = document.getElementById('preview-history-body');
-    const historyPage = document.getElementById('page-history');
+        const generateHTML = (t) => {
+            try {
+                const dateObj   = new Date(t.created_at);
+                const ora       = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                const datyKely  = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
 
-    // 1. Function mpanampy hamoronana ny HTML isaky ny andalana
-    const generateHTML = (t) => {
-        try {
-            const dateObj = new Date(t.created_at);
-            const ora = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-            const datyKely = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
-            
-            // Fantarina raha Envoyer/Retrait (Mena) na Recevoir/Depot (Maitso)
-            const serviceName = t.service.toLowerCase();
-            const isNegative = serviceName.includes('envoyer') || 
-                               serviceName.includes('retrait') || 
-                               serviceName.includes('abonnement');
-            
-            let colorStatus = 'var(--yellow)';
-            if(t.status === 'confirmé') colorStatus = 'var(--green)';
-            if(t.status === 'rejeté') colorStatus = 'var(--red)';
+                const serviceName = t.service.toLowerCase();
+                const isNegative  = serviceName.includes('envoyer') ||
+                                    serviceName.includes('retrait') ||
+                                    serviceName.includes('abonnement');
 
-            return `
-                <div class="history-item">
-                    <div class="history-info">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <div class="history-service">${t.service}</div>
-                            <span style="font-size:10px; color:var(--gray); background:rgba(255,255,255,0.05); padding:2px 5px; border-radius:4px; font-family:monospace;">
-                                #${t.reference ? t.reference : 'CALCUL...'}
-                            </span>
+                let colorStatus = 'var(--yellow)';
+                if (t.status === 'confirmé') colorStatus = 'var(--green)';
+                if (t.status === 'rejeté')   colorStatus = 'var(--red)';
+
+                return `
+                    <div class="history-item">
+                        <div class="history-info">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <div class="history-service">${t.service}</div>
+                                <span style="font-size:10px; color:var(--gray); background:rgba(255,255,255,0.05); padding:2px 5px; border-radius:4px; font-family:monospace;">
+                                    #${t.reference ? t.reference : 'CALCUL...'}
+                                </span>
+                            </div>
+                            <div class="history-time">
+                                <span style="color:var(--yellow); font-weight:600;">${datyKely}</span> • ${ora}
+                                <span style="margin-left:8px; color:${colorStatus}; font-size:10px; border:1px solid ${colorStatus}; padding:1px 4px; border-radius:4px; text-transform:uppercase; font-weight:700;">
+                                    ${t.status}
+                                </span>
+                            </div>
                         </div>
-                        <div class="history-time">
-                            <span style="color:var(--yellow); font-weight:600;">${datyKely}</span> • ${ora} 
-                            <span style="margin-left:8px; color:${colorStatus}; font-size:10px; border:1px solid ${colorStatus}; padding:1px 4px; border-radius:4px; text-transform:uppercase; font-weight:700;">
-                                ${t.status}
-                            </span>
+                        <div class="history-amount ${isNegative ? 'amount-red' : 'amount-green'}" style="text-align:right;">
+                            <span style="font-size:16px;">${isNegative ? '-' : '+'}${t.montant.toLocaleString()}</span>
+                            <span style="font-size:10px; margin-left:2px;">Ar</span>
                         </div>
-                    </div>
-                    <div class="history-amount ${isNegative ? 'amount-red' : 'amount-green'}" style="text-align:right;">
-                        <span style="font-size:16px;">${isNegative ? '-' : '+'}${t.montant.toLocaleString()}</span>
-                        <span style="font-size:10px; margin-left:2px;">Ar</span>
-                    </div>
-                </div>`;
-        } catch (e) {
-            console.error("Error generating row:", e);
-            return ""; 
-        }
-    };
+                    </div>`;
+            } catch (e) {
+                console.error("Error generating row:", e);
+                return "";
+            }
+        };
 
-    // 2. PREVIEW (Home Page) - 3 farany ihany no aseho foana
-    if (previewContainer) {
-        previewContainer.innerHTML = allTransactions.slice(0, 3).map(generateHTML).join('');
-    }
-
-    // 3. FULL HISTORY (Page History)
-    // Tsy mandeha ity raha tsy hita (visible) ny pejy History
-    if (fullContainer)
-        
-        const data = dataToRender || [];
-        
-        if (data.length === 0) {
-            fullContainer.innerHTML = '<div style="text-align:center; padding:40px; color:var(--gray);">Aucune transaction trouvée</div>';
-            return;
+        // Aperçu (3 dernières transactions sur la page Home)
+        if (previewContainer) {
+            previewContainer.innerHTML = allTransactions.slice(0, 3).map(generateHTML).join('');
         }
 
-        // Fitambarana isam-bolana (Grouping by Month)
-        const groups = data.reduce((acc, t) => {
-            const d = new Date(t.created_at);
-            const moisAnnee = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-            if (!acc[moisAnnee]) acc[moisAnnee] = [];
-            acc[moisAnnee].push(t);
-            return acc;
-        }, {});
+        // Historique complet (page History)
+        // FIX #1 — le { était manquant ici, ce qui cassait toute la logique
+        if (fullContainer) {
+            const data = dataToRender || [];
 
-        for (const mois in groups) {
-            fullContainer.innerHTML += `
-                <div class="month-header" style="padding: 15px 0 10px 0; color: var(--gray); font-size: 11px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; letter-spacing: 1px;">
-                    ${mois.toUpperCase()}
-                </div>`;
-            fullContainer.innerHTML += groups[mois].map(generateHTML).join('');
+            if (data.length === 0) {
+                fullContainer.innerHTML = '<div style="text-align:center; padding:40px; color:var(--gray);">Aucune transaction trouvée</div>';
+                return;
+            }
+
+            // Regroupement par mois
+            const groups = data.reduce((acc, t) => {
+                const d          = new Date(t.created_at);
+                const moisAnnee  = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+                if (!acc[moisAnnee]) acc[moisAnnee] = [];
+                acc[moisAnnee].push(t);
+                return acc;
+            }, {});
+
+            // Reset avant reconstruction pour éviter les doublons
+            fullContainer.innerHTML = '';
+
+            for (const mois in groups) {
+                fullContainer.innerHTML += `
+                    <div class="month-header">
+                        ${mois.toUpperCase()}
+                    </div>`;
+                fullContainer.innerHTML += groups[mois].map(generateHTML).join('');
+            }
+        } // ← FIX #1 : accolade fermante de if(fullContainer)
+    }
+
+    function filterHistory(type, element) {
+        document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
+        if (element) element.classList.add('active');
+
+        if (type === 'Tous') {
+            renderHistory(allTransactions);
+        } else {
+            const filtered = allTransactions.filter(t =>
+                t.service.toLowerCase().includes(type.toLowerCase())
+            );
+            renderHistory(filtered);
         }
     }
-}
 
-function filterHistory(type, element) {
-    // Manova ny lokon'ny bokotra voatsindry (Filter Chips)
-    document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
-    if(element) element.classList.add('active');
-
-    if (type === 'Tous') {
-        renderHistory(allTransactions);
-    } else {
-        const filtered = allTransactions.filter(t => 
-            t.service.toLowerCase().includes(type.toLowerCase())
-        );
-        renderHistory(filtered);
-    }
-}
-
-    // --- UI ACTIONS ---
+    // =====================================================
+    // UI ACTIONS
+    // =====================================================
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('active');
-        document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+        document.getElementById('overlay').style.display =
+            document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
     }
 
-function showPage(p) {
-    const homePage = document.getElementById('page-home');
-    const historyPage = document.getElementById('page-history');
+    // =====================================================
+    // FIX #2 — showPage() avait une accolade fermante mal
+    // placée qui imbriquait toutes les fonctions suivantes
+    // (switchMode, openMobile, updateCalc…) à l'intérieur.
+    // =====================================================
+    function showPage(p) {
+        const homePage    = document.getElementById('page-home');
+        const historyPage = document.getElementById('page-history');
 
-    homePage.style.display = 'none';
-    historyPage.style.display = 'none';
+        homePage.style.display    = 'none';
+        historyPage.style.display = 'none';
 
-    if (p === 'home') {
-        homePage.style.display = 'block';
-    } else if (p === 'history') {
-        historyPage.style.display = 'block';
-        renderHistory(allTransactions); // IMPORTANT
-    }
-    
-const sidebar = document.getElementById('sidebar');
+        if (p === 'home') {
+            homePage.style.display = 'block';
+        } else if (p === 'history') {
+            historyPage.style.display = 'block';
+            renderHistory(allTransactions);
+        }
+
+        // Fermeture du sidebar si ouvert
+        const sidebar = document.getElementById('sidebar');
         if (sidebar && sidebar.classList.contains('active')) {
             toggleSidebar();
-    window.scrollTo(0, 0);
-}
+        }
+        window.scrollTo(0, 0);
+    } // ← FIX #2 : accolade fermante correctement placée
 
     function switchMode(m) {
         currentMode = m;
@@ -706,35 +756,47 @@ const sidebar = document.getElementById('sidebar');
         document.getElementById('crypto-select-container').style.display = 'block';
         document.getElementById('label-right').innerText = "Montant (Ar) :";
         document.getElementById('unit-suffix').innerText = "Ar";
-        document.getElementById('label-addr').innerText = "Adresse / ID destinataire :";
-        
+        document.getElementById('label-addr').innerText  = "Adresse / ID destinataire :";
+
         const asset = document.getElementById('crypto-select').value;
-        const addr = document.getElementById('input-addr');
-        if(m === 'Recevoir') {
+        const addr  = document.getElementById('input-addr');
+        if (m === 'Recevoir') {
             document.getElementById('unit-suffix').innerText = asset;
             document.getElementById('label-right').innerText = `Montant (${asset}) :`;
-            addr.value = ADDR_RECEPT[asset];
+            addr.value    = ADDR_RECEPT[asset] || "";
             addr.readOnly = true;
             document.getElementById('copy-btn').style.display = 'block';
         } else {
-            addr.value = "";
+            addr.value    = "";
             addr.readOnly = false;
             document.getElementById('copy-btn').style.display = 'none';
         }
         updateCalc();
     }
 
+    // =====================================================
+    // FIX #9 — openMobile() fermait/ouvrait le sidebar de
+    // façon aléatoire via toggleSidebar(). On ferme
+    // maintenant explicitement sans toggle.
+    // =====================================================
     function openMobile(mode) {
         currentMode = mode;
-        toggleSidebar();
-        document.getElementById('trans-title').innerText = mode + " Mobile Money";
+
+        // Fermeture explicite du sidebar
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        document.getElementById('trans-title').innerText             = mode + " Mobile Money";
         document.getElementById('crypto-select-container').style.display = 'none';
-        document.getElementById('label-right').innerText = "Montant (Ar) :";
-        document.getElementById('unit-suffix').innerText = "Ar";
-        document.getElementById('label-addr').innerText = "Numéro Mobile (Airtel, Orange, MVola) :";
-        document.getElementById('input-addr').value = "";
-        document.getElementById('input-addr').readOnly = false;
-        document.getElementById('copy-btn').style.display = 'none';
+        document.getElementById('label-right').innerText             = "Montant (Ar) :";
+        document.getElementById('unit-suffix').innerText             = "Ar";
+        document.getElementById('label-addr').innerText              = "Numéro Mobile (Airtel, Orange, MVola) :";
+        document.getElementById('input-addr').value                  = "";
+        document.getElementById('input-addr').readOnly               = false;
+        document.getElementById('copy-btn').style.display            = 'none';
         updateCalc();
     }
 
@@ -742,49 +804,75 @@ const sidebar = document.getElementById('sidebar');
         const cry = document.getElementById('crypto-select').value;
         const val = parseFloat(document.getElementById('input-main').value) || 0;
         const res = document.getElementById('calc-res');
-        
+
         if (currentMode.includes('Dépôt') || currentMode.includes('Retrait')) {
             document.getElementById('calc-container').style.display = 'none';
         } else {
             document.getElementById('calc-container').style.display = 'flex';
-            if (currentMode === 'Envoyer') res.innerText = (val / TAUX[cry]).toFixed(2) + " " + cry;
-            else res.innerText = (val * TAUX[cry]).toLocaleString() + " Ar";
+            const taux = TAUX[cry] || 1;
+            if (currentAction === 'Envoyer') {
+                res.innerText = (val / taux).toFixed(2) + " " + cry;
+            } else {
+                res.innerText = (val * taux).toLocaleString() + " Ar";
+            }
         }
     }
 
+    // =====================================================
+    // FIX #6 — updateIcon() gère maintenant tous les actifs
+    // (wallets, betting, abonnements) via un objet ICONS.
+    // =====================================================
     function updateIcon() {
-        const cry = document.getElementById('crypto-select').value;
-        const img = document.getElementById('asset-img');
-        if(cry === 'TRX') img.src = "https://cryptologos.cc/logos/tron-trx-logo.svg";
-        else if(cry === 'USDT') img.src = "https://cryptologos.cc/logos/tether-usdt-logo.svg";
-        else img.src = "https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg";
+        const cry  = document.getElementById('crypto-select').value;
+        const img  = document.getElementById('asset-img');
+        const ICONS = {
+            'TRX':      'https://cryptologos.cc/logos/tron-trx-logo.svg',
+            'USDT':     'https://cryptologos.cc/logos/tether-usdt-logo.svg',
+            '1XBET':    'https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg',
+            'BTC':      'https://cryptologos.cc/logos/bitcoin-btc-logo.svg',
+            'PAYPAL':   'https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg',
+            'SKRILL':   'https://upload.wikimedia.org/wikipedia/commons/8/8b/Skrill_logo.svg',
+            'PAYEER':   'https://via.placeholder.com/22?text=P',
+            'BET365':   'https://via.placeholder.com/22?text=B',
+            'MELBET':   'https://via.placeholder.com/22?text=M',
+            'NETFLIX':  'https://via.placeholder.com/22?text=N',
+            'STARLINK': 'https://via.placeholder.com/22?text=S',
+            'FACEBOOK': 'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg'
+        };
+        img.src = ICONS[cry] || 'https://via.placeholder.com/22';
         updateCalc();
     }
 
+    function logout() {
+        supabaseClient.auth.signOut().then(() => location.reload());
+    }
 
-    function logout() { supabaseClient.auth.signOut().then(() => location.reload()); }
-    
     function previewImage(input) {
-        if(input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => document.getElementById('modal-pp-view').src = e.target.result;
+        if (input.files && input.files[0]) {
+            const reader   = new FileReader();
+            reader.onload  = (e) => document.getElementById('modal-pp-view').src = e.target.result;
             reader.readAsDataURL(input.files[0]);
         }
     }
 
     function openProfile() {
         document.getElementById('edit-full-name').value = userData.full_name;
-        document.getElementById('edit-phone').value = userData.phone;
-        document.getElementById('modal-pp-view').src = userData.avatar_url || "https://via.placeholder.com/100";
+        document.getElementById('edit-phone').value     = userData.phone;
+        document.getElementById('modal-pp-view').src    = userData.avatar_url || "https://via.placeholder.com/100";
         document.getElementById('modal-profile').style.display = 'flex';
     }
-    function closeProfile() { document.getElementById('modal-profile').style.display = 'none'; }
+
+    function closeProfile() {
+        document.getElementById('modal-profile').style.display = 'none';
+    }
 
     async function updateProfile() {
-        const newName = document.getElementById('edit-full-name').value;
+        const newName  = document.getElementById('edit-full-name').value;
         const newPhone = document.getElementById('edit-phone').value;
-        const { error } = await supabaseClient.from('users').update({ full_name: newName, phone: newPhone }).eq('id', currentUserId);
-        if(error) alert(error.message);
+        const { error } = await supabaseClient.from('users')
+            .update({ full_name: newName, phone: newPhone })
+            .eq('id', currentUserId);
+        if (error) alert(error.message);
         else { alert("Profil mis à jour !"); closeProfile(); fetchData(); }
     }
 
@@ -796,234 +884,194 @@ const sidebar = document.getElementById('sidebar');
     }
 
     async function fetchNotifications() {
-    const { data: notifs } = await supabaseClient
-        .from('notifications')
-        .select('*')
-        .eq('user_id', currentUserId)
-        .order('created_at', { ascending: false });
+        const { data: notifs } = await supabaseClient
+            .from('notifications').select('*')
+            .eq('user_id', currentUserId)
+            .order('created_at', { ascending: false });
 
-    if (notifs) {
-        const list = document.getElementById('notif-list');
-        const countBadge = document.getElementById('notif-count');
-        const unreadCount = notifs.filter(n => !n.is_read).length;
+        if (notifs) {
+            const list        = document.getElementById('notif-list');
+            const countBadge  = document.getElementById('notif-count');
+            const unreadCount = notifs.filter(n => !n.is_read).length;
 
-        countBadge.innerText = unreadCount;
-        countBadge.style.display = unreadCount > 0 ? 'block' : 'none';
+            countBadge.innerText      = unreadCount;
+            countBadge.style.display  = unreadCount > 0 ? 'block' : 'none';
 
-        list.innerHTML = notifs.length ? notifs.map(n => `
-            <div class="notif-item ${n.is_read ? '' : 'unread'}" style="padding:12px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                <b style="color:var(--yellow); font-size:13px;">${n.title}</b><br>
-                <span style="color:var(--gray); font-size:12px; line-height:1.4;">${n.message}</span><br>
-                <small style="font-size:10px; color:rgba(255,255,255,0.3)">
-                    ${new Date(n.created_at).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                </small>
-            </div>
-        `).join('') : '<p style="text-align:center; padding:30px; color:var(--gray); font-size:13px;">Aucune nouvelle notification</p>';
-    }
-}
-
-function goToFullHistory() {
-    // 1. Sokafy ny pejy History (mampiasa ilay function showPage efa anananao)
-    showPage('history');
-
-    // 2. Akatony ny Sidebar raha sendra misokatra izy
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar && sidebar.classList.contains('active')) {
-        toggleSidebar(); 
-    }
-
-    // 3. Ataovy "Active" ny sivana "Tous" ao amin'ny pejy History
-    const chips = document.querySelectorAll('#history-filters .filter-chip');
-    chips.forEach(chip => {
-        chip.classList.remove('active');
-        if (chip.innerText === 'Tous') {
-            chip.classList.add('active');
+            list.innerHTML = notifs.length
+                ? notifs.map(n => `
+                    <div class="notif-item ${n.is_read ? '' : 'unread'}" style="padding:12px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <b style="color:var(--yellow); font-size:13px;">${n.title}</b><br>
+                        <span style="color:var(--gray); font-size:12px; line-height:1.4;">${n.message}</span><br>
+                        <small style="font-size:10px; color:rgba(255,255,255,0.3)">
+                            ${new Date(n.created_at).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                        </small>
+                    </div>`).join('')
+                : '<p style="text-align:center; padding:30px; color:var(--gray); font-size:13px;">Aucune nouvelle notification</p>';
         }
-    });
-
-    // 4. Avereno asiana refresh ny data mba hiseho tsara
-    renderHistory(allTransactions);
-    
-    // 5. Ampidino kely ny pejy ho any ambony indrindra (Scroll to top)
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-
-function toggleNotif() {
-    const panel = document.getElementById('notif-panel');
-    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-    if (panel.style.display === 'block') fetchNotifications();
-}
-
-async function markAllRead() {
-    await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUserId);
-    fetchNotifications();
-}
-
-    async function handleForgot() {
-    const email = document.getElementById('forgot-email').value;
-    if(!email) return alert("Ampidiro ny email-nao!");
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
-    if(error) alert(error.message);
-    else alert("Efa nalefa any amin'ny mailakao ny toromarika!");
-}
-
-function selectCategory(category) {
-    // 1. UI: Esory ny loko mavo (active) amin'ny service-item rehetra
-    const buttons = document.querySelectorAll('.service-item');
-    buttons.forEach(btn => {
-        btn.style.backgroundColor = ""; // Miverina amin'ny loko mainty (--card)
-        btn.style.color = "";           // Miverina fotsy
-        btn.classList.remove('active');
-    });
-
-    // 2. Omeo loko mavo ilay bokotra vao voatsindry
-    const targetBtn = document.getElementById('btn-' + category);
-    if (targetBtn) {
-        targetBtn.style.backgroundColor = "var(--yellow)";
-        targetBtn.style.color = "black";
-        targetBtn.classList.add('active');
     }
 
-    // 3. LOGIC: Fanovana ny singa ao anaty Formulaire
-    const cryptoSelect = document.getElementById('crypto-select');
-    const cryptoContainer = document.getElementById('crypto-select-container');
-    const transTitle = document.getElementById('trans-title');
-    const labelAddr = document.getElementById('label-addr');
-    const btnRec = document.getElementById('main-rec-btn');
+    function goToFullHistory() {
+        showPage('history');
 
-    // Fafana ny safidy (options) taloha ao anaty Select mba hanovana azy vaovao
-    if (cryptoSelect) cryptoSelect.innerHTML = "";
+        const chips = document.querySelectorAll('#history-filters .filter-chip');
+        chips.forEach(chip => {
+            chip.classList.remove('active');
+            if (chip.innerText === 'Tous') chip.classList.add('active');
+        });
 
-    // Mampiakatra ny pejy ho any ambony (smooth scroll)
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    switch(category) {
-        case 'crypto':
-            currentMode = "Crypto";
-            transTitle.innerText = "Transaction Crypto";
-            labelAddr.innerText = "Adresse de destination :";
-            if (btnRec) { btnRec.style.opacity = "1"; btnRec.style.pointerEvents = "auto"; }
-            
-            addOptions(cryptoSelect, [
-                {val: 'TRX', txt: 'TRX (TRC20)'},
-                {val: 'USDT', txt: 'USDT (TRC20)'},
-                {val: 'BTC', txt: 'Bitcoin (BTC)'}
-            ]);
-            break;
-
-        case 'wallet':
-            currentMode = "Wallet";
-            transTitle.innerText = "Transaction Wallets";
-            labelAddr.innerText = "Email ou ID Portefeuille :";
-            if (btnRec) { btnRec.style.opacity = "1"; btnRec.style.pointerEvents = "auto"; }
-            
-            addOptions(cryptoSelect, [
-                {val: 'PAYPAL', txt: 'PayPal'},
-                {val: 'SKRILL', txt: 'Skrill'},
-                {val: 'PAYEER', txt: 'Payeer'}
-            ]);
-            break;
-
-        case 'betting':
-            currentMode = "Betting";
-            transTitle.innerText = "Recharge Betting";
-            labelAddr.innerText = "ID Joueur (Compte) :";
-            if (btnRec) { btnRec.style.opacity = "1"; btnRec.style.pointerEvents = "auto"; }
-            
-            addOptions(cryptoSelect, [
-                {val: '1XBET', txt: '1xBet'},
-                {val: 'BET365', txt: 'Bet365'},
-                {val: 'MELBET', txt: 'Melbet'}
-            ]);
-            break;
-
-        case 'abonnement':
-            currentMode = "Abonnement";
-            transTitle.innerText = "Abonnement Service";
-            labelAddr.innerText = "Email ou Compte à booster :";
-            
-            // Vonoina ny bokotra Recevoir ho an'ny Abonnement
-            if (btnRec) {
-                btnRec.style.opacity = "0.3";
-                btnRec.style.pointerEvents = "none";
-                switchAction('Envoyer'); // Force-na ho Envoyer raha sendra tao amin'ny Recevoir izy
-            }
-            
-            addOptions(cryptoSelect, [
-                {val: 'NETFLIX', txt: 'Netflix'},
-                {val: 'STARLINK', txt: 'Starlink'},
-                {val: 'FACEBOOK', txt: 'Boost Page Facebook'}
-            ]);
-            break;
+        renderHistory(allTransactions);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Havaozina ny sary kely (icon) sy ny kajy (calcul)
-    if (typeof updateIcon === "function") updateIcon();
-    if (typeof updateCalc === "function") updateCalc();
-
-}
-
-// Function mpanampy: Manampy safidy (options) ao anaty select
-function addOptions(selectElement, optionsArray) {
-    if (!selectElement) return;
-    optionsArray.forEach(opt => {
-        let option = document.createElement('option');
-        option.value = opt.val;
-        option.text = opt.txt;
-        selectElement.add(option);
-    });
-}
-function switchAction(action) {
-    currentAction = action; // 'Envoyer' na 'Recevoir'
-    
-    const transTitle = document.getElementById('trans-title');
-    const labelAddr = document.getElementById('label-addr');
-    const inputAddr = document.getElementById('input-addr');
-    const copyBtn = document.getElementById('copy-btn');
-
-    // 1. Manova ny Lohateny arakaraka ny Sokajy sy ny Hetsika (Action)
-    if (currentMode === "Crypto") {
-        transTitle.innerText = action + " Crypto";
-    } 
-    else if (currentMode === "Wallet") {
-        transTitle.innerText = action + " Wallets";
-    } 
-    else if (currentMode === "Betting") {
-        // Raha Betting: Envoyer -> Depot, Recevoir -> Retrait
-        transTitle.innerText = (action === "Envoyer") ? "Dépôt Betting" : "Retrait Betting";
-    } 
-    else if (currentMode === "Abonnement") {
-        transTitlet = "Abonnement Service";
+    function toggleNotif() {
+        const panel = document.getElementById('notif-panel');
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        if (panel.style.display === 'block') fetchNotifications();
     }
 
-    // 2. Logic ho an'ny Adresse sy ny Copy Button
-    if (action === 'Recevoir') {
-        inputAddr.readOnly = true;
-        if(copyBtn) copyBtn.style.display = 'block';
-        labelAddr.innerText = "Votre adresse de réception :";
-        
-        const assetVal = document.getElementById('crypto-select') ? document.getElementById('crypto-select').value : "";
-        inputAddr.value = "ADRESSE_NAO_" + assetVal; 
-    } else {
-        inputAddr.readOnly = false;
-        inputAddr.value = "";
-        if(copyBtn) copyBtn.style.display = 'none';
-        
-        // Averina ny Label fampidirana adresse mahazatra
-        if (currentMode === "Crypto") labelAddr.innerText = "Adresse de destination :";
-        else if (currentMode === "Betting") labelAddr.innerText = "ID Joueur (Compte) :";
-        else labelAddr.innerText = "Email ou ID Portefeuille :";
+    async function markAllRead() {
+        await supabaseClient.from('notifications')
+            .update({ is_read: true })
+            .eq('user_id', currentUserId);
+        fetchNotifications();
     }
 
-    // Manova loko ny bokotra Envoyer/Recevoir
-    document.getElementById('main-env-btn').classList.toggle('active', action === 'Envoyer');
-    document.getElementById('main-rec-btn').classList.toggle('active', action === 'Recevoir');
-}
-    
-// Ampio ao anatin'ny fetchData() ity:
-// fetchNotifications();
+    function selectCategory(category) {
+        // Reset visuel des boutons
+        document.querySelectorAll('.service-item').forEach(btn => {
+            btn.style.backgroundColor = "";
+            btn.style.color           = "";
+            btn.classList.remove('active');
+        });
 
+        const targetBtn = document.getElementById('btn-' + category);
+        if (targetBtn) {
+            targetBtn.style.backgroundColor = "var(--yellow)";
+            targetBtn.style.color           = "black";
+            targetBtn.classList.add('active');
+        }
+
+        const cryptoSelect    = document.getElementById('crypto-select');
+        const cryptoContainer = document.getElementById('crypto-select-container');
+        const transTitle      = document.getElementById('trans-title');
+        const labelAddr       = document.getElementById('label-addr');
+        const btnRec          = document.getElementById('main-rec-btn');
+
+        if (cryptoSelect) cryptoSelect.innerHTML = "";
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        switch (category) {
+            case 'crypto':
+                currentMode = "Crypto";
+                transTitle.innerText = "Transaction Crypto";
+                labelAddr.innerText  = "Adresse de destination :";
+                if (btnRec) { btnRec.style.opacity = "1"; btnRec.style.pointerEvents = "auto"; }
+                addOptions(cryptoSelect, [
+                    { val: 'TRX',  txt: 'TRX (TRC20)' },
+                    { val: 'USDT', txt: 'USDT (TRC20)' },
+                    { val: 'BTC',  txt: 'Bitcoin (BTC)' }
+                ]);
+                break;
+
+            case 'wallet':
+                currentMode = "Wallet";
+                transTitle.innerText = "Transaction Wallets";
+                labelAddr.innerText  = "Email ou ID Portefeuille :";
+                if (btnRec) { btnRec.style.opacity = "1"; btnRec.style.pointerEvents = "auto"; }
+                addOptions(cryptoSelect, [
+                    { val: 'PAYPAL', txt: 'PayPal'  },
+                    { val: 'SKRILL', txt: 'Skrill'  },
+                    { val: 'PAYEER', txt: 'Payeer'  }
+                ]);
+                break;
+
+            case 'betting':
+                currentMode = "Betting";
+                transTitle.innerText = "Recharge Betting";
+                labelAddr.innerText  = "ID Joueur (Compte) :";
+                if (btnRec) { btnRec.style.opacity = "1"; btnRec.style.pointerEvents = "auto"; }
+                addOptions(cryptoSelect, [
+                    { val: '1XBET',  txt: '1xBet'  },
+                    { val: 'BET365', txt: 'Bet365' },
+                    { val: 'MELBET', txt: 'Melbet' }
+                ]);
+                break;
+
+            case 'abonnement':
+                currentMode = "Abonnement";
+                transTitle.innerText = "Abonnement Service";
+                labelAddr.innerText  = "Email ou Compte à booster :";
+                if (btnRec) {
+                    btnRec.style.opacity      = "0.3";
+                    btnRec.style.pointerEvents = "none";
+                    switchAction('Envoyer');
+                }
+                addOptions(cryptoSelect, [
+                    { val: 'NETFLIX',  txt: 'Netflix'             },
+                    { val: 'STARLINK', txt: 'Starlink'            },
+                    { val: 'FACEBOOK', txt: 'Boost Page Facebook' }
+                ]);
+                break;
+        }
+
+        if (typeof updateIcon === "function") updateIcon();
+        if (typeof updateCalc === "function") updateCalc();
+    }
+
+    function addOptions(selectElement, optionsArray) {
+        if (!selectElement) return;
+        optionsArray.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt.val;
+            option.text  = opt.txt;
+            selectElement.add(option);
+        });
+    }
+
+    // =====================================================
+    // FIX #3 — Typo "transTitlet" corrigée en "transTitle.innerText"
+    // dans le cas "Abonnement" de switchAction().
+    // =====================================================
+    function switchAction(action) {
+        currentAction = action;
+
+        const transTitle = document.getElementById('trans-title');
+        const labelAddr  = document.getElementById('label-addr');
+        const inputAddr  = document.getElementById('input-addr');
+        const copyBtn    = document.getElementById('copy-btn');
+
+        if (currentMode === "Crypto") {
+            transTitle.innerText = action + " Crypto";
+        } else if (currentMode === "Wallet") {
+            transTitle.innerText = action + " Wallets";
+        } else if (currentMode === "Betting") {
+            transTitle.innerText = (action === "Envoyer") ? "Dépôt Betting" : "Retrait Betting";
+        } else if (currentMode === "Abonnement") {
+            transTitle.innerText = "Abonnement Service"; // FIX #3 : transTitlet → transTitle.innerText
+        }
+
+        if (action === 'Recevoir') {
+            inputAddr.readOnly = true;
+            if (copyBtn) copyBtn.style.display = 'block';
+            labelAddr.innerText = "Votre adresse de réception :";
+            const assetVal = document.getElementById('crypto-select')
+                ? document.getElementById('crypto-select').value : "";
+            inputAddr.value = ADDR_RECEPT[assetVal] || ("ADRESSE_" + assetVal);
+        } else {
+            inputAddr.readOnly = false;
+            inputAddr.value    = "";
+            if (copyBtn) copyBtn.style.display = 'none';
+            if (currentMode === "Crypto")   labelAddr.innerText = "Adresse de destination :";
+            else if (currentMode === "Betting") labelAddr.innerText = "ID Joueur (Compte) :";
+            else labelAddr.innerText = "Email ou ID Portefeuille :";
+        }
+
+        document.getElementById('main-env-btn').classList.toggle('active', action === 'Envoyer');
+        document.getElementById('main-rec-btn').classList.toggle('active', action === 'Recevoir');
+    }
+
+    // Lancement de l'application
     initApp();
 </script>
 </body>
