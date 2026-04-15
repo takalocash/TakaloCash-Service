@@ -801,22 +801,40 @@
     }
 
     function updateCalc() {
-        const cry = document.getElementById('crypto-select').value;
-        const val = parseFloat(document.getElementById('input-main').value) || 0;
-        const res = document.getElementById('calc-res');
-
-        if (currentMode.includes('Dépôt') || currentMode.includes('Retrait')) {
-            document.getElementById('calc-container').style.display = 'none';
-        } else {
-            document.getElementById('calc-container').style.display = 'flex';
-            const taux = TAUX[cry] || 1;
-            if (currentAction === 'Envoyer') {
-                res.innerText = (val / taux).toFixed(2) + " " + cry;
-            } else {
-                res.innerText = (val * taux).toLocaleString() + " Ar";
-            }
-        }
+    const assetKey = document.getElementById('crypto-select').value;
+    const valInput = parseFloat(document.getElementById('input-main').value) || 0;
+    
+    // Alaina avy ao amin'ny config ny frais an'ity asset ity
+    // Mitady ny asset ao anaty ASSETS_DATA (crypto, wallet, sns)
+    let assetInfo = null;
+    for (let cat in ASSETS_DATA) {
+        const found = ASSETS_DATA[cat].find(a => a.val === assetKey);
+        if (found) { assetInfo = found; break; }
     }
+
+    const taux = CURRENT_TAUX[assetKey] || 1;
+    const fraisPercent = assetInfo ? assetInfo.frais : 0;
+    
+    let result = 0;
+
+    if (currentAction === 'Envoyer') {
+        // Ariary -> Crypto (Alana frais ny Ariary alohan'ny hivadika)
+        const montantArNet = valInput * (1 - fraisPercent);
+        result = montantArNet / taux;
+        
+        document.getElementById('calc-res').innerText = result.toFixed(assetKey.includes('USDT') ? 2 : 6);
+    } else {
+        // Crypto -> Ariary (Convertiena Ar vao alana frais)
+        const montantArBrut = valInput * taux;
+        result = montantArBrut * (1 - fraisPercent);
+        
+        document.getElementById('calc-res').innerText = Math.floor(result).toLocaleString() + " Ar";
+    }
+    
+    // Asehoy ny frais eo akaiky
+    const fraisLabel = document.getElementById('frais-info');
+    if(fraisLabel) fraisLabel.innerText = `Frais: ${fraisPercent * 100}% inclus`;
+}
 
     // =====================================================
     // FIX #6 — updateIcon() gère maintenant tous les actifs
@@ -1103,6 +1121,45 @@
         document.getElementById('main-env-btn').classList.toggle('active', action === 'Envoyer');
         document.getElementById('main-rec-btn').classList.toggle('active', action === 'Recevoir');
     }
+<script type="module">
+    // 1. Ampidiro avy hatrany ny data avy ao amin'ny config.js
+    import { ASSETS_DATA, CURRENT_TAUX, USD_TO_MGA } from './config.js';
+
+    // 2. Ampio ilay function fetchBinancePrices nalefanao teo
+    async function fetchBinancePrices() {
+        try {
+            const response = await fetch("https://api.binance.com/api/v3/ticker/price");
+            const prices = await response.json();
+
+            prices.forEach(p => {
+                if (p.symbol === "BTCUSDT") {
+                    CURRENT_TAUX["BTCUSDT"] = parseFloat(p.price) * USD_TO_MGA;
+                }
+                if (p.symbol === "TRXUSDT") {
+                    CURRENT_TAUX["TRXUSDT"] = parseFloat(p.price) * USD_TO_MGA;
+                }
+            });
+
+            CURRENT_TAUX["USDT"] = USD_TO_MGA;
+            console.log("Taux Binance nohavaozina!", CURRENT_TAUX);
+            if (typeof updateCalc === "function") updateCalc();
+
+        } catch (error) {
+            console.error("Error Binance API:", error);
+        }
+    }
+
+    fetchBinancePrices();
+    setInterval(fetchBinancePrices, 3600000);
+
+    // 3. TANDREMO: Rehefa mampiasa module, tsy maintsy atao "window" ny function 
+    // vao afaka antsoina avy amin'ny HTML (onclick)
+    window.selectCategory = selectCategory;
+    window.switchAction = switchAction;
+    window.handleTransaction = handleTransaction;
+    window.showPage = showPage;
+    window.updateIcon = updateIcon;
+    
 
     // Lancement de l'application
     initApp();
