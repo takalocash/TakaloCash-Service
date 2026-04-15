@@ -936,6 +936,35 @@
         fetchNotifications();
     }
 
+    async function handleTransaction() {
+    const asset = document.getElementById('crypto-select').value;
+    const montantAr = parseFloat(document.getElementById('input-main').value);
+    const adresse = document.getElementById('input-addr').value;
+
+    if (!montantAr || !adresse) {
+        return alert("Veuillez remplir le montant et l'adresse !");
+    }
+
+    try {
+        const { error } = await supabaseClient.from('transactions').insert([{
+            user_id: currentUserId,
+            service: currentAction + " " + currentMode + " (" + asset + ")",
+            montant: montantAr,
+            reference: "TRANS-" + Math.floor(Math.random() * 1000000),
+            status: 'en attente',
+            created_at: new Date()
+        }]);
+
+        if (error) throw error;
+
+        alert("Transaction envoyée avec succès ! En attente de confirmation.");
+        showPage('home'); // Miverina amin'ny Home rehefa vita
+        fetchData();     // Refresh ny solde sy ny tantara
+    } catch (err) {
+        alert("Erreur: " + err.message);
+    }
+}
+
     function selectCategory(category) {
         // Reset visuel des boutons
         document.querySelectorAll('.service-item').forEach(btn => {
