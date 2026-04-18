@@ -585,9 +585,9 @@
      FIX: mixed <script type="module"> removed — single script only.
      FIX: initApp() was outside </script> — moved inside.
      ============================ -->
-<script>
-
-    import { ASSETS_DATA, CURRENT_TAUX, updateIcon, updateTaux } from './config.js';
+<script type="module">
+    // Import-na daholo ny zavatra ilaina avy any amin'ny config.js
+    import { ASSETS_DATA, CURRENT_TAUX, updateIcon, updateTaux, ADDR_RECEPT } from './config.js';
     // =====================================================
     // SUPABASE CONFIG
     // Enable Row Level Security (RLS) on all tables.
@@ -858,23 +858,23 @@
     }
 
     function updateCalc() {
-        const assetKey = document.getElementById('crypto-select').value;
-        const val      = parseFloat(document.getElementById('input-main').value) || 0;
-        const rate     = TAUX[assetKey] || 1;
-        const res      = document.getElementById('calc-res');
+    const assetKey = document.getElementById('crypto-select').value;
+    const val      = parseFloat(document.getElementById('input-main').value) || 0;
+    // Jereo tsara: CURRENT_TAUX fa tsy TAUX
+    const rate     = CURRENT_TAUX[assetKey] || 1; 
+    const res      = document.getElementById('calc-res');
 
-        // Mode names (Dépôt/Retrait) and action (Envoyer/Recevoir) are French — match DB values
-        if (currentMode.includes('Dépôt') || currentMode.includes('Retrait')) {
-            document.getElementById('calc-container').style.display = 'none';
+    if (currentMode.includes('Dépôt') || currentMode.includes('Retrait')) {
+        document.getElementById('calc-container').style.display = 'none';
+    } else {
+        document.getElementById('calc-container').style.display = 'flex';
+        if (currentAction === 'Envoyer') {
+            res.innerText = (val / rate).toFixed(assetKey === 'USDT' ? 2 : 6) + " " + assetKey;
         } else {
-            document.getElementById('calc-container').style.display = 'flex';
-            if (currentAction === 'Envoyer') {
-                res.innerText = (val / rate).toFixed(assetKey === 'USDT' ? 2 : 6) + " " + assetKey;
-            } else {
-                res.innerText = Math.floor(val * rate).toLocaleString() + " Ar";
-            }
+            res.innerText = Math.floor(val * rate).toLocaleString() + " Ar";
         }
     }
+}
 
     // =====================================================
     // TRANSACTION SUBMIT
@@ -1112,13 +1112,31 @@
         supabaseClient.auth.signOut().then(() => location.reload());
     }
 
+    // Avoaka ho an'ny bokotra HTML rehetra
+    window.handleLogin = handleLogin;
+    window.handleSignUp = handleSignUp;
+    window.handleForgot = handleForgot;
     window.selectCategory = selectCategory;
-window.updateIcon = updateIcon;
-window.updateCalc = updateCalc;
-window.switchAction = switchAction;
-window.handleTransaction = handleTransaction;
-    // FIX: initApp() was outside
+    window.updateIcon = updateIcon;
+    window.updateCalc = updateCalc;
+    window.switchAction = switchAction;
+    window.handleTransaction = handleTransaction;
+    window.showPage = showPage;
+    window.toggleSidebar = toggleSidebar;
+    window.openMobile = openMobile;
+    window.goToFullHistory = goToFullHistory;
+    window.filterHistory = filterHistory;
+    window.toggleNotif = toggleNotif;
+    window.markAllRead = markAllRead;
+    window.openProfile = openProfile;
+    window.closeProfile = closeProfile;
+    window.updateProfile = updateProfile;
+    window.copyText = copyText;
+    window.previewImage = previewImage;
+    window.logout = logout;
 
+    // Antsoina ny initApp amin'ny farany
+    initApp();
 </script>
 </body>
 </html>
