@@ -606,32 +606,6 @@
     let currentMode     = "Crypto";
     let currentAction   = "Envoyer"; // Stored in DB — stays French
 
-    // =====================================================
-    // RATES — complete set for all assets
-    // =====================================================
-    const TAUX = {
-        "TRX":      150,
-        "USDT":     4600,
-        "1XBET":    1,
-        "BTC":      150000000,
-        "PAYPAL":   4600,
-        "SKRILL":   4600,
-        "PAYEER":   4600,
-        "BET365":   1,
-        "MELBET":   1,
-        "NETFLIX":  1,
-        "STARLINK": 1,
-        "FACEBOOK": 1
-    };
-
-    const ADDR_RECEPT = {
-        "TRX":   "T-RECEIVE-TRX-ADDRESS",
-        "USDT":  "T-RECEIVE-USDT-ADDRESS",
-        "1XBET": "ID-1XBET-OFFICIAL"
-    };
-
-    // =====================================================
-    // AUTH
     // FIX: "fonction" → "function", all translated keywords restored
     // =====================================================
     function showAuth(mode) {
@@ -964,85 +938,58 @@
     //      "ajouterOptions" → addOptions
     // =====================================================
     function selectCategory(category) {
-        document.querySelectorAll('.service-item').forEach(btn => {
-            btn.style.backgroundColor = "";
-            btn.style.color           = "";
-            btn.classList.remove('active');
-        });
+    // 1. UI: Loko mavo amin'ny bokotra
+    document.querySelectorAll('.service-item').forEach(btn => {
+        btn.style.backgroundColor = "";
+        btn.style.color           = "";
+        btn.classList.remove('active');
+    });
 
-        const targetBtn = document.getElementById('btn-' + category);
-        if (targetBtn) {
-            targetBtn.style.backgroundColor = "var(--yellow)";
-            targetBtn.style.color           = "black";
-            targetBtn.classList.add('active');
-        }
-
-        const cryptoSelect = document.getElementById('crypto-select');
-        const transTitle   = document.getElementById('trans-title');
-        const labelAddr    = document.getElementById('label-addr');
-        const btnRec       = document.getElementById('main-rec-btn');
-
-        if (cryptoSelect) cryptoSelect.innerHTML = "";
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        switch (category) {
-            case 'crypto':
-                currentMode          = "Crypto";
-                transTitle.innerText = "Crypto Transaction";
-                labelAddr.innerText  = "Destination address:";
-                if (btnRec) { btnRec.style.opacity = "1"; btnRec.style.pointerEvents = "auto"; }
-                addOptions(cryptoSelect, [
-                    { val: 'TRX',  txt: 'TRX (TRC20)' },
-                    { val: 'USDT', txt: 'USDT (TRC20)' },
-                    { val: 'BTC',  txt: 'Bitcoin (BTC)' }
-                ]);
-                break;
-
-            case 'wallet':
-                currentMode          = "Wallet";
-                transTitle.innerText = "Wallet Transfer";
-                labelAddr.innerText  = "Email or Wallet ID:";
-                if (btnRec) { btnRec.style.opacity = "1"; btnRec.style.pointerEvents = "auto"; }
-                addOptions(cryptoSelect, [
-                    { val: 'PAYPAL', txt: 'PayPal' },
-                    { val: 'SKRILL', txt: 'Skrill' },
-                    { val: 'PAYEER', txt: 'Payeer' }
-                ]);
-                break;
-
-            case 'betting':
-                currentMode          = "Betting";
-                transTitle.innerText = "Betting Top-Up";
-                labelAddr.innerText  = "Player ID (Account):";
-                if (btnRec) { btnRec.style.opacity = "1"; btnRec.style.pointerEvents = "auto"; }
-                addOptions(cryptoSelect, [
-                    { val: '1XBET',  txt: '1xBet'  },
-                    { val: 'BET365', txt: 'Bet365' },
-                    { val: 'MELBET', txt: 'Melbet' }
-                ]);
-                break;
-
-            case 'abonnement':
-                currentMode          = "Subscription";
-                transTitle.innerText = "Subscription Service";
-                labelAddr.innerText  = "Email or Account to boost:";
-                if (btnRec) {
-                    btnRec.style.opacity      = "0.3";
-                    btnRec.style.pointerEvents = "none";
-                    switchAction('Envoyer'); // Force Send mode — French value for DB
-                }
-                addOptions(cryptoSelect, [
-                    { val: 'NETFLIX',  txt: 'Netflix'              },
-                    { val: 'STARLINK', txt: 'Starlink'             },
-                    { val: 'FACEBOOK', txt: 'Boost Facebook Page'  }
-                ]);
-                break;
-        }
-
-        if (typeof updateIcon === "function") updateIcon();
-        if (typeof updateCalc === "function") updateCalc();
+    const targetBtn = document.getElementById('btn-' + category);
+    if (targetBtn) {
+        targetBtn.style.backgroundColor = "var(--yellow)";
+        targetBtn.style.color           = "black";
+        targetBtn.classList.add('active');
     }
 
+    // 2. DATA: Maka ny labels sy items avy ao amin'ny config.js
+    currentMode = category;
+    const data = ASSETS_DATA[category]; 
+    if (!data) return;
+
+    // Fanovana ny soratra eo amin'ny UI
+    document.getElementById('trans-title').innerText = data.title;
+    document.getElementById('label-addr').innerText  = data.label;
+
+    // 3. LOGIC: Fitsapana ny bokotra Recevoir
+    const btnRec = document.getElementById('main-rec-btn'); 
+    if (btnRec) {
+        if (data.allowRecevoir) {
+            btnRec.style.opacity = "1";
+            btnRec.style.pointerEvents = "auto";
+        } else {
+            btnRec.style.opacity = "0.3";
+            btnRec.style.pointerEvents = "none";
+            switchAction('Envoyer'); 
+        }
+    }
+
+    // 4. DROPDOWN: Mameno ny lisitra (options)
+    const cryptoSelect = document.getElementById('crypto-select');
+    if (cryptoSelect) {
+        // Ny 'data.items' no ampiasaina eto (raha izany no anarany ao amin'ny config.js-nao)
+        cryptoSelect.innerHTML = data.items.map(item => 
+            `<option value="${item.val}">${item.txt}</option>`
+        ).join('');
+    }
+
+    // 5. NAVIGATION: Miakatra any ambony ny pejy
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // 6. UPDATE: Ireo andalana nanontanianao (MIJANONA)
+    if (typeof updateIcon === "function") updateIcon();
+    if (typeof updateCalc === "function") updateCalc();
+}
     function addOptions(selectEl, options) {
         if (!selectEl) return;
         selectEl.innerHTML = "";
