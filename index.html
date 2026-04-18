@@ -938,57 +938,41 @@
     //      "ajouterOptions" → addOptions
     // =====================================================
     function selectCategory(category) {
-    // 1. UI: Loko mavo amin'ny bokotra
+    currentMode = category;
+    const data = ASSETS_DATA[category];
+    if (!data) return;
+
+    // 1. Labels & Buttons
+    document.getElementById('trans-title').innerText = data.title;
+    document.getElementById('label-addr').innerText = data.label;
+    
+    // Hamarino tsara raha 'main-rec-btn' na 'btn-recevoir' ny ID ao amin'ny HTML-nao
+    const btnRec = document.getElementById('main-rec-btn');
+    if (btnRec) {
+        btnRec.style.opacity = data.allowRecevoir ? "1" : "0.3";
+        btnRec.style.pointerEvents = data.allowRecevoir ? "auto" : "none";
+        if (!data.allowRecevoir) switchAction('Envoyer');
+    }
+
+    // 2. Options (Dropdown list)
+    document.getElementById('crypto-select').innerHTML = data.items.map(i => 
+        `<option value="${i.val}">${i.txt}</option>`
+    ).join('');
+
+    // 3. UI Colors (Active state)
     document.querySelectorAll('.service-item').forEach(btn => {
         btn.style.backgroundColor = "";
-        btn.style.color           = "";
-        btn.classList.remove('active');
+        btn.style.color = "";
     });
-
     const targetBtn = document.getElementById('btn-' + category);
     if (targetBtn) {
         targetBtn.style.backgroundColor = "var(--yellow)";
-        targetBtn.style.color           = "black";
-        targetBtn.classList.add('active');
+        targetBtn.style.color = "black";
     }
 
-    // 2. DATA: Maka ny labels sy items avy ao amin'ny config.js
-    currentMode = category;
-    const data = ASSETS_DATA[category]; 
-    if (!data) return;
-
-    // Fanovana ny soratra eo amin'ny UI
-    document.getElementById('trans-title').innerText = data.title;
-    document.getElementById('label-addr').innerText  = data.label;
-
-    // 3. LOGIC: Fitsapana ny bokotra Recevoir
-    const btnRec = document.getElementById('main-rec-btn'); 
-    if (btnRec) {
-        if (data.allowRecevoir) {
-            btnRec.style.opacity = "1";
-            btnRec.style.pointerEvents = "auto";
-        } else {
-            btnRec.style.opacity = "0.3";
-            btnRec.style.pointerEvents = "none";
-            switchAction('Envoyer'); 
-        }
-    }
-
-    // 4. DROPDOWN: Mameno ny lisitra (options)
-    const cryptoSelect = document.getElementById('crypto-select');
-    if (cryptoSelect) {
-        // Ny 'data.items' no ampiasaina eto (raha izany no anarany ao amin'ny config.js-nao)
-        cryptoSelect.innerHTML = data.items.map(item => 
-            `<option value="${item.val}">${item.txt}</option>`
-        ).join('');
-    }
-
-    // 5. NAVIGATION: Miakatra any ambony ny pejy
+    // 4. Update Icon & Calc
+    updateIcon(); // Ity dia efa avy any amin'ny config.js
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    // 6. UPDATE: Ireo andalana nanontanianao (MIJANONA)
-    if (typeof updateIcon === "function") updateIcon();
-    if (typeof updateCalc === "function") updateCalc();
 }
     function addOptions(selectEl, options) {
         if (!selectEl) return;
@@ -1148,6 +1132,11 @@
         supabaseClient.auth.signOut().then(() => location.reload());
     }
 
+    window.selectCategory = selectCategory;
+window.updateIcon = updateIcon;
+window.updateCalc = updateCalc;
+window.switchAction = switchAction;
+window.handleTransaction = handleTransaction;
     // FIX: initApp() was outside
 
 </script>
