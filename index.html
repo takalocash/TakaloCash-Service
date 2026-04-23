@@ -816,78 +816,91 @@
     //   switchAction() reads data from ASSETS_DATA[currentMode] instead of
     //   comparing hardcoded capitalized strings.
     function selectCategory(category) {
-        const data = ASSETS_DATA[category];
-        if (!data) return;
+    currentMode = category;
+    const data = ASSETS_DATA[category];
+    if (!data) return;
 
-        currentMode = category;
-
-        // Update form labels from config
-        document.getElementById('trans-title').innerText                 = data.title;
-        document.getElementById('label-addr').innerText                  = data.label;
-        document.getElementById('crypto-select-container').style.display = 'block';
-
-        // Receive button
-        const btnRec = document.getElementById('main-rec-btn');
-        if (btnRec) {
-            btnRec.style.opacity       = data.allowRecevoir ? "1" : "0.3";
-            btnRec.style.pointerEvents = data.allowRecevoir ? "auto" : "none";
-            if (!data.allowRecevoir) switchAction('Envoyer');
-        }
-
-        // Rebuild dropdown options
-        const select = document.getElementById('crypto-select');
-        select.innerHTML = data.items.map(i => `<option value="${i.val}">${i.txt}</option>`).join('');
-
-        // Update active button style
-        document.querySelectorAll('.service-item').forEach(btn => {
-            btn.style.backgroundColor = "";
-            btn.style.color           = "";
-        });
-        const targetBtn = document.getElementById('btn-' + category);
-        if (targetBtn) {
-            targetBtn.style.backgroundColor = "var(--yellow)";
-            targetBtn.style.color           = "black";
-        }
-
-        updateIcon();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    // 1. Labels & UI logic
+    // Eto no mametraka ny "Destination Address" na "Player ID"
+    document.getElementById('label-addr').innerText = data.label;
+    
+    // 2. Fitsapana ny bokotra Recevoir (Abonnement dia disable)
+    const btnRec = document.getElementById('main-rec-btn');
+    if (btnRec) {
+        const isAbo = (category === 'abonnement');
+        btnRec.style.opacity = isAbo ? "0.3" : "1";
+        btnRec.style.pointerEvents = isAbo ? "none" : "auto";
+        if (isAbo) switchAction('Envoyer'); // Force "Envoyer" mode
     }
 
-    // FIX #5 — titles now come from ASSETS_DATA[currentMode].title
-    //   instead of hardcoded capitalized strings that didn't match currentMode.
+    // 3. Fenoina ny Dropdown (Options)
+    const cryptoSelect = document.getElementById('crypto-select');
+    cryptoSelect.innerHTML = data.items.map(i => 
+        `<option value="${i.val}">${i.txt}</option>`
+    ).join('');
+
+    // 4. Loko mavo amin'ny bokotra voafidy
+    document.querySelectorAll('.service-item').forEach(btn => {
+        btn.style.backgroundColor = "";
+        btn.style.color = "";
+    });
+    const targetBtn = document.getElementById('btn-' + category);
+    if (targetBtn) {
+        targetBtn.style.backgroundColor = "var(--yellow)";
+        targetBtn.style.color = "black";
+    }
+
+    // 5. Antsoina ny switchAction mba hanavao ny lohateny sy ny unit
+    switchAction(currentAction);
+    
+    // 6. Navigation & Icon
+    updateIcon();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
     function switchAction(action) {
-        currentAction = action; // 'Envoyer' or 'Recevoir' — French for DB
+    currentAction = action;
+    const transTitle = document.getElementById('trans-title');
+    const unitLabel = document.getElementById('amount-unit');
+    const assetKey = document.getElementById('crypto-select').value;
 
-        const catData    = ASSETS_DATA[currentMode];
-        const transTitle = document.getElementById('trans-title');
-        const labelAddr  = document.getElementById('label-addr');
-        const inputAddr  = document.getElementById('input-addr');
-        const copyBtn    = document.getElementById('copy-btn');
-
-        // Build title: for betting differentiate deposit/withdrawal
-        if (currentMode === 'betting') {
-            transTitle.innerText = action === 'Envoyer' ? "Dépôt Betting" : "Retrait Betting";
-        } else if (catData) {
-            transTitle.innerText = catData.title;
-        }
-
-        if (action === 'Recevoir') {
-            inputAddr.readOnly = true;
-            if (copyBtn) copyBtn.style.display = 'block';
-            labelAddr.innerText = "Your receiving address:";
-            const assetVal      = document.getElementById('crypto-select')?.value || "";
-            inputAddr.value     = ADDR_RECEPT[assetVal] || ("ADDRESS_" + assetVal);
+    // 1. UI: Loko mavo amin'ny bokotra Env/Rec
+    const btnEnv = document.getElementById('main-env-btn');
+    const btnRec = document.getElementById('main-rec-btn');
+    if (btnEnv && btnRec) {
+        if (action === 'Envoyer') {
+            btnEnv.classList.add('active');
+            btnRec.classList.remove('active');
         } else {
-            inputAddr.readOnly  = false;
-            inputAddr.value     = "";
-            if (copyBtn) copyBtn.style.display = 'none';
-            if (catData) labelAddr.innerText = catData.label;
+            btnRec.classList.add('active');
+            btnEnv.classList.remove('active');
         }
-
-        document.getElementById('main-env-btn').classList.toggle('active', action === 'Envoyer');
-        document.getElementById('main-rec-btn').classList.toggle('active', action === 'Recevoir');
-        updateCalc();
     }
+
+    // 2. Lojika ho an'ny Lohateny (Titles)
+    if (currentMode === 'crypto') {
+        transTitle.innerText = (action === 'Envoyer') ? "Envoyer Crypto" : "Recevoir Crypto";
+    } else if (currentMode === 'wallet') {
+        transTitle.innerText = (action === 'Envoyer') ? "Envoyer Wallet" : "Recevoir Wallet";
+    } else if (currentMode === 'betting') {
+        transTitle.innerText = (action === 'Envoyer') ? "Dépôt Betting" : "Retrait Betting";
+    } else {
+        transTitle.innerText = "Service Abonnement";
+    }
+
+    // 3. Lojika ho an'ny Unit (Ar, TRX, $)
+    if (unitLabel) {
+        if (action === 'Envoyer') {
+            unitLabel.innerText = "Ar"; // Envoyer dia Ar foana ampidirina
+        } else {
+            // Recevoir: miankina amin'ny asset
+            if (currentMode === 'crypto') unitLabel.innerText = assetKey;
+            else if (currentMode === 'wallet') unitLabel.innerText = (assetKey === 'PAYPAL') ? "$" : "€";
+            else unitLabel.innerText = "Ar"; // Betting mijanona Ar
+        }
+    }
+
+    updateCalc();
+}
 
     // =========================================================
     // TRANSACTION SUBMIT
