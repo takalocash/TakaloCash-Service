@@ -489,6 +489,20 @@
     <div id="notif-list"></div>
 </div>
 
+<div style="margin-top:10px;">
+  <input type="checkbox" id="check-conditions">
+  <label style="font-size:12px;">
+    J'accepte les conditions générales et la politique de confidentialité
+  </label>
+</div>
+
+    <div style="font-size:12px; margin-top:10px;">
+  Taux : 1 USDT = 4500 Ar
+</div>
+<div style="font-size:12px;">
+  Frais : 5%
+</div>
+    
 <!-- ============================
      JAVASCRIPT
      FIX #1 : <script type="module"> so that ES Module imports work.
@@ -905,28 +919,64 @@
     // =========================================================
     // TRANSACTION SUBMIT
     // =========================================================
-    async function handleTransaction() {
-        const asset    = document.getElementById('crypto-select').value;
-        const amountAr = parseFloat(document.getElementById('input-main').value);
-        const address  = document.getElementById('input-addr').value.trim();
+function handleTransaction() {
+    const asset   = document.getElementById('crypto-select').value;
+    const amount  = parseFloat(document.getElementById('input-main').value);
+    const address = document.getElementById('input-addr').value.trim();
+    const solde   = userData?.solde || 0;
 
-        if (!amountAr || !address) return alert("Please fill in the amount and address.");
-
-        try {
-            const { error } = await supabaseClient.from('transactions').insert([{
-                user_id:    currentUserId,
-                service:    currentAction + " " + currentMode + " (" + asset + ")",  // French action + category key
-                montant:    amountAr,
-                reference:  "TRANS-" + Math.floor(Math.random() * 1000000),
-                status:     "en attente",   // French — matches DB convention
-                created_at: new Date()
-            }]);
-            if (error) throw error;
-            alert("Transaction submitted! Awaiting confirmation.");
-            showPage('home');
-            fetchData();
-        } catch (err) { alert("Error: " + err.message); }
+    if (!amount || !address) {
+        alert("Veuillez remplir tous les champs");
+        return;
     }
+
+    // Frais
+    let frais = 0.05; // exemple 5%
+    let total = amount + (amount * frais);
+
+    // Vérification solde (Envoyer seulement)
+    if (currentAction === "Envoyer" && total > solde) {
+        alert("Solde insuffisant");
+        return;
+    }
+
+    // Vérification conditions
+    const check = document.getElementById("check-conditions");
+    if (!check || !check.checked) {
+        alert("Veuillez accepter les conditions");
+        return;
+    }
+
+    // Message confirmation
+    const confirmMsg = `
+Confirmer la transaction ?
+
+Montant : ${amount} Ar
+Frais : ${frais * 100}%
+Total : ${total.toLocaleString()} Ar
+Destination : ${address}
+    `;
+
+    if (!confirm(confirmMsg)) return;
+
+    // Envoi Supabase
+    supabaseClient.from('transactions').insert([{
+        user_id: currentUserId,
+        service: currentAction + " " + currentMode,
+        montant: amount,
+        status: "en attente",
+        created_at: new Date()
+    }]);
+
+    // Déduction locale
+    if (currentAction === "Envoyer") {
+        userData.solde -= total;
+        document.getElementById("display-solde").innerText =
+            userData.solde.toLocaleString() + " Ar";
+    }
+
+    alert("Transaction envoyée !");
+}
 
     // =========================================================
     // PROFILE
