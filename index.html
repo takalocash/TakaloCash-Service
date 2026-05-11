@@ -56,7 +56,12 @@
             box-shadow:    0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
-        .auth-box h1   { color: var(--yellow); font-weight: 900; margin-bottom: 25px; font-size: 26px; }
+        .auth-box h1 {
+            color:         var(--yellow);
+            font-weight:   900;
+            margin-bottom: 25px;
+            font-size:     26px;
+        }
 
         .styled-input {
             background:    var(--bg-body);
@@ -109,7 +114,12 @@
             display:       none;
         }
 
-        .container { max-width: 480px; margin: auto; padding: 15px; display: none; }
+        .container {
+            max-width: 480px;
+            margin:    auto;
+            padding:   15px;
+            display:   none;
+        }
 
         .solde-card {
             text-align:    center;
@@ -120,7 +130,12 @@
             border:        1px solid var(--border);
         }
 
-        .solde-amount { font-size: 38px; font-weight: 800; margin: 8px 0; letter-spacing: -1px; }
+        .solde-amount {
+            font-size:     38px;
+            font-weight:   800;
+            margin:        8px 0;
+            letter-spacing:-1px;
+        }
 
         .main-actions {
             display:               grid;
@@ -139,11 +154,18 @@
             align-items:     center;
             justify-content: center;
             gap:             10px;
+            transition:      opacity 0.2s;
         }
         .btn-env { background: var(--grad-yellow); color: black; }
         .btn-rec { background: var(--green);       color: white; }
 
-        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
+        /* --- FIX : style for active category button --- */
+        .services-grid {
+            display:               grid;
+            grid-template-columns: 1fr 1fr;
+            gap:                   12px;
+            margin-bottom:         30px;
+        }
 
         .service-item {
             background:    var(--card);
@@ -154,7 +176,16 @@
             align-items:   center;
             gap:           12px;
             cursor:        pointer;
-            transition:    background 0.2s, color 0.2s;
+            transition:    background 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .service-item.active {
+            background:   var(--yellow);
+            color:        black;
+            border-color: var(--yellow);
+        }
+        .service-item.active .icon-box {
+            background:   rgba(0,0,0,0.15);
+            border-color: transparent;
         }
 
         .icon-box {
@@ -170,7 +201,13 @@
             flex-shrink:     0;
         }
 
-        .trans-box { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 22px; margin-bottom: 30px; }
+        .trans-box {
+            background:    var(--card);
+            border:        1px solid var(--border);
+            border-radius: 24px;
+            padding:       22px;
+            margin-bottom: 30px;
+        }
 
         /* --- SIDEBAR & MODAL --- */
         .sidebar {
@@ -184,10 +221,18 @@
             z-index:    6000;
             transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             padding:    30px;
+            overflow-y: auto;
         }
         .sidebar.active { right: 0; }
 
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 5500; backdrop-filter: blur(4px); }
+        .overlay {
+            position:       fixed;
+            inset:          0;
+            background:     rgba(0,0,0,0.8);
+            display:        none;
+            z-index:        5500;
+            backdrop-filter:blur(4px);
+        }
 
         .modal {
             display:         none;
@@ -214,7 +259,13 @@
             letter-spacing: 1px;
         }
 
-        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .history-item {
+            display:         flex;
+            justify-content: space-between;
+            align-items:     center;
+            padding:         15px;
+            border-bottom:   1px solid rgba(255,255,255,0.05);
+        }
         .history-service { font-weight: 500; font-size: 15px; }
         .history-time    { font-size: 12px; color: #999; }
 
@@ -232,7 +283,11 @@
             color:         var(--gray);
             white-space:   nowrap;
         }
-        .filter-chip.active { background: var(--yellow); color: black; border-color: var(--yellow); }
+        .filter-chip.active {
+            background:   var(--yellow);
+            color:        black;
+            border-color: var(--yellow);
+        }
 
         #notif-panel {
             position:      fixed;
@@ -252,8 +307,21 @@
         .notif-item { padding: 15px; border-bottom: 1px solid var(--border); font-size: 13px; }
         .notif-item.unread { background: rgba(252, 213, 53, 0.05); }
 
+        /* --- Conditions checkbox row --- */
+        .conditions-row {
+            display:     flex;
+            align-items: flex-start;
+            gap:         8px;
+            margin-top:  15px;
+            font-size:   12px;
+            color:       var(--gray);
+            line-height: 1.5;
+        }
+        .conditions-row input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; accent-color: var(--yellow); }
+        .conditions-row a { color: var(--yellow); text-decoration: underline; }
+
         #page-home    { display: block; }
-        #page-history { display: none; }
+        #page-history { display: none;  }
     </style>
 </head>
 <body>
@@ -263,6 +331,7 @@
      ============================ -->
 <div id="auth-container">
 
+    <!-- LOGIN -->
     <div class="auth-box" id="login-form">
         <h1>Sign In</h1>
         <input type="email"    id="login-email" class="styled-input" placeholder="Email address">
@@ -276,6 +345,7 @@
         </p>
     </div>
 
+    <!-- SIGN UP -->
     <div class="auth-box" id="signup-form" style="display:none;">
         <h1>Create Account</h1>
         <input type="text"     id="reg-name"    class="styled-input" placeholder="Full name">
@@ -289,88 +359,137 @@
         </p>
     </div>
 
+    <!-- FORGOT PASSWORD -->
     <div class="auth-box" id="forgot-form" style="display:none;">
         <h1>Reset Password</h1>
-        <p style="font-size:13px; color:var(--gray); margin-bottom:20px;">Enter your email to receive a reset link.</p>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:20px;">
+            Enter your email to receive a reset link.
+        </p>
         <input type="email" id="forgot-email" class="styled-input" placeholder="Email address">
         <button class="btn-valider" onclick="handleForgot()">Send Reset Link</button>
         <p class="auth-link" onclick="showAuth('login')">Back to Sign In</p>
     </div>
 
-</div>
+</div><!-- /#auth-container -->
+
 
 <!-- ============================
      HEADER
      ============================ -->
-<header id="nav-header" style="display:none; padding:10px 20px; background:#121212; border-bottom:1px solid var(--border); position:sticky; top:0; z-index:1000; width:100%; box-sizing:border-box;">
-    <div style="display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto;">
+<header id="nav-header" style="display:none; padding:10px 20px; background:#121212;
+    border-bottom:1px solid var(--border); position:sticky; top:0; z-index:1000;
+    width:100%; box-sizing:border-box;">
+    <div style="display:flex; justify-content:space-between; align-items:center;
+                max-width:1200px; margin:0 auto;">
         <div style="display:flex; align-items:center; gap:15px;">
-            <i class="fas fa-bars" onclick="toggleSidebar()" style="font-size:20px; color:white; cursor:pointer;"></i>
-            <h1 onclick="showPage('home')" style="margin:0; font-size:20px; font-weight:900; color:var(--yellow); cursor:pointer; letter-spacing:-1px;">TAKALOCASH</h1>
+            <i class="fas fa-bars" onclick="toggleSidebar()"
+               style="font-size:20px; color:white; cursor:pointer;"></i>
+            <h1 onclick="showPage('home')"
+                style="margin:0; font-size:20px; font-weight:900; color:var(--yellow);
+                       cursor:pointer; letter-spacing:-1px;">TAKALOCASH</h1>
         </div>
         <div style="display:flex; align-items:center; gap:18px;">
-            <div style="position:relative; cursor:pointer; display:flex; align-items:center;" onclick="toggleNotif()">
+            <div style="position:relative; cursor:pointer; display:flex; align-items:center;"
+                 onclick="toggleNotif()">
                 <i class="fas fa-bell" style="font-size:19px; color:white;"></i>
-                <span id="notif-count" style="display:none; position:absolute; top:-7px; right:-7px; background:var(--red); color:white; font-size:9px; padding:2px 5px; border-radius:10px; font-weight:800; border:2px solid #121212;">0</span>
+                <span id="notif-count"
+                      style="display:none; position:absolute; top:-7px; right:-7px;
+                             background:var(--red); color:white; font-size:9px;
+                             padding:2px 5px; border-radius:10px; font-weight:800;
+                             border:2px solid #121212;">0</span>
             </div>
-            <img id="header-avatar" onclick="openProfile()" src="https://via.placeholder.com/35"
-                 style="width:32px; height:32px; border-radius:50%; border:1.5px solid var(--yellow); cursor:pointer; object-fit:cover;">
+            <img id="header-avatar" onclick="openProfile()"
+                 src="https://via.placeholder.com/35"
+                 style="width:32px; height:32px; border-radius:50%;
+                        border:1.5px solid var(--yellow); cursor:pointer; object-fit:cover;">
         </div>
     </div>
 </header>
+
 
 <!-- ============================
      SIDEBAR & OVERLAY
      ============================ -->
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
 <div class="sidebar" id="sidebar">
-    <div style="display:flex; align-items:center; gap:12px; margin-bottom:30px; padding-bottom:20px; border-bottom:1px solid var(--border);">
-        <img id="side-avatar" src="https://via.placeholder.com/50" style="width:50px; height:50px; border-radius:50%; border:2px solid var(--yellow); object-fit:cover;">
+    <!-- Profile info -->
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:30px;
+                padding-bottom:20px; border-bottom:1px solid var(--border);">
+        <img id="side-avatar" src="https://via.placeholder.com/50"
+             style="width:50px; height:50px; border-radius:50%;
+                    border:2px solid var(--yellow); object-fit:cover;">
         <div>
             <div id="side-full-name" style="font-weight:bold; font-size:16px;">Loading...</div>
-            <div id="side-tk-id"    style="font-size:12px; color:var(--yellow); font-weight:800;">ID: TK-0000</div>
+            <div id="side-tk-id"    style="font-size:12px; color:var(--yellow); font-weight:800;">
+                ID: TK-0000
+            </div>
         </div>
     </div>
-    <div onclick="showPage('history')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-clock-rotate-left"></i> &nbsp; History</div>
-    <!-- DB mode values stay French: Dépôt / Retrait -->
-    <div onclick="openMobile('Dépôt')"   style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-plus-circle"></i>  &nbsp; Mobile Deposit</div>
-    <div onclick="openMobile('Retrait')" style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;"><i class="fa-solid fa-minus-circle"></i> &nbsp; Mobile Withdrawal</div>
-    <div onclick="logout()"              style="padding:15px 0; color:var(--red); cursor:pointer; margin-top:40px;"><i class="fa-solid fa-power-off"></i> &nbsp; Sign Out</div>
+
+    <div onclick="showPage('history')"
+         style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;">
+        <i class="fa-solid fa-clock-rotate-left"></i> &nbsp; History
+    </div>
+    <div onclick="openMobile('Dépôt')"
+         style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;">
+        <i class="fa-solid fa-plus-circle"></i> &nbsp; Mobile Deposit
+    </div>
+    <div onclick="openMobile('Retrait')"
+         style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;">
+        <i class="fa-solid fa-minus-circle"></i> &nbsp; Mobile Withdrawal
+    </div>
+    <div onclick="logout()"
+         style="padding:15px 0; color:var(--red); cursor:pointer; margin-top:40px;">
+        <i class="fa-solid fa-power-off"></i> &nbsp; Sign Out
+    </div>
 </div>
+
 
 <!-- ============================
      MAIN APP
      ============================ -->
 <div class="container" id="main-app">
 
-    <!-- PAGE: HOME -->
+    <!-- ===================== PAGE: HOME ===================== -->
     <div id="page-home">
 
+        <!-- Balance card -->
         <div class="solde-card">
-            <div style="color:var(--gray); font-size:12px; font-weight:600; text-transform:uppercase;">Available Balance</div>
+            <div style="color:var(--gray); font-size:12px; font-weight:600;
+                        text-transform:uppercase;">Available Balance</div>
             <h1 class="solde-amount" id="display-solde">0 Ar</h1>
         </div>
 
+        <!-- Category buttons -->
         <div class="services-grid">
-            <div class="service-item active" id="btn-crypto"      onclick="selectCategory('crypto')">
-                <div class="icon-box" style="color:#f3ba2f;"><i class="fa-solid fa-coins"></i></div>
+            <div class="service-item active" id="btn-crypto" onclick="selectCategory('crypto')">
+                <div class="icon-box" style="color:#f3ba2f;">
+                    <i class="fa-solid fa-coins"></i>
+                </div>
                 <b>Crypto</b>
             </div>
-            <div class="service-item" id="btn-wallet"             onclick="selectCategory('wallet')">
-                <div class="icon-box" style="color:#8132ad;"><i class="fa-solid fa-wallet"></i></div>
+            <div class="service-item" id="btn-wallet" onclick="selectCategory('wallet')">
+                <div class="icon-box" style="color:#8132ad;">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
                 <b>Wallets</b>
             </div>
-            <div class="service-item" id="btn-betting"            onclick="selectCategory('betting')">
-                <div class="icon-box" style="color:#2ebd85;"><i class="fa-solid fa-gamepad"></i></div>
+            <div class="service-item" id="btn-betting" onclick="selectCategory('betting')">
+                <div class="icon-box" style="color:#2ebd85;">
+                    <i class="fa-solid fa-gamepad"></i>
+                </div>
                 <b>Betting</b>
             </div>
-            <div class="service-item" id="btn-abonnement"         onclick="selectCategory('abonnement')">
-                <div class="icon-box" style="color:#ff4d4d;"><i class="fa-solid fa-tv"></i></div>
+            <div class="service-item" id="btn-abonnement" onclick="selectCategory('abonnement')">
+                <div class="icon-box" style="color:#ff4d4d;">
+                    <i class="fa-solid fa-tv"></i>
+                </div>
                 <b>Subscription</b>
             </div>
         </div>
 
-        <!-- DB action values stay French: Envoyer / Recevoir -->
+        <!-- Send / Receive buttons -->
         <div class="main-actions">
             <button class="btn-action btn-env" id="main-env-btn" onclick="switchAction('Envoyer')">
                 <i class="fa-solid fa-paper-plane"></i> Send
@@ -380,74 +499,121 @@
             </button>
         </div>
 
+        <!-- Transaction form -->
         <div class="trans-box">
-            <b id="trans-title" style="color:var(--yellow); font-size:17px; display:block; margin-bottom:15px;">Send Crypto</b>
+            <b id="trans-title"
+               style="color:var(--yellow); font-size:17px; display:block; margin-bottom:15px;">
+                Send Crypto
+            </b>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <!-- Asset selector -->
                 <div id="crypto-select-container">
                     <label style="font-size:11px; color:var(--gray)">Asset:</label>
                     <div style="display:flex; align-items:center; gap:8px; margin-top:5px;">
-                        <img id="asset-img" src="https://cryptologos.cc/logos/tron-trx-logo.svg" width="22">
-                        <!-- FIX: calls both updateIcon() AND updateCalc() on change -->
-                        <select id="crypto-select" class="styled-input" style="margin-top:0; padding:10px;"
-                                onchange="updateIcon(); updateCalc();">
+                        <img id="asset-img"
+                             src="https://cryptologos.cc/logos/tron-trx-logo.svg" width="22">
+                        <select id="crypto-select" class="styled-input"
+                                style="margin-top:0; padding:10px;"
+                                onchange="updateIcon();">
                             <option value="TRX">TRX (TRC20)</option>
                             <option value="USDT">USDT (TRC20)</option>
-                            <option value="1XBET">1xBet Account</option>
                         </select>
                     </div>
                 </div>
+                <!-- Amount input -->
                 <div>
-                    <label id="label-right" style="font-size:11px; color:var(--gray)">Amount (Ar):</label>
+                    <label id="label-right" style="font-size:11px; color:var(--gray)">
+                        Amount (Ar):
+                    </label>
                     <div style="position:relative;">
-                        <input type="number" id="input-main" class="styled-input" placeholder="0" oninput="updateCalc()">
-                        <span id="unit-suffix" style="position:absolute; right:12px; top:12px; color:var(--gray); font-size:12px; font-weight:bold;">Ar</span>
+                        <input type="number" id="input-main" class="styled-input"
+                               placeholder="0" oninput="updateCalc()">
+                        <span id="unit-suffix"
+                              style="position:absolute; right:12px; top:12px;
+                                     color:var(--gray); font-size:12px; font-weight:bold;">
+                            Ar
+                        </span>
                     </div>
                 </div>
             </div>
 
+            <!-- Address / destination -->
             <div style="margin-top:15px;">
-                <label id="label-addr" style="font-size:11px; color:var(--gray)">Recipient address / ID:</label>
+                <label id="label-addr" style="font-size:11px; color:var(--gray)">
+                    Recipient address / ID:
+                </label>
                 <div style="position:relative; display:flex; align-items:center;">
-                    <input type="text" id="input-addr" class="styled-input" placeholder="Enter address">
-                    <i class="fa-solid fa-copy" id="copy-btn" onclick="copyText()" style="position:absolute; right:12px; top:18px; color:var(--yellow); cursor:pointer; display:none;"></i>
+                    <input type="text" id="input-addr" class="styled-input"
+                           placeholder="Enter address">
+                    <i class="fa-solid fa-copy" id="copy-btn" onclick="copyText()"
+                       style="position:absolute; right:12px; top:18px;
+                              color:var(--yellow); cursor:pointer; display:none;"></i>
                 </div>
             </div>
 
-            <div id="calc-container" style="display:flex; justify-content:space-between; font-size:12px; margin-top:15px; background:rgba(255,255,255,0.03); padding:12px; border-radius:12px;">
+            <!-- Equivalent display -->
+            <div id="calc-container"
+                 style="display:flex; justify-content:space-between; font-size:12px;
+                        margin-top:15px; background:rgba(255,255,255,0.03);
+                        padding:12px; border-radius:12px;">
                 <span style="color:var(--gray)">Equivalent:</span>
-                <span id="calc-res" style="color:var(--yellow); font-weight:800;">0.00 TRX</span>
+                <span id="calc-res" style="color:var(--yellow); font-weight:800;">
+                    0.00 TRX
+                </span>
             </div>
-            <div id="frais-info" style="text-align:right; font-size:11px; color:var(--gray); margin-top:6px;"></div>
+            <div id="frais-info"
+                 style="text-align:right; font-size:11px; color:var(--gray); margin-top:6px;">
+            </div>
 
-            <div style="margin-top:10px;">
-  <input type="checkbox" id="check-conditions">
-  <label style="font-size:12px;">
-    J'accepte les conditions générales et la politique de confidentialité
-  </label>
-</div>
-            <button class="btn-valider" id="btn-submit" onclick="handleTransaction()">Confirm</button>
-        </div>
+            <!-- Terms checkbox (single, inside the form) -->
+            <div class="conditions-row">
+                <input type="checkbox" id="check-conditions">
+                <label for="check-conditions">
+                    I accept the
+                    <a href="#" onclick="return false;">terms &amp; conditions</a>
+                    and the
+                    <a href="#" onclick="return false;">privacy policy</a>
+                </label>
+            </div>
 
+            <button class="btn-valider" id="btn-submit" onclick="handleTransaction()">
+                Confirm
+            </button>
+        </div><!-- /.trans-box -->
+
+        <!-- Recent transactions preview -->
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h3 style="font-size:16px;">Recent Transactions</h3>
-            <span onclick="goToFullHistory()" style="color:var(--yellow); font-size:13px; cursor:pointer;">See All</span>
+            <span onclick="goToFullHistory()"
+                  style="color:var(--yellow); font-size:13px; cursor:pointer;">
+                See All
+            </span>
         </div>
-        <table class="history-table"><tbody id="preview-history-body"></tbody></table>
+        <table class="history-table">
+            <tbody id="preview-history-body"></tbody>
+        </table>
 
-    </div>
+    </div><!-- /#page-home -->
 
-    <!-- PAGE: HISTORY -->
+
+    <!-- ===================== PAGE: HISTORY ===================== -->
     <div id="page-history" style="display:none;">
         <div style="display:flex; align-items:center; gap:15px; padding:10px 0 20px 0;">
-            <div onclick="showPage('home')" style="cursor:pointer; width:40px; height:40px; background:var(--card); border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center;">
+            <div onclick="showPage('home')"
+                 style="cursor:pointer; width:40px; height:40px; background:var(--card);
+                        border:1px solid var(--border); border-radius:12px;
+                        display:flex; align-items:center; justify-content:center;">
                 <i class="fas fa-arrow-left" style="color:var(--yellow); font-size:18px;"></i>
             </div>
-            <h2 style="margin:0; font-size:20px; font-weight:800; letter-spacing:-0.5px;">Transaction History</h2>
+            <h2 style="margin:0; font-size:20px; font-weight:800; letter-spacing:-0.5px;">
+                Transaction History
+            </h2>
         </div>
 
-        <!-- Filter labels in English; filter values in French to match DB service names -->
-        <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:15px;" id="history-filters">
+        <!-- Filter chips (labels in English; values match French DB service strings) -->
+        <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:15px;"
+             id="history-filters">
             <div class="filter-chip active" onclick="filterHistory('All',      this)">All</div>
             <div class="filter-chip"        onclick="filterHistory('Envoyer',  this)">Send</div>
             <div class="filter-chip"        onclick="filterHistory('Retrait',  this)">Withdrawal</div>
@@ -456,647 +622,863 @@
         </div>
 
         <div id="full-history-container"></div>
-    </div>
+    </div><!-- /#page-history -->
 
-</div>
+</div><!-- /.container #main-app -->
+
 
 <!-- ============================
      PROFILE MODAL
      ============================ -->
 <div id="modal-profile" class="modal">
-    <div style="background:var(--card); padding:25px; border-radius:28px; width:100%; max-width:350px; border:1px solid var(--border); text-align:center;">
+    <div style="background:var(--card); padding:25px; border-radius:28px; width:100%;
+                max-width:350px; border:1px solid var(--border); text-align:center;">
         <h3 style="color:var(--yellow); margin-top:0;">Profile Settings</h3>
         <div style="position:relative; display:inline-block; margin-bottom:20px;">
-            <img id="modal-pp-view" src="https://via.placeholder.com/100" style="width:100px; height:100px; border-radius:50%; border:3px solid var(--yellow); object-fit:cover;">
-            <label for="file-pp" style="position:absolute; bottom:5px; right:0; background:var(--yellow); color:black; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border:3px solid var(--card);">
+            <img id="modal-pp-view" src="https://via.placeholder.com/100"
+                 style="width:100px; height:100px; border-radius:50%;
+                        border:3px solid var(--yellow); object-fit:cover;">
+            <label for="file-pp"
+                   style="position:absolute; bottom:5px; right:0; background:var(--yellow);
+                          color:black; width:30px; height:30px; border-radius:50%;
+                          display:flex; align-items:center; justify-content:center;
+                          cursor:pointer; border:3px solid var(--card);">
                 <i class="fa-solid fa-camera" style="font-size:14px;"></i>
             </label>
-            <input type="file" id="file-pp" accept="image/*" style="display:none;" onchange="previewImage(this)">
+            <input type="file" id="file-pp" accept="image/*" style="display:none;"
+                   onchange="previewImage(this)">
         </div>
         <div style="text-align:left;">
             <label style="font-size:11px; color:var(--gray)">Full name:</label>
             <input type="text" id="edit-full-name" class="styled-input" style="margin-bottom:15px;">
             <label style="font-size:11px; color:var(--gray)">Phone number:</label>
-            <input type="tel"  id="edit-phone" class="styled-input">
+            <input type="tel" id="edit-phone" class="styled-input">
         </div>
         <button class="btn-valider" onclick="updateProfile()">Save Changes</button>
-        <p onclick="closeProfile()" style="text-align:center; cursor:pointer; color:var(--gray); margin-top:15px; font-size:13px;">Close</p>
+        <p onclick="closeProfile()"
+           style="text-align:center; cursor:pointer; color:var(--gray);
+                  margin-top:15px; font-size:13px;">
+            Close
+        </p>
     </div>
 </div>
+
 
 <!-- ============================
      NOTIFICATIONS PANEL
      ============================ -->
 <div id="notif-panel">
-    <div style="padding:15px; font-weight:bold; border-bottom:1px solid var(--border); display:flex; justify-content:space-between;">
+    <div style="padding:15px; font-weight:bold; border-bottom:1px solid var(--border);
+                display:flex; justify-content:space-between;">
         Notifications
-        <small style="color:var(--yellow); cursor:pointer;" onclick="markAllRead()">Mark all read</small>
+        <small style="color:var(--yellow); cursor:pointer;" onclick="markAllRead()">
+            Mark all read
+        </small>
     </div>
     <div id="notif-list"></div>
 </div>
 
-<div style="margin-top:10px;">
-  <input type="checkbox" id="check-conditions">
-  <label style="font-size:12px;">
-    J'accepte les conditions générales et la politique de confidentialité
-  </label>
-</div>
 
-    <div style="font-size:12px; margin-top:10px;">
-  Taux : 1 USDT = 4500 Ar
-</div>
-<div style="font-size:12px;">
-  Frais : 5%
-</div>
-    
 <!-- ============================
      JAVASCRIPT
-     FIX #1 : <script type="module"> so that ES Module imports work.
-     FIX #6 : All functions used in onclick handlers are exposed on window
-              at the bottom of this script (required for module scope).
+     FIX: regular <script> (no type="module")
+          → functions are global by default;
+          → no import/export needed;
+          → no window.xxx assignments needed.
      ============================ -->
-<script type="module">
+<script>
 
-    // =========================================================
-    // FIX #1 — import is now inside type="module" (was in a
-    //   plain <script> which caused an immediate SyntaxError)
-    // FIX #3 — ADDR_RECEPT is now imported (was missing)
-    // =========================================================
-    import {
-        ASSETS_DATA,
-        CURRENT_TAUX,
-        ADDR_RECEPT,
-        updateIcon as _updateIcon,
-        updateTaux
-    } from './config.js';
+// =========================================================
+// CONFIG — inlined (previously external config.js)
+// =========================================================
 
-    // =========================================================
-    // SUPABASE — enable RLS on all tables in your Supabase dashboard
-    // =========================================================
-    const _URL = "https://nyeopreahmajoisartoz.supabase.co";
-    const _KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA";
-    const supabaseClient = supabase.createClient(_URL, _KEY);
+/** Exchange rates  (Ar per 1 unit).  Updated via updateTaux(). */
+const CURRENT_TAUX = {
+    TRX:       650,
+    USDT:      4500,
+    BNB:       1800000,
+    PAYPAL:    4500,
+    SKRILL:    4300,
+    NETELLER:  4300,
+    "1XBET":   1,
+    MELBET:    1,
+    BETWAY:    1,
+    NETFLIX:   1,
+    DSTV:      1,
+    CANAL:     1,
+    SPOTIFY:   1
+};
 
-    // =========================================================
-    // STATE
-    // currentMode  = category key ('crypto','wallet','betting','abonnement')
-    // currentAction = French DB value ('Envoyer' or 'Recevoir')
-    // =========================================================
-    let currentUserId   = null;
-    let userData        = null;
-    let allTransactions = [];
-    let currentMode     = 'crypto';      // matches ASSETS_DATA keys
-    let currentAction   = 'Envoyer';     // French — stored in DB
+/** Receiving addresses shown when action = 'Recevoir'. */
+const ADDR_RECEPT = {
+    TRX:     "TYourTRXAddressHereXXXXXXXXXXXX",
+    USDT:    "TYourUSDTAddressHereXXXXXXXXXXX",
+    BNB:     "0xYourBNBAddressHereXXXXXXXXXX",
+    PAYPAL:  "payments@takalocash.mg",
+    SKRILL:  "payments@takalocash.mg",
+    NETELLER:"payments@takalocash.mg",
+    "1XBET": "TakaloCash1xBet",
+    MELBET:  "TakaloCashMelbet"
+};
 
-    // =========================================================
-    // AUTH
-    // =========================================================
-    function showAuth(mode) {
-        document.getElementById('login-form').style.display  = mode === 'login'  ? 'block' : 'none';
-        document.getElementById('signup-form').style.display = mode === 'signup' ? 'block' : 'none';
-        document.getElementById('forgot-form').style.display = mode === 'forgot' ? 'block' : 'none';
+/**
+ * Asset data grouped by category.
+ *  - label   : label for the address/ID input
+ *  - items   : list of selectable assets
+ *    - val   : <select> option value (used as key in CURRENT_TAUX)
+ *    - txt   : human-readable option label
+ *    - frais : fee fraction (0.05 = 5 %)
+ *    - logo  : URL for the icon (empty string = hide icon)
+ */
+const ASSETS_DATA = {
+    crypto: {
+        label: "Recipient address (TRC20):",
+        items: [
+            { val: "TRX",  txt: "TRX (TRC20)",  frais: 0.05,
+              logo: "https://cryptologos.cc/logos/tron-trx-logo.svg" },
+            { val: "USDT", txt: "USDT (TRC20)", frais: 0.03,
+              logo: "https://cryptologos.cc/logos/tether-usdt-logo.svg" },
+            { val: "BNB",  txt: "BNB (BEP20)",  frais: 0.05,
+              logo: "https://cryptologos.cc/logos/bnb-bnb-logo.svg" }
+        ]
+    },
+    wallet: {
+        label: "Wallet email / account ID:",
+        items: [
+            { val: "PAYPAL",   txt: "PayPal",   frais: 0.05, logo: "" },
+            { val: "SKRILL",   txt: "Skrill",   frais: 0.04, logo: "" },
+            { val: "NETELLER", txt: "Neteller", frais: 0.04, logo: "" }
+        ]
+    },
+    betting: {
+        label: "Player ID / Username:",
+        items: [
+            { val: "1XBET",  txt: "1xBet",  frais: 0.05, logo: "" },
+            { val: "MELBET", txt: "Melbet", frais: 0.05, logo: "" },
+            { val: "BETWAY", txt: "Betway", frais: 0.05, logo: "" }
+        ]
+    },
+    abonnement: {
+        label: "Account email / activation code:",
+        items: [
+            { val: "NETFLIX", txt: "Netflix",  frais: 0.0, logo: "" },
+            { val: "DSTV",    txt: "DStv",     frais: 0.0, logo: "" },
+            { val: "CANAL",   txt: "Canal+",   frais: 0.0, logo: "" },
+            { val: "SPOTIFY", txt: "Spotify",  frais: 0.0, logo: "" }
+        ]
     }
+};
 
-    async function handleSignUp() {
-        const name    = document.getElementById('reg-name').value.trim();
-        const phone   = document.getElementById('reg-phone').value.trim();
-        const email   = document.getElementById('reg-email').value.trim();
-        const pass    = document.getElementById('reg-pass').value;
-        const confirm = document.getElementById('reg-confirm').value;
+// =========================================================
+// SUPABASE
+// =========================================================
+const _URL = "https://nyeopreahmajoisartoz.supabase.co";
+const _KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA";
+const supabaseClient = supabase.createClient(_URL, _KEY);
 
-        if (pass !== confirm) return alert("Passwords do not match!");
-        if (!name || !phone || !email || !pass) return alert("Please fill in all fields.");
+// =========================================================
+// STATE
+//  currentMode   = category key: 'crypto' | 'wallet' | 'betting' | 'abonnement'
+//                  or mobile mode: 'Dépôt' | 'Retrait'
+//  currentAction = French DB value: 'Envoyer' | 'Recevoir'
+//                  (also 'Dépôt' / 'Retrait' for mobile money)
+// =========================================================
+let currentUserId   = null;
+let userData        = null;
+let allTransactions = [];
+let currentMode     = 'crypto';
+let currentAction   = 'Envoyer';
 
-        const tkId = "TK-" + Math.floor(1000 + Math.random() * 9000);
+// =========================================================
+// CONFIG HELPERS
+// =========================================================
 
-        try {
-            const { data: authData, error: authError } = await supabaseClient.auth.signUp({ email, password: pass });
-            if (authError) throw authError;
-
-            if (authData.user) {
-                const { error: dbError } = await supabaseClient.from('users').insert([{
-                    id: authData.user.id, full_name: name, phone, email, tk_id: tkId, solde: 0
-                }]);
-                if (dbError) throw dbError;
-                alert("Account created! Your ID: " + tkId);
-                showAuth('login');
-            }
-        } catch (err) { alert("Error: " + err.message); }
+/** Fetch live rates from CoinGecko and update CURRENT_TAUX.
+    Falls back silently if the request fails. */
+async function updateTaux() {
+    try {
+        const res  = await fetch(
+            "https://api.coingecko.com/api/v3/simple/price?ids=tron,tether,binancecoin&vs_currencies=mga"
+        );
+        const json = await res.json();
+        if (json.tron)        CURRENT_TAUX.TRX  = json.tron.mga;
+        if (json.tether)      CURRENT_TAUX.USDT = json.tether.mga;
+        if (json.binancecoin) CURRENT_TAUX.BNB  = json.binancecoin.mga;
+    } catch (_) {
+        // silently keep the last-known rates
     }
+}
 
-    async function handleLogin() {
-        const email = document.getElementById('login-email').value;
-        const pass  = document.getElementById('login-pass').value;
-        const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-        if (error) return alert("Incorrect email or password.");
-        initApp();
-    }
-
-    async function handleForgot() {
-        const email = document.getElementById('forgot-email').value;
-        if (!email) return alert("Please enter your email address.");
-        const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
-        if (error) alert(error.message);
-        else alert("Password reset link sent to your email!");
-    }
-
-    // =========================================================
-    // APP INIT & DATA
-    // FIX #9 (config.js) — updateTaux() and setInterval are now
-    //   called here (after DOM is ready) instead of at module
-    //   top level in config.js.
-    // =========================================================
-    async function initApp() {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        if (user) {
-            currentUserId = user.id;
-            document.getElementById('auth-container').style.display = 'none';
-            document.getElementById('nav-header').style.display     = 'block';
-            document.getElementById('main-app').style.display       = 'block';
-
-            // Start live rate updates only after login
-            await updateTaux();
-            setInterval(updateTaux, 3600000);
-
-            fetchData();
-        }
-    }
-
-    async function fetchData() {
-        const { data: u } = await supabaseClient.from('users').select('*').eq('id', currentUserId).single();
-        if (u) {
-            userData = u;
-            document.getElementById('display-solde').innerText  = (u.solde || 0).toLocaleString() + " Ar";
-            document.getElementById('side-full-name').innerText = u.full_name;
-            document.getElementById('side-tk-id').innerText     = "ID: " + u.tk_id;
-            document.getElementById('header-avatar').src = u.avatar_url || "https://via.placeholder.com/35";
-            document.getElementById('side-avatar').src   = u.avatar_url || "https://via.placeholder.com/50";
-        }
-
-        const { data: ts } = await supabaseClient
-            .from('transactions').select('*')
-            .eq('user_id', currentUserId)
-            .order('created_at', { ascending: false });
-
-        allTransactions = ts || [];
-        renderHistory(allTransactions);
-        fetchNotifications();
-    }
-
-    // =========================================================
-    // RENDER HISTORY
-    // DB statuses are French: 'en attente', 'confirmé', 'rejeté'
-    // DB service strings are French: 'Envoyer Crypto (BTC)', etc.
-    // =========================================================
-    function renderHistory(dataToRender = allTransactions) {
-        const fullContainer    = document.getElementById('full-history-container');
-        const previewContainer = document.getElementById('preview-history-body');
-
-        const generateHTML = (t) => {
-            try {
-                const dateObj = new Date(t.created_at);
-                const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-                const dateStr = dateObj.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
-
-                const svc        = t.service.toLowerCase();
-                const isNegative = svc.includes('envoyer') || svc.includes('retrait') || svc.includes('abonnement');
-
-                let statusColor = 'var(--yellow)';
-                if (t.status === 'confirmé') statusColor = 'var(--green)';
-                if (t.status === 'rejeté')   statusColor = 'var(--red)';
-
-                return `
-                    <div class="history-item">
-                        <div class="history-info">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <div class="history-service">${t.service}</div>
-                                <span style="font-size:10px; color:var(--gray); background:rgba(255,255,255,0.05); padding:2px 5px; border-radius:4px; font-family:monospace;">
-                                    #${t.reference || 'PENDING'}
-                                </span>
-                            </div>
-                            <div class="history-time">
-                                <span style="color:var(--yellow); font-weight:600;">${dateStr}</span> • ${timeStr}
-                                <span style="margin-left:8px; color:${statusColor}; font-size:10px; border:1px solid ${statusColor}; padding:1px 4px; border-radius:4px; text-transform:uppercase; font-weight:700;">
-                                    ${t.status}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="history-amount ${isNegative ? 'amount-red' : 'amount-green'}" style="text-align:right;">
-                            <span style="font-size:16px;">${isNegative ? '-' : '+'}${t.montant.toLocaleString()}</span>
-                            <span style="font-size:10px; margin-left:2px;">Ar</span>
-                        </div>
-                    </div>`;
-            } catch (e) {
-                console.error("Row render error:", e);
-                return "";
-            }
-        };
-
-        if (previewContainer) {
-            previewContainer.innerHTML = allTransactions.slice(0, 3).map(generateHTML).join('');
-        }
-
-        if (fullContainer) {
-            const data = dataToRender || [];
-            if (data.length === 0) {
-                fullContainer.innerHTML = '<div style="text-align:center; padding:40px; color:var(--gray);">No transactions found.</div>';
-                return;
-            }
-
-            const groups = data.reduce((acc, t) => {
-                const monthYr = new Date(t.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                if (!acc[monthYr]) acc[monthYr] = [];
-                acc[monthYr].push(t);
-                return acc;
-            }, {});
-
-            fullContainer.innerHTML = '';
-            for (const month in groups) {
-                fullContainer.innerHTML += `<div class="month-header">${month.toUpperCase()}</div>`;
-                fullContainer.innerHTML += groups[month].map(generateHTML).join('');
-            }
-        }
-    }
-
-    function filterHistory(type, el) {
-        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-        if (el) el.classList.add('active');
-
-        if (type === 'All') {
-            renderHistory(allTransactions);
+/** Update the asset logo next to the <select>. */
+function updateIcon() {
+    const assetKey = document.getElementById('crypto-select').value;
+    const catData  = ASSETS_DATA[currentMode];
+    const imgEl    = document.getElementById('asset-img');
+    if (catData) {
+        const item = catData.items.find(i => i.val === assetKey);
+        if (item && item.logo) {
+            imgEl.src   = item.logo;
+            imgEl.style.display = 'inline';
         } else {
-            renderHistory(allTransactions.filter(t =>
-                t.service.toLowerCase().includes(type.toLowerCase())
-            ));
+            imgEl.style.display = 'none';
         }
     }
+    updateCalc();
+}
 
-    // =========================================================
-    // NAVIGATION
-    // =========================================================
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('active');
-        document.getElementById('overlay').style.display =
-            document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
-    }
+// =========================================================
+// AUTH
+// =========================================================
+function showAuth(mode) {
+    document.getElementById('login-form').style.display  = mode === 'login'  ? 'block' : 'none';
+    document.getElementById('signup-form').style.display = mode === 'signup' ? 'block' : 'none';
+    document.getElementById('forgot-form').style.display = mode === 'forgot' ? 'block' : 'none';
+}
 
-    function showPage(p) {
-        document.getElementById('page-home').style.display    = 'none';
-        document.getElementById('page-history').style.display = 'none';
+async function handleSignUp() {
+    const name    = document.getElementById('reg-name').value.trim();
+    const phone   = document.getElementById('reg-phone').value.trim();
+    const email   = document.getElementById('reg-email').value.trim();
+    const pass    = document.getElementById('reg-pass').value;
+    const confirm = document.getElementById('reg-confirm').value;
 
-        if (p === 'home') {
-            document.getElementById('page-home').style.display = 'block';
-        } else if (p === 'history') {
-            document.getElementById('page-history').style.display = 'block';
-            renderHistory(allTransactions);
+    if (!name || !phone || !email || !pass) return alert("Please fill in all fields.");
+    if (pass !== confirm)                   return alert("Passwords do not match!");
+
+    const tkId = "TK-" + Math.floor(1000 + Math.random() * 9000);
+
+    try {
+        const { data: authData, error: authError } =
+            await supabaseClient.auth.signUp({ email, password: pass });
+        if (authError) throw authError;
+
+        if (authData.user) {
+            const { error: dbError } = await supabaseClient.from('users').insert([{
+                id:        authData.user.id,
+                full_name: name,
+                phone,
+                email,
+                tk_id:     tkId,
+                solde:     0
+            }]);
+            if (dbError) throw dbError;
+            alert("Account created! Your ID: " + tkId);
+            showAuth('login');
         }
+    } catch (err) { alert("Error: " + err.message); }
+}
 
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar && sidebar.classList.contains('active')) toggleSidebar();
-        window.scrollTo(0, 0);
+async function handleLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const pass  = document.getElementById('login-pass').value;
+    if (!email || !pass) return alert("Please enter your email and password.");
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+    if (error) return alert("Incorrect email or password.");
+    initApp();
+}
+
+async function handleForgot() {
+    const email = document.getElementById('forgot-email').value.trim();
+    if (!email) return alert("Please enter your email address.");
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+    if (error) alert(error.message);
+    else       alert("Password reset link sent to your email!");
+}
+
+// =========================================================
+// APP INIT & DATA
+// =========================================================
+async function initApp() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) return; // not logged in
+
+    currentUserId = user.id;
+
+    document.getElementById('auth-container').style.display = 'none';
+    document.getElementById('nav-header').style.display     = 'block';
+    document.getElementById('main-app').style.display       = 'block';
+
+    // Fetch live rates once, then every hour
+    await updateTaux();
+    setInterval(updateTaux, 3_600_000);
+
+    // Initialise default UI state
+    selectCategory('crypto');
+
+    fetchData();
+}
+
+async function fetchData() {
+    // User profile
+    const { data: u, error: uErr } =
+        await supabaseClient.from('users').select('*').eq('id', currentUserId).single();
+    if (uErr) { console.error("fetchData/user:", uErr.message); return; }
+
+    if (u) {
+        userData = u;
+        document.getElementById('display-solde').innerText  = (u.solde || 0).toLocaleString() + " Ar";
+        document.getElementById('side-full-name').innerText = u.full_name;
+        document.getElementById('side-tk-id').innerText     = "ID: " + u.tk_id;
+        const avatar = u.avatar_url || "https://via.placeholder.com/35";
+        document.getElementById('header-avatar').src = avatar;
+        document.getElementById('side-avatar').src   = u.avatar_url || "https://via.placeholder.com/50";
     }
 
-    function goToFullHistory() {
-        showPage('history');
-        document.querySelectorAll('#history-filters .filter-chip').forEach(chip => {
-            chip.classList.remove('active');
-            if (chip.innerText === 'All') chip.classList.add('active');
-        });
-        renderHistory(allTransactions);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    // Transactions
+    const { data: ts, error: tErr } = await supabaseClient
+        .from('transactions').select('*')
+        .eq('user_id', currentUserId)
+        .order('created_at', { ascending: false });
+    if (tErr) { console.error("fetchData/transactions:", tErr.message); }
 
-    // =========================================================
-    // TRANSACTION FORM
-    // =========================================================
-    function openMobile(mode) {
-        currentMode = mode; // 'Dépôt' or 'Retrait' — French for DB
+    allTransactions = ts || [];
+    renderHistory(allTransactions);
+    fetchNotifications();
+}
 
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar && sidebar.classList.contains('active')) {
-            sidebar.classList.remove('active');
-            document.getElementById('overlay').style.display = 'none';
+// =========================================================
+// HISTORY RENDERING
+//  DB statuses (French): 'en attente', 'confirmé', 'rejeté'
+//  DB service field is built from currentAction + category
+// =========================================================
+function renderHistory(dataToRender = allTransactions) {
+    const fullContainer    = document.getElementById('full-history-container');
+    const previewContainer = document.getElementById('preview-history-body');
+
+    const generateHTML = (t) => {
+        try {
+            const dateObj = new Date(t.created_at);
+            const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            const dateStr = dateObj.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
+
+            const svc        = t.service.toLowerCase();
+            const isNegative = svc.includes('envoyer') || svc.includes('retrait') ||
+                               svc.includes('abonnement') || svc.includes('dépôt');
+
+            let statusColor = 'var(--yellow)';
+            if (t.status === 'confirmé') statusColor = 'var(--green)';
+            if (t.status === 'rejeté')   statusColor = 'var(--red)';
+
+            return `
+                <div class="history-item">
+                    <div class="history-info">
+                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                            <div class="history-service">${t.service}</div>
+                            <span style="font-size:10px; color:var(--gray);
+                                         background:rgba(255,255,255,0.05);
+                                         padding:2px 5px; border-radius:4px; font-family:monospace;">
+                                #${t.reference || 'PENDING'}
+                            </span>
+                        </div>
+                        <div class="history-time">
+                            <span style="color:var(--yellow); font-weight:600;">${dateStr}</span>
+                            &bull; ${timeStr}
+                            <span style="margin-left:8px; color:${statusColor}; font-size:10px;
+                                         border:1px solid ${statusColor}; padding:1px 4px;
+                                         border-radius:4px; text-transform:uppercase;
+                                         font-weight:700;">
+                                ${t.status}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="history-amount ${isNegative ? 'amount-red' : 'amount-green'}"
+                         style="text-align:right; white-space:nowrap;">
+                        <span style="font-size:16px;">
+                            ${isNegative ? '-' : '+'}${Number(t.montant).toLocaleString()}
+                        </span>
+                        <span style="font-size:10px; margin-left:2px;">Ar</span>
+                    </div>
+                </div>`;
+        } catch (e) {
+            console.error("Row render error:", e);
+            return "";
         }
+    };
 
-        document.getElementById('trans-title').innerText                 = mode + " Mobile Money";
-        document.getElementById('crypto-select-container').style.display = 'none';
-        document.getElementById('label-right').innerText                 = "Amount (Ar):";
-        document.getElementById('unit-suffix').innerText                 = "Ar";
-        document.getElementById('label-addr').innerText                  = "Mobile Number (Airtel, Orange, MVola):";
-        document.getElementById('input-addr').value                      = "";
-        document.getElementById('input-addr').readOnly                   = false;
-        document.getElementById('copy-btn').style.display                = 'none';
-        updateCalc();
+    // Preview (home page — last 3)
+    if (previewContainer) {
+        previewContainer.innerHTML = allTransactions.slice(0, 3).map(generateHTML).join('');
     }
 
-    // FIX #2 — was referencing undefined "TAUX" → now uses CURRENT_TAUX from config.js
-    function updateCalc() {
-        const assetKey = document.getElementById('crypto-select').value;
-        const val      = parseFloat(document.getElementById('input-main').value) || 0;
-        const rate     = CURRENT_TAUX[assetKey] || 1;
-        const res      = document.getElementById('calc-res');
-        const fraisEl  = document.getElementById('frais-info');
-
-        // currentMode is 'Dépôt' / 'Retrait' for mobile money
-        if (currentMode === 'Dépôt' || currentMode === 'Retrait') {
-            document.getElementById('calc-container').style.display = 'none';
+    // Full history page
+    if (fullContainer) {
+        if (!dataToRender || dataToRender.length === 0) {
+            fullContainer.innerHTML =
+                '<div style="text-align:center; padding:40px; color:var(--gray);">' +
+                'No transactions found.</div>';
             return;
         }
 
-        document.getElementById('calc-container').style.display = 'flex';
+        // Group by month/year
+        const groups = dataToRender.reduce((acc, t) => {
+            const monthYr = new Date(t.created_at)
+                .toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            if (!acc[monthYr]) acc[monthYr] = [];
+            acc[monthYr].push(t);
+            return acc;
+        }, {});
 
-        // Find fee for current asset
-        let frais = 0;
-        const catData = ASSETS_DATA[currentMode];
-        if (catData) {
-            const item = catData.items.find(i => i.val === assetKey);
-            if (item) frais = item.frais;
+        fullContainer.innerHTML = '';
+        for (const month in groups) {
+            fullContainer.innerHTML +=
+                `<div class="month-header">${month.toUpperCase()}</div>`;
+            fullContainer.innerHTML += groups[month].map(generateHTML).join('');
         }
+    }
+}
 
-        if (currentAction === 'Envoyer') {
-            const netAr = val * (1 - frais);
-            res.innerText = (netAr / rate).toFixed(assetKey === 'USDT' ? 2 : 6) + " " + assetKey;
-        } else {
-            const grossAr = val * rate;
-            res.innerText = Math.floor(grossAr * (1 - frais)).toLocaleString() + " Ar";
-        }
+function filterHistory(type, el) {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    if (el) el.classList.add('active');
 
-        if (fraisEl) fraisEl.innerText = frais > 0 ? `Fee: ${(frais * 100).toFixed(0)}% included` : '';
+    if (type === 'All') {
+        renderHistory(allTransactions);
+    } else {
+        renderHistory(allTransactions.filter(t =>
+            t.service.toLowerCase().includes(type.toLowerCase())
+        ));
+    }
+}
+
+// =========================================================
+// NAVIGATION
+// =========================================================
+function toggleSidebar() {
+    const sidebar  = document.getElementById('sidebar');
+    const overlay  = document.getElementById('overlay');
+    sidebar.classList.toggle('active');
+    overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+}
+
+function showPage(p) {
+    document.getElementById('page-home').style.display    = 'none';
+    document.getElementById('page-history').style.display = 'none';
+
+    if (p === 'home') {
+        document.getElementById('page-home').style.display = 'block';
+    } else if (p === 'history') {
+        document.getElementById('page-history').style.display = 'block';
+        renderHistory(allTransactions);
     }
 
-    // FIX #7 — updateIcon() is imported from config.js (_updateIcon).
-    //   We wrap it so updateCalc() is called right after without
-    //   relying on the window.updateCalc circular dependency.
-    function updateIcon() {
-        _updateIcon();   // updates the <img> element
-        updateCalc();    // recalculates the equivalent
-    }
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && sidebar.classList.contains('active')) toggleSidebar();
+    window.scrollTo(0, 0);
+}
 
-    // FIX #5 — currentMode is now set to the category key (matches ASSETS_DATA).
-    //   switchAction() reads data from ASSETS_DATA[currentMode] instead of
-    //   comparing hardcoded capitalized strings.
-    function selectCategory(category) {
-    currentMode = category;
-    const data = ASSETS_DATA[category];
-    if (!data) return;
-
-    // 1. Labels & UI logic
-    // Eto no mametraka ny "Destination Address" na "Player ID"
-    document.getElementById('label-addr').innerText = data.label;
-    
-    // 2. Fitsapana ny bokotra Recevoir (Abonnement dia disable)
-    const btnRec = document.getElementById('main-rec-btn');
-    if (btnRec) {
-        const isAbo = (category === 'abonnement');
-        btnRec.style.opacity = isAbo ? "0.3" : "1";
-        btnRec.style.pointerEvents = isAbo ? "none" : "auto";
-        if (isAbo) switchAction('Envoyer'); // Force "Envoyer" mode
-    }
-
-    // 3. Fenoina ny Dropdown (Options)
-    const cryptoSelect = document.getElementById('crypto-select');
-    cryptoSelect.innerHTML = data.items.map(i => 
-        `<option value="${i.val}">${i.txt}</option>`
-    ).join('');
-
-    // 4. Loko mavo amin'ny bokotra voafidy
-    document.querySelectorAll('.service-item').forEach(btn => {
-        btn.style.backgroundColor = "";
-        btn.style.color = "";
+function goToFullHistory() {
+    showPage('history');
+    document.querySelectorAll('#history-filters .filter-chip').forEach(chip => {
+        chip.classList.remove('active');
+        if (chip.innerText.trim() === 'All') chip.classList.add('active');
     });
-    const targetBtn = document.getElementById('btn-' + category);
-    if (targetBtn) {
-        targetBtn.style.backgroundColor = "var(--yellow)";
-        targetBtn.style.color = "black";
-    }
-
-    // 5. Antsoina ny switchAction mba hanavao ny lohateny sy ny unit
-    switchAction(currentAction);
-    
-    // 6. Navigation & Icon
-    updateIcon();
+    renderHistory(allTransactions);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-    function switchAction(action) {
-    currentAction = action;
-    const transTitle = document.getElementById('trans-title');
-    const unitLabel = document.getElementById('amount-unit');
-    const assetKey = document.getElementById('crypto-select').value;
 
-    // 1. UI: Loko mavo amin'ny bokotra Env/Rec
+// =========================================================
+// MOBILE MONEY (Deposit / Withdrawal)
+// =========================================================
+function openMobile(mode) {
+    // mode is 'Dépôt' or 'Retrait' — stored as-is in DB
+    currentMode   = mode;
+    currentAction = mode;   // FIX: keep action in sync
+
+    // Close sidebar if open
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+        document.getElementById('overlay').style.display = 'none';
+    }
+
+    // Update form
+    document.getElementById('trans-title').innerText                 = mode + " Mobile Money";
+    document.getElementById('crypto-select-container').style.display = 'none';
+    document.getElementById('label-right').innerText                 = "Amount (Ar):";
+    document.getElementById('unit-suffix').innerText                 = "Ar";
+    document.getElementById('label-addr').innerText                  = "Mobile number (Airtel / Orange / MVola):";
+    document.getElementById('input-addr').value                      = "";
+    document.getElementById('input-addr').readOnly                   = false;
+    document.getElementById('copy-btn').style.display                = 'none';
+    document.getElementById('calc-container').style.display          = 'none';
+    document.getElementById('frais-info').innerText                  = '';
+
+    // Scroll to form
+    document.querySelector('.trans-box').scrollIntoView({ behavior: 'smooth' });
+}
+
+// =========================================================
+// CATEGORY SELECTION
+// =========================================================
+function selectCategory(category) {
+    currentMode = category;
+    const data  = ASSETS_DATA[category];
+    if (!data)  return;
+
+    // 1. Active highlight on category buttons
+    document.querySelectorAll('.service-item').forEach(btn => btn.classList.remove('active'));
+    const targetBtn = document.getElementById('btn-' + category);
+    if (targetBtn) targetBtn.classList.add('active');
+
+    // 2. Show asset selector (hidden by openMobile)
+    document.getElementById('crypto-select-container').style.display = 'block';
+
+    // 3. Populate <select> with category items
+    const cryptoSelect   = document.getElementById('crypto-select');
+    cryptoSelect.innerHTML = data.items
+        .map(i => `<option value="${i.val}">${i.txt}</option>`)
+        .join('');
+
+    // 4. Address label
+    document.getElementById('label-addr').innerText = data.label;
+
+    // 5. Disable "Receive" for subscriptions (no incoming flow)
+    const btnRec = document.getElementById('main-rec-btn');
+    if (btnRec) {
+        const isAbo             = (category === 'abonnement');
+        btnRec.style.opacity       = isAbo ? "0.35" : "1";
+        btnRec.style.pointerEvents = isAbo ? "none"  : "auto";
+        if (isAbo) currentAction = 'Envoyer'; // force send mode
+    }
+
+    // 6. Refresh action UI (title, unit, address field)
+    switchAction(currentAction);
+
+    // 7. Refresh icon
+    updateIcon();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// =========================================================
+// SWITCH SEND / RECEIVE
+// =========================================================
+function switchAction(action) {
+    currentAction = action;
+
+    const assetKey    = document.getElementById('crypto-select').value;
+    const transTitle  = document.getElementById('trans-title');
+    const labelRight  = document.getElementById('label-right');
+    const unitSuffix  = document.getElementById('unit-suffix');  // FIX: was 'amount-unit'
+    const inputAddr   = document.getElementById('input-addr');
+    const copyBtn     = document.getElementById('copy-btn');
+    const labelAddr   = document.getElementById('label-addr');
+
+    // --- Button visual state ---
     const btnEnv = document.getElementById('main-env-btn');
     const btnRec = document.getElementById('main-rec-btn');
-    if (btnEnv && btnRec) {
-        if (action === 'Envoyer') {
-            btnEnv.classList.add('active');
-            btnRec.classList.remove('active');
-        } else {
-            btnRec.classList.add('active');
-            btnEnv.classList.remove('active');
-        }
+    if (btnEnv) btnEnv.style.opacity = action === 'Envoyer' ? '1' : '0.6';
+    if (btnRec) btnRec.style.opacity = action === 'Recevoir' ? '1' : '0.6';
+
+    // --- Title ---
+    const titleMap = {
+        crypto:      { Envoyer: "Send Crypto",         Recevoir: "Receive Crypto"      },
+        wallet:      { Envoyer: "Send to Wallet",      Recevoir: "Receive from Wallet" },
+        betting:     { Envoyer: "Betting Deposit",     Recevoir: "Betting Withdrawal"  },
+        abonnement:  { Envoyer: "Subscription",        Recevoir: "Subscription"        }
+    };
+    const modeTitles = titleMap[currentMode];
+    if (modeTitles) {
+        transTitle.innerText = modeTitles[action] || modeTitles.Envoyer;
     }
 
-    // 2. Lojika ho an'ny Lohateny (Titles)
-    if (currentMode === 'crypto') {
-        transTitle.innerText = (action === 'Envoyer') ? "Envoyer Crypto" : "Recevoir Crypto";
-    } else if (currentMode === 'wallet') {
-        transTitle.innerText = (action === 'Envoyer') ? "Envoyer Wallet" : "Recevoir Wallet";
-    } else if (currentMode === 'betting') {
-        transTitle.innerText = (action === 'Envoyer') ? "Dépôt Betting" : "Retrait Betting";
+    // --- Input unit ---
+    if (action === 'Envoyer') {
+        labelRight.innerText  = "Amount (Ar):";
+        unitSuffix.innerText  = "Ar";
     } else {
-        transTitle.innerText = "Service Abonnement";
+        // Recevoir: user enters crypto/asset amount
+        let unitLabel = assetKey;
+        if (currentMode === 'wallet' && assetKey === 'PAYPAL') unitLabel = 'USD';
+        else if (currentMode === 'wallet')                       unitLabel = 'EUR';
+        labelRight.innerText = `Amount (${unitLabel}):`;
+        unitSuffix.innerText  = unitLabel;
     }
 
-    // 3. Lojika ho an'ny Unit (Ar, TRX, $)
-    if (unitLabel) {
-        if (action === 'Envoyer') {
-            unitLabel.innerText = "Ar"; // Envoyer dia Ar foana ampidirina
-        } else {
-            // Recevoir: miankina amin'ny asset
-            if (currentMode === 'crypto') unitLabel.innerText = assetKey;
-            else if (currentMode === 'wallet') unitLabel.innerText = (assetKey === 'PAYPAL') ? "$" : "€";
-            else unitLabel.innerText = "Ar"; // Betting mijanona Ar
-        }
+    // --- Address field ---
+    if (action === 'Recevoir') {
+        // Show our own receiving address — read only
+        const addr = ADDR_RECEPT[assetKey] || '';
+        inputAddr.value    = addr;
+        inputAddr.readOnly = true;
+        labelAddr.innerText = "Send to this address:";
+        copyBtn.style.display = 'inline';
+    } else {
+        // Clear for user input
+        inputAddr.value       = "";
+        inputAddr.readOnly    = false;
+        copyBtn.style.display = 'none';
+        // Restore label from category data
+        const catData = ASSETS_DATA[currentMode];
+        if (catData) labelAddr.innerText = catData.label;
     }
 
     updateCalc();
 }
 
-    // =========================================================
-    // TRANSACTION SUBMIT
-    // =========================================================
-function handleTransaction() {
+// =========================================================
+// CALCULATOR
+// =========================================================
+function updateCalc() {
+    const calcContainer = document.getElementById('calc-container');
+    const res           = document.getElementById('calc-res');
+    const fraisEl       = document.getElementById('frais-info');
+
+    // Mobile money — no conversion to display
+    if (currentMode === 'Dépôt' || currentMode === 'Retrait') {
+        calcContainer.style.display = 'none';
+        return;
+    }
+
+    calcContainer.style.display = 'flex';
+
+    const assetKey = document.getElementById('crypto-select').value;
+    const val      = parseFloat(document.getElementById('input-main').value) || 0;
+    const rate     = CURRENT_TAUX[assetKey] || 1;
+
+    // Get fee for current asset
+    let frais = 0;
+    const catData = ASSETS_DATA[currentMode];
+    if (catData) {
+        const item = catData.items.find(i => i.val === assetKey);
+        if (item) frais = item.frais;
+    }
+
+    if (currentAction === 'Envoyer') {
+        // Input: Ar  →  Output: crypto equivalent after fee
+        const netAr  = val * (1 - frais);
+        const crypto = netAr / rate;
+        res.innerText = crypto.toFixed(assetKey === 'USDT' ? 2 : 6) + " " + assetKey;
+    } else {
+        // Input: crypto amount  →  Output: Ar received after fee
+        const grossAr = val * rate;
+        const netAr   = Math.floor(grossAr * (1 - frais));
+        res.innerText = netAr.toLocaleString() + " Ar";
+    }
+
+    fraisEl.innerText = frais > 0
+        ? `Fee: ${(frais * 100).toFixed(0)}% included`
+        : '';
+}
+
+// =========================================================
+// TRANSACTION SUBMIT
+// =========================================================
+async function handleTransaction() {
     const asset   = document.getElementById('crypto-select').value;
     const amount  = parseFloat(document.getElementById('input-main').value);
     const address = document.getElementById('input-addr').value.trim();
     const solde   = userData?.solde || 0;
 
-    if (!amount || !address) {
-        alert("Veuillez remplir tous les champs");
-        return;
-    }
+    // Validation
+    if (!amount || amount <= 0) return alert("Please enter a valid amount.");
+    if (!address)               return alert("Please enter a recipient address or ID.");
 
-    // Frais
-    let frais = 0.05; // exemple 5%
-    let total = amount + (amount * frais);
-
-    // Vérification solde (Envoyer seulement)
-    if (currentAction === "Envoyer" && total > solde) {
-        alert("Solde insuffisant");
-        return;
-    }
-
-    // Vérification conditions
-    const check = document.getElementById("check-conditions");
+    const check = document.getElementById('check-conditions');
     if (!check || !check.checked) {
-        alert("Veuillez accepter les conditions");
-        return;
+        return alert("Please accept the terms & conditions.");
     }
 
-    // Message confirmation
-    const confirmMsg = `
-Confirmer la transaction ?
-
-Montant : ${amount} Ar
-Frais : ${frais * 100}%
-Total : ${total.toLocaleString()} Ar
-Destination : ${address}
-    `;
-
-    if (!confirm(confirmMsg)) return;
-
-    // Envoi Supabase
-    supabaseClient.from('transactions').insert([{
-        user_id: currentUserId,
-        service: currentAction + " " + currentMode,
-        montant: amount,
-        status: "en attente",
-        created_at: new Date()
-    }]);
-
-    // Déduction locale
-    if (currentAction === "Envoyer") {
-        userData.solde -= total;
-        document.getElementById("display-solde").innerText =
-            userData.solde.toLocaleString() + " Ar";
+    // Fee calculation
+    let frais = 0;
+    const catData = ASSETS_DATA[currentMode];
+    if (catData) {
+        const item = catData.items.find(i => i.val === asset);
+        if (item) frais = item.frais;
     }
 
-    alert("Transaction envoyée !");
+    const feesAr = Math.round(amount * frais);
+    const total  = amount + feesAr;   // total deducted for 'Envoyer'
+
+    // Balance check (only when sending)
+    if ((currentAction === 'Envoyer' || currentAction === 'Dépôt') && total > solde) {
+        return alert(`Insufficient balance.\nRequired: ${total.toLocaleString()} Ar\nAvailable: ${solde.toLocaleString()} Ar`);
+    }
+
+    // Build readable service label (French base kept for DB consistency)
+    let serviceLabel;
+    if (currentMode === 'Dépôt' || currentMode === 'Retrait') {
+        serviceLabel = `${currentMode} Mobile Money`;
+    } else {
+        serviceLabel = `${currentAction} ${currentMode.charAt(0).toUpperCase() + currentMode.slice(1)} (${asset})`;
+    }
+
+    // Unique reference
+    const reference = "REF-" + Date.now().toString(36).toUpperCase();
+
+    // Confirmation dialog
+    const confirmed = window.confirm(
+        `Confirm transaction?\n\n` +
+        `Service   : ${serviceLabel}\n` +
+        `Amount    : ${amount.toLocaleString()} Ar\n` +
+        `Fees      : ${feesAr.toLocaleString()} Ar (${(frais * 100).toFixed(0)}%)\n` +
+        `Total     : ${total.toLocaleString()} Ar\n` +
+        `To        : ${address}\n` +
+        `Reference : ${reference}`
+    );
+    if (!confirmed) return;
+
+    try {
+        // Insert transaction
+        const { error: txErr } = await supabaseClient.from('transactions').insert([{
+            user_id:    currentUserId,
+            service:    serviceLabel,
+            montant:    amount,
+            status:     'en attente',
+            reference:  reference,
+            address:    address,
+            asset:      asset,
+            created_at: new Date().toISOString()
+        }]);
+        if (txErr) throw txErr;
+
+        // Deduct balance for outgoing transactions
+        if (currentAction === 'Envoyer' || currentMode === 'Retrait') {
+            const newSolde = solde - total;
+            const { error: soldeErr } = await supabaseClient
+                .from('users').update({ solde: newSolde }).eq('id', currentUserId);
+            if (soldeErr) throw soldeErr;
+
+            userData.solde = newSolde;
+            document.getElementById('display-solde').innerText =
+                newSolde.toLocaleString() + " Ar";
+        }
+
+        alert(`Transaction submitted!\nReference: ${reference}`);
+
+        // Reset form
+        document.getElementById('input-main').value = '';
+        if (!document.getElementById('input-addr').readOnly) {
+            document.getElementById('input-addr').value = '';
+        }
+        check.checked = false;
+        updateCalc();
+
+        // Refresh history
+        fetchData();
+
+    } catch (err) {
+        alert("Error: " + err.message);
+    }
 }
 
-    // =========================================================
-    // PROFILE
-    // =========================================================
-    function previewImage(input) {
-        if (input.files && input.files[0]) {
-            const reader  = new FileReader();
-            reader.onload = (e) => { document.getElementById('modal-pp-view').src = e.target.result; };
-            reader.readAsDataURL(input.files[0]);
-        }
+// =========================================================
+// PROFILE
+// =========================================================
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader  = new FileReader();
+        reader.onload = (e) => {
+            document.getElementById('modal-pp-view').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
     }
+}
 
-    function openProfile() {
-        document.getElementById('edit-full-name').value = userData.full_name;
-        document.getElementById('edit-phone').value     = userData.phone;
-        document.getElementById('modal-pp-view').src    = userData.avatar_url || "https://via.placeholder.com/100";
-        document.getElementById('modal-profile').style.display = 'flex';
+function openProfile() {
+    if (!userData) return;
+    document.getElementById('edit-full-name').value = userData.full_name || '';
+    document.getElementById('edit-phone').value     = userData.phone     || '';
+    document.getElementById('modal-pp-view').src    = userData.avatar_url || "https://via.placeholder.com/100";
+    document.getElementById('modal-profile').style.display = 'flex';
+}
+
+function closeProfile() {
+    document.getElementById('modal-profile').style.display = 'none';
+}
+
+async function updateProfile() {
+    const newName  = document.getElementById('edit-full-name').value.trim();
+    const newPhone = document.getElementById('edit-phone').value.trim();
+    if (!newName) return alert("Full name cannot be empty.");
+
+    const { error } = await supabaseClient.from('users')
+        .update({ full_name: newName, phone: newPhone })
+        .eq('id', currentUserId);
+
+    if (error) alert(error.message);
+    else {
+        alert("Profile updated!");
+        closeProfile();
+        fetchData();
     }
+}
 
-    function closeProfile() { document.getElementById('modal-profile').style.display = 'none'; }
-
-    async function updateProfile() {
-        const newName  = document.getElementById('edit-full-name').value;
-        const newPhone = document.getElementById('edit-phone').value;
-        const { error } = await supabaseClient.from('users')
-            .update({ full_name: newName, phone: newPhone })
-            .eq('id', currentUserId);
-        if (error) alert(error.message);
-        else { alert("Profile updated!"); closeProfile(); fetchData(); }
-    }
-
-    function copyText() {
-        document.getElementById('input-addr').select();
+function copyText() {
+    const input = document.getElementById('input-addr');
+    input.select();
+    try {
         document.execCommand("copy");
         alert("Address copied to clipboard!");
+    } catch (_) {
+        alert("Copy failed — please copy manually.");
     }
+}
 
-    // =========================================================
-    // NOTIFICATIONS
-    // =========================================================
-    async function fetchNotifications() {
-        const { data: notifs } = await supabaseClient
-            .from('notifications').select('*')
-            .eq('user_id', currentUserId)
-            .order('created_at', { ascending: false });
+// =========================================================
+// NOTIFICATIONS
+// =========================================================
+async function fetchNotifications() {
+    const { data: notifs } = await supabaseClient
+        .from('notifications').select('*')
+        .eq('user_id', currentUserId)
+        .order('created_at', { ascending: false });
 
-        if (notifs) {
-            const list        = document.getElementById('notif-list');
-            const countBadge  = document.getElementById('notif-count');
-            const unreadCount = notifs.filter(n => !n.is_read).length;
+    if (!notifs) return;
 
-            countBadge.innerText     = unreadCount;
-            countBadge.style.display = unreadCount > 0 ? 'block' : 'none';
+    const list        = document.getElementById('notif-list');
+    const countBadge  = document.getElementById('notif-count');
+    const unreadCount = notifs.filter(n => !n.is_read).length;
 
-            list.innerHTML = notifs.length
-                ? notifs.map(n => `
-                    <div class="notif-item ${n.is_read ? '' : 'unread'}" style="padding:12px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                        <b style="color:var(--yellow); font-size:13px;">${n.title}</b><br>
-                        <span style="color:var(--gray); font-size:12px; line-height:1.4;">${n.message}</span><br>
-                        <small style="font-size:10px; color:rgba(255,255,255,0.3);">
-                            ${new Date(n.created_at).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                        </small>
-                    </div>`).join('')
-                : '<p style="text-align:center; padding:30px; color:var(--gray); font-size:13px;">No notifications.</p>';
-        }
+    countBadge.innerText     = unreadCount;
+    countBadge.style.display = unreadCount > 0 ? 'block' : 'none';
+
+    list.innerHTML = notifs.length
+        ? notifs.map(n => `
+            <div class="notif-item ${n.is_read ? '' : 'unread'}">
+                <b style="color:var(--yellow); font-size:13px;">${n.title}</b><br>
+                <span style="color:var(--gray); font-size:12px; line-height:1.4;">
+                    ${n.message}
+                </span><br>
+                <small style="font-size:10px; color:rgba(255,255,255,0.3);">
+                    ${new Date(n.created_at).toLocaleString('en-US',
+                        { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                </small>
+            </div>`).join('')
+        : '<p style="text-align:center; padding:30px; color:var(--gray); font-size:13px;">No notifications.</p>';
+}
+
+function toggleNotif() {
+    const panel = document.getElementById('notif-panel');
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    if (panel.style.display === 'block') fetchNotifications();
+}
+
+async function markAllRead() {
+    await supabaseClient.from('notifications')
+        .update({ is_read: true })
+        .eq('user_id', currentUserId);
+    fetchNotifications();
+}
+
+// =========================================================
+// LOGOUT
+// =========================================================
+function logout() {
+    supabaseClient.auth.signOut().then(() => location.reload());
+}
+
+// =========================================================
+// BOOT — check for an existing session on page load
+// FIX: onAuthStateChange ensures initApp() fires for both
+//      fresh logins and page refreshes with a valid session.
+// =========================================================
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (session && session.user) {
+        currentUserId = session.user.id;
+        initApp();
     }
-
-    function toggleNotif() {
-        const panel = document.getElementById('notif-panel');
-        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-        if (panel.style.display === 'block') fetchNotifications();
-    }
-
-    async function markAllRead() {
-        await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUserId);
-        fetchNotifications();
-    }
-
-    function logout() { supabaseClient.auth.signOut().then(() => location.reload()); }
-
-    // =========================================================
-    // FIX #6 — Expose ALL onclick-handler functions on window.
-    //   In a type="module" script, functions are NOT global by
-    //   default. Every function called from HTML onclick="..."
-    //   must be assigned to window explicitly.
-    // =========================================================
-    window.showAuth          = showAuth;
-    window.handleLogin       = handleLogin;
-    window.handleSignUp      = handleSignUp;
-    window.handleForgot      = handleForgot;
-    window.toggleSidebar     = toggleSidebar;
-    window.showPage          = showPage;
-    window.goToFullHistory   = goToFullHistory;
-    window.openMobile        = openMobile;
-    window.selectCategory    = selectCategory;
-    window.switchAction      = switchAction;
-    window.updateIcon        = updateIcon;
-    window.updateCalc        = updateCalc;
-    window.handleTransaction = handleTransaction;
-    window.filterHistory     = filterHistory;
-    window.toggleNotif       = toggleNotif;
-    window.markAllRead       = markAllRead;
-    window.openProfile       = openProfile;
-    window.closeProfile      = closeProfile;
-    window.updateProfile     = updateProfile;
-    window.previewImage      = previewImage;
-    window.copyText          = copyText;
-    window.logout            = logout;
-
-    // =========================================================
-    // FIX #4 — initApp() is now actually called.
-    //   (It was missing — the app never started.)
-    // =========================================================
-    initApp();
+});
 
 </script>
 </body>
