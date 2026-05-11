@@ -1441,8 +1441,13 @@ async function fetchNotifications() {
                     ${n.message}
                 </span><br>
                 <small style="font-size:10px; color:rgba(255,255,255,0.3);">
-                    ${new Date(n.created_at).toLocaleString('en-US',
-                        { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    ${new Date(n.created_at).toLocaleString('fr-FR',
+                        timeZone: 'Indian/Antananarivo',
+                        day: 'numeric',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                     })}
                 </small>
             </div>`).join('')
         : '<p style="text-align:center; padding:30px; color:var(--gray); font-size:13px;">No notifications.</p>';
