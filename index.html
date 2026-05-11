@@ -1270,16 +1270,16 @@ async function handleTransaction() {
     const address = document.getElementById('input-addr').value.trim();
     const solde   = userData?.solde || 0;
 
-    // Validation
-    if (!amount || amount <= 0) return alert("Please enter a valid amount.");
-    if (!address)               return alert("Please enter a recipient address or ID.");
+    // 1. Validation de base
+    if (!amount || amount <= 0) return alert("Ampidiro ny montant azafady.");
+    if (!address)               return alert("Ampidiro ny adiresy na ID handefasana azy.");
 
     const check = document.getElementById('check-conditions');
     if (!check || !check.checked) {
-        return alert("Please accept the terms & conditions.");
+        return alert("Azafady ekeo ny fepetra (Terms & Conditions).");
     }
 
-    // Fee calculation
+    // 2. Kajy ny Frais
     let frais = 0;
     const catData = ASSETS_DATA[currentMode];
     if (catData) {
@@ -1288,77 +1288,79 @@ async function handleTransaction() {
     }
 
     const feesAr = Math.round(amount * frais);
-    const total  = amount + feesAr;   // total deducted for 'Envoyer'
+    const total  = amount + feesAr; // Total mivoaka raha 'Envoyer'
 
-    // Balance check (only when sending)
-    if ((currentAction === 'Envoyer' || currentAction === 'Dépôt') && total > solde) {
-        return alert(`Insufficient balance.\nRequired: ${total.toLocaleString()} Ar\nAvailable: ${solde.toLocaleString()} Ar`);
+    // 3. Fanamarinana ny Solde (Ho an'ny ENVOYER ihany)
+    // Tsy misy check solde intsony raha Dépôt/Recevoir
+    if (currentAction === 'Envoyer' && total > solde) {
+        return alert(`Tsy ampy ny solde-nao.\nIlaina: ${total.toLocaleString()} Ar\nAnananao: ${solde.toLocaleString()} Ar`);
     }
 
-    // Build readable service label (French base kept for DB consistency)
-    let serviceLabel;
-    if (currentMode === 'Dépôt' || currentMode === 'Retrait') {
-        serviceLabel = `${currentMode} Mobile Money`;
-    } else {
-        serviceLabel = `${currentAction} ${currentMode.charAt(0).toUpperCase() + currentMode.slice(1)} (${asset})`;
-    }
-
-    // Unique reference
+    // 4. Famoronana Reference Unique
     const reference = "REF-" + Date.now().toString(36).toUpperCase();
 
-    // Confirmation dialog
+    // 5. Confirmation dialog
     const confirmed = window.confirm(
-        `Confirm transaction?\n\n` +
-        `Service   : ${serviceLabel}\n` +
-        `Amount    : ${amount.toLocaleString()} Ar\n` +
-        `Fees      : ${feesAr.toLocaleString()} Ar (${(frais * 100).toFixed(0)}%)\n` +
+        `Hanamarina ny transaction?\n\n` +
+        `Service   : ${currentAction} ${asset}\n` +
+        `Montant   : ${amount.toLocaleString()} Ar\n` +
+        `Frais     : ${feesAr.toLocaleString()} Ar\n` +
         `Total     : ${total.toLocaleString()} Ar\n` +
-        `To        : ${address}\n` +
-        `Reference : ${reference}`
+        `Dest      : ${address}\n` +
+        `Ref       : ${reference}`
     );
     if (!confirmed) return;
 
     try {
-        // Insert transaction
+        // 6. Fampidirana ao amin'ny Supabase (Transactions Table)
         const { error: txErr } = await supabaseClient.from('transactions').insert([{
-            user_id:    currentUserId,
-            service:    serviceLabel,
-            montant:    amount,
-            status:     'en attente',
-            reference:  reference,
-            address:    address,
-            asset:      asset,
-            created_at: new Date().toISOString()
+            user_id:      currentUserId,
+            category:     currentMode,      // 'crypto', 'wallet', na 'betting'
+            type:         currentAction,    // 'Envoyer' na 'Recevoir'
+            asset:        asset,
+            amount_input: amount,          // Column vaovao numeric
+            frais:        feesAr,          // Column vaovao numeric
+            address_dest: address,         // Nataontsika address_dest tany amin'ny SQL
+            status:       'en attente',
+            reference:    reference,
+            currency_input: 'Ar'
         }]);
+        
         if (txErr) throw txErr;
 
-        // Deduct balance for outgoing transactions
-        if (currentAction === 'Envoyer' || currentMode === 'Retrait') {
+        // 7. Fanitsiana ny Solde raha ENVOYER
+        if (currentAction === 'Envoyer') {
             const newSolde = solde - total;
             const { error: soldeErr } = await supabaseClient
-                .from('users').update({ solde: newSolde }).eq('id', currentUserId);
+                .from('users') // Hamarino raha 'users' sa 'profiles' ny anarany any amin'ny Supabase
+                .update({ solde: newSolde })
+                .eq('id', currentUserId);
+            
             if (soldeErr) throw soldeErr;
 
+            // Fanavaozana ny fisehon'ny solde eo amin'ny app
             userData.solde = newSolde;
-            document.getElementById('display-solde').innerText =
-                newSolde.toLocaleString() + " Ar";
+            const soldeDisplay = document.getElementById('display-solde');
+            if (soldeDisplay) soldeDisplay.innerText = newSolde.toLocaleString() + " Ar";
         }
 
-        alert(`Transaction submitted!\nReference: ${reference}`);
+        alert(`Transaction voaray!\nReference: ${reference}`);
 
-        // Reset form
+        // 8. Famerenana ny Form ho foana (Reset)
         document.getElementById('input-main').value = '';
         if (!document.getElementById('input-addr').readOnly) {
             document.getElementById('input-addr').value = '';
         }
         check.checked = false;
-        updateCalc();
+        if (typeof updateCalc === "function") updateCalc();
 
-        // Refresh history
-        fetchData();
+        // 9. Refresh data
+        if (typeof fetchData === "function") fetchData();
+        if (typeof closeModal === "function") closeModal('modal-confirm');
 
     } catch (err) {
-        alert("Error: " + err.message);
+        console.error("Error detail:", err);
+        alert("Nisy olana: " + err.message);
     }
 }
 
