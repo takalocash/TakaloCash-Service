@@ -687,6 +687,88 @@
           → no window.xxx assignments needed.
      ============================ -->
 <script>
+// =========================================================
+// 1. CONFIGURATION (Ilay avy ao amin'ny config.js taloha)
+// =========================================================
+let USD_TO_MGA = 4700; // Nampiana ity satria ilaina amin'ny updateTaux
+
+const ADDR_RECEPT = {
+    'TRX':    'YOUR_TRON_ADDRESS_HERE',
+    'USDT':   'YOUR_USDT_TRC20_ADDRESS_HERE',
+    'BTC':    'YOUR_BITCOIN_ADDRESS_HERE',
+    'PAYPAL': 'your-email@paypal.com',
+    '1XBET':  'YOUR_1XBET_ID'
+};
+
+const ASSETS_DATA = {
+    crypto: {
+        title: "Crypto Transaction",
+        label: "Destination address:",
+        allowRecevoir: true,
+        items: [
+            { val: 'BTC',  txt: 'Bitcoin (BTC)', icon: "https://cryptologos.cc/logos/bitcoin-btc-logo.svg",  frais: 0.04 },
+            { val: 'TRX',  txt: 'TRX (TRC20)',   icon: "https://cryptologos.cc/logos/tron-trx-logo.svg",    frais: 0.02 },
+            { val: 'USDT', txt: 'USDT (TRC20)',  icon: "https://cryptologos.cc/logos/tether-usdt-logo.svg", frais: 0.03 }
+        ]
+    },
+    // ... tohizo eto ny ambiny (wallet, betting, sns.)
+};
+
+let CURRENT_TAUX = {
+    "BTC":  60000000,
+    "TRX":  600,
+    "USDT": 4700,
+    "PAYPAL": 4700,
+    "1XBET":  1,
+    // ... sns.
+};
+
+// =========================================================
+// 2. SUPABASE INIT
+// =========================================================
+const _URL = "https://nyeopreahmajoisartoz.supabase.co";
+const _KEY = "YOUR_KEY_HERE";
+const supabaseClient = supabase.createClient(_URL, _KEY);
+
+// =========================================================
+// 3. FONCTIONS (updateIcon, updateTaux, handleTransaction...)
+// =========================================================
+
+async function updateTaux() {
+    try {
+        const url = `https://api.binance.com/api/v3/ticker/price?symbols=["BTCUSDT","TRXUSDT"]`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        data.forEach(item => {
+            const uiKey = item.symbol.replace('USDT', '');
+            if (CURRENT_TAUX.hasOwnProperty(uiKey)) {
+                CURRENT_TAUX[uiKey] = Math.round(parseFloat(item.price) * USD_TO_MGA);
+            }
+        });
+        CURRENT_TAUX["USDT"] = USD_TO_MGA;
+        console.log('Taux updated');
+    } catch (err) {
+        console.warn('Binance API error');
+    }
+}
+
+function updateIcon() {
+    const cryptoSelect = document.getElementById('crypto-select');
+    const imgElement = document.getElementById('asset-img');
+    if (!cryptoSelect || !imgElement) return;
+
+    const assetKey = cryptoSelect.value;
+    for (const cat in ASSETS_DATA) {
+        const found = ASSETS_DATA[cat].items.find(item => item.val === assetKey);
+        if (found) {
+            imgElement.src = found.icon;
+            break;
+        }
+    }
+    // Antsoy eto ny updateCalc() raha vao miova ny icon
+    if (typeof updateCalc === "function") updateCalc();
+}
 
 // =========================================================
 // CONFIG — inlined (previously external config.js)
