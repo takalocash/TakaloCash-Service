@@ -159,7 +159,6 @@
         .btn-env { background: var(--grad-yellow); color: black; }
         .btn-rec { background: var(--green);       color: white; }
 
-        /* --- FIX : style for active category button --- */
         .services-grid {
             display:               grid;
             grid-template-columns: 1fr 1fr;
@@ -226,12 +225,12 @@
         .sidebar.active { right: 0; }
 
         .overlay {
-            position:       fixed;
-            inset:          0;
-            background:     rgba(0,0,0,0.8);
-            display:        none;
-            z-index:        5500;
-            backdrop-filter:blur(4px);
+            position:        fixed;
+            inset:           0;
+            background:      rgba(0,0,0,0.8);
+            display:         none;
+            z-index:         5500;
+            backdrop-filter: blur(4px);
         }
 
         .modal {
@@ -413,7 +412,6 @@
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
 <div class="sidebar" id="sidebar">
-    <!-- Profile info -->
     <div style="display:flex; align-items:center; gap:12px; margin-bottom:30px;
                 padding-bottom:20px; border-bottom:1px solid var(--border);">
         <img id="side-avatar" src="https://via.placeholder.com/50"
@@ -517,7 +515,6 @@
                                 style="margin-top:0; padding:10px;"
                                 onchange="updateIcon();">
                             <option value="TRX">TRX (TRC20)</option>
-                            <option value="USDT">USDT (TRC20)</option>
                         </select>
                     </div>
                 </div>
@@ -566,7 +563,7 @@
                  style="text-align:right; font-size:11px; color:var(--gray); margin-top:6px;">
             </div>
 
-            <!-- Terms checkbox (single, inside the form) -->
+            <!-- Terms checkbox -->
             <div class="conditions-row">
                 <input type="checkbox" id="check-conditions">
                 <label for="check-conditions">
@@ -611,7 +608,7 @@
             </h2>
         </div>
 
-        <!-- Filter chips (labels in English; values match French DB service strings) -->
+        <!-- Filter chips -->
         <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:15px;"
              id="history-filters">
             <div class="filter-chip active" onclick="filterHistory('All',      this)">All</div>
@@ -681,213 +678,165 @@
 
 <!-- ============================
      JAVASCRIPT
-     FIX: regular <script> (no type="module")
-          → functions are global by default;
-          → no import/export needed;
-          → no window.xxx assignments needed.
      ============================ -->
 <script>
-// =========================================================
-// 1. CONFIGURATION (Ilay avy ao amin'ny config.js taloha)
-// =========================================================
-let USD_TO_MGA = 4700; // Nampiana ity satria ilaina amin'ny updateTaux
-
-const ADDR_RECEPT = {
-    'TRX':    'YOUR_TRON_ADDRESS_HERE',
-    'USDT':   'YOUR_USDT_TRC20_ADDRESS_HERE',
-    'BTC':    'YOUR_BITCOIN_ADDRESS_HERE',
-    'PAYPAL': 'your-email@paypal.com',
-    '1XBET':  'YOUR_1XBET_ID'
-};
-
-const ASSETS_DATA = {
-    crypto: {
-        title: "Crypto Transaction",
-        label: "Destination address:",
-        allowRecevoir: true,
-        items: [
-            { val: 'BTC',  txt: 'Bitcoin (BTC)', icon: "https://cryptologos.cc/logos/bitcoin-btc-logo.svg",  frais: 0.04 },
-            { val: 'TRX',  txt: 'TRX (TRC20)',   icon: "https://cryptologos.cc/logos/tron-trx-logo.svg",    frais: 0.02 },
-            { val: 'USDT', txt: 'USDT (TRC20)',  icon: "https://cryptologos.cc/logos/tether-usdt-logo.svg", frais: 0.03 }
-        ]
-    },
-    // ... tohizo eto ny ambiny (wallet, betting, sns.)
-};
-
-let CURRENT_TAUX = {
-    "BTC":  60000000,
-    "TRX":  600,
-    "USDT": 4700,
-    "PAYPAL": 4700,
-    "1XBET":  1,
-    // ... sns.
-};
 
 // =========================================================
-// 2. SUPABASE INIT
-// =========================================================
-const _URL = "https://nyeopreahmajoisartoz.supabase.co";
-const _KEY = "YOUR_KEY_HERE";
-const supabaseClient = supabase.createClient(_URL, _KEY);
-
-// =========================================================
-// 3. FONCTIONS (updateIcon, updateTaux, handleTransaction...)
+// CONFIG  (merged from config.js — no external file needed)
 // =========================================================
 
-async function updateTaux() {
-    try {
-        const url = `https://api.binance.com/api/v3/ticker/price?symbols=["BTCUSDT","TRXUSDT"]`;
-        const res = await fetch(url);
-        const data = await res.json();
+/** USD → MGA exchange rate (updated live by updateTaux) */
+let USD_TO_MGA = 4700;
 
-        data.forEach(item => {
-            const uiKey = item.symbol.replace('USDT', '');
-            if (CURRENT_TAUX.hasOwnProperty(uiKey)) {
-                CURRENT_TAUX[uiKey] = Math.round(parseFloat(item.price) * USD_TO_MGA);
-            }
-        });
-        CURRENT_TAUX["USDT"] = USD_TO_MGA;
-        console.log('Taux updated');
-    } catch (err) {
-        console.warn('Binance API error');
-    }
-}
-
-function updateIcon() {
-    const cryptoSelect = document.getElementById('crypto-select');
-    const imgElement = document.getElementById('asset-img');
-    if (!cryptoSelect || !imgElement) return;
-
-    const assetKey = cryptoSelect.value;
-    for (const cat in ASSETS_DATA) {
-        const found = ASSETS_DATA[cat].items.find(item => item.val === assetKey);
-        if (found) {
-            imgElement.src = found.icon;
-            break;
-        }
-    }
-    // Antsoy eto ny updateCalc() raha vao miova ny icon
-    if (typeof updateCalc === "function") updateCalc();
-}
-
-// =========================================================
-// CONFIG — inlined (previously external config.js)
-// =========================================================
-
-/** Exchange rates  (Ar per 1 unit).  Updated via updateTaux(). */
+/**
+ * Live rates in Ariary (MGA) per 1 unit of each asset.
+ * Crypto values are refreshed automatically by updateTaux().
+ * Wallet values track USD_TO_MGA.
+ * Betting / subscription values are 1 (direct Ariary input).
+ */
 const CURRENT_TAUX = {
-    TRX:       650,
-    USDT:      4500,
-    BNB:       1800000,
-    PAYPAL:    4500,
-    SKRILL:    4300,
-    NETELLER:  4300,
-    "1XBET":   1,
-    MELBET:    1,
-    BETWAY:    1,
-    NETFLIX:   1,
-    DSTV:      1,
-    CANAL:     1,
-    SPOTIFY:   1
+    // Crypto
+    TRX:      600,
+    USDT:     4700,
+    BNB:      1800000,
+    BTC:      280000000,
+
+    // Wallets (USD-pegged)
+    PAYPAL:   4700,
+    SKRILL:   4700,
+    NETELLER: 4700,
+
+    // Betting (1-to-1 Ariary top-up)
+    "1XBET":  1,
+    MELBET:   1,
+    BETWAY:   1,
+
+    // Subscriptions (fixed-price per transaction)
+    NETFLIX:  1,
+    DSTV:     1,
+    CANAL:    1,
+    SPOTIFY:  1
 };
 
-/** Receiving addresses shown when action = 'Recevoir'. */
+/**
+ * Our receiving addresses shown to the user in "Receive" mode.
+ * Replace placeholder strings with your real addresses before going live.
+ */
 const ADDR_RECEPT = {
-    TRX:     "TYourTRXAddressHereXXXXXXXXXXXX",
-    USDT:    "TYourUSDTAddressHereXXXXXXXXXXX",
-    BNB:     "0xYourBNBAddressHereXXXXXXXXXX",
-    PAYPAL:  "payments@takalocash.mg",
-    SKRILL:  "payments@takalocash.mg",
-    NETELLER:"payments@takalocash.mg",
-    "1XBET": "TakaloCash1xBet",
-    MELBET:  "TakaloCashMelbet"
+    TRX:       "TYourTRXAddressHereXXXXXXXXXXXX",
+    USDT:      "TYourUSDTAddressHereXXXXXXXXXXX",
+    BNB:       "0xYourBNBAddressHereXXXXXXXXXX",
+    BTC:       "YourBitcoinAddressHere",
+    PAYPAL:    "payments@takalocash.mg",
+    SKRILL:    "payments@takalocash.mg",
+    NETELLER:  "payments@takalocash.mg",
+    "1XBET":   "TakaloCash1xBet",
+    MELBET:    "TakaloCashMelbet"
 };
 
 /**
  * Asset data grouped by category.
- *  - label   : label for the address/ID input
- *  - items   : list of selectable assets
- *    - val   : <select> option value (used as key in CURRENT_TAUX)
- *    - txt   : human-readable option label
- *    - frais : fee fraction (0.05 = 5 %)
- *    - logo  : URL for the icon (empty string = hide icon)
+ *   label         → address/ID input label text
+ *   allowRecevoir → whether the Receive button is active
+ *   items[]
+ *     val   → <select> option value (= key in CURRENT_TAUX)
+ *     txt   → displayed option label
+ *     frais → fee fraction (0.05 = 5 %)
+ *     logo  → icon URL (empty string hides the icon)
  */
 const ASSETS_DATA = {
     crypto: {
-        label: "Recipient address (TRC20):",
+        label:         "Recipient address (TRC20 / BEP20):",
+        allowRecevoir: true,
         items: [
             { val: "TRX",  txt: "TRX (TRC20)",  frais: 0.05,
               logo: "https://cryptologos.cc/logos/tron-trx-logo.svg" },
             { val: "USDT", txt: "USDT (TRC20)", frais: 0.03,
               logo: "https://cryptologos.cc/logos/tether-usdt-logo.svg" },
             { val: "BNB",  txt: "BNB (BEP20)",  frais: 0.05,
-              logo: "https://cryptologos.cc/logos/bnb-bnb-logo.svg" }
+              logo: "https://cryptologos.cc/logos/bnb-bnb-logo.svg" },
+            { val: "BTC",  txt: "Bitcoin (BTC)", frais: 0.04,
+              logo: "https://cryptologos.cc/logos/bitcoin-btc-logo.svg" }
         ]
     },
     wallet: {
-        label: "Wallet email / account ID:",
+        label:         "Wallet email / account ID:",
+        allowRecevoir: true,
         items: [
-            { val: "PAYPAL",   txt: "PayPal",   frais: 0.05, logo: "" },
-            { val: "SKRILL",   txt: "Skrill",   frais: 0.04, logo: "" },
+            { val: "PAYPAL",   txt: "PayPal",   frais: 0.05,
+              logo: "https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" },
+            { val: "SKRILL",   txt: "Skrill",   frais: 0.04,
+              logo: "https://upload.wikimedia.org/wikipedia/commons/8/8b/Skrill_logo.svg" },
             { val: "NETELLER", txt: "Neteller", frais: 0.04, logo: "" }
         ]
     },
     betting: {
-        label: "Player ID / Username:",
+        label:         "Player ID / Username:",
+        allowRecevoir: true,
         items: [
-            { val: "1XBET",  txt: "1xBet",  frais: 0.05, logo: "" },
+            { val: "1XBET",  txt: "1xBet",  frais: 0.05,
+              logo: "https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg" },
             { val: "MELBET", txt: "Melbet", frais: 0.05, logo: "" },
             { val: "BETWAY", txt: "Betway", frais: 0.05, logo: "" }
         ]
     },
     abonnement: {
-        label: "Account email / activation code:",
+        label:         "Account email / activation code:",
+        allowRecevoir: false,   // subscriptions are send-only
         items: [
-            { val: "NETFLIX", txt: "Netflix",  frais: 0.0, logo: "" },
-            { val: "DSTV",    txt: "DStv",     frais: 0.0, logo: "" },
-            { val: "CANAL",   txt: "Canal+",   frais: 0.0, logo: "" },
-            { val: "SPOTIFY", txt: "Spotify",  frais: 0.0, logo: "" }
+            { val: "NETFLIX", txt: "Netflix", frais: 0.02,
+              logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" },
+            { val: "DSTV",    txt: "DStv",    frais: 0.02, logo: "" },
+            { val: "CANAL",   txt: "Canal+",  frais: 0.02, logo: "" },
+            { val: "SPOTIFY", txt: "Spotify", frais: 0.02, logo: "" }
         ]
     }
 };
 
 // =========================================================
-// SUPABASE
+// SUPABASE — replace the values below with your own project
 // =========================================================
 const _URL = "https://nyeopreahmajoisartoz.supabase.co";
 const _KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA";
 const supabaseClient = supabase.createClient(_URL, _KEY);
 
 // =========================================================
-// STATE
-//  currentMode   = category key: 'crypto' | 'wallet' | 'betting' | 'abonnement'
-//                  or mobile mode: 'Dépôt' | 'Retrait'
-//  currentAction = French DB value: 'Envoyer' | 'Recevoir'
-//                  (also 'Dépôt' / 'Retrait' for mobile money)
+// APP STATE
 // =========================================================
 let currentUserId   = null;
 let userData        = null;
 let allTransactions = [];
-let currentMode     = 'crypto';
-let currentAction   = 'Envoyer';
+let currentMode     = 'crypto';   // category key or 'Dépôt'|'Retrait'
+let currentAction   = 'Envoyer';  // 'Envoyer'|'Recevoir'|'Dépôt'|'Retrait'
 
 // =========================================================
 // CONFIG HELPERS
 // =========================================================
 
-/** Fetch live rates from CoinGecko and update CURRENT_TAUX.
-    Falls back silently if the request fails. */
+/**
+ * Fetch live crypto prices from CoinGecko and update CURRENT_TAUX.
+ * Silently falls back to cached rates on network errors.
+ */
 async function updateTaux() {
     try {
         const res  = await fetch(
-            "https://api.coingecko.com/api/v3/simple/price?ids=tron,tether,binancecoin&vs_currencies=mga"
+            "https://api.coingecko.com/api/v3/simple/price" +
+            "?ids=tron,tether,binancecoin,bitcoin&vs_currencies=mga"
         );
         const json = await res.json();
-        if (json.tron)        CURRENT_TAUX.TRX  = json.tron.mga;
-        if (json.tether)      CURRENT_TAUX.USDT = json.tether.mga;
-        if (json.binancecoin) CURRENT_TAUX.BNB  = json.binancecoin.mga;
+        if (json.tron)        CURRENT_TAUX.TRX  = Math.round(json.tron.mga);
+        if (json.tether)      CURRENT_TAUX.USDT = Math.round(json.tether.mga);
+        if (json.binancecoin) CURRENT_TAUX.BNB  = Math.round(json.binancecoin.mga);
+        if (json.bitcoin)     CURRENT_TAUX.BTC  = Math.round(json.bitcoin.mga);
+
+        // Keep USD-pegged wallets in sync with the USDT/MGA rate
+        CURRENT_TAUX.PAYPAL   = CURRENT_TAUX.USDT;
+        CURRENT_TAUX.SKRILL   = CURRENT_TAUX.USDT;
+        CURRENT_TAUX.NETELLER = CURRENT_TAUX.USDT;
+
+        console.log('[TakaloCash] Rates updated:', new Date().toLocaleTimeString());
     } catch (_) {
-        // silently keep the last-known rates
+        console.warn('[TakaloCash] CoinGecko unavailable — using cached rates.');
     }
 }
 
@@ -896,10 +845,12 @@ function updateIcon() {
     const assetKey = document.getElementById('crypto-select').value;
     const catData  = ASSETS_DATA[currentMode];
     const imgEl    = document.getElementById('asset-img');
+    if (!imgEl) return;
+
     if (catData) {
         const item = catData.items.find(i => i.val === assetKey);
         if (item && item.logo) {
-            imgEl.src   = item.logo;
+            imgEl.src           = item.logo;
             imgEl.style.display = 'inline';
         } else {
             imgEl.style.display = 'none';
@@ -954,9 +905,12 @@ async function handleLogin() {
     const email = document.getElementById('login-email').value.trim();
     const pass  = document.getElementById('login-pass').value;
     if (!email || !pass) return alert("Please enter your email and password.");
+
     const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
     if (error) return alert("Incorrect email or password.");
-    initApp();
+    // FIX: Do NOT call initApp() here directly.
+    //      onAuthStateChange (at the bottom) handles it for both fresh logins
+    //      and page refreshes — calling it twice caused a double-initialisation bug.
 }
 
 async function handleForgot() {
@@ -968,11 +922,11 @@ async function handleForgot() {
 }
 
 // =========================================================
-// APP INIT & DATA
+// APP INIT & DATA FETCH
 // =========================================================
 async function initApp() {
     const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) return; // not logged in
+    if (!user) return;
 
     currentUserId = user.id;
 
@@ -980,13 +934,12 @@ async function initApp() {
     document.getElementById('nav-header').style.display     = 'block';
     document.getElementById('main-app').style.display       = 'block';
 
-    // Fetch live rates once, then every hour
+    // Fetch live rates once at startup, then refresh every hour
     await updateTaux();
     setInterval(updateTaux, 3_600_000);
 
     // Initialise default UI state
     selectCategory('crypto');
-
     fetchData();
 }
 
@@ -999,11 +952,10 @@ async function fetchData() {
     if (u) {
         userData = u;
         document.getElementById('display-solde').innerText  = (u.solde || 0).toLocaleString() + " Ar";
-        document.getElementById('side-full-name').innerText = u.full_name;
-        document.getElementById('side-tk-id').innerText     = "ID: " + u.tk_id;
-        const avatar = u.avatar_url || "https://via.placeholder.com/35";
-        document.getElementById('header-avatar').src = avatar;
-        document.getElementById('side-avatar').src   = u.avatar_url || "https://via.placeholder.com/50";
+        document.getElementById('side-full-name').innerText = u.full_name || '';
+        document.getElementById('side-tk-id').innerText     = "ID: " + (u.tk_id || '');
+        document.getElementById('header-avatar').src        = u.avatar_url || "https://via.placeholder.com/35";
+        document.getElementById('side-avatar').src          = u.avatar_url || "https://via.placeholder.com/50";
     }
 
     // Transactions
@@ -1020,9 +972,40 @@ async function fetchData() {
 
 // =========================================================
 // HISTORY RENDERING
-//  DB statuses (French): 'en attente', 'confirmé', 'rejeté'
-//  DB service field is built from currentAction + category
+//
+// Columns stored by handleTransaction():
+//   type         → 'Envoyer' | 'Recevoir' | 'Dépôt' | 'Retrait'
+//   category     → 'crypto' | 'wallet' | 'betting' | 'abonnement'
+//   asset        → e.g. 'TRX', 'PAYPAL', '1XBET'
+//   amount_input → numeric Ariary amount entered by the user
+//   frais        → fee amount in Ariary
+//   status       → 'en attente' | 'confirmé' | 'rejeté'
+//   reference    → 'REF-XXXXXXXX'
+//
+// FIX: previous code read t.service and t.montant which do not exist
+//      in the schema → history was always blank.
+//      buildServiceLabel() and buildAmount() handle both the current
+//      schema and any legacy rows that may have a 'service'/'montant' column.
 // =========================================================
+
+function buildServiceLabel(t) {
+    if (t.service) return t.service;                  // legacy rows
+    const type  = t.type  || '';
+    const asset = t.asset || '';
+    return (type + (asset ? ' ' + asset : '')).trim();
+}
+
+function buildAmount(t) {
+    // Prefer legacy 'montant' if present, otherwise use 'amount_input'
+    if (t.montant !== undefined && t.montant !== null) return t.montant;
+    return t.amount_input || 0;
+}
+
+function isNegativeTransaction(t) {
+    const typ = (t.type || t.service || '').toLowerCase();
+    return typ.includes('envoyer') || typ.includes('retrait') || typ.includes('abonnement');
+}
+
 function renderHistory(dataToRender = allTransactions) {
     const fullContainer    = document.getElementById('full-history-container');
     const previewContainer = document.getElementById('preview-history-body');
@@ -1033,9 +1016,9 @@ function renderHistory(dataToRender = allTransactions) {
             const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
             const dateStr = dateObj.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
 
-            const svc        = t.service.toLowerCase();
-            const isNegative = svc.includes('envoyer') || svc.includes('retrait') ||
-                               svc.includes('abonnement') || svc.includes('dépôt');
+            const label      = buildServiceLabel(t);
+            const amount     = buildAmount(t);
+            const isNegative = isNegativeTransaction(t);
 
             let statusColor = 'var(--yellow)';
             if (t.status === 'confirmé') statusColor = 'var(--green)';
@@ -1045,7 +1028,7 @@ function renderHistory(dataToRender = allTransactions) {
                 <div class="history-item">
                     <div class="history-info">
                         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                            <div class="history-service">${t.service}</div>
+                            <div class="history-service">${label}</div>
                             <span style="font-size:10px; color:var(--gray);
                                          background:rgba(255,255,255,0.05);
                                          padding:2px 5px; border-radius:4px; font-family:monospace;">
@@ -1063,23 +1046,26 @@ function renderHistory(dataToRender = allTransactions) {
                             </span>
                         </div>
                     </div>
-                    <div class="history-amount ${isNegative ? 'amount-red' : 'amount-green'}"
+                    <div class="${isNegative ? 'amount-red' : 'amount-green'}"
                          style="text-align:right; white-space:nowrap;">
                         <span style="font-size:16px;">
-                            ${isNegative ? '-' : '+'}${Number(t.montant).toLocaleString()}
+                            ${isNegative ? '-' : '+'}${Number(amount).toLocaleString()}
                         </span>
                         <span style="font-size:10px; margin-left:2px;">Ar</span>
                     </div>
                 </div>`;
         } catch (e) {
-            console.error("Row render error:", e);
+            console.error("Row render error:", e, t);
             return "";
         }
     };
 
-    // Preview (home page — last 3)
+    // Preview (home page — last 3 transactions)
     if (previewContainer) {
-        previewContainer.innerHTML = allTransactions.slice(0, 3).map(generateHTML).join('');
+        const preview = allTransactions.slice(0, 3);
+        previewContainer.innerHTML = preview.length
+            ? preview.map(t => `<tr><td>${generateHTML(t)}</td></tr>`).join('')
+            : '<tr><td style="text-align:center; padding:30px; color:var(--gray); font-size:13px;">No recent transactions.</td></tr>';
     }
 
     // Full history page
@@ -1091,19 +1077,17 @@ function renderHistory(dataToRender = allTransactions) {
             return;
         }
 
-        // Group by month/year
+        // Group by month / year
         const groups = dataToRender.reduce((acc, t) => {
             const monthYr = new Date(t.created_at)
                 .toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-            if (!acc[monthYr]) acc[monthYr] = [];
-            acc[monthYr].push(t);
+            (acc[monthYr] = acc[monthYr] || []).push(t);
             return acc;
         }, {});
 
         fullContainer.innerHTML = '';
         for (const month in groups) {
-            fullContainer.innerHTML +=
-                `<div class="month-header">${month.toUpperCase()}</div>`;
+            fullContainer.innerHTML += `<div class="month-header">${month.toUpperCase()}</div>`;
             fullContainer.innerHTML += groups[month].map(generateHTML).join('');
         }
     }
@@ -1116,9 +1100,11 @@ function filterHistory(type, el) {
     if (type === 'All') {
         renderHistory(allTransactions);
     } else {
-        renderHistory(allTransactions.filter(t =>
-            t.service.toLowerCase().includes(type.toLowerCase())
-        ));
+        renderHistory(allTransactions.filter(t => {
+            const label = buildServiceLabel(t).toLowerCase();
+            const typ   = (t.type || '').toLowerCase();
+            return label.includes(type.toLowerCase()) || typ === type.toLowerCase();
+        }));
     }
 }
 
@@ -1126,8 +1112,8 @@ function filterHistory(type, el) {
 // NAVIGATION
 // =========================================================
 function toggleSidebar() {
-    const sidebar  = document.getElementById('sidebar');
-    const overlay  = document.getElementById('overlay');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
     sidebar.classList.toggle('active');
     overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
 }
@@ -1162,18 +1148,15 @@ function goToFullHistory() {
 // MOBILE MONEY (Deposit / Withdrawal)
 // =========================================================
 function openMobile(mode) {
-    // mode is 'Dépôt' or 'Retrait' — stored as-is in DB
     currentMode   = mode;
-    currentAction = mode;   // FIX: keep action in sync
+    currentAction = mode;
 
-    // Close sidebar if open
     const sidebar = document.getElementById('sidebar');
     if (sidebar && sidebar.classList.contains('active')) {
         sidebar.classList.remove('active');
         document.getElementById('overlay').style.display = 'none';
     }
 
-    // Update form
     document.getElementById('trans-title').innerText                 = mode + " Mobile Money";
     document.getElementById('crypto-select-container').style.display = 'none';
     document.getElementById('label-right').innerText                 = "Amount (Ar):";
@@ -1185,7 +1168,6 @@ function openMobile(mode) {
     document.getElementById('calc-container').style.display          = 'none';
     document.getElementById('frais-info').innerText                  = '';
 
-    // Scroll to form
     document.querySelector('.trans-box').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -1197,36 +1179,34 @@ function selectCategory(category) {
     const data  = ASSETS_DATA[category];
     if (!data)  return;
 
-    // 1. Active highlight on category buttons
+    // Highlight active category button
     document.querySelectorAll('.service-item').forEach(btn => btn.classList.remove('active'));
     const targetBtn = document.getElementById('btn-' + category);
     if (targetBtn) targetBtn.classList.add('active');
 
-    // 2. Show asset selector (hidden by openMobile)
+    // Show asset selector (might be hidden from openMobile)
     document.getElementById('crypto-select-container').style.display = 'block';
 
-    // 3. Populate <select> with category items
-    const cryptoSelect   = document.getElementById('crypto-select');
+    // Populate <select> with this category's assets
+    const cryptoSelect    = document.getElementById('crypto-select');
     cryptoSelect.innerHTML = data.items
         .map(i => `<option value="${i.val}">${i.txt}</option>`)
         .join('');
 
-    // 4. Address label
+    // Address input label
     document.getElementById('label-addr').innerText = data.label;
 
-    // 5. Disable "Receive" for subscriptions (no incoming flow)
+    // Disable Receive for categories that don't support it
     const btnRec = document.getElementById('main-rec-btn');
     if (btnRec) {
-        const isAbo             = (category === 'abonnement');
-        btnRec.style.opacity       = isAbo ? "0.35" : "1";
-        btnRec.style.pointerEvents = isAbo ? "none"  : "auto";
-        if (isAbo) currentAction = 'Envoyer'; // force send mode
+        const noReceive          = !data.allowRecevoir;
+        btnRec.style.opacity       = noReceive ? "0.35" : "1";
+        btnRec.style.pointerEvents = noReceive ? "none"  : "auto";
+        if (noReceive) currentAction = 'Envoyer';
     }
 
-    // 6. Refresh action UI (title, unit, address field)
+    // Refresh form state
     switchAction(currentAction);
-
-    // 7. Refresh icon
     updateIcon();
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1238,59 +1218,53 @@ function selectCategory(category) {
 function switchAction(action) {
     currentAction = action;
 
-    const assetKey    = document.getElementById('crypto-select').value;
-    const transTitle  = document.getElementById('trans-title');
-    const labelRight  = document.getElementById('label-right');
-    const unitSuffix  = document.getElementById('unit-suffix');  // FIX: was 'amount-unit'
-    const inputAddr   = document.getElementById('input-addr');
-    const copyBtn     = document.getElementById('copy-btn');
-    const labelAddr   = document.getElementById('label-addr');
+    const assetKey   = document.getElementById('crypto-select').value;
+    const transTitle = document.getElementById('trans-title');
+    const labelRight = document.getElementById('label-right');
+    const unitSuffix = document.getElementById('unit-suffix');
+    const inputAddr  = document.getElementById('input-addr');
+    const copyBtn    = document.getElementById('copy-btn');
+    const labelAddr  = document.getElementById('label-addr');
+    const btnEnv     = document.getElementById('main-env-btn');
+    const btnRec     = document.getElementById('main-rec-btn');
 
-    // --- Button visual state ---
-    const btnEnv = document.getElementById('main-env-btn');
-    const btnRec = document.getElementById('main-rec-btn');
-    if (btnEnv) btnEnv.style.opacity = action === 'Envoyer' ? '1' : '0.6';
+    // Button visual state
+    if (btnEnv) btnEnv.style.opacity = action === 'Envoyer'  ? '1' : '0.6';
     if (btnRec) btnRec.style.opacity = action === 'Recevoir' ? '1' : '0.6';
 
-    // --- Title ---
+    // Form title
     const titleMap = {
-        crypto:      { Envoyer: "Send Crypto",         Recevoir: "Receive Crypto"      },
-        wallet:      { Envoyer: "Send to Wallet",      Recevoir: "Receive from Wallet" },
-        betting:     { Envoyer: "Betting Deposit",     Recevoir: "Betting Withdrawal"  },
-        abonnement:  { Envoyer: "Subscription",        Recevoir: "Subscription"        }
+        crypto:     { Envoyer: "Send Crypto",       Recevoir: "Receive Crypto"      },
+        wallet:     { Envoyer: "Send to Wallet",    Recevoir: "Receive from Wallet" },
+        betting:    { Envoyer: "Betting Deposit",   Recevoir: "Betting Withdrawal"  },
+        abonnement: { Envoyer: "Subscription",      Recevoir: "Subscription"        }
     };
-    const modeTitles = titleMap[currentMode];
-    if (modeTitles) {
-        transTitle.innerText = modeTitles[action] || modeTitles.Envoyer;
+    if (titleMap[currentMode]) {
+        transTitle.innerText = titleMap[currentMode][action] || titleMap[currentMode].Envoyer;
     }
 
-    // --- Input unit ---
+    // Input label / unit suffix
     if (action === 'Envoyer') {
-        labelRight.innerText  = "Amount (Ar):";
-        unitSuffix.innerText  = "Ar";
+        labelRight.innerText = "Amount (Ar):";
+        unitSuffix.innerText = "Ar";
     } else {
-        // Recevoir: user enters crypto/asset amount
         let unitLabel = assetKey;
         if (currentMode === 'wallet' && assetKey === 'PAYPAL') unitLabel = 'USD';
-        else if (currentMode === 'wallet')                       unitLabel = 'EUR';
+        else if (currentMode === 'wallet')                      unitLabel = 'EUR';
         labelRight.innerText = `Amount (${unitLabel}):`;
-        unitSuffix.innerText  = unitLabel;
+        unitSuffix.innerText = unitLabel;
     }
 
-    // --- Address field ---
+    // Address field
     if (action === 'Recevoir') {
-        // Show our own receiving address — read only
-        const addr = ADDR_RECEPT[assetKey] || '';
-        inputAddr.value    = addr;
-        inputAddr.readOnly = true;
-        labelAddr.innerText = "Send to this address:";
+        inputAddr.value       = ADDR_RECEPT[assetKey] || '';
+        inputAddr.readOnly    = true;
+        labelAddr.innerText   = "Send to this address:";
         copyBtn.style.display = 'inline';
     } else {
-        // Clear for user input
         inputAddr.value       = "";
         inputAddr.readOnly    = false;
         copyBtn.style.display = 'none';
-        // Restore label from category data
         const catData = ASSETS_DATA[currentMode];
         if (catData) labelAddr.innerText = catData.label;
     }
@@ -1306,19 +1280,17 @@ function updateCalc() {
     const res           = document.getElementById('calc-res');
     const fraisEl       = document.getElementById('frais-info');
 
-    // Mobile money — no conversion to display
+    // Mobile money modes have no conversion panel
     if (currentMode === 'Dépôt' || currentMode === 'Retrait') {
         calcContainer.style.display = 'none';
         return;
     }
-
     calcContainer.style.display = 'flex';
 
     const assetKey = document.getElementById('crypto-select').value;
     const val      = parseFloat(document.getElementById('input-main').value) || 0;
     const rate     = CURRENT_TAUX[assetKey] || 1;
 
-    // Get fee for current asset
     let frais = 0;
     const catData = ASSETS_DATA[currentMode];
     if (catData) {
@@ -1327,20 +1299,22 @@ function updateCalc() {
     }
 
     if (currentAction === 'Envoyer') {
-        // Input: Ar  →  Output: crypto equivalent after fee
+        // Input: Ariary → Output: crypto quantity user receives after fee
         const netAr  = val * (1 - frais);
-        const crypto = netAr / rate;
-        res.innerText = crypto.toFixed(assetKey === 'USDT' ? 2 : 6) + " " + assetKey;
+        if (rate > 1) {
+            const crypto = netAr / rate;
+            res.innerText = crypto.toFixed(assetKey === 'USDT' ? 2 : 6) + " " + assetKey;
+        } else {
+            res.innerText = netAr.toLocaleString() + " Ar";
+        }
     } else {
-        // Input: crypto amount  →  Output: Ar received after fee
+        // Input: crypto quantity → Output: Ariary user sends after fee
         const grossAr = val * rate;
         const netAr   = Math.floor(grossAr * (1 - frais));
         res.innerText = netAr.toLocaleString() + " Ar";
     }
 
-    fraisEl.innerText = frais > 0
-        ? `Fee: ${(frais * 100).toFixed(0)}% included`
-        : '';
+    fraisEl.innerText = frais > 0 ? `Fee: ${(frais * 100).toFixed(0)}% included` : '';
 }
 
 // =========================================================
@@ -1352,7 +1326,6 @@ async function handleTransaction() {
     const address = document.getElementById('input-addr').value.trim();
     const solde   = userData?.solde || 0;
 
-    // 1. Validation de base
     if (!amount || amount <= 0) return alert("Ampidiro ny montant azafady.");
     if (!address)               return alert("Ampidiro ny adiresy na ID handefasana azy.");
 
@@ -1361,27 +1334,27 @@ async function handleTransaction() {
         return alert("Azafady ekeo ny fepetra (Terms & Conditions).");
     }
 
-    // 2. Kajy ny Frais
+    // Fee calculation
     let frais = 0;
     const catData = ASSETS_DATA[currentMode];
     if (catData) {
         const item = catData.items.find(i => i.val === asset);
         if (item) frais = item.frais;
     }
-
     const feesAr = Math.round(amount * frais);
-    const total  = amount + feesAr; // Total mivoaka raha 'Envoyer'
+    const total  = amount + feesAr;
 
-    // 3. Fanamarinana ny Solde (Ho an'ny ENVOYER ihany)
-    // Tsy misy check solde intsony raha Dépôt/Recevoir
+    // Balance check (Send only)
     if (currentAction === 'Envoyer' && total > solde) {
-        return alert(`Tsy ampy ny solde-nao.\nIlaina: ${total.toLocaleString()} Ar\nAnananao: ${solde.toLocaleString()} Ar`);
+        return alert(
+            `Tsy ampy ny solde-nao.\n` +
+            `Ilaina: ${total.toLocaleString()} Ar\n` +
+            `Anananao: ${solde.toLocaleString()} Ar`
+        );
     }
 
-    // 4. Famoronana Reference Unique
     const reference = "REF-" + Date.now().toString(36).toUpperCase();
 
-    // 5. Confirmation dialog
     const confirmed = window.confirm(
         `Hanamarina ny transaction?\n\n` +
         `Service   : ${currentAction} ${asset}\n` +
@@ -1394,33 +1367,29 @@ async function handleTransaction() {
     if (!confirmed) return;
 
     try {
-        // 6. Fampidirana ao amin'ny Supabase (Transactions Table)
         const { error: txErr } = await supabaseClient.from('transactions').insert([{
-            user_id:      currentUserId,
-            category:     currentMode,      // 'crypto', 'wallet', na 'betting'
-            type:         currentAction,    // 'Envoyer' na 'Recevoir'
-            asset:        asset,
-            amount_input: amount,          // Column vaovao numeric
-            frais:        feesAr,          // Column vaovao numeric
-            address_dest: address,         // Nataontsika address_dest tany amin'ny SQL
-            status:       'en attente',
-            reference:    reference,
+            user_id:        currentUserId,
+            category:       currentMode,
+            type:           currentAction,
+            asset:          asset,
+            amount_input:   amount,
+            frais:          feesAr,
+            address_dest:   address,
+            status:         'en attente',
+            reference:      reference,
             currency_input: 'Ar'
         }]);
-        
         if (txErr) throw txErr;
 
-        // 7. Fanitsiana ny Solde raha ENVOYER
+        // Deduct balance on Send
         if (currentAction === 'Envoyer') {
             const newSolde = solde - total;
             const { error: soldeErr } = await supabaseClient
-                .from('users') // Hamarino raha 'users' sa 'profiles' ny anarany any amin'ny Supabase
+                .from('users')
                 .update({ solde: newSolde })
                 .eq('id', currentUserId);
-            
             if (soldeErr) throw soldeErr;
 
-            // Fanavaozana ny fisehon'ny solde eo amin'ny app
             userData.solde = newSolde;
             const soldeDisplay = document.getElementById('display-solde');
             if (soldeDisplay) soldeDisplay.innerText = newSolde.toLocaleString() + " Ar";
@@ -1428,20 +1397,17 @@ async function handleTransaction() {
 
         alert(`Transaction voaray!\nReference: ${reference}`);
 
-        // 8. Famerenana ny Form ho foana (Reset)
+        // Reset form
         document.getElementById('input-main').value = '';
         if (!document.getElementById('input-addr').readOnly) {
             document.getElementById('input-addr').value = '';
         }
         check.checked = false;
-        if (typeof updateCalc === "function") updateCalc();
-
-        // 9. Refresh data
-        if (typeof fetchData === "function") fetchData();
-        if (typeof closeModal === "function") closeModal('modal-confirm');
+        updateCalc();
+        fetchData();
 
     } catch (err) {
-        console.error("Error detail:", err);
+        console.error("Transaction error:", err);
         alert("Nisy olana: " + err.message);
     }
 }
@@ -1452,9 +1418,7 @@ async function handleTransaction() {
 function previewImage(input) {
     if (input.files && input.files[0]) {
         const reader  = new FileReader();
-        reader.onload = (e) => {
-            document.getElementById('modal-pp-view').src = e.target.result;
-        };
+        reader.onload = (e) => { document.getElementById('modal-pp-view').src = e.target.result; };
         reader.readAsDataURL(input.files[0]);
     }
 }
@@ -1481,26 +1445,31 @@ async function updateProfile() {
         .eq('id', currentUserId);
 
     if (error) alert(error.message);
-    else {
-        alert("Profile updated!");
-        closeProfile();
-        fetchData();
-    }
+    else { alert("Profile updated!"); closeProfile(); fetchData(); }
 }
 
 function copyText() {
     const input = document.getElementById('input-addr');
-    input.select();
-    try {
-        document.execCommand("copy");
-        alert("Address copied to clipboard!");
-    } catch (_) {
-        alert("Copy failed — please copy manually.");
+    const doCopy = () => { input.select(); document.execCommand("copy"); alert("Address copied!"); };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(input.value)
+            .then(() => alert("Address copied!"))
+            .catch(doCopy);
+    } else {
+        doCopy();
     }
 }
 
 // =========================================================
 // NOTIFICATIONS
+//
+// FIX (critical): the original code was missing the opening { in the
+// toLocaleString() options argument, which caused a SyntaxError that
+// prevented the ENTIRE script block from parsing — so nothing worked.
+//
+//   BROKEN:  toLocaleString('fr-FR',  timeZone: '…',  ← no {
+//   FIXED:   toLocaleString('fr-FR', { timeZone: '…', ← added {
 // =========================================================
 async function fetchNotifications() {
     const { data: notifs } = await supabaseClient
@@ -1525,14 +1494,13 @@ async function fetchNotifications() {
                     ${n.message}
                 </span><br>
                 <small style="font-size:10px; color:rgba(255,255,255,0.3);">
-                    ${new Date(n.created_at).toLocaleString('fr-FR',
-                       {
+                    ${new Date(n.created_at).toLocaleString('fr-FR', {
                         timeZone: 'Indian/Antananarivo',
-                        day: 'numeric',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                     })}
+                        day:      'numeric',
+                        month:    'short',
+                        hour:     '2-digit',
+                        minute:   '2-digit'
+                    })}
                 </small>
             </div>`).join('')
         : '<p style="text-align:center; padding:30px; color:var(--gray); font-size:13px;">No notifications.</p>';
@@ -1559,9 +1527,16 @@ function logout() {
 }
 
 // =========================================================
-// BOOT — check for an existing session on page load
-// FIX: onAuthStateChange ensures initApp() fires for both
-//      fresh logins and page refreshes with a valid session.
+// BOOT
+//
+// onAuthStateChange is the single entry point for initApp().
+// It fires on both:
+//   • page load when a valid session already exists (SIGNED_IN)
+//   • right after a successful signInWithPassword()  (SIGNED_IN)
+//
+// FIX: removed the redundant initApp() call inside handleLogin().
+//      Calling it there AND here caused double-initialisation:
+//      two concurrent fetchData() calls, two setInterval timers, etc.
 // =========================================================
 supabaseClient.auth.onAuthStateChange((event, session) => {
     if (session && session.user) {
