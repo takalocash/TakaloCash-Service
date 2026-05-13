@@ -198,129 +198,220 @@
             background:      #000;
             border:          1px solid var(--border);
             flex-shrink:     0;
+<style>
+        :root {
+            --bg-body:     #0b0e11;      /* Mainty Binance */
+            --bg-nav:      #181a20;      /* Mainty kely fotsiny */
+            --card:        #1e2329;      /* Loko gris maizina amin'ny cards */
+            --yellow:      #fcd535;      /* Mavo Binance */
+            --green:       #2ebd85;      /* Maitso transaction */
+            --red:         #f6465d;      /* Mena */
+            --gray:        #848e9c;      /* Soratra matroka */
+            --border:      rgba(71, 77, 87, 0.25);
+            --grad-yellow: linear-gradient(135deg, #fcd535, #f0b90b);
         }
 
-        .trans-box {
-            background:    var(--card);
-            border:        1px solid var(--border);
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin:      0;
+            background:  var(--bg-body);
+            color:       white;
+            font-family: 'Inter', sans-serif;
+            display:     flex;
+            justify-content: center;
+            overflow-x:  hidden;
+        }
+
+        .app-container {
+            width:      100%;
+            max-width:  480px;
+            min-height: 100vh;
+            background: var(--bg-body);
+            position:   relative;
+            padding-bottom: 100px;
+        }
+
+        /* --- HEADER & NAVIGATION --- */
+        nav {
+            background: var(--bg-nav);
+            padding:    15px 20px;
+            display:    flex;
+            justify-content: space-between;
+            align-items: center;
+            position:   sticky;
+            top:        0;
+            z-index:    5000;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo { font-weight: 800; font-size: 20px; color: var(--yellow); letter-spacing: -0.5px; }
+
+        /* --- BALANCE SECTION --- */
+        .balance-card {
+            background: var(--bg-nav);
+            margin:     20px;
+            padding:    30px 25px;
             border-radius: 24px;
-            padding:       22px;
+            border:     1px solid var(--border);
+            position:   relative;
+            overflow:   hidden;
+        }
+        .balance-card::after {
+            content: ""; position: absolute; top: -50px; right: -50px;
+            width: 150px; height: 150px; background: var(--yellow);
+            filter: blur(80px); opacity: 0.1;
+        }
+        .bal-label { color: var(--gray); font-size: 13px; font-weight: 500; }
+        .bal-amount { font-size: 36px; font-weight: 800; margin: 10px 0; letter-spacing: -1px; }
+
+        /* --- MAIN ACTION BUTTONS --- */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 0 20px;
             margin-bottom: 30px;
         }
+        .btn-main {
+            padding: 16px;
+            border-radius: 16px;
+            border: none;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+        .btn-yellow { background: var(--grad-yellow); color: black; }
+        .btn-gray   { background: #2b3139; color: white; }
+        .btn-main:active { transform: scale(0.96); }
 
-        /* --- SIDEBAR & MODAL --- */
+        /* --- SERVICE GRID (Icons 4 columns) --- */
+        .service-grid {
+            display:               grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap:                   15px;
+            padding:               0 20px;
+            margin-bottom:         30px;
+        }
+        .service-item {
+            text-align: center;
+            cursor:     pointer;
+            transition: 0.3s;
+        }
+        .icon-box {
+            width:         48px;
+            height:        48px;
+            background:    #2b3139;
+            border-radius: 14px;
+            display:       flex;
+            align-items:   center;
+            justify-content: center;
+            margin:        0 auto 8px;
+            font-size:     20px;
+            color:         var(--gray);
+            border:        1px solid var(--border);
+            transition:    0.3s;
+        }
+        .service-item span { font-size: 11px; font-weight: 500; color: var(--gray); }
+        
+        .service-item.active .icon-box {
+            background: var(--grad-yellow);
+            color:      black;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(252, 213, 53, 0.2);
+        }
+        .service-item.active span { color: var(--yellow); }
+
+        /* --- TRANSACTION FORM --- */
+        .trans-box {
+            background:    var(--card);
+            margin:        0 20px 30px;
+            border-radius: 28px;
+            padding:       25px;
+            border:        1px solid var(--border);
+            box-shadow:    0 10px 30px rgba(0,0,0,0.3);
+        }
+        .input-group {
+            background: #0b0e11;
+            border:     1px solid var(--border);
+            border-radius: 14px;
+            padding:    12px 15px;
+            margin-bottom: 15px;
+        }
+        .input-group label { display: block; font-size: 11px; color: var(--gray); margin-bottom: 5px; }
+        .input-group input, .input-group select {
+            background: transparent;
+            border:     none;
+            color:      white;
+            width:      100%;
+            font-size:  16px;
+            font-weight: 600;
+            outline:    none;
+        }
+
+        .btn-submit {
+            width:      100%;
+            padding:    18px;
+            background: var(--grad-yellow);
+            color:      black;
+            border:     none;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size:  16px;
+            cursor:     pointer;
+            margin-top: 10px;
+        }
+
+        /* --- SIDEBAR (Premium Glass) --- */
         .sidebar {
-            position:   fixed;
-            top:        0;
-            right:      -100%;
-            width:      80%;
-            max-width:  300px;
-            height:     100%;
-            background: var(--bg-nav);
-            z-index:    6000;
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding:    30px;
-            overflow-y: auto;
+            position:    fixed;
+            top:         0;
+            right:       -100%;
+            width:       85%;
+            max-width:   320px;
+            height:      100%;
+            background:  rgba(24, 26, 32, 0.98);
+            backdrop-filter: blur(15px);
+            z-index:     6000;
+            transition:  0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding:     40px 25px;
+            border-left: 1px solid var(--border);
         }
         .sidebar.active { right: 0; }
 
-        .overlay {
-            position:        fixed;
-            inset:           0;
-            background:      rgba(0,0,0,0.8);
-            display:         none;
-            z-index:         5500;
-            backdrop-filter: blur(4px);
-        }
-
-        .modal {
-            display:         none;
-            position:        fixed;
-            inset:           0;
-            background:      rgba(0,0,0,0.9);
-            z-index:         7000;
-            align-items:     center;
-            justify-content: center;
-            padding:         20px;
-        }
-
         /* --- HISTORY --- */
-        .history-table { width: 100%; border-collapse: collapse; }
-        .history-table td { padding: 15px 0; border-bottom: 1px solid var(--border); }
-
-        .month-header {
-            padding:        15px 0 10px 0;
-            color:          var(--gray);
-            font-size:      11px;
-            font-weight:    bold;
-            border-bottom:  1px solid rgba(255,255,255,0.05);
-            margin-bottom:  10px;
-            letter-spacing: 1px;
-        }
-
         .history-item {
-            display:         flex;
+            background:    rgba(255,255,255,0.03);
+            margin-bottom: 10px;
+            padding:       16px;
+            border-radius: 18px;
+            display:       flex;
             justify-content: space-between;
-            align-items:     center;
-            padding:         15px;
-            border-bottom:   1px solid rgba(255,255,255,0.05);
+            align-items:   center;
+            border:        1px solid rgba(255,255,255,0.05);
         }
-        .history-service { font-weight: 500; font-size: 15px; }
-        .history-time    { font-size: 12px; color: #999; }
+        .amount-green { color: #2ebd85; font-weight: 700; }
+        .amount-red   { color: #f6465d; font-weight: 700; }
 
-        #page-history h2 { color: white; }
-        .amount-red      { color: #ff4d4d; font-weight: bold; }
-        .amount-green    { color: #27ae60; font-weight: bold; }
-
-        .filter-chip {
-            background:    var(--card);
-            border:        1px solid var(--border);
-            padding:       8px 18px;
-            border-radius: 20px;
-            font-size:     12px;
-            cursor:        pointer;
-            color:         var(--gray);
-            white-space:   nowrap;
-        }
-        .filter-chip.active {
-            background:   var(--yellow);
-            color:        black;
-            border-color: var(--yellow);
-        }
-
+        /* --- NOTIF PANEL --- */
         #notif-panel {
             position:      fixed;
-            top:           70px;
+            top:           75px;
             right:         20px;
-            width:         300px;
-            background:    var(--card);
+            width:         320px;
+            background:    rgba(30, 35, 41, 0.98);
+            backdrop-filter: blur(12px);
             border:        1px solid var(--border);
-            border-radius: 20px;
+            border-radius: 24px;
             display:       none;
             z-index:       8000;
-            max-height:    400px;
-            overflow-y:    auto;
-            box-shadow:    0 10px 30px rgba(0,0,0,0.5);
+            box-shadow:    0 20px 50px rgba(0,0,0,0.5);
         }
-
-        .notif-item { padding: 15px; border-bottom: 1px solid var(--border); font-size: 13px; }
-        .notif-item.unread { background: rgba(252, 213, 53, 0.05); }
-
-        /* --- Conditions checkbox row --- */
-        .conditions-row {
-            display:     flex;
-            align-items: flex-start;
-            gap:         8px;
-            margin-top:  15px;
-            font-size:   12px;
-            color:       var(--gray);
-            line-height: 1.5;
-        }
-        .conditions-row input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; accent-color: var(--yellow); }
-        .conditions-row a { color: var(--yellow); text-decoration: underline; }
-
-        #page-home    { display: block; }
-        #page-history { display: none;  }
     </style>
 </head>
 <body>
