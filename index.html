@@ -1256,7 +1256,13 @@ select, input { font-family: var(--font); }
             <div class="footer-col-title">Suivez-nous</div>
             <div class="footer-link"><i class="fa-brands fa-telegram"></i> Telegram</div>
             <div class="footer-link"><i class="fa-brands fa-facebook-f"></i> Facebook</div>
-        </div>
+        </div> 
+        <div id="support-chat" style="position:fixed; bottom:20px; right:20px; z-index:999;">
+    <a href="https://wa.me/2613XXXXXXXX" target="_blank" style="background:#25d366; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 5px 15px rgba(0,0,0,0.3); text-decoration:none;">
+        <i class="fab fa-whatsapp" style="font-size:30px;"></i>
+    </a>
+</div>
+        <a href="#" onclick="event.preventDefault(); document.getElementById('modal-help').style.display='flex'" style="color:#666; text-decoration:none; font-size:11px;">Centre d'aide</a>
     </div>
 </footer>
 
@@ -1296,6 +1302,33 @@ select, input { font-family: var(--font); }
     </div>
 </div>
 
+    
+<div id="modal-help" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#1a1a1a; width:100%; max-width:500px; max-height:85vh; border-radius:20px; padding:25px; display:flex; flex-direction:column; border:1px solid #333;">
+        <h2 style="color:white; font-size:18px; text-align:center;">Centre d'Aide & Support</h2>
+        
+        <div style="overflow-y:auto; margin:15px 0; padding-right:10px;">
+            <div style="margin-bottom:20px;">
+                <h3 style="color:#f39c12; font-size:14px;">Questions Fréquentes</h3>
+                <details style="color:#ccc; font-size:12px; margin-bottom:10px; background:#252525; padding:10px; border-radius:8px;">
+                    <summary style="cursor:pointer; font-weight:bold;">Délais de transaction</summary>
+                    <p style="margin-top:5px;">Le traitement prend généralement entre 15 min et 2 heures.</p>
+                </details>
+                <details style="color:#ccc; font-size:12px; margin-bottom:10px; background:#252525; padding:10px; border-radius:8px;">
+                    <summary style="cursor:pointer; font-weight:bold;">Sécurité des fonds</summary>
+                    <p style="margin-top:5px;">Vos fonds sont sécurisés via nos protocoles de vérification manuelle et automatique.</p>
+                </details>
+            </div>
+
+            <div style="text-align:center; padding:15px; background:rgba(243,156,18,0.1); border:1px dashed #f39c12; border-radius:10px;">
+                <p style="color:white; font-size:13px; margin-bottom:10px;">Besoin d'une discussion en direct ?</p>
+                <a href="https://wa.me/2613XXXXXXXX" style="display:inline-block; background:#25d366; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:bold; font-size:13px;">WhatsApp Support</a>
+            </div>
+        </div>
+
+        <button onclick="document.getElementById('modal-help').style.display='none'" style="background:#333; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer;">Fermer</button>
+    </div>
+</div>
 
 <!-- ========================================
      NOTIFICATIONS PANEL
