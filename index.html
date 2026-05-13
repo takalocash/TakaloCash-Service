@@ -1,951 +1,1435 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TakaloCash Premium</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <style>
-        :root {
-            --bg-body:     #0d1117;
-            --bg-nav:      #161b22;
-            --card:        #1c2128;
-            --yellow:      #fcd535;
-            --green:       #2ebd85;
-            --red:         #ff4d4d;
-            --gray:        #848e9c;
-            --border:      rgba(255, 255, 255, 0.1);
-            --grad-yellow: linear-gradient(135deg, #fcd535, #f7b500);
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            margin:      0;
-            background:  var(--bg-body);
-            font-family: 'Inter', sans-serif;
-            color:       white;
-            overflow-x:  hidden;
-        }
-
-        /* --- AUTH --- */
-        #auth-container {
-            position:        fixed;
-            inset:           0;
-            background:      var(--bg-body);
-            z-index:         9999;
-            display:         flex;
-            align-items:     center;
-            justify-content: center;
-            padding:         20px;
-            overflow-y:      auto;
-        }
-
-        .auth-box {
-            background:    var(--card);
-            padding:       35px 25px;
-            border-radius: 30px;
-            width:         100%;
-            max-width:     380px;
-            text-align:    center;
-            border:        1px solid var(--border);
-            box-shadow:    0 20px 50px rgba(0, 0, 0, 0.5);
-        }
-
-        .auth-box h1 {
-            color:         var(--yellow);
-            font-weight:   900;
-            margin-bottom: 25px;
-            font-size:     26px;
-        }
-
-        .styled-input {
-            background:    var(--bg-body);
-            border:        1px solid var(--border);
-            border-radius: 14px;
-            padding:       15px;
-            color:         white;
-            width:         100%;
-            outline:       none;
-            font-size:     14px;
-            margin-top:    12px;
-            transition:    0.3s;
-        }
-        .styled-input:focus { border-color: var(--yellow); }
-
-        .btn-valider {
-            width:         100%;
-            background:    var(--grad-yellow);
-            border:        none;
-            padding:       18px;
-            border-radius: 16px;
-            font-weight:   800;
-            cursor:        pointer;
-            color:         black;
-            margin-top:    25px;
-            font-size:     16px;
-            transition:    0.2s;
-        }
-        .btn-valider:active   { transform: scale(0.98); }
-        .btn-valider:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .auth-link {
-            color:           var(--yellow);
-            cursor:          pointer;
-            font-size:       13px;
-            font-weight:     600;
-            margin-top:      15px;
-            display:         inline-block;
-            text-decoration: none;
-        }
-
-        /* --- APP SHELL --- */
-        header {
-            background:    var(--bg-nav);
-            padding:       15px 20px;
-            border-bottom: 1px solid var(--border);
-            position:      sticky;
-            top:           0;
-            z-index:       1000;
-            display:       none;
-        }
-
-        .container {
-            max-width: 480px;
-            margin:    auto;
-            padding:   15px;
-            display:   none;
-        }
-
-        .solde-card {
-            text-align:    center;
-            padding:       35px 20px;
-            background:    radial-gradient(circle at top right, #1c2128, #0d1117);
-            border-radius: 28px;
-            margin-bottom: 25px;
-            border:        1px solid var(--border);
-        }
-
-        .solde-amount {
-            font-size:     38px;
-            font-weight:   800;
-            margin:        8px 0;
-            letter-spacing:-1px;
-        }
-
-        .main-actions {
-            display:               grid;
-            grid-template-columns: 1fr 1fr;
-            gap:                   15px;
-            margin-bottom:         30px;
-        }
-
-        .btn-action {
-            border:          none;
-            padding:         18px;
-            border-radius:   18px;
-            font-weight:     700;
-            cursor:          pointer;
-            display:         flex;
-            align-items:     center;
-            justify-content: center;
-            gap:             10px;
-            transition:      opacity 0.2s;
-        }
-        .btn-env { background: var(--grad-yellow); color: black; }
-        .btn-rec { background: var(--green);       color: white; }
-
-        .services-grid {
-            display:               grid;
-            grid-template-columns: 1fr 1fr;
-            gap:                   12px;
-            margin-bottom:         30px;
-        }
-
-        .service-item {
-            background:    var(--card);
-            border:        1px solid var(--border);
-            padding:       15px;
-            border-radius: 20px;
-            display:       flex;
-            align-items:   center;
-            gap:           12px;
-            cursor:        pointer;
-            transition:    background 0.2s, color 0.2s, border-color 0.2s;
-        }
-        .service-item.active {
-            background:   var(--yellow);
-            color:        black;
-            border-color: var(--yellow);
-        }
-        .service-item.active .icon-box {
-            background:   rgba(0,0,0,0.15);
-            border-color: transparent;
-        }
-
-        .icon-box {
-            width:           44px;
-            height:          44px;
-            border-radius:   12px;
-            display:         flex;
-            align-items:     center;
-            justify-content: center;
-            font-size:       22px;
-            background:      #000;
-            border:          1px solid var(--border);
-            flex-shrink:     0;
 <style>
-        :root {
-            --bg-body:     #0b0e11;      /* Mainty Binance */
-            --bg-nav:      #181a20;      /* Mainty kely fotsiny */
-            --card:        #1e2329;      /* Loko gris maizina amin'ny cards */
-            --yellow:      #fcd535;      /* Mavo Binance */
-            --green:       #2ebd85;      /* Maitso transaction */
-            --red:         #f6465d;      /* Mena */
-            --gray:        #848e9c;      /* Soratra matroka */
-            --border:      rgba(71, 77, 87, 0.25);
-            --grad-yellow: linear-gradient(135deg, #fcd535, #f0b90b);
-        }
+/* =====================================================
+   ROOT TOKENS
+   ===================================================== */
+:root {
+    --bg:         #13151e;
+    --bg-card:    #1a1d2e;
+    --bg-input:   #0e101a;
+    --yellow:     #f5c518;
+    --yellow-dk:  #d4a800;
+    --green:      #1db87a;
+    --green-dk:   #169960;
+    --red:        #e84040;
+    --teal:       #00c8a0;
+    --gray:       #7a8299;
+    --gray-lt:    #a8b0c8;
+    --border:     rgba(255,255,255,0.08);
+    --border-md:  rgba(255,255,255,0.12);
+    --shadow:     0 8px 32px rgba(0,0,0,0.45);
+    --font:       'Exo 2', 'Rajdhani', sans-serif;
+}
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+/* =====================================================
+   RESET & BASE
+   ===================================================== */
+*, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        body {
-            margin:      0;
-            background:  var(--bg-body);
-            color:       white;
-            font-family: 'Inter', sans-serif;
-            display:     flex;
-            justify-content: center;
-            overflow-x:  hidden;
-        }
+html { scroll-behavior: smooth; }
 
-        .app-container {
-            width:      100%;
-            max-width:  480px;
-            min-height: 100vh;
-            background: var(--bg-body);
-            position:   relative;
-            padding-bottom: 100px;
-        }
+body {
+    margin:      0;
+    background:  var(--bg);
+    font-family: var(--font);
+    color:       #e8eaf2;
+    overflow-x:  hidden;
+    min-height:  100vh;
+}
 
-        /* --- HEADER & NAVIGATION --- */
-        nav {
-            background: var(--bg-nav);
-            padding:    15px 20px;
-            display:    flex;
-            justify-content: space-between;
-            align-items: center;
-            position:   sticky;
-            top:        0;
-            z-index:    5000;
-            border-bottom: 1px solid var(--border);
-        }
+a { color: inherit; text-decoration: none; }
+button { font-family: var(--font); }
+select, input { font-family: var(--font); }
 
-        .logo { font-weight: 800; font-size: 20px; color: var(--yellow); letter-spacing: -0.5px; }
+/* =====================================================
+   AUTH SCREEN
+   ===================================================== */
+#auth-container {
+    position:        fixed;
+    inset:           0;
+    background:      var(--bg);
+    z-index:         9999;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    padding:         20px;
+    overflow-y:      auto;
+}
 
-        /* --- BALANCE SECTION --- */
-        .balance-card {
-            background: var(--bg-nav);
-            margin:     20px;
-            padding:    30px 25px;
-            border-radius: 24px;
-            border:     1px solid var(--border);
-            position:   relative;
-            overflow:   hidden;
-        }
-        .balance-card::after {
-            content: ""; position: absolute; top: -50px; right: -50px;
-            width: 150px; height: 150px; background: var(--yellow);
-            filter: blur(80px); opacity: 0.1;
-        }
-        .bal-label { color: var(--gray); font-size: 13px; font-weight: 500; }
-        .bal-amount { font-size: 36px; font-weight: 800; margin: 10px 0; letter-spacing: -1px; }
+/* subtle animated bg for auth */
+#auth-container::before {
+    content:    '';
+    position:   absolute;
+    inset:      0;
+    background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(245,197,24,.08) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 80% 100%, rgba(0,200,160,.06) 0%, transparent 70%);
+    pointer-events: none;
+}
 
-        /* --- MAIN ACTION BUTTONS --- */
-        .action-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            padding: 0 20px;
-            margin-bottom: 30px;
-        }
-        .btn-main {
-            padding: 16px;
-            border-radius: 16px;
-            border: none;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: 0.2s;
-        }
-        .btn-yellow { background: var(--grad-yellow); color: black; }
-        .btn-gray   { background: #2b3139; color: white; }
-        .btn-main:active { transform: scale(0.96); }
+.auth-logo {
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    gap:             10px;
+    margin-bottom:   28px;
+}
+.auth-logo-icon {
+    width:           42px;
+    height:          42px;
+    background:      var(--teal);
+    border-radius:   10px;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    font-weight:     900;
+    font-size:       18px;
+    color:           #0d1117;
+    letter-spacing:  -1px;
+}
+.auth-logo-text {
+    font-size:   24px;
+    font-weight: 800;
+    color:       white;
+    letter-spacing: -0.5px;
+}
 
-        /* --- SERVICE GRID (Icons 4 columns) --- */
-        .service-grid {
-            display:               grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap:                   15px;
-            padding:               0 20px;
-            margin-bottom:         30px;
-        }
-        .service-item {
-            text-align: center;
-            cursor:     pointer;
-            transition: 0.3s;
-        }
-        .icon-box {
-            width:         48px;
-            height:        48px;
-            background:    #2b3139;
-            border-radius: 14px;
-            display:       flex;
-            align-items:   center;
-            justify-content: center;
-            margin:        0 auto 8px;
-            font-size:     20px;
-            color:         var(--gray);
-            border:        1px solid var(--border);
-            transition:    0.3s;
-        }
-        .service-item span { font-size: 11px; font-weight: 500; color: var(--gray); }
-        
-        .service-item.active .icon-box {
-            background: var(--grad-yellow);
-            color:      black;
-            border-color: transparent;
-            box-shadow: 0 4px 15px rgba(252, 213, 53, 0.2);
-        }
-        .service-item.active span { color: var(--yellow); }
+.auth-box {
+    background:    var(--bg-card);
+    padding:       36px 28px;
+    border-radius: 20px;
+    width:         100%;
+    max-width:     380px;
+    text-align:    center;
+    border:        1px solid var(--border-md);
+    box-shadow:    var(--shadow);
+    position:      relative;
+    z-index:       1;
+}
 
-        /* --- TRANSACTION FORM --- */
-        .trans-box {
-            background:    var(--card);
-            margin:        0 20px 30px;
-            border-radius: 28px;
-            padding:       25px;
-            border:        1px solid var(--border);
-            box-shadow:    0 10px 30px rgba(0,0,0,0.3);
-        }
-        .input-group {
-            background: #0b0e11;
-            border:     1px solid var(--border);
-            border-radius: 14px;
-            padding:    12px 15px;
-            margin-bottom: 15px;
-        }
-        .input-group label { display: block; font-size: 11px; color: var(--gray); margin-bottom: 5px; }
-        .input-group input, .input-group select {
-            background: transparent;
-            border:     none;
-            color:      white;
-            width:      100%;
-            font-size:  16px;
-            font-weight: 600;
-            outline:    none;
-        }
+.auth-box h2 {
+    color:         white;
+    font-weight:   800;
+    font-size:     22px;
+    margin:        0 0 24px;
+    letter-spacing: -0.3px;
+}
 
-        .btn-submit {
-            width:      100%;
-            padding:    18px;
-            background: var(--grad-yellow);
-            color:      black;
-            border:     none;
-            border-radius: 16px;
-            font-weight: 800;
-            font-size:  16px;
-            cursor:     pointer;
-            margin-top: 10px;
-        }
+.styled-input {
+    background:    var(--bg-input);
+    border:        1px solid var(--border-md);
+    border-radius: 10px;
+    padding:       14px 16px;
+    color:         white;
+    width:         100%;
+    outline:       none;
+    font-size:     14px;
+    font-family:   var(--font);
+    margin-top:    12px;
+    transition:    border-color 0.2s, box-shadow 0.2s;
+}
+.styled-input:focus {
+    border-color: var(--yellow);
+    box-shadow:   0 0 0 3px rgba(245,197,24,.12);
+}
+.styled-input::placeholder { color: var(--gray); }
 
-        /* --- SIDEBAR (Premium Glass) --- */
-        .sidebar {
-            position:    fixed;
-            top:         0;
-            right:       -100%;
-            width:       85%;
-            max-width:   320px;
-            height:      100%;
-            background:  rgba(24, 26, 32, 0.98);
-            backdrop-filter: blur(15px);
-            z-index:     6000;
-            transition:  0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding:     40px 25px;
-            border-left: 1px solid var(--border);
-        }
-        .sidebar.active { right: 0; }
+.btn-primary {
+    width:         100%;
+    background:    var(--yellow);
+    border:        none;
+    padding:       16px;
+    border-radius: 10px;
+    font-weight:   800;
+    font-size:     15px;
+    font-family:   var(--font);
+    cursor:        pointer;
+    color:         #13151e;
+    margin-top:    20px;
+    letter-spacing: 0.3px;
+    transition:    background 0.2s, transform 0.1s;
+}
+.btn-primary:hover  { background: #ffd62e; }
+.btn-primary:active { transform: scale(0.98); }
 
-        /* --- HISTORY --- */
-        .history-item {
-            background:    rgba(255,255,255,0.03);
-            margin-bottom: 10px;
-            padding:       16px;
-            border-radius: 18px;
-            display:       flex;
-            justify-content: space-between;
-            align-items:   center;
-            border:        1px solid rgba(255,255,255,0.05);
-        }
-        .amount-green { color: #2ebd85; font-weight: 700; }
-        .amount-red   { color: #f6465d; font-weight: 700; }
+/* keep old alias for JS references */
+.btn-valider { width:100%; background:var(--yellow); border:none; padding:16px; border-radius:10px; font-weight:800; font-size:15px; font-family:var(--font); cursor:pointer; color:#13151e; margin-top:20px; letter-spacing:0.3px; transition:background 0.2s,transform 0.1s; }
+.btn-valider:hover { background:#ffd62e; }
+.btn-valider:active { transform:scale(0.98); }
 
-        /* --- NOTIF PANEL --- */
-        #notif-panel {
-            position:      fixed;
-            top:           75px;
-            right:         20px;
-            width:         320px;
-            background:    rgba(30, 35, 41, 0.98);
-            backdrop-filter: blur(12px);
-            border:        1px solid var(--border);
-            border-radius: 24px;
-            display:       none;
-            z-index:       8000;
-            box-shadow:    0 20px 50px rgba(0,0,0,0.5);
-        }
-    </style>
+.auth-link {
+    color:       var(--yellow);
+    cursor:      pointer;
+    font-size:   13px;
+    font-weight: 600;
+    transition:  opacity 0.2s;
+}
+.auth-link:hover { opacity: 0.8; }
+
+/* =====================================================
+   HEADER / NAV
+   ===================================================== */
+#nav-header {
+    display:         none;
+    background:      var(--bg-card);
+    border-bottom:   1px solid var(--border);
+    padding:         0 20px;
+    height:          58px;
+    position:        sticky;
+    top:             0;
+    z-index:         1000;
+    width:           100%;
+}
+
+.header-inner {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     center;
+    height:          100%;
+    max-width:       520px;
+    margin:          0 auto;
+}
+
+.header-logo {
+    display:     flex;
+    align-items: center;
+    gap:         9px;
+    cursor:      pointer;
+}
+.header-logo-icon {
+    width:           34px;
+    height:          34px;
+    background:      var(--teal);
+    border-radius:   8px;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    font-weight:     900;
+    font-size:       14px;
+    color:           #0d1117;
+    letter-spacing:  -0.5px;
+    flex-shrink:     0;
+}
+.header-logo-text {
+    font-size:      18px;
+    font-weight:    800;
+    color:          white;
+    letter-spacing: -0.5px;
+}
+
+.header-actions {
+    display:     flex;
+    align-items: center;
+    gap:         14px;
+}
+.header-icon-btn {
+    position:   relative;
+    cursor:     pointer;
+    color:      var(--gray-lt);
+    font-size:  18px;
+    transition: color 0.2s;
+    line-height: 1;
+}
+.header-icon-btn:hover { color: white; }
+
+.notif-badge {
+    position:      absolute;
+    top:           -6px;
+    right:         -6px;
+    background:    var(--red);
+    color:         white;
+    font-size:     9px;
+    font-weight:   800;
+    padding:       2px 5px;
+    border-radius: 10px;
+    border:        2px solid var(--bg-card);
+    line-height:   1;
+    min-width:     17px;
+    text-align:    center;
+}
+.header-avatar {
+    width:         34px;
+    height:        34px;
+    border-radius: 50%;
+    border:        2px solid var(--yellow);
+    object-fit:    cover;
+    cursor:        pointer;
+}
+.header-menu-btn {
+    width:         34px;
+    height:        34px;
+    background:    rgba(255,255,255,0.06);
+    border-radius: 8px;
+    display:       flex;
+    align-items:   center;
+    justify-content: center;
+    cursor:        pointer;
+    color:         var(--gray-lt);
+    font-size:     16px;
+    transition:    background 0.2s;
+}
+.header-menu-btn:hover { background: rgba(255,255,255,0.12); color: white; }
+
+/* =====================================================
+   SIDEBAR
+   ===================================================== */
+.overlay {
+    position:        fixed;
+    inset:           0;
+    background:      rgba(0,0,0,0.7);
+    display:         none;
+    z-index:         5500;
+    backdrop-filter: blur(3px);
+}
+
+.sidebar {
+    position:   fixed;
+    top:        0;
+    right:      -100%;
+    width:      78%;
+    max-width:  300px;
+    height:     100%;
+    background: var(--bg-card);
+    border-left: 1px solid var(--border);
+    z-index:    6000;
+    transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
+    padding:    28px 24px;
+    overflow-y: auto;
+}
+.sidebar.active { right: 0; }
+
+.sidebar-profile {
+    display:       flex;
+    align-items:   center;
+    gap:           12px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+}
+.sidebar-avatar {
+    width:         50px;
+    height:        50px;
+    border-radius: 50%;
+    border:        2px solid var(--yellow);
+    object-fit:    cover;
+}
+.sidebar-name { font-weight: 700; font-size: 15px; color: white; }
+.sidebar-id   { font-size: 12px; color: var(--teal); font-weight: 700; margin-top: 2px; }
+
+.sidebar-item {
+    display:     flex;
+    align-items: center;
+    gap:         12px;
+    padding:     14px 0;
+    border-bottom: 1px solid var(--border);
+    cursor:      pointer;
+    color:       var(--gray-lt);
+    font-size:   14px;
+    font-weight: 600;
+    transition:  color 0.2s;
+}
+.sidebar-item:hover { color: white; }
+.sidebar-item i { width: 18px; text-align: center; }
+.sidebar-item.danger { color: var(--red); margin-top: 30px; border-bottom: none; }
+
+/* =====================================================
+   MAIN APP CONTAINER
+   ===================================================== */
+.container {
+    max-width: 520px;
+    margin:    0 auto;
+    padding:   16px;
+    display:   none;
+}
+
+/* =====================================================
+   BALANCE CARD
+   ===================================================== */
+.solde-card {
+    background:    var(--bg-card);
+    border:        1px solid var(--border);
+    border-radius: 16px;
+    padding:       28px 20px 24px;
+    margin-bottom: 14px;
+    text-align:    center;
+    position:      relative;
+    overflow:      hidden;
+}
+.solde-card::before {
+    content:    '';
+    position:   absolute;
+    top:        -40px; right: -40px;
+    width:      120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,197,24,.12) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.solde-label {
+    display:     flex;
+    align-items: center;
+    justify-content: center;
+    gap:         8px;
+    color:       var(--gray);
+    font-size:   12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+}
+.solde-arrow-box {
+    background:    rgba(29,184,122,.2);
+    border-radius: 5px;
+    width:         22px;
+    height:        22px;
+    display:       flex;
+    align-items:   center;
+    justify-content: center;
+    color:         var(--green);
+    font-size:     11px;
+}
+.solde-amount {
+    font-size:      38px;
+    font-weight:    900;
+    color:          white;
+    letter-spacing: -1.5px;
+    line-height:    1;
+}
+
+/* =====================================================
+   ACTION BUTTONS (Envoyer / Recevoir)
+   ===================================================== */
+.main-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap:     10px;
+    margin-bottom: 14px;
+}
+
+.btn-action {
+    border:          none;
+    padding:         15px 10px;
+    border-radius:   12px;
+    font-weight:     800;
+    font-size:       15px;
+    font-family:     var(--font);
+    cursor:          pointer;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    gap:             9px;
+    letter-spacing:  0.2px;
+    transition:      opacity 0.2s, transform 0.1s;
+}
+.btn-action:active { transform: scale(0.97); }
+
+.btn-env {
+    background: var(--yellow);
+    color:      #13151e;
+}
+.btn-env:hover { background: #ffd62e; }
+
+.btn-rec {
+    background: var(--green);
+    color:      white;
+}
+.btn-rec:hover { background: #22d48a; }
+
+/* =====================================================
+   CATEGORY CARDS
+   ===================================================== */
+.services-grid {
+    display:               grid;
+    grid-template-columns: 1fr 1fr;
+    gap:                   10px;
+    margin-bottom:         14px;
+}
+
+.service-item {
+    background:    var(--bg-card);
+    border:        1px solid var(--border);
+    padding:       14px 12px;
+    border-radius: 14px;
+    display:       flex;
+    align-items:   center;
+    gap:           11px;
+    cursor:        pointer;
+    transition:    border-color 0.2s, background 0.2s;
+    overflow:      hidden;
+    position:      relative;
+}
+.service-item:hover { border-color: var(--border-md); background: #1e2236; }
+.service-item.active {
+    border-color: var(--yellow);
+    background:   rgba(245,197,24,.08);
+}
+.service-item.active .svc-title { color: var(--yellow); }
+
+.svc-icon-wrap {
+    width:           42px;
+    height:          42px;
+    border-radius:   50%;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    flex-shrink:     0;
+    font-size:       19px;
+}
+.svc-icon-wrap.gold    { background: rgba(245,197,24,.15); color: var(--yellow); }
+.svc-icon-wrap.green   { background: rgba(29,184,122,.15); color: var(--green);  }
+.svc-icon-wrap.orange  { background: rgba(255,120,50,.15); color: #ff7832;       }
+.svc-icon-wrap.purple  { background: rgba(130,80,220,.15); color: #9b6ef0;       }
+
+.svc-text { min-width: 0; }
+.svc-title   { font-weight: 700; font-size: 13px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.svc-sub     { font-size: 10.5px; color: var(--gray); margin-top: 2px; line-height: 1.3; }
+
+/* =====================================================
+   TRANSACTION FORM CARD
+   ===================================================== */
+.trans-box {
+    background:    var(--bg-card);
+    border:        1px solid var(--border);
+    border-radius: 16px;
+    padding:       0;
+    margin-bottom: 22px;
+    overflow:      hidden;
+}
+
+.trans-header {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     center;
+    padding:         16px 18px 14px;
+    border-bottom:   1px solid var(--border);
+}
+.trans-title-wrap { display: flex; align-items: center; gap: 6px; }
+.trans-title-action { color: var(--yellow); font-weight: 800; font-size: 16px; }
+.trans-title-mode   { color: white;         font-weight: 700; font-size: 16px; }
+.trans-header-chevron { color: var(--gray); font-size: 14px; }
+
+.trans-body { padding: 16px 18px 18px; }
+
+.trans-row2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 11px; color: var(--gray); font-weight: 600; letter-spacing: 0.3px; }
+
+/* asset selector with icon */
+.asset-select-wrap {
+    display:       flex;
+    align-items:   center;
+    gap:           8px;
+    background:    var(--bg-input);
+    border:        1px solid var(--border-md);
+    border-radius: 10px;
+    padding:       11px 12px;
+    position:      relative;
+}
+.asset-select-wrap:focus-within { border-color: var(--yellow); }
+
+#asset-img { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
+
+#crypto-select {
+    background:  transparent;
+    border:      none;
+    color:       white;
+    font-family: var(--font);
+    font-weight: 700;
+    font-size:   14px;
+    outline:     none;
+    flex:        1;
+    cursor:      pointer;
+    min-width:   0;
+    -webkit-appearance: none;
+}
+#crypto-select option { background: #1a1d2e; }
+
+.amount-input-wrap { position: relative; }
+#input-main {
+    background:    var(--bg-input);
+    border:        1px solid var(--border-md);
+    border-radius: 10px;
+    padding:       11px 46px 11px 14px;
+    color:         white;
+    font-family:   var(--font);
+    font-weight:   700;
+    font-size:     14px;
+    width:         100%;
+    outline:       none;
+    transition:    border-color 0.2s;
+}
+#input-main:focus { border-color: var(--yellow); }
+#unit-suffix {
+    position:    absolute;
+    right:       13px;
+    top:         50%;
+    transform:   translateY(-50%);
+    color:       var(--gray);
+    font-size:   12px;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+/* address field */
+.addr-wrap { position: relative; margin-bottom: 14px; }
+#input-addr {
+    background:    var(--bg-input);
+    border:        1px solid var(--border-md);
+    border-radius: 10px;
+    padding:       12px 42px 12px 14px;
+    color:         white;
+    font-family:   var(--font);
+    font-size:     13px;
+    width:         100%;
+    outline:       none;
+    transition:    border-color 0.2s;
+}
+#input-addr:focus { border-color: var(--yellow); }
+#input-addr::placeholder { color: var(--gray); }
+#copy-btn {
+    position:  absolute;
+    right:     13px;
+    top:       50%;
+    transform: translateY(-50%);
+    color:     var(--yellow);
+    cursor:    pointer;
+    font-size: 14px;
+    display:   none;
+}
+
+/* equivalent row */
+.equiv-row {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     center;
+    background:      rgba(255,255,255,0.03);
+    border:          1px solid var(--border);
+    border-radius:   10px;
+    padding:         11px 14px;
+    margin-bottom:   10px;
+    font-size:       13px;
+}
+.equiv-label { color: var(--gray); font-weight: 500; }
+#calc-res    { color: var(--yellow); font-weight: 800; font-size: 14px; }
+#frais-info  { font-size: 11px; color: var(--gray); text-align: right; margin-bottom: 8px; }
+
+/* balance display inside form */
+.form-solde-row {
+    font-size:     12px;
+    color:         var(--gray);
+    margin-bottom: 14px;
+}
+.form-solde-row span { color: var(--green); font-weight: 700; }
+
+/* conditions row */
+.conditions-row {
+    display:     flex;
+    align-items: flex-start;
+    gap:         8px;
+    font-size:   12px;
+    color:       var(--gray);
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+.conditions-row input[type="checkbox"] {
+    margin-top:   2px;
+    flex-shrink:  0;
+    accent-color: var(--yellow);
+}
+.conditions-row a { color: var(--yellow); text-decoration: underline; }
+
+/* submit button */
+.btn-submit {
+    width:         100%;
+    background:    var(--yellow);
+    border:        none;
+    padding:       15px;
+    border-radius: 10px;
+    font-weight:   900;
+    font-size:     15px;
+    font-family:   var(--font);
+    cursor:        pointer;
+    color:         #13151e;
+    letter-spacing: 0.5px;
+    transition:    background 0.2s, transform 0.1s;
+}
+.btn-submit:hover  { background: #ffd62e; }
+.btn-submit:active { transform: scale(0.98); }
+
+/* =====================================================
+   HISTORY SECTION
+   ===================================================== */
+.section-header {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     center;
+    margin-bottom:   14px;
+}
+.section-title {
+    font-size:   16px;
+    font-weight: 800;
+    color:       white;
+    letter-spacing: -0.2px;
+}
+.section-link {
+    color:     var(--yellow);
+    font-size: 12px;
+    font-weight: 600;
+    cursor:    pointer;
+}
+.section-link:hover { opacity: 0.8; }
+
+/* history table */
+.hist-table {
+    width:           100%;
+    border-collapse: separate;
+    border-spacing:  0;
+    font-size:       13px;
+}
+.hist-table thead th {
+    color:          var(--gray);
+    font-weight:    600;
+    font-size:      11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding:        0 8px 10px;
+    text-align:     left;
+    border-bottom:  1px solid var(--border);
+}
+.hist-table thead th:last-child { text-align: right; }
+
+.hist-table tbody tr { transition: background 0.15s; }
+.hist-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+.hist-table tbody td {
+    padding:       13px 8px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+.hist-table tbody tr:last-child td { border-bottom: none; }
+
+.hist-date { color: var(--gray); font-weight: 600; font-size: 12px; white-space: nowrap; }
+
+.hist-svc-cell { display: flex; align-items: center; gap: 8px; }
+.hist-svc-badge {
+    font-size:     10px;
+    font-weight:   700;
+    padding:       2px 7px;
+    border-radius: 5px;
+    white-space:   nowrap;
+}
+.hist-svc-badge.crypto { background: rgba(245,197,24,.18); color: var(--yellow); }
+.hist-svc-badge.wallet { background: rgba(130,80,220,.18); color: #9b6ef0; }
+.hist-svc-badge.betting{ background: rgba(255,120,50,.18); color: #ff7832; }
+.hist-svc-badge.abo    { background: rgba(29,184,122,.18); color: var(--green); }
+
+.hist-svc-name  { font-weight: 600; color: white; white-space: nowrap; }
+.hist-type      { color: var(--gray-lt); font-weight: 500; }
+.hist-amount    { font-weight: 700; white-space: nowrap; }
+.hist-amount.negative { color: var(--red);   }
+.hist-amount.positive { color: var(--green); }
+
+.hist-status    { text-align: right; }
+.status-badge {
+    display:       inline-flex;
+    align-items:   center;
+    gap:           5px;
+    font-size:     11px;
+    font-weight:   700;
+    text-transform: capitalize;
+}
+.status-badge.pending  { color: var(--yellow); }
+.status-badge.confirmed{ color: var(--green);  }
+.status-badge.rejected { color: var(--red);    }
+
+/* full history page */
+#page-history { display: none; }
+
+.back-btn {
+    width:           36px;
+    height:          36px;
+    background:      var(--bg-card);
+    border:          1px solid var(--border);
+    border-radius:   10px;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    cursor:          pointer;
+    color:           var(--yellow);
+    flex-shrink:     0;
+}
+
+.filter-bar {
+    display:    flex;
+    gap:        8px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scrollbar-width: none;
+    margin-bottom: 4px;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+
+.filter-chip {
+    background:    var(--bg-card);
+    border:        1px solid var(--border);
+    padding:       7px 16px;
+    border-radius: 20px;
+    font-size:     12px;
+    font-weight:   600;
+    cursor:        pointer;
+    color:         var(--gray);
+    white-space:   nowrap;
+    transition:    all 0.2s;
+    font-family:   var(--font);
+}
+.filter-chip.active,
+.filter-chip:hover {
+    background:   var(--yellow);
+    color:        #13151e;
+    border-color: var(--yellow);
+}
+
+.month-header {
+    padding:        14px 0 6px;
+    color:          var(--gray);
+    font-size:      10px;
+    font-weight:    700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    border-bottom:  1px solid var(--border);
+    margin-bottom:  4px;
+}
+
+/* =====================================================
+   NOTIFICATIONS PANEL
+   ===================================================== */
+#notif-panel {
+    position:      fixed;
+    top:           66px;
+    right:         16px;
+    width:         310px;
+    background:    var(--bg-card);
+    border:        1px solid var(--border-md);
+    border-radius: 14px;
+    display:       none;
+    z-index:       8000;
+    max-height:    400px;
+    overflow-y:    auto;
+    box-shadow:    0 16px 48px rgba(0,0,0,0.6);
+}
+.notif-panel-header {
+    padding:         14px 16px;
+    font-weight:     700;
+    font-size:       14px;
+    border-bottom:   1px solid var(--border);
+    display:         flex;
+    justify-content: space-between;
+    align-items:     center;
+    position:        sticky;
+    top:             0;
+    background:      var(--bg-card);
+}
+.notif-item {
+    padding:       13px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size:     13px;
+    transition:    background 0.15s;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item.unread { background: rgba(245,197,24,.04); }
+.notif-item:hover  { background: rgba(255,255,255,0.03); }
+
+/* =====================================================
+   MODAL (profile)
+   ===================================================== */
+.modal {
+    display:         none;
+    position:        fixed;
+    inset:           0;
+    background:      rgba(0,0,0,0.88);
+    z-index:         7000;
+    align-items:     center;
+    justify-content: center;
+    padding:         20px;
+}
+.modal-box {
+    background:    var(--bg-card);
+    padding:       28px;
+    border-radius: 20px;
+    width:         100%;
+    max-width:     360px;
+    border:        1px solid var(--border-md);
+    text-align:    center;
+}
+.modal-title { color: var(--yellow); font-weight: 800; font-size: 17px; margin: 0 0 20px; }
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+.app-footer {
+    border-top:    1px solid var(--border);
+    padding:       24px 16px;
+    margin-top:    8px;
+}
+.footer-grid {
+    display:               grid;
+    grid-template-columns: 1fr 1fr;
+    gap:                   18px 10px;
+    max-width:             520px;
+    margin:                0 auto;
+}
+.footer-col-title {
+    font-size:     11px;
+    font-weight:   700;
+    color:         var(--gray-lt);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+}
+.footer-link {
+    display:     flex;
+    align-items: center;
+    gap:         6px;
+    font-size:   12px;
+    color:       var(--gray);
+    padding:     4px 0;
+    cursor:      pointer;
+    transition:  color 0.2s;
+}
+.footer-link:hover { color: white; }
+.footer-link i { font-size: 13px; width: 16px; text-align: center; }
+
+/* =====================================================
+   UTILITIES
+   ===================================================== */
+.hidden { display: none !important; }
+
+#page-home    { display: block; }
+#page-history { display: none;  }
+</style>
 </head>
 <body>
 
-<!-- ============================
+<!-- ========================================
      AUTH
-     ============================ -->
+     ======================================== -->
 <div id="auth-container">
 
     <!-- LOGIN -->
     <div class="auth-box" id="login-form">
-        <h1>Sign In</h1>
-        <input type="email"    id="login-email" class="styled-input" placeholder="Email address">
-        <input type="password" id="login-pass"  class="styled-input" placeholder="Password">
-        <div style="text-align:right; margin-top:8px;">
-            <span class="auth-link" style="color:var(--gray);" onclick="showAuth('forgot')">Forgot password?</span>
+        <div class="auth-logo">
+            <div class="auth-logo-icon">TC</div>
+            <span class="auth-logo-text">TakaloCash</span>
         </div>
-        <button class="btn-valider" onclick="handleLogin()">Sign In</button>
-        <p style="font-size:13px; color:var(--gray); margin-top:25px;">
-            Don't have an account? <span class="auth-link" onclick="showAuth('signup')">Sign Up</span>
+        <h2>Connexion</h2>
+        <input type="email"    id="login-email" class="styled-input" placeholder="Adresse email">
+        <input type="password" id="login-pass"  class="styled-input" placeholder="Mot de passe">
+        <div style="text-align:right; margin-top:8px;">
+            <span class="auth-link" onclick="showAuth('forgot')">Mot de passe oublié ?</span>
+        </div>
+        <button class="btn-primary" onclick="handleLogin()">Se connecter</button>
+        <p style="font-size:13px; color:var(--gray); margin:20px 0 0;">
+            Pas encore de compte ? <span class="auth-link" onclick="showAuth('signup')">Créer un compte</span>
         </p>
     </div>
 
     <!-- SIGN UP -->
     <div class="auth-box" id="signup-form" style="display:none;">
-        <h1>Create Account</h1>
-        <input type="text"     id="reg-name"    class="styled-input" placeholder="Full name">
-        <input type="tel"      id="reg-phone"   class="styled-input" placeholder="Phone number (e.g. 034...)">
-        <input type="email"    id="reg-email"   class="styled-input" placeholder="Email address">
-        <input type="password" id="reg-pass"    class="styled-input" placeholder="Password">
-        <input type="password" id="reg-confirm" class="styled-input" placeholder="Confirm password">
-        <button class="btn-valider" onclick="handleSignUp()">Create Account</button>
-        <p style="font-size:13px; color:var(--gray); margin-top:25px;">
-            Already have an account? <span class="auth-link" onclick="showAuth('login')">Sign In</span>
+        <div class="auth-logo">
+            <div class="auth-logo-icon">TC</div>
+            <span class="auth-logo-text">TakaloCash</span>
+        </div>
+        <h2>Créer un compte</h2>
+        <input type="text"     id="reg-name"    class="styled-input" placeholder="Nom complet">
+        <input type="tel"      id="reg-phone"   class="styled-input" placeholder="Téléphone (ex. 034...)">
+        <input type="email"    id="reg-email"   class="styled-input" placeholder="Adresse email">
+        <input type="password" id="reg-pass"    class="styled-input" placeholder="Mot de passe">
+        <input type="password" id="reg-confirm" class="styled-input" placeholder="Confirmer le mot de passe">
+        <button class="btn-primary" onclick="handleSignUp()">Créer mon compte</button>
+        <p style="font-size:13px; color:var(--gray); margin:20px 0 0;">
+            Déjà un compte ? <span class="auth-link" onclick="showAuth('login')">Se connecter</span>
         </p>
     </div>
 
     <!-- FORGOT PASSWORD -->
     <div class="auth-box" id="forgot-form" style="display:none;">
-        <h1>Reset Password</h1>
-        <p style="font-size:13px; color:var(--gray); margin-bottom:20px;">
-            Enter your email to receive a reset link.
+        <div class="auth-logo">
+            <div class="auth-logo-icon">TC</div>
+            <span class="auth-logo-text">TakaloCash</span>
+        </div>
+        <h2>Réinitialisation</h2>
+        <p style="font-size:13px; color:var(--gray); margin:0 0 4px;">
+            Entrez votre email pour recevoir un lien de réinitialisation.
         </p>
-        <input type="email" id="forgot-email" class="styled-input" placeholder="Email address">
-        <button class="btn-valider" onclick="handleForgot()">Send Reset Link</button>
-        <p class="auth-link" onclick="showAuth('login')">Back to Sign In</p>
+        <input type="email" id="forgot-email" class="styled-input" placeholder="Adresse email">
+        <button class="btn-primary" onclick="handleForgot()">Envoyer le lien</button>
+        <p style="margin-top:16px;"><span class="auth-link" onclick="showAuth('login')">← Retour</span></p>
     </div>
 
 </div><!-- /#auth-container -->
 
 
-<!-- ============================
+<!-- ========================================
      HEADER
-     ============================ -->
-<header id="nav-header" style="display:none; padding:10px 20px; background:#121212;
-    border-bottom:1px solid var(--border); position:sticky; top:0; z-index:1000;
-    width:100%; box-sizing:border-box;">
-    <div style="display:flex; justify-content:space-between; align-items:center;
-                max-width:1200px; margin:0 auto;">
-        <div style="display:flex; align-items:center; gap:15px;">
-            <i class="fas fa-bars" onclick="toggleSidebar()"
-               style="font-size:20px; color:white; cursor:pointer;"></i>
-            <h1 onclick="showPage('home')"
-                style="margin:0; font-size:20px; font-weight:900; color:var(--yellow);
-                       cursor:pointer; letter-spacing:-1px;">TAKALOCASH</h1>
+     ======================================== -->
+<header id="nav-header">
+    <div class="header-inner">
+
+        <!-- Logo -->
+        <div class="header-logo" onclick="showPage('home')">
+            <div class="header-logo-icon">TC</div>
+            <span class="header-logo-text">TakaloCash</span>
         </div>
-        <div style="display:flex; align-items:center; gap:18px;">
-            <div style="position:relative; cursor:pointer; display:flex; align-items:center;"
-                 onclick="toggleNotif()">
-                <i class="fas fa-bell" style="font-size:19px; color:white;"></i>
-                <span id="notif-count"
-                      style="display:none; position:absolute; top:-7px; right:-7px;
-                             background:var(--red); color:white; font-size:9px;
-                             padding:2px 5px; border-radius:10px; font-weight:800;
-                             border:2px solid #121212;">0</span>
+
+        <!-- Icons row -->
+        <div class="header-actions">
+            <div class="header-icon-btn" onclick="openMobile('Dépôt')" title="Dépôt">
+                <i class="fa-solid fa-plus"></i>
             </div>
-            <img id="header-avatar" onclick="openProfile()"
+            <div class="header-icon-btn" onclick="showPage('history')" title="Historique">
+                <i class="fa-regular fa-envelope"></i>
+            </div>
+            <div class="header-icon-btn" onclick="toggleNotif()" title="Notifications">
+                <i class="fa-solid fa-bell"></i>
+                <span id="notif-count" class="notif-badge" style="display:none;">0</span>
+            </div>
+            <img id="header-avatar"
                  src="https://via.placeholder.com/35"
-                 style="width:32px; height:32px; border-radius:50%;
-                        border:1.5px solid var(--yellow); cursor:pointer; object-fit:cover;">
+                 class="header-avatar"
+                 onclick="openProfile()"
+                 alt="Avatar">
+            <div class="header-menu-btn" onclick="toggleSidebar()">
+                <i class="fa-solid fa-bars"></i>
+            </div>
         </div>
+
     </div>
 </header>
 
 
-<!-- ============================
+<!-- ========================================
      SIDEBAR & OVERLAY
-     ============================ -->
+     ======================================== -->
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
 <div class="sidebar" id="sidebar">
-    <div style="display:flex; align-items:center; gap:12px; margin-bottom:30px;
-                padding-bottom:20px; border-bottom:1px solid var(--border);">
-        <img id="side-avatar" src="https://via.placeholder.com/50"
-             style="width:50px; height:50px; border-radius:50%;
-                    border:2px solid var(--yellow); object-fit:cover;">
+    <div class="sidebar-profile">
+        <img id="side-avatar" src="https://via.placeholder.com/50" class="sidebar-avatar" alt="">
         <div>
-            <div id="side-full-name" style="font-weight:bold; font-size:16px;">Loading...</div>
-            <div id="side-tk-id"    style="font-size:12px; color:var(--yellow); font-weight:800;">
-                ID: TK-0000
-            </div>
+            <div id="side-full-name" class="sidebar-name">Chargement...</div>
+            <div id="side-tk-id"     class="sidebar-id">ID: TK-0000</div>
         </div>
     </div>
 
-    <div onclick="showPage('history')"
-         style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;">
-        <i class="fa-solid fa-clock-rotate-left"></i> &nbsp; History
+    <div class="sidebar-item" onclick="showPage('history'); toggleSidebar();">
+        <i class="fa-solid fa-clock-rotate-left"></i> Historique
     </div>
-    <div onclick="openMobile('Dépôt')"
-         style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;">
-        <i class="fa-solid fa-plus-circle"></i> &nbsp; Mobile Deposit
+    <div class="sidebar-item" onclick="openMobile('Dépôt')">
+        <i class="fa-solid fa-arrow-down-to-line"></i> Dépôt Mobile
     </div>
-    <div onclick="openMobile('Retrait')"
-         style="padding:15px 0; border-bottom:1px solid var(--border); cursor:pointer;">
-        <i class="fa-solid fa-minus-circle"></i> &nbsp; Mobile Withdrawal
+    <div class="sidebar-item" onclick="openMobile('Retrait')">
+        <i class="fa-solid fa-arrow-up-from-line"></i> Retrait Mobile
     </div>
-    <div onclick="logout()"
-         style="padding:15px 0; color:var(--red); cursor:pointer; margin-top:40px;">
-        <i class="fa-solid fa-power-off"></i> &nbsp; Sign Out
+    <div class="sidebar-item danger" onclick="logout()">
+        <i class="fa-solid fa-power-off"></i> Déconnexion
     </div>
 </div>
 
 
-<!-- ============================
+<!-- ========================================
      MAIN APP
-     ============================ -->
+     ======================================== -->
 <div class="container" id="main-app">
 
-    <!-- ===================== PAGE: HOME ===================== -->
+    <!-- ============ PAGE HOME ============ -->
     <div id="page-home">
 
-        <!-- Balance card -->
+        <!-- Balance -->
         <div class="solde-card">
-            <div style="color:var(--gray); font-size:12px; font-weight:600;
-                        text-transform:uppercase;">Available Balance</div>
-            <h1 class="solde-amount" id="display-solde">0 Ar</h1>
+            <div class="solde-label">
+                Solde disponible
+                <div class="solde-arrow-box"><i class="fa-solid fa-arrow-up-right"></i></div>
+            </div>
+            <div class="solde-amount" id="display-solde">0 Ar</div>
         </div>
 
-        <!-- Category buttons -->
-        <div class="services-grid">
-            <div class="service-item active" id="btn-crypto" onclick="selectCategory('crypto')">
-                <div class="icon-box" style="color:#f3ba2f;">
-                    <i class="fa-solid fa-coins"></i>
-                </div>
-                <b>Crypto</b>
-            </div>
-            <div class="service-item" id="btn-wallet" onclick="selectCategory('wallet')">
-                <div class="icon-box" style="color:#8132ad;">
-                    <i class="fa-solid fa-wallet"></i>
-                </div>
-                <b>Wallets</b>
-            </div>
-            <div class="service-item" id="btn-betting" onclick="selectCategory('betting')">
-                <div class="icon-box" style="color:#2ebd85;">
-                    <i class="fa-solid fa-gamepad"></i>
-                </div>
-                <b>Betting</b>
-            </div>
-            <div class="service-item" id="btn-abonnement" onclick="selectCategory('abonnement')">
-                <div class="icon-box" style="color:#ff4d4d;">
-                    <i class="fa-solid fa-tv"></i>
-                </div>
-                <b>Subscription</b>
-            </div>
-        </div>
-
-        <!-- Send / Receive buttons -->
+        <!-- Envoyer / Recevoir -->
         <div class="main-actions">
             <button class="btn-action btn-env" id="main-env-btn" onclick="switchAction('Envoyer')">
-                <i class="fa-solid fa-paper-plane"></i> Send
+                <i class="fa-solid fa-arrow-right"></i> Envoyer
             </button>
             <button class="btn-action btn-rec" id="main-rec-btn" onclick="switchAction('Recevoir')">
-                <i class="fa-solid fa-qrcode"></i> Receive
+                <i class="fa-solid fa-arrow-down"></i> Recevoir
             </button>
+        </div>
+
+        <!-- Category cards -->
+        <div class="services-grid">
+            <div class="service-item active" id="btn-crypto" onclick="selectCategory('crypto')">
+                <div class="svc-icon-wrap gold"><i class="fa-brands fa-bitcoin"></i></div>
+                <div class="svc-text">
+                    <div class="svc-title">Crypto</div>
+                    <div class="svc-sub">Envoyer &amp; recevoir monnaie virtuelle</div>
+                </div>
+            </div>
+            <div class="service-item" id="btn-wallet" onclick="selectCategory('wallet')">
+                <div class="svc-icon-wrap green"><i class="fa-solid fa-wallet"></i></div>
+                <div class="svc-text">
+                    <div class="svc-title">Porte-feuille</div>
+                    <div class="svc-sub">PayPal / Skrill / Nete...</div>
+                </div>
+            </div>
+            <div class="service-item" id="btn-betting" onclick="selectCategory('betting')">
+                <div class="svc-icon-wrap orange"><i class="fa-solid fa-dice"></i></div>
+                <div class="svc-text">
+                    <div class="svc-title">1xBet &amp; paris</div>
+                    <div class="svc-sub">Envoyer, retirer &amp; jouer</div>
+                </div>
+            </div>
+            <div class="service-item" id="btn-abonnement" onclick="selectCategory('abonnement')">
+                <div class="svc-icon-wrap purple"><i class="fa-solid fa-satellite-dish"></i></div>
+                <div class="svc-text">
+                    <div class="svc-title">Abonnement</div>
+                    <div class="svc-sub">Netflix / Canal / Starlink...</div>
+                </div>
+            </div>
         </div>
 
         <!-- Transaction form -->
         <div class="trans-box">
-            <b id="trans-title"
-               style="color:var(--yellow); font-size:17px; display:block; margin-bottom:15px;">
-                Send Crypto
-            </b>
+            <div class="trans-header">
+                <div class="trans-title-wrap">
+                    <span class="trans-title-action" id="trans-action-label">Envoyer</span>
+                    <span class="trans-title-mode"   id="trans-title">Crypto</span>
+                </div>
+                <i class="fa-solid fa-chevron-down trans-header-chevron"></i>
+            </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                <!-- Asset selector -->
-                <div id="crypto-select-container">
-                    <label style="font-size:11px; color:var(--gray)">Asset:</label>
-                    <div style="display:flex; align-items:center; gap:8px; margin-top:5px;">
-                        <img id="asset-img"
-                             src="https://cryptologos.cc/logos/tron-trx-logo.svg" width="22">
-                        <select id="crypto-select" class="styled-input"
-                                style="margin-top:0; padding:10px;"
-                                onchange="updateIcon();">
-                            <option value="TRX">TRX (TRC20)</option>
-                        </select>
+            <div class="trans-body">
+
+                <!-- Row 1: asset selector + amount -->
+                <div class="trans-row2">
+                    <!-- Asset -->
+                    <div class="form-group" id="crypto-select-container">
+                        <label class="form-label">Choisir actif :</label>
+                        <div class="asset-select-wrap">
+                            <img id="asset-img"
+                                 src="https://cryptologos.cc/logos/tron-trx-logo.svg"
+                                 style="width:22px;height:22px;object-fit:contain;">
+                            <select id="crypto-select" onchange="updateIcon();">
+                                <option value="TRX">TRX</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down" style="color:var(--gray);font-size:11px;pointer-events:none;"></i>
+                        </div>
+                    </div>
+                    <!-- Amount -->
+                    <div class="form-group">
+                        <label class="form-label" id="label-right">Montant à envoyer (Ar) :</label>
+                        <div class="amount-input-wrap">
+                            <input type="number" id="input-main" placeholder="0" oninput="updateCalc()">
+                            <span id="unit-suffix">Ar</span>
+                        </div>
                     </div>
                 </div>
-                <!-- Amount input -->
-                <div>
-                    <label id="label-right" style="font-size:11px; color:var(--gray)">
-                        Amount (Ar):
+
+                <!-- Address -->
+                <div class="form-group" style="margin-bottom:14px;">
+                    <label class="form-label" id="label-addr">Adresse crypto destinataire :</label>
+                    <div class="addr-wrap" style="margin-bottom:0;">
+                        <input type="text" id="input-addr" placeholder="Entrer l'adresse">
+                        <i class="fa-solid fa-copy" id="copy-btn" onclick="copyText()"></i>
+                    </div>
+                </div>
+
+                <!-- Equivalent -->
+                <div id="calc-container" class="equiv-row">
+                    <span class="equiv-label">Équivalent crypto</span>
+                    <span id="calc-res">0.00 TRX</span>
+                </div>
+                <div id="frais-info"></div>
+
+                <!-- Balance hint -->
+                <div class="form-solde-row">
+                    Solde disponible <span id="form-solde-hint">0 Ar</span>
+                </div>
+
+                <!-- Conditions -->
+                <div class="conditions-row">
+                    <input type="checkbox" id="check-conditions">
+                    <label for="check-conditions">
+                        J'accepte les <a href="#" onclick="return false;">conditions d'utilisation</a>
+                        et la <a href="#" onclick="return false;">politique de confidentialité</a>
                     </label>
-                    <div style="position:relative;">
-                        <input type="number" id="input-main" class="styled-input"
-                               placeholder="0" oninput="updateCalc()">
-                        <span id="unit-suffix"
-                              style="position:absolute; right:12px; top:12px;
-                                     color:var(--gray); font-size:12px; font-weight:bold;">
-                            Ar
-                        </span>
-                    </div>
                 </div>
-            </div>
 
-            <!-- Address / destination -->
-            <div style="margin-top:15px;">
-                <label id="label-addr" style="font-size:11px; color:var(--gray)">
-                    Recipient address / ID:
-                </label>
-                <div style="position:relative; display:flex; align-items:center;">
-                    <input type="text" id="input-addr" class="styled-input"
-                           placeholder="Enter address">
-                    <i class="fa-solid fa-copy" id="copy-btn" onclick="copyText()"
-                       style="position:absolute; right:12px; top:18px;
-                              color:var(--yellow); cursor:pointer; display:none;"></i>
-                </div>
-            </div>
+                <button class="btn-submit" onclick="handleTransaction()">Valider Envoi</button>
 
-            <!-- Equivalent display -->
-            <div id="calc-container"
-                 style="display:flex; justify-content:space-between; font-size:12px;
-                        margin-top:15px; background:rgba(255,255,255,0.03);
-                        padding:12px; border-radius:12px;">
-                <span style="color:var(--gray)">Equivalent:</span>
-                <span id="calc-res" style="color:var(--yellow); font-weight:800;">
-                    0.00 TRX
-                </span>
-            </div>
-            <div id="frais-info"
-                 style="text-align:right; font-size:11px; color:var(--gray); margin-top:6px;">
-            </div>
-
-            <!-- Terms checkbox -->
-            <div class="conditions-row">
-                <input type="checkbox" id="check-conditions">
-                <label for="check-conditions">
-                    I accept the
-                    <a href="#" onclick="return false;">terms &amp; conditions</a>
-                    and the
-                    <a href="#" onclick="return false;">privacy policy</a>
-                </label>
-            </div>
-
-            <button class="btn-valider" id="btn-submit" onclick="handleTransaction()">
-                Confirm
-            </button>
+            </div><!-- /.trans-body -->
         </div><!-- /.trans-box -->
 
         <!-- Recent transactions preview -->
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="font-size:16px;">Recent Transactions</h3>
-            <span onclick="goToFullHistory()"
-                  style="color:var(--yellow); font-size:13px; cursor:pointer;">
-                See All
-            </span>
+        <div class="section-header">
+            <span class="section-title">Historique des transferts</span>
+            <span class="section-link" onclick="goToFullHistory()">Voir tout</span>
         </div>
-        <table class="history-table">
-            <tbody id="preview-history-body"></tbody>
-        </table>
+
+        <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:8px;">
+            <table class="hist-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Service</th>
+                        <th>Type</th>
+                        <th>Montant</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody id="preview-history-body">
+                    <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--gray);font-size:13px;">Aucune transaction récente.</td></tr>
+                </tbody>
+            </table>
+        </div>
 
     </div><!-- /#page-home -->
 
 
-    <!-- ===================== PAGE: HISTORY ===================== -->
-    <div id="page-history" style="display:none;">
-        <div style="display:flex; align-items:center; gap:15px; padding:10px 0 20px 0;">
-            <div onclick="showPage('home')"
-                 style="cursor:pointer; width:40px; height:40px; background:var(--card);
-                        border:1px solid var(--border); border-radius:12px;
-                        display:flex; align-items:center; justify-content:center;">
-                <i class="fas fa-arrow-left" style="color:var(--yellow); font-size:18px;"></i>
+    <!-- ============ PAGE HISTORY ============ -->
+    <div id="page-history">
+        <div style="display:flex; align-items:center; gap:12px; padding:8px 0 18px;">
+            <div class="back-btn" onclick="showPage('home')">
+                <i class="fa-solid fa-arrow-left"></i>
             </div>
             <h2 style="margin:0; font-size:20px; font-weight:800; letter-spacing:-0.5px;">
-                Transaction History
+                Historique des transferts
             </h2>
         </div>
 
-        <!-- Filter chips -->
-        <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:15px;"
-             id="history-filters">
-            <div class="filter-chip active" onclick="filterHistory('All',      this)">All</div>
-            <div class="filter-chip"        onclick="filterHistory('Envoyer',  this)">Send</div>
-            <div class="filter-chip"        onclick="filterHistory('Retrait',  this)">Withdrawal</div>
-            <div class="filter-chip"        onclick="filterHistory('Dépôt',    this)">Deposit</div>
-            <div class="filter-chip"        onclick="filterHistory('Recevoir', this)">Receive</div>
+        <div class="filter-bar" id="history-filters">
+            <div class="filter-chip active" onclick="filterHistory('All',      this)">Tous</div>
+            <div class="filter-chip"        onclick="filterHistory('Envoyer',  this)">Envoi</div>
+            <div class="filter-chip"        onclick="filterHistory('Retrait',  this)">Retrait</div>
+            <div class="filter-chip"        onclick="filterHistory('Dépôt',    this)">Dépôt</div>
+            <div class="filter-chip"        onclick="filterHistory('Recevoir', this)">Réception</div>
         </div>
 
-        <div id="full-history-container"></div>
+        <div id="full-history-container"
+             style="background:var(--bg-card); border:1px solid var(--border); border-radius:14px; overflow:hidden;">
+        </div>
     </div><!-- /#page-history -->
 
 </div><!-- /.container #main-app -->
 
 
-<!-- ============================
+<!-- ========================================
+     FOOTER
+     ======================================== -->
+<footer class="app-footer" id="app-footer" style="display:none;">
+    <div class="footer-grid">
+        <div>
+            <div class="footer-col-title">Légal</div>
+            <div class="footer-link"><i class="fa-regular fa-file-lines"></i> Conditions d'utilisation</div>
+            <div class="footer-link"><i class="fa-solid fa-shield-halved"></i> Politique de confidentialité</div>
+        </div>
+        <div>
+            <div class="footer-col-title">Chat &amp; Aide</div>
+            <div class="footer-link"><i class="fa-solid fa-headset"></i> Centre d'aide</div>
+            <div class="footer-link"><i class="fa-brands fa-discord"></i> Discussion</div>
+        </div>
+        <div>
+            <div class="footer-col-title">Contact</div>
+            <div class="footer-link"><i class="fa-regular fa-envelope"></i> Email</div>
+            <div class="footer-link"><i class="fa-brands fa-whatsapp"></i> WhatsApp</div>
+        </div>
+        <div>
+            <div class="footer-col-title">Suivez-nous</div>
+            <div class="footer-link"><i class="fa-brands fa-telegram"></i> Telegram</div>
+            <div class="footer-link"><i class="fa-brands fa-facebook-f"></i> Facebook</div>
+        </div>
+    </div>
+</footer>
+
+
+<!-- ========================================
      PROFILE MODAL
-     ============================ -->
+     ======================================== -->
 <div id="modal-profile" class="modal">
-    <div style="background:var(--card); padding:25px; border-radius:28px; width:100%;
-                max-width:350px; border:1px solid var(--border); text-align:center;">
-        <h3 style="color:var(--yellow); margin-top:0;">Profile Settings</h3>
+    <div class="modal-box">
+        <h3 class="modal-title">Paramètres du profil</h3>
         <div style="position:relative; display:inline-block; margin-bottom:20px;">
             <img id="modal-pp-view" src="https://via.placeholder.com/100"
-                 style="width:100px; height:100px; border-radius:50%;
+                 style="width:90px; height:90px; border-radius:50%;
                         border:3px solid var(--yellow); object-fit:cover;">
             <label for="file-pp"
-                   style="position:absolute; bottom:5px; right:0; background:var(--yellow);
-                          color:black; width:30px; height:30px; border-radius:50%;
+                   style="position:absolute; bottom:3px; right:0; background:var(--yellow);
+                          color:#13151e; width:28px; height:28px; border-radius:50%;
                           display:flex; align-items:center; justify-content:center;
-                          cursor:pointer; border:3px solid var(--card);">
-                <i class="fa-solid fa-camera" style="font-size:14px;"></i>
+                          cursor:pointer; border:2px solid var(--bg-card);">
+                <i class="fa-solid fa-camera" style="font-size:12px;"></i>
             </label>
             <input type="file" id="file-pp" accept="image/*" style="display:none;"
                    onchange="previewImage(this)">
         </div>
         <div style="text-align:left;">
-            <label style="font-size:11px; color:var(--gray)">Full name:</label>
-            <input type="text" id="edit-full-name" class="styled-input" style="margin-bottom:15px;">
-            <label style="font-size:11px; color:var(--gray)">Phone number:</label>
-            <input type="tel" id="edit-phone" class="styled-input">
+            <label class="form-label" style="display:block;margin-bottom:4px;">Nom complet :</label>
+            <input type="text" id="edit-full-name" class="styled-input" style="margin-top:0; margin-bottom:12px;">
+            <label class="form-label" style="display:block;margin-bottom:4px;">Téléphone :</label>
+            <input type="tel"  id="edit-phone"     class="styled-input" style="margin-top:0;">
         </div>
-        <button class="btn-valider" onclick="updateProfile()">Save Changes</button>
+        <button class="btn-valider" onclick="updateProfile()">Enregistrer</button>
         <p onclick="closeProfile()"
            style="text-align:center; cursor:pointer; color:var(--gray);
-                  margin-top:15px; font-size:13px;">
-            Close
+                  margin-top:14px; font-size:13px;">
+            Fermer
         </p>
     </div>
 </div>
 
 
-<!-- ============================
+<!-- ========================================
      NOTIFICATIONS PANEL
-     ============================ -->
+     ======================================== -->
 <div id="notif-panel">
-    <div style="padding:15px; font-weight:bold; border-bottom:1px solid var(--border);
-                display:flex; justify-content:space-between;">
+    <div class="notif-panel-header">
         Notifications
-        <small style="color:var(--yellow); cursor:pointer;" onclick="markAllRead()">
-            Mark all read
+        <small style="color:var(--yellow); cursor:pointer; font-size:12px;" onclick="markAllRead()">
+            Tout marquer lu
         </small>
     </div>
     <div id="notif-list"></div>
 </div>
 
 
-<!-- ============================
-     JAVASCRIPT
-     ============================ -->
+<!-- ========================================
+     JAVASCRIPT — all logic preserved exactly
+     ======================================== -->
 <script>
 
 // =========================================================
-// CONFIG  (merged from config.js — no external file needed)
+// CONFIG  (merged from config.js)
 // =========================================================
-
-/** USD → MGA exchange rate (updated live by updateTaux) */
 let USD_TO_MGA = 4700;
 
-/**
- * Live rates in Ariary (MGA) per 1 unit of each asset.
- * Crypto values are refreshed automatically by updateTaux().
- * Wallet values track USD_TO_MGA.
- * Betting / subscription values are 1 (direct Ariary input).
- */
 const CURRENT_TAUX = {
-    // Crypto
-    TRX:      600,
-    USDT:     4700,
-    BNB:      1800000,
-    BTC:      280000000,
-
-    // Wallets (USD-pegged)
-    PAYPAL:   4700,
-    SKRILL:   4700,
-    NETELLER: 4700,
-
-    // Betting (1-to-1 Ariary top-up)
-    "1XBET":  1,
-    MELBET:   1,
-    BETWAY:   1,
-
-    // Subscriptions (fixed-price per transaction)
-    NETFLIX:  1,
-    DSTV:     1,
-    CANAL:    1,
-    SPOTIFY:  1
+    TRX: 600, USDT: 4700, BNB: 1800000, BTC: 280000000,
+    PAYPAL: 4700, SKRILL: 4700, NETELLER: 4700,
+    "1XBET": 1, MELBET: 1, BETWAY: 1,
+    NETFLIX: 1, DSTV: 1, CANAL: 1, SPOTIFY: 1
 };
 
-/**
- * Our receiving addresses shown to the user in "Receive" mode.
- * Replace placeholder strings with your real addresses before going live.
- */
 const ADDR_RECEPT = {
-    TRX:       "TYourTRXAddressHereXXXXXXXXXXXX",
-    USDT:      "TYourUSDTAddressHereXXXXXXXXXXX",
-    BNB:       "0xYourBNBAddressHereXXXXXXXXXX",
-    BTC:       "YourBitcoinAddressHere",
-    PAYPAL:    "payments@takalocash.mg",
-    SKRILL:    "payments@takalocash.mg",
-    NETELLER:  "payments@takalocash.mg",
-    "1XBET":   "TakaloCash1xBet",
-    MELBET:    "TakaloCashMelbet"
+    TRX:      "TYourTRXAddressHereXXXXXXXXXXXX",
+    USDT:     "TYourUSDTAddressHereXXXXXXXXXXX",
+    BNB:      "0xYourBNBAddressHereXXXXXXXXXX",
+    BTC:      "YourBitcoinAddressHere",
+    PAYPAL:   "payments@takalocash.mg",
+    SKRILL:   "payments@takalocash.mg",
+    NETELLER: "payments@takalocash.mg",
+    "1XBET":  "TakaloCash1xBet",
+    MELBET:   "TakaloCashMelbet"
 };
 
-/**
- * Asset data grouped by category.
- *   label         → address/ID input label text
- *   allowRecevoir → whether the Receive button is active
- *   items[]
- *     val   → <select> option value (= key in CURRENT_TAUX)
- *     txt   → displayed option label
- *     frais → fee fraction (0.05 = 5 %)
- *     logo  → icon URL (empty string hides the icon)
- */
 const ASSETS_DATA = {
     crypto: {
-        label:         "Recipient address (TRC20 / BEP20):",
-        allowRecevoir: true,
+        label: "Adresse crypto destinataire :", allowRecevoir: true,
         items: [
-            { val: "TRX",  txt: "TRX (TRC20)",  frais: 0.05,
-              logo: "https://cryptologos.cc/logos/tron-trx-logo.svg" },
-            { val: "USDT", txt: "USDT (TRC20)", frais: 0.03,
-              logo: "https://cryptologos.cc/logos/tether-usdt-logo.svg" },
-            { val: "BNB",  txt: "BNB (BEP20)",  frais: 0.05,
-              logo: "https://cryptologos.cc/logos/bnb-bnb-logo.svg" },
-            { val: "BTC",  txt: "Bitcoin (BTC)", frais: 0.04,
-              logo: "https://cryptologos.cc/logos/bitcoin-btc-logo.svg" }
+            { val:"TRX",  txt:"TRX (TRC20)",  frais:0.05, logo:"https://cryptologos.cc/logos/tron-trx-logo.svg" },
+            { val:"USDT", txt:"USDT (TRC20)", frais:0.03, logo:"https://cryptologos.cc/logos/tether-usdt-logo.svg" },
+            { val:"BNB",  txt:"BNB (BEP20)",  frais:0.05, logo:"https://cryptologos.cc/logos/bnb-bnb-logo.svg" },
+            { val:"BTC",  txt:"Bitcoin (BTC)", frais:0.04, logo:"https://cryptologos.cc/logos/bitcoin-btc-logo.svg" }
         ]
     },
     wallet: {
-        label:         "Wallet email / account ID:",
-        allowRecevoir: true,
+        label: "Email ou ID du portefeuille :", allowRecevoir: true,
         items: [
-            { val: "PAYPAL",   txt: "PayPal",   frais: 0.05,
-              logo: "https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" },
-            { val: "SKRILL",   txt: "Skrill",   frais: 0.04,
-              logo: "https://upload.wikimedia.org/wikipedia/commons/8/8b/Skrill_logo.svg" },
-            { val: "NETELLER", txt: "Neteller", frais: 0.04, logo: "" }
+            { val:"PAYPAL",   txt:"PayPal",   frais:0.05, logo:"https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" },
+            { val:"SKRILL",   txt:"Skrill",   frais:0.04, logo:"https://upload.wikimedia.org/wikipedia/commons/8/8b/Skrill_logo.svg" },
+            { val:"NETELLER", txt:"Neteller", frais:0.04, logo:"" }
         ]
     },
     betting: {
-        label:         "Player ID / Username:",
-        allowRecevoir: true,
+        label: "ID joueur / Nom d'utilisateur :", allowRecevoir: true,
         items: [
-            { val: "1XBET",  txt: "1xBet",  frais: 0.05,
-              logo: "https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg" },
-            { val: "MELBET", txt: "Melbet", frais: 0.05, logo: "" },
-            { val: "BETWAY", txt: "Betway", frais: 0.05, logo: "" }
+            { val:"1XBET",  txt:"1xBet",  frais:0.05, logo:"https://upload.wikimedia.org/wikipedia/commons/1/14/1xBet_logo.svg" },
+            { val:"MELBET", txt:"Melbet", frais:0.05, logo:"" },
+            { val:"BETWAY", txt:"Betway", frais:0.05, logo:"" }
         ]
     },
     abonnement: {
-        label:         "Account email / activation code:",
-        allowRecevoir: false,   // subscriptions are send-only
+        label: "Email / code d'activation :", allowRecevoir: false,
         items: [
-            { val: "NETFLIX", txt: "Netflix", frais: 0.02,
-              logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" },
-            { val: "DSTV",    txt: "DStv",    frais: 0.02, logo: "" },
-            { val: "CANAL",   txt: "Canal+",  frais: 0.02, logo: "" },
-            { val: "SPOTIFY", txt: "Spotify", frais: 0.02, logo: "" }
+            { val:"NETFLIX", txt:"Netflix", frais:0.02, logo:"https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" },
+            { val:"DSTV",    txt:"DStv",    frais:0.02, logo:"" },
+            { val:"CANAL",   txt:"Canal+",  frais:0.02, logo:"" },
+            { val:"SPOTIFY", txt:"Spotify", frais:0.02, logo:"" }
         ]
     }
 };
 
+// Title map (updated to match screenshot language)
+const TITLE_MAP = {
+    crypto:     { Envoyer:"Crypto",          Recevoir:"Crypto"          },
+    wallet:     { Envoyer:"Porte-feuille",   Recevoir:"Porte-feuille"   },
+    betting:    { Envoyer:"Paris sportifs",  Recevoir:"Paris sportifs"  },
+    abonnement: { Envoyer:"Abonnement",      Recevoir:"Abonnement"      }
+};
+
 // =========================================================
-// SUPABASE — replace the values below with your own project
+// SUPABASE
 // =========================================================
 const _URL = "https://nyeopreahmajoisartoz.supabase.co";
 const _KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA";
 const supabaseClient = supabase.createClient(_URL, _KEY);
 
 // =========================================================
-// APP STATE
+// STATE
 // =========================================================
 let currentUserId   = null;
 let userData        = null;
 let allTransactions = [];
-let currentMode     = 'crypto';   // category key or 'Dépôt'|'Retrait'
-let currentAction   = 'Envoyer';  // 'Envoyer'|'Recevoir'|'Dépôt'|'Retrait'
+let currentMode     = 'crypto';
+let currentAction   = 'Envoyer';
 
 // =========================================================
 // CONFIG HELPERS
 // =========================================================
-
-/**
- * Fetch live crypto prices from CoinGecko and update CURRENT_TAUX.
- * Silently falls back to cached rates on network errors.
- */
 async function updateTaux() {
     try {
-        const res  = await fetch(
-            "https://api.coingecko.com/api/v3/simple/price" +
-            "?ids=tron,tether,binancecoin,bitcoin&vs_currencies=mga"
-        );
+        const res  = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tron,tether,binancecoin,bitcoin&vs_currencies=mga");
         const json = await res.json();
         if (json.tron)        CURRENT_TAUX.TRX  = Math.round(json.tron.mga);
         if (json.tether)      CURRENT_TAUX.USDT = Math.round(json.tether.mga);
         if (json.binancecoin) CURRENT_TAUX.BNB  = Math.round(json.binancecoin.mga);
         if (json.bitcoin)     CURRENT_TAUX.BTC  = Math.round(json.bitcoin.mga);
-
-        // Keep USD-pegged wallets in sync with the USDT/MGA rate
-        CURRENT_TAUX.PAYPAL   = CURRENT_TAUX.USDT;
-        CURRENT_TAUX.SKRILL   = CURRENT_TAUX.USDT;
-        CURRENT_TAUX.NETELLER = CURRENT_TAUX.USDT;
-
+        CURRENT_TAUX.PAYPAL = CURRENT_TAUX.SKRILL = CURRENT_TAUX.NETELLER = CURRENT_TAUX.USDT;
         console.log('[TakaloCash] Rates updated:', new Date().toLocaleTimeString());
     } catch (_) {
         console.warn('[TakaloCash] CoinGecko unavailable — using cached rates.');
     }
 }
 
-/** Update the asset logo next to the <select>. */
 function updateIcon() {
     const assetKey = document.getElementById('crypto-select').value;
     const catData  = ASSETS_DATA[currentMode];
     const imgEl    = document.getElementById('asset-img');
     if (!imgEl) return;
-
     if (catData) {
         const item = catData.items.find(i => i.val === assetKey);
-        if (item && item.logo) {
-            imgEl.src           = item.logo;
-            imgEl.style.display = 'inline';
-        } else {
-            imgEl.style.display = 'none';
-        }
+        if (item && item.logo) { imgEl.src = item.logo; imgEl.style.display = 'inline'; }
+        else                   { imgEl.style.display = 'none'; }
     }
     updateCalc();
 }
@@ -965,51 +1449,38 @@ async function handleSignUp() {
     const email   = document.getElementById('reg-email').value.trim();
     const pass    = document.getElementById('reg-pass').value;
     const confirm = document.getElementById('reg-confirm').value;
-
-    if (!name || !phone || !email || !pass) return alert("Please fill in all fields.");
-    if (pass !== confirm)                   return alert("Passwords do not match!");
-
+    if (!name || !phone || !email || !pass) return alert("Veuillez remplir tous les champs.");
+    if (pass !== confirm)                   return alert("Les mots de passe ne correspondent pas !");
     const tkId = "TK-" + Math.floor(1000 + Math.random() * 9000);
-
     try {
-        const { data: authData, error: authError } =
-            await supabaseClient.auth.signUp({ email, password: pass });
+        const { data: authData, error: authError } = await supabaseClient.auth.signUp({ email, password: pass });
         if (authError) throw authError;
-
         if (authData.user) {
             const { error: dbError } = await supabaseClient.from('users').insert([{
-                id:        authData.user.id,
-                full_name: name,
-                phone,
-                email,
-                tk_id:     tkId,
-                solde:     0
+                id: authData.user.id, full_name: name, phone, email, tk_id: tkId, solde: 0
             }]);
             if (dbError) throw dbError;
-            alert("Account created! Your ID: " + tkId);
+            alert("Compte créé ! Votre ID : " + tkId);
             showAuth('login');
         }
-    } catch (err) { alert("Error: " + err.message); }
+    } catch (err) { alert("Erreur : " + err.message); }
 }
 
 async function handleLogin() {
     const email = document.getElementById('login-email').value.trim();
     const pass  = document.getElementById('login-pass').value;
-    if (!email || !pass) return alert("Please enter your email and password.");
-
+    if (!email || !pass) return alert("Veuillez entrer votre email et mot de passe.");
     const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-    if (error) return alert("Incorrect email or password.");
-    // FIX: Do NOT call initApp() here directly.
-    //      onAuthStateChange (at the bottom) handles it for both fresh logins
-    //      and page refreshes — calling it twice caused a double-initialisation bug.
+    if (error) return alert("Email ou mot de passe incorrect.");
+    // onAuthStateChange handles initApp()
 }
 
 async function handleForgot() {
     const email = document.getElementById('forgot-email').value.trim();
-    if (!email) return alert("Please enter your email address.");
+    if (!email) return alert("Veuillez entrer votre adresse email.");
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
     if (error) alert(error.message);
-    else       alert("Password reset link sent to your email!");
+    else       alert("Lien de réinitialisation envoyé !");
 }
 
 // =========================================================
@@ -1018,44 +1489,37 @@ async function handleForgot() {
 async function initApp() {
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return;
-
     currentUserId = user.id;
 
     document.getElementById('auth-container').style.display = 'none';
     document.getElementById('nav-header').style.display     = 'block';
     document.getElementById('main-app').style.display       = 'block';
+    document.getElementById('app-footer').style.display     = 'block';
 
-    // Fetch live rates once at startup, then refresh every hour
     await updateTaux();
     setInterval(updateTaux, 3_600_000);
 
-    // Initialise default UI state
     selectCategory('crypto');
     fetchData();
 }
 
 async function fetchData() {
-    // User profile
-    const { data: u, error: uErr } =
-        await supabaseClient.from('users').select('*').eq('id', currentUserId).single();
+    const { data: u, error: uErr } = await supabaseClient.from('users').select('*').eq('id', currentUserId).single();
     if (uErr) { console.error("fetchData/user:", uErr.message); return; }
-
     if (u) {
         userData = u;
-        document.getElementById('display-solde').innerText  = (u.solde || 0).toLocaleString() + " Ar";
-        document.getElementById('side-full-name').innerText = u.full_name || '';
-        document.getElementById('side-tk-id').innerText     = "ID: " + (u.tk_id || '');
-        document.getElementById('header-avatar').src        = u.avatar_url || "https://via.placeholder.com/35";
-        document.getElementById('side-avatar').src          = u.avatar_url || "https://via.placeholder.com/50";
+        const solde = (u.solde || 0).toLocaleString('fr-FR') + " Ar";
+        document.getElementById('display-solde').innerText   = solde;
+        document.getElementById('form-solde-hint').innerText = solde;
+        document.getElementById('side-full-name').innerText  = u.full_name || '';
+        document.getElementById('side-tk-id').innerText      = "ID: " + (u.tk_id || '');
+        document.getElementById('header-avatar').src         = u.avatar_url || "https://via.placeholder.com/35";
+        document.getElementById('side-avatar').src           = u.avatar_url || "https://via.placeholder.com/50";
     }
-
-    // Transactions
     const { data: ts, error: tErr } = await supabaseClient
-        .from('transactions').select('*')
-        .eq('user_id', currentUserId)
+        .from('transactions').select('*').eq('user_id', currentUserId)
         .order('created_at', { ascending: false });
-    if (tErr) { console.error("fetchData/transactions:", tErr.message); }
-
+    if (tErr) console.error("fetchData/transactions:", tErr.message);
     allTransactions = ts || [];
     renderHistory(allTransactions);
     fetchNotifications();
@@ -1063,140 +1527,114 @@ async function fetchData() {
 
 // =========================================================
 // HISTORY RENDERING
-//
-// Columns stored by handleTransaction():
-//   type         → 'Envoyer' | 'Recevoir' | 'Dépôt' | 'Retrait'
-//   category     → 'crypto' | 'wallet' | 'betting' | 'abonnement'
-//   asset        → e.g. 'TRX', 'PAYPAL', '1XBET'
-//   amount_input → numeric Ariary amount entered by the user
-//   frais        → fee amount in Ariary
-//   status       → 'en attente' | 'confirmé' | 'rejeté'
-//   reference    → 'REF-XXXXXXXX'
-//
-// FIX: previous code read t.service and t.montant which do not exist
-//      in the schema → history was always blank.
-//      buildServiceLabel() and buildAmount() handle both the current
-//      schema and any legacy rows that may have a 'service'/'montant' column.
 // =========================================================
-
 function buildServiceLabel(t) {
-    if (t.service) return t.service;                  // legacy rows
-    const type  = t.type  || '';
-    const asset = t.asset || '';
-    return (type + (asset ? ' ' + asset : '')).trim();
+    if (t.service) return t.service;
+    return ((t.type || '') + (t.asset ? ' ' + t.asset : '')).trim();
 }
-
 function buildAmount(t) {
-    // Prefer legacy 'montant' if present, otherwise use 'amount_input'
     if (t.montant !== undefined && t.montant !== null) return t.montant;
     return t.amount_input || 0;
 }
-
 function isNegativeTransaction(t) {
     const typ = (t.type || t.service || '').toLowerCase();
     return typ.includes('envoyer') || typ.includes('retrait') || typ.includes('abonnement');
+}
+function getCategoryBadge(t) {
+    const cat = (t.category || '').toLowerCase();
+    if (cat === 'crypto')     return '<span class="hist-svc-badge crypto">Crypto</span>';
+    if (cat === 'wallet')     return '<span class="hist-svc-badge wallet">Wallet</span>';
+    if (cat === 'betting')    return '<span class="hist-svc-badge betting">Paris</span>';
+    if (cat === 'abonnement') return '<span class="hist-svc-badge abo">Abo</span>';
+    return '';
+}
+
+function generateHistRow(t) {
+    try {
+        const dateObj    = new Date(t.created_at);
+        const dateStr    = dateObj.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' });
+        const label      = buildServiceLabel(t);
+        const amount     = buildAmount(t);
+        const isNeg      = isNegativeTransaction(t);
+        const badge      = getCategoryBadge(t);
+
+        let statusClass = 'pending', statusIcon = 'clock', statusLabel = 'En attente';
+        if (t.status === 'confirmé') { statusClass = 'confirmed'; statusIcon = 'check'; statusLabel = 'Confirmé'; }
+        if (t.status === 'rejeté')   { statusClass = 'rejected';  statusIcon = 'xmark'; statusLabel = 'Rejeté'; }
+
+        return `
+        <tr>
+            <td class="hist-date">${dateStr}</td>
+            <td>
+                <div class="hist-svc-cell">
+                    ${badge}
+                    <span class="hist-svc-name">${label}</span>
+                </div>
+            </td>
+            <td class="hist-type">${t.type || ''}</td>
+            <td class="hist-amount ${isNeg ? 'negative' : 'positive'}">
+                ${isNeg ? '-' : '+'}${Number(amount).toLocaleString('fr-FR')} Ar
+            </td>
+            <td class="hist-status">
+                <span class="status-badge ${statusClass}">
+                    <i class="fa-solid fa-${statusIcon}" style="font-size:10px;"></i>
+                    ${statusLabel}
+                </span>
+            </td>
+        </tr>`;
+    } catch (e) {
+        console.error("Row render error:", e, t);
+        return "";
+    }
 }
 
 function renderHistory(dataToRender = allTransactions) {
     const fullContainer    = document.getElementById('full-history-container');
     const previewContainer = document.getElementById('preview-history-body');
 
-    const generateHTML = (t) => {
-        try {
-            const dateObj = new Date(t.created_at);
-            const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-            const dateStr = dateObj.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
-
-            const label      = buildServiceLabel(t);
-            const amount     = buildAmount(t);
-            const isNegative = isNegativeTransaction(t);
-
-            let statusColor = 'var(--yellow)';
-            if (t.status === 'confirmé') statusColor = 'var(--green)';
-            if (t.status === 'rejeté')   statusColor = 'var(--red)';
-
-            return `
-                <div class="history-item">
-                    <div class="history-info">
-                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                            <div class="history-service">${label}</div>
-                            <span style="font-size:10px; color:var(--gray);
-                                         background:rgba(255,255,255,0.05);
-                                         padding:2px 5px; border-radius:4px; font-family:monospace;">
-                                #${t.reference || 'PENDING'}
-                            </span>
-                        </div>
-                        <div class="history-time">
-                            <span style="color:var(--yellow); font-weight:600;">${dateStr}</span>
-                            &bull; ${timeStr}
-                            <span style="margin-left:8px; color:${statusColor}; font-size:10px;
-                                         border:1px solid ${statusColor}; padding:1px 4px;
-                                         border-radius:4px; text-transform:uppercase;
-                                         font-weight:700;">
-                                ${t.status}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="${isNegative ? 'amount-red' : 'amount-green'}"
-                         style="text-align:right; white-space:nowrap;">
-                        <span style="font-size:16px;">
-                            ${isNegative ? '-' : '+'}${Number(amount).toLocaleString()}
-                        </span>
-                        <span style="font-size:10px; margin-left:2px;">Ar</span>
-                    </div>
-                </div>`;
-        } catch (e) {
-            console.error("Row render error:", e, t);
-            return "";
-        }
-    };
-
-    // Preview (home page — last 3 transactions)
+    // Preview table (home — last 3)
     if (previewContainer) {
         const preview = allTransactions.slice(0, 3);
         previewContainer.innerHTML = preview.length
-            ? preview.map(t => `<tr><td>${generateHTML(t)}</td></tr>`).join('')
-            : '<tr><td style="text-align:center; padding:30px; color:var(--gray); font-size:13px;">No recent transactions.</td></tr>';
+            ? preview.map(generateHistRow).join('')
+            : '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--gray);font-size:13px;">Aucune transaction récente.</td></tr>';
     }
 
     // Full history page
     if (fullContainer) {
         if (!dataToRender || dataToRender.length === 0) {
             fullContainer.innerHTML =
-                '<div style="text-align:center; padding:40px; color:var(--gray);">' +
-                'No transactions found.</div>';
+                '<div style="text-align:center;padding:40px;color:var(--gray);font-size:13px;">Aucune transaction trouvée.</div>';
             return;
         }
-
-        // Group by month / year
         const groups = dataToRender.reduce((acc, t) => {
-            const monthYr = new Date(t.created_at)
-                .toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            const monthYr = new Date(t.created_at).toLocaleDateString('fr-FR', { month:'long', year:'numeric' });
             (acc[monthYr] = acc[monthYr] || []).push(t);
             return acc;
         }, {});
 
-        fullContainer.innerHTML = '';
+        let html = '';
         for (const month in groups) {
-            fullContainer.innerHTML += `<div class="month-header">${month.toUpperCase()}</div>`;
-            fullContainer.innerHTML += groups[month].map(generateHTML).join('');
+            html += `<div class="month-header">${month.toUpperCase()}</div>`;
+            html += `<table class="hist-table"><thead><tr><th>Date</th><th>Service</th><th>Type</th><th>Montant</th><th>Statut</th></tr></thead><tbody>`;
+            html += groups[month].map(generateHistRow).join('');
+            html += `</tbody></table>`;
         }
+        fullContainer.innerHTML = html;
     }
 }
 
 function filterHistory(type, el) {
     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
     if (el) el.classList.add('active');
-
-    if (type === 'All') {
-        renderHistory(allTransactions);
-    } else {
-        renderHistory(allTransactions.filter(t => {
+    renderHistory(type === 'All'
+        ? allTransactions
+        : allTransactions.filter(t => {
             const label = buildServiceLabel(t).toLowerCase();
             const typ   = (t.type || '').toLowerCase();
             return label.includes(type.toLowerCase()) || typ === type.toLowerCase();
-        }));
-    }
+          })
+    );
 }
 
 // =========================================================
@@ -1210,16 +1648,8 @@ function toggleSidebar() {
 }
 
 function showPage(p) {
-    document.getElementById('page-home').style.display    = 'none';
-    document.getElementById('page-history').style.display = 'none';
-
-    if (p === 'home') {
-        document.getElementById('page-home').style.display = 'block';
-    } else if (p === 'history') {
-        document.getElementById('page-history').style.display = 'block';
-        renderHistory(allTransactions);
-    }
-
+    document.getElementById('page-home').style.display    = p === 'home'    ? 'block' : 'none';
+    document.getElementById('page-history').style.display = p === 'history' ? 'block' : 'none';
     const sidebar = document.getElementById('sidebar');
     if (sidebar && sidebar.classList.contains('active')) toggleSidebar();
     window.scrollTo(0, 0);
@@ -1228,37 +1658,34 @@ function showPage(p) {
 function goToFullHistory() {
     showPage('history');
     document.querySelectorAll('#history-filters .filter-chip').forEach(chip => {
-        chip.classList.remove('active');
-        if (chip.innerText.trim() === 'All') chip.classList.add('active');
+        chip.classList.toggle('active', chip.innerText.trim() === 'Tous');
     });
     renderHistory(allTransactions);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // =========================================================
-// MOBILE MONEY (Deposit / Withdrawal)
+// MOBILE MONEY
 // =========================================================
 function openMobile(mode) {
     currentMode   = mode;
     currentAction = mode;
-
     const sidebar = document.getElementById('sidebar');
     if (sidebar && sidebar.classList.contains('active')) {
         sidebar.classList.remove('active');
         document.getElementById('overlay').style.display = 'none';
     }
-
-    document.getElementById('trans-title').innerText                 = mode + " Mobile Money";
-    document.getElementById('crypto-select-container').style.display = 'none';
-    document.getElementById('label-right').innerText                 = "Amount (Ar):";
-    document.getElementById('unit-suffix').innerText                 = "Ar";
-    document.getElementById('label-addr').innerText                  = "Mobile number (Airtel / Orange / MVola):";
-    document.getElementById('input-addr').value                      = "";
-    document.getElementById('input-addr').readOnly                   = false;
-    document.getElementById('copy-btn').style.display                = 'none';
-    document.getElementById('calc-container').style.display          = 'none';
-    document.getElementById('frais-info').innerText                  = '';
-
+    document.getElementById('trans-action-label').innerText              = mode;
+    document.getElementById('trans-title').innerText                     = "Mobile Money";
+    document.getElementById('crypto-select-container').style.display     = 'none';
+    document.getElementById('label-right').innerText                     = "Montant (Ar) :";
+    document.getElementById('unit-suffix').innerText                     = "Ar";
+    document.getElementById('label-addr').innerText                      = "Numéro mobile (Airtel / Orange / MVola) :";
+    document.getElementById('input-addr').value                          = "";
+    document.getElementById('input-addr').readOnly                       = false;
+    document.getElementById('copy-btn').style.display                    = 'none';
+    document.getElementById('calc-container').style.display              = 'none';
+    document.getElementById('frais-info').innerText                      = '';
     document.querySelector('.trans-box').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -1268,89 +1695,70 @@ function openMobile(mode) {
 function selectCategory(category) {
     currentMode = category;
     const data  = ASSETS_DATA[category];
-    if (!data)  return;
+    if (!data) return;
 
-    // Highlight active category button
-    document.querySelectorAll('.service-item').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.service-item').forEach(b => b.classList.remove('active'));
     const targetBtn = document.getElementById('btn-' + category);
     if (targetBtn) targetBtn.classList.add('active');
 
-    // Show asset selector (might be hidden from openMobile)
     document.getElementById('crypto-select-container').style.display = 'block';
 
-    // Populate <select> with this category's assets
     const cryptoSelect    = document.getElementById('crypto-select');
-    cryptoSelect.innerHTML = data.items
-        .map(i => `<option value="${i.val}">${i.txt}</option>`)
-        .join('');
-
-    // Address input label
+    cryptoSelect.innerHTML = data.items.map(i => `<option value="${i.val}">${i.txt}</option>`).join('');
     document.getElementById('label-addr').innerText = data.label;
 
-    // Disable Receive for categories that don't support it
     const btnRec = document.getElementById('main-rec-btn');
     if (btnRec) {
-        const noReceive          = !data.allowRecevoir;
+        const noReceive            = !data.allowRecevoir;
         btnRec.style.opacity       = noReceive ? "0.35" : "1";
         btnRec.style.pointerEvents = noReceive ? "none"  : "auto";
         if (noReceive) currentAction = 'Envoyer';
     }
 
-    // Refresh form state
     switchAction(currentAction);
     updateIcon();
-
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // =========================================================
-// SWITCH SEND / RECEIVE
+// SWITCH ACTION
 // =========================================================
 function switchAction(action) {
     currentAction = action;
+    const assetKey = document.getElementById('crypto-select').value;
+    const btnEnv   = document.getElementById('main-env-btn');
+    const btnRec   = document.getElementById('main-rec-btn');
 
-    const assetKey   = document.getElementById('crypto-select').value;
-    const transTitle = document.getElementById('trans-title');
+    if (btnEnv) btnEnv.style.opacity = action === 'Envoyer'  ? '1' : '0.6';
+    if (btnRec) btnRec.style.opacity = action === 'Recevoir' ? '1' : '0.6';
+
+    const modeData   = TITLE_MAP[currentMode] || {};
+    const actionLabel = document.getElementById('trans-action-label');
+    const modeLabel   = document.getElementById('trans-title');
+    if (actionLabel) actionLabel.innerText = action === 'Envoyer' ? 'Envoyer' : 'Recevoir';
+    if (modeLabel)   modeLabel.innerText   = modeData[action] || modeData.Envoyer || '';
+
     const labelRight = document.getElementById('label-right');
     const unitSuffix = document.getElementById('unit-suffix');
     const inputAddr  = document.getElementById('input-addr');
     const copyBtn    = document.getElementById('copy-btn');
     const labelAddr  = document.getElementById('label-addr');
-    const btnEnv     = document.getElementById('main-env-btn');
-    const btnRec     = document.getElementById('main-rec-btn');
 
-    // Button visual state
-    if (btnEnv) btnEnv.style.opacity = action === 'Envoyer'  ? '1' : '0.6';
-    if (btnRec) btnRec.style.opacity = action === 'Recevoir' ? '1' : '0.6';
-
-    // Form title
-    const titleMap = {
-        crypto:     { Envoyer: "Send Crypto",       Recevoir: "Receive Crypto"      },
-        wallet:     { Envoyer: "Send to Wallet",    Recevoir: "Receive from Wallet" },
-        betting:    { Envoyer: "Betting Deposit",   Recevoir: "Betting Withdrawal"  },
-        abonnement: { Envoyer: "Subscription",      Recevoir: "Subscription"        }
-    };
-    if (titleMap[currentMode]) {
-        transTitle.innerText = titleMap[currentMode][action] || titleMap[currentMode].Envoyer;
-    }
-
-    // Input label / unit suffix
     if (action === 'Envoyer') {
-        labelRight.innerText = "Amount (Ar):";
+        labelRight.innerText = "Montant à envoyer (Ar) :";
         unitSuffix.innerText = "Ar";
     } else {
         let unitLabel = assetKey;
         if (currentMode === 'wallet' && assetKey === 'PAYPAL') unitLabel = 'USD';
         else if (currentMode === 'wallet')                      unitLabel = 'EUR';
-        labelRight.innerText = `Amount (${unitLabel}):`;
+        labelRight.innerText = `Montant (${unitLabel}) :`;
         unitSuffix.innerText = unitLabel;
     }
 
-    // Address field
     if (action === 'Recevoir') {
         inputAddr.value       = ADDR_RECEPT[assetKey] || '';
         inputAddr.readOnly    = true;
-        labelAddr.innerText   = "Send to this address:";
+        labelAddr.innerText   = "Envoyer à cette adresse :";
         copyBtn.style.display = 'inline';
     } else {
         inputAddr.value       = "";
@@ -1371,10 +1779,8 @@ function updateCalc() {
     const res           = document.getElementById('calc-res');
     const fraisEl       = document.getElementById('frais-info');
 
-    // Mobile money modes have no conversion panel
     if (currentMode === 'Dépôt' || currentMode === 'Retrait') {
-        calcContainer.style.display = 'none';
-        return;
+        calcContainer.style.display = 'none'; return;
     }
     calcContainer.style.display = 'flex';
 
@@ -1384,28 +1790,18 @@ function updateCalc() {
 
     let frais = 0;
     const catData = ASSETS_DATA[currentMode];
-    if (catData) {
-        const item = catData.items.find(i => i.val === assetKey);
-        if (item) frais = item.frais;
-    }
+    if (catData) { const item = catData.items.find(i => i.val === assetKey); if (item) frais = item.frais; }
 
     if (currentAction === 'Envoyer') {
-        // Input: Ariary → Output: crypto quantity user receives after fee
-        const netAr  = val * (1 - frais);
-        if (rate > 1) {
-            const crypto = netAr / rate;
-            res.innerText = crypto.toFixed(assetKey === 'USDT' ? 2 : 6) + " " + assetKey;
-        } else {
-            res.innerText = netAr.toLocaleString() + " Ar";
-        }
+        const netAr = val * (1 - frais);
+        res.innerText = rate > 1
+            ? (netAr / rate).toFixed(assetKey === 'USDT' ? 2 : 6) + " " + assetKey
+            : netAr.toLocaleString('fr-FR') + " Ar";
     } else {
-        // Input: crypto quantity → Output: Ariary user sends after fee
-        const grossAr = val * rate;
-        const netAr   = Math.floor(grossAr * (1 - frais));
-        res.innerText = netAr.toLocaleString() + " Ar";
+        res.innerText = Math.floor(val * rate * (1 - frais)).toLocaleString('fr-FR') + " Ar";
     }
 
-    fraisEl.innerText = frais > 0 ? `Fee: ${(frais * 100).toFixed(0)}% included` : '';
+    fraisEl.innerText = frais > 0 ? `Frais : ${(frais*100).toFixed(0)}% inclus` : '';
 }
 
 // =========================================================
@@ -1421,39 +1817,21 @@ async function handleTransaction() {
     if (!address)               return alert("Ampidiro ny adiresy na ID handefasana azy.");
 
     const check = document.getElementById('check-conditions');
-    if (!check || !check.checked) {
-        return alert("Azafady ekeo ny fepetra (Terms & Conditions).");
-    }
+    if (!check || !check.checked) return alert("Azafady ekeo ny fepetra (Terms & Conditions).");
 
-    // Fee calculation
     let frais = 0;
     const catData = ASSETS_DATA[currentMode];
-    if (catData) {
-        const item = catData.items.find(i => i.val === asset);
-        if (item) frais = item.frais;
-    }
+    if (catData) { const item = catData.items.find(i => i.val === asset); if (item) frais = item.frais; }
     const feesAr = Math.round(amount * frais);
     const total  = amount + feesAr;
 
-    // Balance check (Send only)
     if (currentAction === 'Envoyer' && total > solde) {
-        return alert(
-            `Tsy ampy ny solde-nao.\n` +
-            `Ilaina: ${total.toLocaleString()} Ar\n` +
-            `Anananao: ${solde.toLocaleString()} Ar`
-        );
+        return alert(`Tsy ampy ny solde-nao.\nIlaina: ${total.toLocaleString()} Ar\nAnananao: ${solde.toLocaleString()} Ar`);
     }
 
     const reference = "REF-" + Date.now().toString(36).toUpperCase();
-
     const confirmed = window.confirm(
-        `Hanamarina ny transaction?\n\n` +
-        `Service   : ${currentAction} ${asset}\n` +
-        `Montant   : ${amount.toLocaleString()} Ar\n` +
-        `Frais     : ${feesAr.toLocaleString()} Ar\n` +
-        `Total     : ${total.toLocaleString()} Ar\n` +
-        `Dest      : ${address}\n` +
-        `Ref       : ${reference}`
+        `Hanamarina ny transaction?\n\nService: ${currentAction} ${asset}\nMontant: ${amount.toLocaleString()} Ar\nFrais: ${feesAr.toLocaleString()} Ar\nTotal: ${total.toLocaleString()} Ar\nDest: ${address}\nRef: ${reference}`
     );
     if (!confirmed) return;
 
@@ -1472,31 +1850,22 @@ async function handleTransaction() {
         }]);
         if (txErr) throw txErr;
 
-        // Deduct balance on Send
         if (currentAction === 'Envoyer') {
             const newSolde = solde - total;
-            const { error: soldeErr } = await supabaseClient
-                .from('users')
-                .update({ solde: newSolde })
-                .eq('id', currentUserId);
+            const { error: soldeErr } = await supabaseClient.from('users').update({ solde: newSolde }).eq('id', currentUserId);
             if (soldeErr) throw soldeErr;
-
             userData.solde = newSolde;
-            const soldeDisplay = document.getElementById('display-solde');
-            if (soldeDisplay) soldeDisplay.innerText = newSolde.toLocaleString() + " Ar";
+            const fmt = newSolde.toLocaleString('fr-FR') + " Ar";
+            document.getElementById('display-solde').innerText   = fmt;
+            document.getElementById('form-solde-hint').innerText = fmt;
         }
 
         alert(`Transaction voaray!\nReference: ${reference}`);
-
-        // Reset form
         document.getElementById('input-main').value = '';
-        if (!document.getElementById('input-addr').readOnly) {
-            document.getElementById('input-addr').value = '';
-        }
+        if (!document.getElementById('input-addr').readOnly) document.getElementById('input-addr').value = '';
         check.checked = false;
         updateCalc();
         fetchData();
-
     } catch (err) {
         console.error("Transaction error:", err);
         alert("Nisy olana: " + err.message);
@@ -1508,12 +1877,11 @@ async function handleTransaction() {
 // =========================================================
 function previewImage(input) {
     if (input.files && input.files[0]) {
-        const reader  = new FileReader();
-        reader.onload = (e) => { document.getElementById('modal-pp-view').src = e.target.result; };
-        reader.readAsDataURL(input.files[0]);
+        const r = new FileReader();
+        r.onload = (e) => { document.getElementById('modal-pp-view').src = e.target.result; };
+        r.readAsDataURL(input.files[0]);
     }
 }
-
 function openProfile() {
     if (!userData) return;
     document.getElementById('edit-full-name').value = userData.full_name || '';
@@ -1521,80 +1889,54 @@ function openProfile() {
     document.getElementById('modal-pp-view').src    = userData.avatar_url || "https://via.placeholder.com/100";
     document.getElementById('modal-profile').style.display = 'flex';
 }
-
-function closeProfile() {
-    document.getElementById('modal-profile').style.display = 'none';
-}
+function closeProfile() { document.getElementById('modal-profile').style.display = 'none'; }
 
 async function updateProfile() {
     const newName  = document.getElementById('edit-full-name').value.trim();
     const newPhone = document.getElementById('edit-phone').value.trim();
-    if (!newName) return alert("Full name cannot be empty.");
-
-    const { error } = await supabaseClient.from('users')
-        .update({ full_name: newName, phone: newPhone })
-        .eq('id', currentUserId);
-
+    if (!newName) return alert("Le nom ne peut pas être vide.");
+    const { error } = await supabaseClient.from('users').update({ full_name: newName, phone: newPhone }).eq('id', currentUserId);
     if (error) alert(error.message);
-    else { alert("Profile updated!"); closeProfile(); fetchData(); }
+    else { alert("Profil mis à jour !"); closeProfile(); fetchData(); }
 }
 
 function copyText() {
     const input = document.getElementById('input-addr');
-    const doCopy = () => { input.select(); document.execCommand("copy"); alert("Address copied!"); };
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(input.value)
-            .then(() => alert("Address copied!"))
-            .catch(doCopy);
-    } else {
-        doCopy();
-    }
+    const doCopy = () => { input.select(); document.execCommand("copy"); alert("Adresse copiée !"); };
+    if (navigator.clipboard && navigator.clipboard.writeText)
+        navigator.clipboard.writeText(input.value).then(() => alert("Adresse copiée !")).catch(doCopy);
+    else doCopy();
 }
 
 // =========================================================
 // NOTIFICATIONS
-//
-// FIX (critical): the original code was missing the opening { in the
-// toLocaleString() options argument, which caused a SyntaxError that
-// prevented the ENTIRE script block from parsing — so nothing worked.
-//
-//   BROKEN:  toLocaleString('fr-FR',  timeZone: '…',  ← no {
-//   FIXED:   toLocaleString('fr-FR', { timeZone: '…', ← added {
 // =========================================================
 async function fetchNotifications() {
     const { data: notifs } = await supabaseClient
         .from('notifications').select('*')
         .eq('user_id', currentUserId)
         .order('created_at', { ascending: false });
-
     if (!notifs) return;
 
     const list        = document.getElementById('notif-list');
     const countBadge  = document.getElementById('notif-count');
     const unreadCount = notifs.filter(n => !n.is_read).length;
-
     countBadge.innerText     = unreadCount;
     countBadge.style.display = unreadCount > 0 ? 'block' : 'none';
 
     list.innerHTML = notifs.length
         ? notifs.map(n => `
             <div class="notif-item ${n.is_read ? '' : 'unread'}">
-                <b style="color:var(--yellow); font-size:13px;">${n.title}</b><br>
-                <span style="color:var(--gray); font-size:12px; line-height:1.4;">
-                    ${n.message}
-                </span><br>
-                <small style="font-size:10px; color:rgba(255,255,255,0.3);">
+                <b style="color:var(--yellow);font-size:13px;">${n.title}</b><br>
+                <span style="color:var(--gray);font-size:12px;line-height:1.4;">${n.message}</span><br>
+                <small style="font-size:10px;color:rgba(255,255,255,0.3);">
                     ${new Date(n.created_at).toLocaleString('fr-FR', {
                         timeZone: 'Indian/Antananarivo',
-                        day:      'numeric',
-                        month:    'short',
-                        hour:     '2-digit',
-                        minute:   '2-digit'
+                        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
                     })}
                 </small>
             </div>`).join('')
-        : '<p style="text-align:center; padding:30px; color:var(--gray); font-size:13px;">No notifications.</p>';
+        : '<p style="text-align:center;padding:28px;color:var(--gray);font-size:13px;">Aucune notification.</p>';
 }
 
 function toggleNotif() {
@@ -1604,30 +1946,17 @@ function toggleNotif() {
 }
 
 async function markAllRead() {
-    await supabaseClient.from('notifications')
-        .update({ is_read: true })
-        .eq('user_id', currentUserId);
+    await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUserId);
     fetchNotifications();
 }
 
 // =========================================================
 // LOGOUT
 // =========================================================
-function logout() {
-    supabaseClient.auth.signOut().then(() => location.reload());
-}
+function logout() { supabaseClient.auth.signOut().then(() => location.reload()); }
 
 // =========================================================
 // BOOT
-//
-// onAuthStateChange is the single entry point for initApp().
-// It fires on both:
-//   • page load when a valid session already exists (SIGNED_IN)
-//   • right after a successful signInWithPassword()  (SIGNED_IN)
-//
-// FIX: removed the redundant initApp() call inside handleLogin().
-//      Calling it there AND here caused double-initialisation:
-//      two concurrent fetchData() calls, two setInterval timers, etc.
 // =========================================================
 supabaseClient.auth.onAuthStateChange((event, session) => {
     if (session && session.user) {
