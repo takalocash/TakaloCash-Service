@@ -1168,10 +1168,10 @@ select, input { font-family: var(--font); }
                 </div>
 
                 <!-- Conditions -->
-                <div style="display:flex; align-items:flex-start; gap:10px; margin-top:20px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px;">
-    <input type="checkbox" id="check-conditions" style="width:18px; height:18px; cursor:pointer;">
-    <label for="check-conditions" style="font-size:12px; color:#aaa; cursor:pointer; line-height:1.4;">
-        J'accepte les <span onclick="showTerms()" style="color:#f39c12; text-decoration:underline; font-weight:bold;">Conditions d'Utilisation & la Politique de Confidentialité</span> de TakaloCash.
+              <div style="display:flex; align-items:flex-start; gap:10px; margin: 15px 0; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+    <input type="checkbox" id="check-conditions" style="width:18px; height:18px;">
+    <label for="check-conditions" style="font-size:11px; color:#aaa; line-height:1.4;">
+        J'accepte les <span onclick="showTerms()" style="color:#f39c12; text-decoration:underline; cursor:pointer; font-weight:bold;">Conditions d'Utilisation & Confidentialité</span>.
     </label>
 </div>
 
@@ -1238,11 +1238,10 @@ select, input { font-family: var(--font); }
      ======================================== -->
 <footer class="app-footer" id="app-footer" style="display:none;">
     <div class="footer-grid">
-        <div>
-            <div class="footer-col-title">Légal</div>
-            <div class="footer-link"><i class="fa-regular fa-file-lines"></i> Conditions d'utilisation</div>
-            <div class="footer-link"><i class="fa-solid fa-shield-halved"></i> Politique de confidentialité</div>
-        </div>
+        <div style="margin-top:20px; border-top:1px solid #333; padding-top:20px; display:flex; justify-content:center; gap:15px;">
+    <a href="#" onclick="openFooterTerms(event)" style="color:#666; text-decoration:none; font-size:11px;">Conditions d'utilisation</a>
+    <a href="#" onclick="openFooterTerms(event)" style="color:#666; text-decoration:none; font-size:11px;">Politique de confidentialité</a>
+</div>
         <div>
             <div class="footer-col-title">Chat &amp; Aide</div>
             <div class="footer-link"><i class="fa-solid fa-headset"></i> Centre d'aide</div>
@@ -1311,12 +1310,12 @@ select, input { font-family: var(--font); }
     <div id="notif-list"></div>
 </div>
 
-<div id="modal-terms" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:#1a1a1a; width:100%; max-width:500px; max-height:80vh; border-radius:20px; padding:25px; position:relative; display:flex; flex-direction:column; border:1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+<div id="modal-terms" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#1a1a1a; width:100%; max-width:500px; max-height:80vh; border-radius:20px; padding:25px; position:relative; display:flex; flex-direction:column; border:1px solid #333;">
         
         <h2 style="color:white; margin-top:0; border-bottom:1px solid #333; padding-bottom:15px; font-size:18px; text-align:center;">Conditions & Confidentialité</h2>
         
-        <div style="overflow-y:auto; color:#ccc; font-size:13px; line-height:1.6; padding-right:10px; margin:15px 0;">
+        <div style="overflow-y:auto; color:#ccc; font-size:13px; line-height:1.6; padding-right:10px; margin:15px 0; text-align: left;">
             <h3 style="color:#f39c12; font-size:14px;">1. Conditions d'Utilisation</h3>
             <p><strong>Nature du Service :</strong> TakaloCash est une plateforme intermédiaire d'échange de monnaies électroniques, crypto-monnaies (TRX, USDT) et recharges betting. Nous ne sommes pas une institution bancaire.</p>
             <p><strong>Responsabilité :</strong> Vous êtes responsable de l'exactitude des informations fournies. Toute erreur d'adresse de destination (Wallet/ID) est irréversible.</p>
@@ -1331,9 +1330,10 @@ select, input { font-family: var(--font); }
             <p><strong>Protection :</strong> Nous utilisons Supabase RLS pour garantir la sécurité de vos données privées.</p>
         </div>
 
-        <button onclick="closeTermsModal()" style="background:#f39c12; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold; width:100%; transition: 0.3s;">J'ai compris et j'accepte</button>
+        <button onclick="closeTermsModal()" style="background:#f39c12; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold; width:100%;">J'ai compris et j'accepte</button>
     </div>
 </div>
+</body>
 <!-- ========================================
      JAVASCRIPT — all logic preserved exactly
      ======================================== -->
@@ -1964,6 +1964,20 @@ function toggleNotif() {
     const panel = document.getElementById('notif-panel');
     panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
     if (panel.style.display === 'block') fetchNotifications();
+}
+
+    function showTerms() {
+    document.getElementById('modal-terms').style.display = 'flex';
+}
+
+function closeTermsModal() {
+    document.getElementById('modal-terms').style.display = 'none';
+}
+
+// Manampy an'ilay izy ao amin'ny pieds (Footer) raha misy manindry any ambany
+function openFooterTerms(e) {
+    if(e) e.preventDefault();
+    showTerms();
 }
 
 async function markAllRead() {
