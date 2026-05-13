@@ -1236,36 +1236,52 @@ select, input { font-family: var(--font); }
 <!-- ========================================
      FOOTER
      ======================================== -->
-<footer class="app-footer" id="app-footer" style="display:none;">
-    <div class="footer-grid">
-        <div style="margin-top:20px; border-top:1px solid #333; padding-top:20px; display:flex; justify-content:center; gap:15px;">
-    <a href="#" onclick="openFooterTerms(event)" style="color:#666; text-decoration:none; font-size:11px;">Conditions d'utilisation</a>
-    <a href="#" onclick="openFooterTerms(event)" style="color:#666; text-decoration:none; font-size:11px;">Politique de confidentialité</a>
-</div>
-        <div>
-            <div class="footer-col-title">Chat &amp; Aide</div>
-            <div class="footer-link"><i class="fa-solid fa-headset"></i> Centre d'aide</div>
-            <div class="footer-link"><i class="fa-brands fa-discord"></i> Discussion</div>
-        </div>
-        <div>
-            <div class="footer-col-title">Contact</div>
-            <div class="footer-link"><i class="fa-regular fa-envelope"></i> Email</div>
-            <div class="footer-link"><i class="fa-brands fa-whatsapp"></i> WhatsApp</div>
-        </div>
-        <div>
-            <div class="footer-col-title">Suivez-nous</div>
-            <div class="footer-link"><i class="fa-brands fa-telegram"></i> Telegram</div>
-            <div class="footer-link"><i class="fa-brands fa-facebook-f"></i> Facebook</div>
-        </div> 
-        <div id="support-chat" style="position:fixed; bottom:20px; right:20px; z-index:999;">
-    <a href="https://wa.me/2613XXXXXXXX" target="_blank" style="background:#25d366; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 5px 15px rgba(0,0,0,0.3); text-decoration:none;">
-        <i class="fab fa-whatsapp" style="font-size:30px;"></i>
-    </a>
-</div>
-        <a href="#" onclick="event.preventDefault(); document.getElementById('modal-help').style.display='flex'" style="color:#666; text-decoration:none; font-size:11px;">Centre d'aide</a>
+
+<footer class="app-footer" id="app-footer" style="display:none; margin-top: 50px; padding: 40px 20px; border-top: 1px solid #222; text-align: center; background: #0e101a;">
+    
+    <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 25px;">
+        <a href="mailto:contact@takalocash.com" title="Email" style="width: 45px; height: 45px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border: 1px solid #333; transition: 0.3s; text-decoration: none;">
+            <i class="fas fa-envelope" style="font-size: 18px; color: #f39c12;"></i>
+        </a>
+        <a href="https://t.me/TakaloCash" target="_blank" title="Telegram" style="width: 45px; height: 45px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border: 1px solid #333; transition: 0.3s; text-decoration: none;">
+            <i class="fab fa-telegram-plane" style="font-size: 18px; color: #0088cc;"></i>
+        </a>
+        <a href="https://facebook.com/TakaloCash" target="_blank" title="Facebook" style="width: 45px; height: 45px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border: 1px solid #333; transition: 0.3s; text-decoration: none;">
+            <i class="fab fa-facebook-f" style="font-size: 18px; color: #1877f2;"></i>
+        </a>
+        <a href="https://wa.me/2613XXXXXXXX" target="_blank" title="WhatsApp" style="width: 45px; height: 45px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border: 1px solid #333; transition: 0.3s; text-decoration: none;">
+            <i class="fab fa-whatsapp" style="font-size: 18px; color: #25d366;"></i>
+        </a>
+    </div>
+
+    <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; margin-bottom: 25px;">
+        <span onclick="document.getElementById('modal-help').style.display='flex'" style="cursor:pointer; color:#7a8299; font-size: 12px; display: flex; align-items: center; gap: 5px;">
+            <i class="fas fa-life-ring"></i> Centre d'aide
+        </span>
+        <span onclick="window.open('https://wa.me/2613XXXXXXXX')" style="cursor:pointer; color:#7a8299; font-size: 12px; display: flex; align-items: center; gap: 5px;">
+            <i class="fas fa-comments"></i> Discussion
+        </span>
+        <span onclick="showTerms()" style="cursor:pointer; color:#7a8299; font-size: 12px; display: flex; align-items: center; gap: 5px;">
+            <i class="fas fa-file-contract"></i> Conditions
+        </span>
+        <span onclick="showTerms()" style="cursor:pointer; color:#7a8299; font-size: 12px; display: flex; align-items: center; gap: 5px;">
+            <i class="fas fa-user-shield"></i> Confidentialité
+        </span>
+    </div>
+
+    <div style="border-top: 1px solid #1a1d2e; padding-top: 20px;">
+        <p style="color: #444; font-size: 10px; margin: 0; letter-spacing: 0.5px;">
+            &copy; 2026 TAKALOCASH PREMIUM. TOUS DROITS RÉSERVÉS.<br>
+            <span style="color:#222; font-size: 9px; margin-top: 5px; display: block;">SECURED BY BLOCKCHAIN TECHNOLOGY & SUPABASE</span>
+        </p>
+    </div>
+
+    <div id="support-chat" style="position:fixed; bottom:20px; right:20px; z-index:999;">
+        <a href="https://wa.me/2613XXXXXXXX" target="_blank" style="background:#25d366; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 5px 15px rgba(0,0,0,0.3); text-decoration:none;">
+            <i class="fab fa-whatsapp" style="font-size:30px;"></i>
+        </a>
     </div>
 </footer>
-
 
 <!-- ========================================
      PROFILE MODAL
