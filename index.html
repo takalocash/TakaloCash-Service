@@ -1282,7 +1282,7 @@ select, input { font-family: var(--font); }
     </label>
 </div>
 
-                <button class="btn-submit" onclick="handleTransaction()">Valider Envoi</button>
+                <button class="btn-submit" id="btn-submit" onclick="handleTransaction()">Valider Envoi</button>
 
             </div><!-- /.trans-body -->
         </div><!-- /.trans-box -->
@@ -1650,7 +1650,19 @@ const TITLE_MAP = {
 // =========================================================
 const _URL = "https://nyeopreahmajoisartoz.supabase.co";
 const _KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZW9wcmVhaG1ham9pc2FydG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjgzMDgsImV4cCI6MjA5MDE0NDMwOH0.2ASTgZPKssdhGnFGcjit7BZOdEFOnFqIHkmt8w239EA";
-const supabaseClient = supabase.createClient(_URL, _KEY);
+
+let supabaseClient;
+try {
+    supabaseClient = supabase.createClient(_URL, _KEY);
+} catch (e) {
+    console.error("[TakaloCash] Supabase init failed:", e.message);
+    document.getElementById('auth-container').innerHTML =
+        '<div style="text-align:center;color:#e84040;padding:40px;font-family:sans-serif;">' +
+        '<p style="font-size:18px;font-weight:bold;">⚠️ Erreur de connexion</p>' +
+        '<p style="color:#aaa;font-size:13px;">Impossible de charger le service. Vérifiez votre connexion Internet et rechargez la page.</p>' +
+        '<button onclick="location.reload()" style="margin-top:16px;background:#f5c518;color:#13151e;border:none;padding:12px 24px;border-radius:10px;font-weight:800;cursor:pointer;">Recharger</button>' +
+        '</div>';
+}
 
 // =========================================================
 // STATE
@@ -1944,6 +1956,8 @@ function openMobile(mode) {
     document.getElementById('copy-btn').style.display                    = 'none';
     document.getElementById('calc-container').style.display              = 'none';
     document.getElementById('frais-info').innerText                      = '';
+    const btnSub = document.getElementById('btn-submit');
+    if (btnSub) btnSub.innerText = mode === 'Dépôt' ? 'Valider le Dépôt' : 'Valider le Retrait';
     document.querySelector('.trans-box').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -2025,6 +2039,10 @@ function switchAction(action) {
         const catData = ASSETS_DATA[currentMode];
         if (catData) labelAddr.innerText = catData.label;
     }
+
+    // Update submit button label
+    const btnSubmit = document.getElementById('btn-submit');
+    if (btnSubmit) btnSubmit.innerText = action === 'Envoyer' ? 'Valider l\'Envoi' : 'Valider la Réception';
 
     updateCalc();
 }
@@ -2246,17 +2264,21 @@ document.addEventListener('click', function(e) {
 // =========================================================
 // LOGOUT
 // =========================================================
-function logout() { supabaseClient.auth.signOut().then(() => location.reload()); }
+function logout() {
+    if (supabaseClient) supabaseClient.auth.signOut().then(() => location.reload());
+}
 
 // =========================================================
 // BOOT
 // =========================================================
-supabaseClient.auth.onAuthStateChange((event, session) => {
-    if (session && session.user) {
-        currentUserId = session.user.id;
-        initApp();
-    }
-});
+if (supabaseClient) {
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (session && session.user) {
+            currentUserId = session.user.id;
+            initApp();
+        }
+    });
+}
 
 </script>
 </body>
