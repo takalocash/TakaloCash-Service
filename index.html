@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TakaloCash Premium</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,38 +14,42 @@
    ROOT TOKENS
    ===================================================== */
 :root {
-    --bg:        #13151e;
-    --bg-card:   #1a1d2e;
-    --bg-input:  #0e101a;
-    --yellow:    #f5c518;
-    --yellow-dk: #d4a800;
-    --green:     #1db87a;
-    --green-dk:  #169960;
-    --red:       #e84040;
-    --teal:      #00c8a0;
-    --gray:      #7a8299;
-    --gray-lt:   #a8b0c8;
-    --border:    rgba(255,255,255,0.08);
-    --border-md: rgba(255,255,255,0.12);
-    --shadow:    0 8px 32px rgba(0,0,0,0.45);
-    --font:      'Exo 2', 'Rajdhani', sans-serif;
+    --bg:         #13151e;
+    --bg-card:    #1a1d2e;
+    --bg-input:   #0e101a;
+    --yellow:     #f5c518;
+    --yellow-dk:  #d4a800;
+    --green:      #1db87a;
+    --green-dk:   #169960;
+    --red:        #e84040;
+    --teal:       #00c8a0;
+    --gray:       #7a8299;
+    --gray-lt:    #a8b0c8;
+    --border:     rgba(255,255,255,0.08);
+    --border-md:  rgba(255,255,255,0.12);
+    --shadow:     0 8px 32px rgba(0,0,0,0.45);
+    --font:       'Exo 2', 'Rajdhani', sans-serif;
 }
 
 /* =====================================================
    RESET & BASE
    ===================================================== */
 *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
 html { scroll-behavior: smooth; }
+
 body {
-    margin:     0;
-    background: var(--bg);
-    font-family:var(--font);
-    color:      #e8eaf2;
-    overflow-x: hidden;
-    min-height: 100vh;
+    margin:      0;
+    background:  var(--bg);
+    font-family: var(--font);
+    color:       #e8eaf2;
+    overflow-x:  hidden;
+    min-height:  100vh;
 }
+
 a { color: inherit; text-decoration: none; }
-button, select, input { font-family: var(--font); }
+button { font-family: var(--font); }
+select, input { font-family: var(--font); }
 
 /* =====================================================
    AUTH SCREEN
@@ -60,12 +65,14 @@ button, select, input { font-family: var(--font); }
     padding:         20px;
     overflow-y:      auto;
 }
+
+/* subtle animated bg for auth */
 #auth-container::before {
     content:    '';
     position:   absolute;
     inset:      0;
-    background: radial-gradient(ellipse 60% 40% at 50% 0%,  rgba(245,197,24,.08) 0%,  transparent 70%),
-                radial-gradient(ellipse 40% 60% at 80% 100%, rgba(0,200,160,.06)  0%,  transparent 70%);
+    background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(245,197,24,.08) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 80% 100%, rgba(0,200,160,.06) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -90,9 +97,9 @@ button, select, input { font-family: var(--font); }
     letter-spacing:  -1px;
 }
 .auth-logo-text {
-    font-size:      24px;
-    font-weight:    800;
-    color:          white;
+    font-size:   24px;
+    font-weight: 800;
+    color:       white;
     letter-spacing: -0.5px;
 }
 
@@ -108,11 +115,12 @@ button, select, input { font-family: var(--font); }
     position:      relative;
     z-index:       1;
 }
+
 .auth-box h2 {
-    color:          white;
-    font-weight:    800;
-    font-size:      22px;
-    margin:         0 0 24px;
+    color:         white;
+    font-weight:   800;
+    font-size:     22px;
+    margin:        0 0 24px;
     letter-spacing: -0.3px;
 }
 
@@ -129,30 +137,33 @@ button, select, input { font-family: var(--font); }
     margin-top:    12px;
     transition:    border-color 0.2s, box-shadow 0.2s;
 }
-.styled-input:focus      { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(245,197,24,.12); }
+.styled-input:focus {
+    border-color: var(--yellow);
+    box-shadow:   0 0 0 3px rgba(245,197,24,.12);
+}
 .styled-input::placeholder { color: var(--gray); }
 
 .btn-primary {
-    width:          100%;
-    background:     var(--yellow);
-    border:         none;
-    padding:        16px;
-    border-radius:  10px;
-    font-weight:    800;
-    font-size:      15px;
-    font-family:    var(--font);
-    cursor:         pointer;
-    color:          #13151e;
-    margin-top:     20px;
+    width:         100%;
+    background:    var(--yellow);
+    border:        none;
+    padding:       16px;
+    border-radius: 10px;
+    font-weight:   800;
+    font-size:     15px;
+    font-family:   var(--font);
+    cursor:        pointer;
+    color:         #13151e;
+    margin-top:    20px;
     letter-spacing: 0.3px;
-    transition:     background 0.2s, transform 0.1s;
+    transition:    background 0.2s, transform 0.1s;
 }
 .btn-primary:hover  { background: #ffd62e; }
 .btn-primary:active { transform: scale(0.98); }
 
-/* alias for profile modal */
+/* keep old alias for JS references */
 .btn-valider { width:100%; background:var(--yellow); border:none; padding:16px; border-radius:10px; font-weight:800; font-size:15px; font-family:var(--font); cursor:pointer; color:#13151e; margin-top:20px; letter-spacing:0.3px; transition:background 0.2s,transform 0.1s; }
-.btn-valider:hover  { background:#ffd62e; }
+.btn-valider:hover { background:#ffd62e; }
 .btn-valider:active { transform:scale(0.98); }
 
 .auth-link {
@@ -168,16 +179,17 @@ button, select, input { font-family: var(--font); }
    HEADER / NAV
    ===================================================== */
 #nav-header {
-    display:       none;          /* shown via JS as flex */
-    background:    var(--bg-card);
-    border-bottom: 1px solid var(--border);
-    padding:       0 20px;
-    height:        58px;
-    position:      sticky;
-    top:           0;
-    z-index:       1000;
-    width:         100%;
+    display:         none;
+    background:      var(--bg-card);
+    border-bottom:   1px solid var(--border);
+    padding:         0 20px;
+    height:          58px;
+    position:        sticky;
+    top:             0;
+    z-index:         1000;
+    width:           100%;
 }
+
 .header-inner {
     display:         flex;
     justify-content: space-between;
@@ -186,6 +198,7 @@ button, select, input { font-family: var(--font); }
     max-width:       520px;
     margin:          0 auto;
 }
+
 .header-logo {
     display:     flex;
     align-items: center;
@@ -206,16 +219,24 @@ button, select, input { font-family: var(--font); }
     letter-spacing:  -0.5px;
     flex-shrink:     0;
 }
-.header-logo-text { font-size: 18px; font-weight: 800; color: white; letter-spacing: -0.5px; }
+.header-logo-text {
+    font-size:      18px;
+    font-weight:    800;
+    color:          white;
+    letter-spacing: -0.5px;
+}
 
-.header-actions { display: flex; align-items: center; gap: 14px; }
-
+.header-actions {
+    display:     flex;
+    align-items: center;
+    gap:         14px;
+}
 .header-icon-btn {
-    position:    relative;
-    cursor:      pointer;
-    color:       var(--gray-lt);
-    font-size:   18px;
-    transition:  color 0.2s;
+    position:   relative;
+    cursor:     pointer;
+    color:      var(--gray-lt);
+    font-size:  18px;
+    transition: color 0.2s;
     line-height: 1;
 }
 .header-icon-btn:hover { color: white; }
@@ -244,17 +265,17 @@ button, select, input { font-family: var(--font); }
     cursor:        pointer;
 }
 .header-menu-btn {
-    width:           34px;
-    height:          34px;
-    background:      rgba(255,255,255,0.06);
-    border-radius:   8px;
-    display:         flex;
-    align-items:     center;
+    width:         34px;
+    height:        34px;
+    background:    rgba(255,255,255,0.06);
+    border-radius: 8px;
+    display:       flex;
+    align-items:   center;
     justify-content: center;
-    cursor:          pointer;
-    color:           var(--gray-lt);
-    font-size:       16px;
-    transition:      background 0.2s;
+    cursor:        pointer;
+    color:         var(--gray-lt);
+    font-size:     16px;
+    transition:    background 0.2s;
 }
 .header-menu-btn:hover { background: rgba(255,255,255,0.12); color: white; }
 
@@ -269,45 +290,52 @@ button, select, input { font-family: var(--font); }
     z-index:         5500;
     backdrop-filter: blur(3px);
 }
+
 .sidebar {
-    position:    fixed;
-    top:         0;
-    right:       -100%;
-    width:       78%;
-    max-width:   300px;
-    height:      100%;
-    background:  var(--bg-card);
+    position:   fixed;
+    top:        0;
+    right:      -100%;
+    width:      78%;
+    max-width:  300px;
+    height:     100%;
+    background: var(--bg-card);
     border-left: 1px solid var(--border);
-    z-index:     6000;
-    transition:  right 0.35s cubic-bezier(0.4,0,0.2,1);
-    padding:     28px 24px;
-    overflow-y:  auto;
+    z-index:    6000;
+    transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
+    padding:    28px 24px;
+    overflow-y: auto;
 }
 .sidebar.active { right: 0; }
 
 .sidebar-profile {
-    display:        flex;
-    align-items:    center;
-    gap:            12px;
-    padding-bottom: 20px;
-    border-bottom:  1px solid var(--border);
-    margin-bottom:  20px;
-}
-.sidebar-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--yellow); object-fit: cover; }
-.sidebar-name   { font-weight: 700; font-size: 15px; color: white; }
-.sidebar-id     { font-size: 12px; color: var(--teal); font-weight: 700; margin-top: 2px; }
-
-.sidebar-item {
     display:       flex;
     align-items:   center;
     gap:           12px;
-    padding:       14px 0;
+    padding-bottom: 20px;
     border-bottom: 1px solid var(--border);
-    cursor:        pointer;
-    color:         var(--gray-lt);
-    font-size:     14px;
-    font-weight:   600;
-    transition:    color 0.2s;
+    margin-bottom: 20px;
+}
+.sidebar-avatar {
+    width:         50px;
+    height:        50px;
+    border-radius: 50%;
+    border:        2px solid var(--yellow);
+    object-fit:    cover;
+}
+.sidebar-name { font-weight: 700; font-size: 15px; color: white; }
+.sidebar-id   { font-size: 12px; color: var(--teal); font-weight: 700; margin-top: 2px; }
+
+.sidebar-item {
+    display:     flex;
+    align-items: center;
+    gap:         12px;
+    padding:     14px 0;
+    border-bottom: 1px solid var(--border);
+    cursor:      pointer;
+    color:       var(--gray-lt);
+    font-size:   14px;
+    font-weight: 600;
+    transition:  color 0.2s;
 }
 .sidebar-item:hover { color: white; }
 .sidebar-item i { width: 18px; text-align: center; }
@@ -316,7 +344,12 @@ button, select, input { font-family: var(--font); }
 /* =====================================================
    MAIN APP CONTAINER
    ===================================================== */
-.container { max-width: 520px; margin: 0 auto; padding: 16px; display: none; }
+.container {
+    max-width: 520px;
+    margin:    0 auto;
+    padding:   16px;
+    display:   none;
+}
 
 /* =====================================================
    BALANCE CARD
@@ -340,17 +373,18 @@ button, select, input { font-family: var(--font); }
     background: radial-gradient(circle, rgba(245,197,24,.12) 0%, transparent 70%);
     pointer-events: none;
 }
+
 .solde-label {
-    display:         flex;
-    align-items:     center;
+    display:     flex;
+    align-items: center;
     justify-content: center;
-    gap:             8px;
-    color:           var(--gray);
-    font-size:       12px;
-    font-weight:     600;
-    text-transform:  uppercase;
-    letter-spacing:  0.8px;
-    margin-bottom:   8px;
+    gap:         8px;
+    color:       var(--gray);
+    font-size:   12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
 }
 .solde-arrow-box {
     background:    rgba(29,184,122,.2);
@@ -363,12 +397,23 @@ button, select, input { font-family: var(--font); }
     color:         var(--green);
     font-size:     11px;
 }
-.solde-amount { font-size: 38px; font-weight: 900; color: white; letter-spacing: -1.5px; line-height: 1; }
+.solde-amount {
+    font-size:      38px;
+    font-weight:    900;
+    color:          white;
+    letter-spacing: -1.5px;
+    line-height:    1;
+}
 
 /* =====================================================
    ACTION BUTTONS (Envoyer / Recevoir)
    ===================================================== */
-.main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.main-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap:     10px;
+    margin-bottom: 14px;
+}
 
 .btn-action {
     border:          none;
@@ -386,9 +431,17 @@ button, select, input { font-family: var(--font); }
     transition:      opacity 0.2s, transform 0.1s;
 }
 .btn-action:active { transform: scale(0.97); }
-.btn-env { background: var(--yellow); color: #13151e; }
+
+.btn-env {
+    background: var(--yellow);
+    color:      #13151e;
+}
 .btn-env:hover { background: #ffd62e; }
-.btn-rec { background: var(--green); color: white; }
+
+.btn-rec {
+    background: var(--green);
+    color:      white;
+}
 .btn-rec:hover { background: #22d48a; }
 
 /* =====================================================
@@ -400,6 +453,7 @@ button, select, input { font-family: var(--font); }
     gap:                   10px;
     margin-bottom:         14px;
 }
+
 .service-item {
     background:    var(--bg-card);
     border:        1px solid var(--border);
@@ -414,7 +468,10 @@ button, select, input { font-family: var(--font); }
     position:      relative;
 }
 .service-item:hover { border-color: var(--border-md); background: #1e2236; }
-.service-item.active { border-color: var(--yellow); background: rgba(245,197,24,.08); }
+.service-item.active {
+    border-color: var(--yellow);
+    background:   rgba(245,197,24,.08);
+}
 .service-item.active .svc-title { color: var(--yellow); }
 
 .svc-icon-wrap {
@@ -427,14 +484,14 @@ button, select, input { font-family: var(--font); }
     flex-shrink:     0;
     font-size:       19px;
 }
-.svc-icon-wrap.gold   { background: rgba(245,197,24,.15); color: var(--yellow); }
-.svc-icon-wrap.green  { background: rgba(29,184,122,.15); color: var(--green);  }
-.svc-icon-wrap.orange { background: rgba(255,120,50,.15); color: #ff7832;       }
-.svc-icon-wrap.purple { background: rgba(130,80,220,.15); color: #9b6ef0;       }
+.svc-icon-wrap.gold    { background: rgba(245,197,24,.15); color: var(--yellow); }
+.svc-icon-wrap.green   { background: rgba(29,184,122,.15); color: var(--green);  }
+.svc-icon-wrap.orange  { background: rgba(255,120,50,.15); color: #ff7832;       }
+.svc-icon-wrap.purple  { background: rgba(130,80,220,.15); color: #9b6ef0;       }
 
-.svc-text  { min-width: 0; }
-.svc-title { font-weight: 700; font-size: 13px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.svc-sub   { font-size: 10.5px; color: var(--gray); margin-top: 2px; line-height: 1.3; }
+.svc-text { min-width: 0; }
+.svc-title   { font-weight: 700; font-size: 13px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.svc-sub     { font-size: 10.5px; color: var(--gray); margin-top: 2px; line-height: 1.3; }
 
 /* =====================================================
    TRANSACTION FORM CARD
@@ -447,6 +504,7 @@ button, select, input { font-family: var(--font); }
     margin-bottom: 22px;
     overflow:      hidden;
 }
+
 .trans-header {
     display:         flex;
     justify-content: space-between;
@@ -454,7 +512,7 @@ button, select, input { font-family: var(--font); }
     padding:         16px 18px 14px;
     border-bottom:   1px solid var(--border);
 }
-.trans-title-wrap   { display: flex; align-items: center; gap: 6px; }
+.trans-title-wrap { display: flex; align-items: center; gap: 6px; }
 .trans-title-action { color: var(--yellow); font-weight: 800; font-size: 16px; }
 .trans-title-mode   { color: white;         font-weight: 700; font-size: 16px; }
 .trans-header-chevron { color: var(--gray); font-size: 14px; }
@@ -462,10 +520,10 @@ button, select, input { font-family: var(--font); }
 .trans-body { padding: 16px 18px 18px; }
 
 .trans-row2 {
-    display:               grid;
+    display: grid;
     grid-template-columns: 1fr 1fr;
-    gap:                   12px;
-    margin-bottom:         14px;
+    gap: 12px;
+    margin-bottom: 14px;
 }
 
 .form-group { display: flex; flex-direction: column; gap: 6px; }
@@ -528,7 +586,7 @@ button, select, input { font-family: var(--font); }
 }
 
 /* address field */
-.addr-wrap { position: relative; margin-bottom: 0; }
+.addr-wrap { position: relative; margin-bottom: 14px; }
 #input-addr {
     background:    var(--bg-input);
     border:        1px solid var(--border-md);
@@ -541,7 +599,7 @@ button, select, input { font-family: var(--font); }
     outline:       none;
     transition:    border-color 0.2s;
 }
-#input-addr:focus       { border-color: var(--yellow); }
+#input-addr:focus { border-color: var(--yellow); }
 #input-addr::placeholder { color: var(--gray); }
 #copy-btn {
     position:  absolute;
@@ -551,7 +609,7 @@ button, select, input { font-family: var(--font); }
     color:     var(--yellow);
     cursor:    pointer;
     font-size: 14px;
-    display:   none; /* hidden by default; shown in Recevoir mode */
+    display:   none;
 }
 
 /* equivalent row */
@@ -571,39 +629,44 @@ button, select, input { font-family: var(--font); }
 #frais-info  { font-size: 11px; color: var(--gray); text-align: right; margin-bottom: 8px; }
 
 /* balance display inside form */
-.form-solde-row { font-size: 12px; color: var(--gray); margin-bottom: 14px; }
+.form-solde-row {
+    font-size:     12px;
+    color:         var(--gray);
+    margin-bottom: 14px;
+}
 .form-solde-row span { color: var(--green); font-weight: 700; }
 
 /* conditions row */
 .conditions-row {
-    display:       flex;
-    align-items:   flex-start;
-    gap:           10px;
-    font-size:     11px;
-    color:         #aaa;
-    line-height:   1.4;
-    margin:        15px 0;
-    background:    rgba(255,255,255,0.05);
-    padding:       10px;
-    border-radius: 8px;
+    display:     flex;
+    align-items: flex-start;
+    gap:         8px;
+    font-size:   12px;
+    color:       var(--gray);
+    line-height: 1.5;
+    margin-bottom: 14px;
 }
-.conditions-row input[type="checkbox"] { width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--yellow); }
-.conditions-row a { color: var(--yellow); text-decoration: underline; cursor: pointer; font-weight: bold; }
+.conditions-row input[type="checkbox"] {
+    margin-top:   2px;
+    flex-shrink:  0;
+    accent-color: var(--yellow);
+}
+.conditions-row a { color: var(--yellow); text-decoration: underline; }
 
 /* submit button */
 .btn-submit {
-    width:          100%;
-    background:     var(--yellow);
-    border:         none;
-    padding:        15px;
-    border-radius:  10px;
-    font-weight:    900;
-    font-size:      15px;
-    font-family:    var(--font);
-    cursor:         pointer;
-    color:          #13151e;
+    width:         100%;
+    background:    var(--yellow);
+    border:        none;
+    padding:       15px;
+    border-radius: 10px;
+    font-weight:   900;
+    font-size:     15px;
+    font-family:   var(--font);
+    cursor:        pointer;
+    color:         #13151e;
     letter-spacing: 0.5px;
-    transition:     background 0.2s, transform 0.1s;
+    transition:    background 0.2s, transform 0.1s;
 }
 .btn-submit:hover  { background: #ffd62e; }
 .btn-submit:active { transform: scale(0.98); }
@@ -611,12 +674,33 @@ button, select, input { font-family: var(--font); }
 /* =====================================================
    HISTORY SECTION
    ===================================================== */
-.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-.section-title  { font-size: 16px; font-weight: 800; color: white; letter-spacing: -0.2px; }
-.section-link   { color: var(--yellow); font-size: 12px; font-weight: 600; cursor: pointer; }
+.section-header {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     center;
+    margin-bottom:   14px;
+}
+.section-title {
+    font-size:   16px;
+    font-weight: 800;
+    color:       white;
+    letter-spacing: -0.2px;
+}
+.section-link {
+    color:     var(--yellow);
+    font-size: 12px;
+    font-weight: 600;
+    cursor:    pointer;
+}
 .section-link:hover { opacity: 0.8; }
 
-.hist-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+/* history table */
+.hist-table {
+    width:           100%;
+    border-collapse: separate;
+    border-spacing:  0;
+    font-size:       13px;
+}
 .hist-table thead th {
     color:          var(--gray);
     font-weight:    600;
@@ -628,12 +712,18 @@ button, select, input { font-family: var(--font); }
     border-bottom:  1px solid var(--border);
 }
 .hist-table thead th:last-child { text-align: right; }
+
 .hist-table tbody tr { transition: background 0.15s; }
 .hist-table tbody tr:hover { background: rgba(255,255,255,0.02); }
-.hist-table tbody td { padding: 13px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.hist-table tbody td {
+    padding:       13px 8px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
 .hist-table tbody tr:last-child td { border-bottom: none; }
 
-.hist-date     { color: var(--gray); font-weight: 600; font-size: 12px; white-space: nowrap; }
+.hist-date { color: var(--gray); font-weight: 600; font-size: 12px; white-space: nowrap; }
+
 .hist-svc-cell { display: flex; align-items: center; gap: 8px; }
 .hist-svc-badge {
     font-size:     10px;
@@ -642,28 +732,29 @@ button, select, input { font-family: var(--font); }
     border-radius: 5px;
     white-space:   nowrap;
 }
-.hist-svc-badge.crypto  { background: rgba(245,197,24,.18);  color: var(--yellow); }
-.hist-svc-badge.wallet  { background: rgba(130,80,220,.18);  color: #9b6ef0; }
-.hist-svc-badge.betting { background: rgba(255,120,50,.18);  color: #ff7832; }
-.hist-svc-badge.abo     { background: rgba(29,184,122,.18);  color: var(--green); }
+.hist-svc-badge.crypto { background: rgba(245,197,24,.18); color: var(--yellow); }
+.hist-svc-badge.wallet { background: rgba(130,80,220,.18); color: #9b6ef0; }
+.hist-svc-badge.betting{ background: rgba(255,120,50,.18); color: #ff7832; }
+.hist-svc-badge.abo    { background: rgba(29,184,122,.18); color: var(--green); }
 
-.hist-svc-name          { font-weight: 600; color: white; white-space: nowrap; }
-.hist-type              { color: var(--gray-lt); font-weight: 500; }
-.hist-amount            { font-weight: 700; white-space: nowrap; }
-.hist-amount.negative   { color: var(--red);   }
-.hist-amount.positive   { color: var(--green); }
-.hist-status            { text-align: right; }
+.hist-svc-name  { font-weight: 600; color: white; white-space: nowrap; }
+.hist-type      { color: var(--gray-lt); font-weight: 500; }
+.hist-amount    { font-weight: 700; white-space: nowrap; }
+.hist-amount.negative { color: var(--red);   }
+.hist-amount.positive { color: var(--green); }
+
+.hist-status    { text-align: right; }
 .status-badge {
-    display:        inline-flex;
-    align-items:    center;
-    gap:            5px;
-    font-size:      11px;
-    font-weight:    700;
+    display:       inline-flex;
+    align-items:   center;
+    gap:           5px;
+    font-size:     11px;
+    font-weight:   700;
     text-transform: capitalize;
 }
-.status-badge.pending   { color: var(--yellow); }
-.status-badge.confirmed { color: var(--green);  }
-.status-badge.rejected  { color: var(--red);    }
+.status-badge.pending  { color: var(--yellow); }
+.status-badge.confirmed{ color: var(--green);  }
+.status-badge.rejected { color: var(--red);    }
 
 /* full history page */
 #page-history { display: none; }
@@ -681,7 +772,15 @@ button, select, input { font-family: var(--font); }
     color:           var(--yellow);
     flex-shrink:     0;
 }
-.filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; margin-bottom: 4px; }
+
+.filter-bar {
+    display:    flex;
+    gap:        8px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scrollbar-width: none;
+    margin-bottom: 4px;
+}
 .filter-bar::-webkit-scrollbar { display: none; }
 
 .filter-chip {
@@ -698,7 +797,11 @@ button, select, input { font-family: var(--font); }
     font-family:   var(--font);
 }
 .filter-chip.active,
-.filter-chip:hover { background: var(--yellow); color: #13151e; border-color: var(--yellow); }
+.filter-chip:hover {
+    background:   var(--yellow);
+    color:        #13151e;
+    border-color: var(--yellow);
+}
 
 .month-header {
     padding:        14px 0 6px;
@@ -740,13 +843,18 @@ button, select, input { font-family: var(--font); }
     top:             0;
     background:      var(--bg-card);
 }
-.notif-item { padding: 13px 16px; border-bottom: 1px solid var(--border); font-size: 13px; transition: background 0.15s; }
+.notif-item {
+    padding:       13px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size:     13px;
+    transition:    background 0.15s;
+}
 .notif-item:last-child { border-bottom: none; }
-.notif-item.unread     { background: rgba(245,197,24,.04); }
-.notif-item:hover      { background: rgba(255,255,255,0.03); }
+.notif-item.unread { background: rgba(245,197,24,.04); }
+.notif-item:hover  { background: rgba(255,255,255,0.03); }
 
 /* =====================================================
-   MODAL
+   MODAL (profile)
    ===================================================== */
 .modal {
     display:         none;
@@ -769,8 +877,80 @@ button, select, input { font-family: var(--font); }
 }
 .modal-title { color: var(--yellow); font-weight: 800; font-size: 17px; margin: 0 0 20px; }
 
-/* large modals (help / terms) */
-.modal-large {
+/* =====================================================
+   FOOTER
+   ===================================================== */
+.app-footer {
+    border-top:  1px solid var(--border);
+    padding:     28px 16px 32px;
+    margin-top:  8px;
+}
+.footer-section-title {
+    font-size:      10px;
+    font-weight:    700;
+    color:          var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin:         0 0 10px;
+    text-align:     center;
+}
+.footer-btn-group {
+    display:         flex;
+    flex-wrap:       wrap;
+    gap:             8px;
+    justify-content: center;
+    margin-bottom:   20px;
+    max-width:       520px;
+    margin-left:     auto;
+    margin-right:    auto;
+}
+.footer-btn {
+    display:       flex;
+    align-items:   center;
+    gap:           7px;
+    background:    rgba(255,255,255,0.05);
+    border:        1px solid var(--border-md);
+    border-radius: 10px;
+    padding:       10px 16px;
+    font-family:   var(--font);
+    font-size:     12px;
+    font-weight:   600;
+    color:         var(--gray-lt);
+    cursor:        pointer;
+    text-decoration: none;
+    transition:    background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
+    white-space:   nowrap;
+    line-height:   1;
+}
+.footer-btn:hover  { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white; }
+.footer-btn:active { transform: scale(0.97); }
+.footer-btn i      { font-size: 14px; width: 16px; text-align: center; flex-shrink: 0; }
+.footer-btn.yellow { border-color: rgba(245,197,24,0.3); color: var(--yellow); }
+.footer-btn.yellow:hover { background: rgba(245,197,24,0.1); border-color: rgba(245,197,24,0.6); }
+.footer-btn.green  { border-color: rgba(29,184,122,0.3); color: var(--green); }
+.footer-btn.green:hover  { background: rgba(29,184,122,0.1); border-color: rgba(29,184,122,0.6); }
+.footer-btn.blue   { border-color: rgba(59,130,246,0.3); color: #60a5fa; }
+.footer-btn.blue:hover   { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.6); }
+.footer-btn.purple { border-color: rgba(130,80,220,0.3); color: #a78bfa; }
+.footer-btn.purple:hover { background: rgba(130,80,220,0.1); border-color: rgba(130,80,220,0.6); }
+.footer-btn.cyan   { border-color: rgba(0,200,160,0.3); color: var(--teal); }
+.footer-btn.cyan:hover   { background: rgba(0,200,160,0.1); border-color: rgba(0,200,160,0.6); }
+.footer-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 4px auto 20px;
+    max-width: 520px;
+}
+.footer-copy {
+    text-align:  center;
+    font-size:   11px;
+    color:       var(--gray);
+    margin-top:  8px;
+}
+/* =====================================================
+   MODAL LEGAL / AIDE (shared inner style)
+   ===================================================== */
+.modal-legal {
     display:         none;
     position:        fixed;
     inset:           0;
@@ -780,36 +960,73 @@ button, select, input { font-family: var(--font); }
     justify-content: center;
     padding:         20px;
 }
-.modal-large-box {
-    background:    #1a1a1a;
+.modal-legal-box {
+    background:    var(--bg-card);
     width:         100%;
-    max-width:     500px;
+    max-width:     550px;
     max-height:    85vh;
     border-radius: 20px;
     padding:       25px;
     position:      relative;
     display:       flex;
-    flex-direction:column;
+    flex-direction: column;
     border:        1px solid #333;
+    box-shadow:    0 10px 30px rgba(0,0,0,0.5);
 }
-
-/* =====================================================
-   FOOTER
-   ===================================================== */
-.app-footer {
-    display:       none;   /* shown via JS */
-    margin-top:    50px;
-    padding:       40px 20px;
-    border-top:    1px solid #222;
+.modal-legal-title {
+    color:         white;
+    margin:        0;
+    border-bottom: 1px solid #222;
+    padding-bottom: 15px;
+    font-size:     18px;
     text-align:    center;
-    background:    #0e101a;
+    font-family:   'Exo 2', sans-serif;
 }
+.modal-legal-body {
+    overflow-y:  auto;
+    color:       #7a8299;
+    font-size:   13px;
+    line-height: 1.6;
+    padding-right: 10px;
+    margin:      15px 0;
+    text-align:  left;
+    font-family: sans-serif;
+}
+.modal-legal-body h3 {
+    color:          var(--yellow);
+    font-size:      14px;
+    margin-top:     20px;
+    font-family:    'Rajdhani', sans-serif;
+    text-transform: uppercase;
+}
+.modal-legal-body strong { color: #fff; }
+.modal-legal-body p  { margin: 8px 0; }
+.modal-legal-body hr { border: 0; border-top: 1px solid #222; margin: 20px 0; }
+.modal-legal-btn {
+    background:     var(--yellow);
+    color:          #13151e;
+    border:         none;
+    padding:        12px;
+    border-radius:  10px;
+    cursor:         pointer;
+    font-weight:    800;
+    width:          100%;
+    font-family:    'Exo 2', sans-serif;
+    transition:     background 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size:      14px;
+    margin-top:     4px;
+}
+.modal-legal-btn:hover { background: #ffd62e; }
 
 /* =====================================================
    UTILITIES
    ===================================================== */
 .hidden { display: none !important; }
+
 #page-home    { display: block; }
+#page-history { display: none;  }
 </style>
 </head>
 <body>
@@ -891,14 +1108,14 @@ button, select, input { font-family: var(--font); }
                 <i class="fa-solid fa-plus"></i>
             </div>
             <div class="header-icon-btn" onclick="showPage('history')" title="Historique">
-                <i class="fa-regular fa-clock-rotate-left"></i>
+                <i class="fa-regular fa-envelope"></i>
             </div>
             <div class="header-icon-btn" onclick="toggleNotif()" title="Notifications">
                 <i class="fa-solid fa-bell"></i>
                 <span id="notif-count" class="notif-badge" style="display:none;">0</span>
             </div>
             <img id="header-avatar"
-                 src="https://placehold.co/35x35/1a1d2e/00c8a0?text=TC"
+                 src="https://via.placeholder.com/35"
                  class="header-avatar"
                  onclick="openProfile()"
                  alt="Avatar">
@@ -918,7 +1135,7 @@ button, select, input { font-family: var(--font); }
 
 <div class="sidebar" id="sidebar">
     <div class="sidebar-profile">
-        <img id="side-avatar" src="https://placehold.co/50x50/1a1d2e/00c8a0?text=TC" class="sidebar-avatar" alt="">
+        <img id="side-avatar" src="https://via.placeholder.com/50" class="sidebar-avatar" alt="">
         <div>
             <div id="side-full-name" class="sidebar-name">Chargement...</div>
             <div id="side-tk-id"     class="sidebar-id">ID: TK-0000</div>
@@ -928,10 +1145,10 @@ button, select, input { font-family: var(--font); }
     <div class="sidebar-item" onclick="showPage('history'); toggleSidebar();">
         <i class="fa-solid fa-clock-rotate-left"></i> Historique
     </div>
-    <div class="sidebar-item" onclick="openMobile('Dépôt'); toggleSidebar();">
+    <div class="sidebar-item" onclick="openMobile('Dépôt')">
         <i class="fa-solid fa-arrow-down-to-line"></i> Dépôt Mobile
     </div>
-    <div class="sidebar-item" onclick="openMobile('Retrait'); toggleSidebar();">
+    <div class="sidebar-item" onclick="openMobile('Retrait')">
         <i class="fa-solid fa-arrow-up-from-line"></i> Retrait Mobile
     </div>
     <div class="sidebar-item danger" onclick="logout()">
@@ -980,7 +1197,7 @@ button, select, input { font-family: var(--font); }
                 <div class="svc-icon-wrap green"><i class="fa-solid fa-wallet"></i></div>
                 <div class="svc-text">
                     <div class="svc-title">Porte-feuille</div>
-                    <div class="svc-sub">PayPal / Skrill / Neteller</div>
+                    <div class="svc-sub">PayPal / Skrill / Nete...</div>
                 </div>
             </div>
             <div class="service-item" id="btn-betting" onclick="selectCategory('betting')">
@@ -994,7 +1211,7 @@ button, select, input { font-family: var(--font); }
                 <div class="svc-icon-wrap purple"><i class="fa-solid fa-satellite-dish"></i></div>
                 <div class="svc-text">
                     <div class="svc-title">Abonnement</div>
-                    <div class="svc-sub">Netflix / Canal / Spotify...</div>
+                    <div class="svc-sub">Netflix / Canal / Starlink...</div>
                 </div>
             </div>
         </div>
@@ -1020,7 +1237,7 @@ button, select, input { font-family: var(--font); }
                             <img id="asset-img"
                                  src="https://cryptologos.cc/logos/tron-trx-logo.svg"
                                  style="width:22px;height:22px;object-fit:contain;">
-                            <select id="crypto-select" onchange="updateIcon()">
+                            <select id="crypto-select" onchange="updateIcon();">
                                 <option value="TRX">TRX</option>
                             </select>
                             <i class="fa-solid fa-chevron-down" style="color:var(--gray);font-size:11px;pointer-events:none;"></i>
@@ -1039,14 +1256,14 @@ button, select, input { font-family: var(--font); }
                 <!-- Address -->
                 <div class="form-group" style="margin-bottom:14px;">
                     <label class="form-label" id="label-addr">Adresse crypto destinataire :</label>
-                    <div class="addr-wrap">
+                    <div class="addr-wrap" style="margin-bottom:0;">
                         <input type="text" id="input-addr" placeholder="Entrer l'adresse">
                         <i class="fa-solid fa-copy" id="copy-btn" onclick="copyText()"></i>
                     </div>
                 </div>
 
                 <!-- Equivalent -->
-                <div id="calc-container" class="equiv-row" style="display:none;">
+                <div id="calc-container" class="equiv-row">
                     <span class="equiv-label">Équivalent crypto</span>
                     <span id="calc-res">0.00 TRX</span>
                 </div>
@@ -1058,15 +1275,14 @@ button, select, input { font-family: var(--font); }
                 </div>
 
                 <!-- Conditions -->
-                <div class="conditions-row">
-                    <input type="checkbox" id="check-conditions">
-                    <label for="check-conditions">
-                        J'accepte les <a onclick="showTerms()">Conditions d'Utilisation &amp; Confidentialité</a>.
-                    </label>
-                </div>
+                <div style="display:flex; align-items:flex-start; gap:10px; margin-top:20px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px;">
+    <input type="checkbox" id="check-conditions" style="width:18px; height:18px; cursor:pointer;">
+    <label for="check-conditions" style="font-size:12px; color:#aaa; cursor:pointer; line-height:1.4;">
+        J'accepte les <span onclick="openConditionsModal()" style="color:#f5c518; text-decoration:underline; font-weight:bold;">Conditions d'Utilisation</span> &amp; la <span onclick="openPolitiqueModal()" style="color:#f5c518; text-decoration:underline; font-weight:bold;">Politique de Confidentialité</span> de TakaloCash.
+    </label>
+</div>
 
-                <!-- FIX: button text updated dynamically by switchAction() -->
-                <button class="btn-submit" id="btn-submit" onclick="handleTransaction()">Valider Envoi</button>
+                <button class="btn-submit" onclick="handleTransaction()">Valider Envoi</button>
 
             </div><!-- /.trans-body -->
         </div><!-- /.trans-box -->
@@ -1127,61 +1343,97 @@ button, select, input { font-family: var(--font); }
 <!-- ========================================
      FOOTER
      ======================================== -->
-<footer class="app-footer" id="app-footer">
+<footer class="app-footer" id="app-footer" style="display:none;">
 
-    <div style="display:flex; justify-content:center; gap:15px; margin-bottom:25px;">
-        <a href="mailto:contact@takalocash.com" title="Email"
-           style="width:45px;height:45px;border-radius:50%;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;border:1px solid #333;">
-            <i class="fas fa-envelope" style="font-size:18px; color:#f39c12;"></i>
-        </a>
-        <a href="https://t.me/TakaloCash" target="_blank" title="Telegram"
-           style="width:45px;height:45px;border-radius:50%;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;border:1px solid #333;">
-            <i class="fab fa-telegram-plane" style="font-size:18px; color:#0088cc;"></i>
-        </a>
-        <a href="https://facebook.com/TakaloCash" target="_blank" title="Facebook"
-           style="width:45px;height:45px;border-radius:50%;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;border:1px solid #333;">
-            <i class="fab fa-facebook-f" style="font-size:18px; color:#1877f2;"></i>
-        </a>
-        <a href="https://wa.me/2613XXXXXXXX" target="_blank" title="WhatsApp"
-           style="width:45px;height:45px;border-radius:50%;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;border:1px solid #333;">
-            <i class="fab fa-whatsapp" style="font-size:18px; color:#25d366;"></i>
+    <!-- Légal -->
+    <p class="footer-section-title">⚖️ Légal</p>
+    <div class="footer-btn-group">
+        <button class="footer-btn yellow" onclick="openConditionsModal()">
+            <i class="fa-regular fa-file-lines"></i> Conditions d'utilisation
+        </button>
+        <button class="footer-btn yellow" onclick="openPolitiqueModal()">
+            <i class="fa-solid fa-shield-halved"></i> Politique de confidentialité
+        </button>
+    </div>
+
+    <hr class="footer-divider">
+
+    <!-- Aide -->
+    <p class="footer-section-title">🛟 Aide & Support</p>
+    <div class="footer-btn-group">
+        <button class="footer-btn cyan" onclick="openHelpModal()">
+            <i class="fa-solid fa-headset"></i> Centre d'aide
+        </button>
+        <a class="footer-btn purple" href="https://www.facebook.com/TakaloCash-Service" target="_blank">
+            <i class="fa-brands fa-facebook-messenger"></i> Discussion
         </a>
     </div>
 
-    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:20px; margin-bottom:25px;">
-        <span onclick="document.getElementById('modal-help').style.display='flex'"
-              style="cursor:pointer; color:#7a8299; font-size:12px; display:flex; align-items:center; gap:5px;">
-            <i class="fas fa-life-ring"></i> Centre d'aide
-        </span>
-        <span onclick="window.open('https://wa.me/2613XXXXXXXX')"
-              style="cursor:pointer; color:#7a8299; font-size:12px; display:flex; align-items:center; gap:5px;">
-            <i class="fas fa-comments"></i> Discussion
-        </span>
-        <span onclick="showTerms()"
-              style="cursor:pointer; color:#7a8299; font-size:12px; display:flex; align-items:center; gap:5px;">
-            <i class="fas fa-file-contract"></i> Conditions
-        </span>
-        <span onclick="showTerms()"
-              style="cursor:pointer; color:#7a8299; font-size:12px; display:flex; align-items:center; gap:5px;">
-            <i class="fas fa-user-shield"></i> Confidentialité
-        </span>
+    <hr class="footer-divider">
+
+    <!-- Contact -->
+    <p class="footer-section-title">📬 Contact</p>
+    <div class="footer-btn-group">
+        <a class="footer-btn" href="mailto:takalocash@gmail.com">
+            <i class="fa-regular fa-envelope"></i> takalocash@gmail.com
+        </a>
+        <a class="footer-btn green" href="https://wa.me/261347451051" target="_blank">
+            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+        </a>
     </div>
 
-    <div style="border-top:1px solid #1a1d2e; padding-top:20px;">
-        <p style="color:#444; font-size:10px; margin:0; letter-spacing:0.5px;">
-            &copy; 2026 TAKALOCASH PREMIUM. TOUS DROITS RÉSERVÉS.<br>
-            <span style="color:#222; font-size:9px; margin-top:5px; display:block;">SECURED BY BLOCKCHAIN TECHNOLOGY &amp; SUPABASE</span>
+    <hr class="footer-divider">
+
+    <!-- Réseaux sociaux -->
+    <p class="footer-section-title">🌐 Suivez-nous</p>
+    <div class="footer-btn-group">
+        <a class="footer-btn blue" href="https://www.facebook.com/TakaloCash-Service" target="_blank">
+            <i class="fa-brands fa-facebook-f"></i> Facebook
+        </a>
+        <a class="footer-btn" href="https://t.me/TakaloCashService" target="_blank">
+            <i class="fa-brands fa-telegram"></i> Telegram
+        </a>
+    </div>
+
+    <p class="footer-copy">© 2026 TakaloCash · Tous droits réservés</p>
+
+</footer>
+
+
+<!-- ========================================
+     PROFILE MODAL
+     ======================================== -->
+<div id="modal-profile" class="modal">
+    <div class="modal-box">
+        <h3 class="modal-title">Paramètres du profil</h3>
+        <div style="position:relative; display:inline-block; margin-bottom:20px;">
+            <img id="modal-pp-view" src="https://via.placeholder.com/100"
+                 style="width:90px; height:90px; border-radius:50%;
+                        border:3px solid var(--yellow); object-fit:cover;">
+            <label for="file-pp"
+                   style="position:absolute; bottom:3px; right:0; background:var(--yellow);
+                          color:#13151e; width:28px; height:28px; border-radius:50%;
+                          display:flex; align-items:center; justify-content:center;
+                          cursor:pointer; border:2px solid var(--bg-card);">
+                <i class="fa-solid fa-camera" style="font-size:12px;"></i>
+            </label>
+            <input type="file" id="file-pp" accept="image/*" style="display:none;"
+                   onchange="previewImage(this)">
+        </div>
+        <div style="text-align:left;">
+            <label class="form-label" style="display:block;margin-bottom:4px;">Nom complet :</label>
+            <input type="text" id="edit-full-name" class="styled-input" style="margin-top:0; margin-bottom:12px;">
+            <label class="form-label" style="display:block;margin-bottom:4px;">Téléphone :</label>
+            <input type="tel"  id="edit-phone"     class="styled-input" style="margin-top:0;">
+        </div>
+        <button class="btn-valider" onclick="updateProfile()">Enregistrer</button>
+        <p onclick="closeProfile()"
+           style="text-align:center; cursor:pointer; color:var(--gray);
+                  margin-top:14px; font-size:13px;">
+            Fermer
         </p>
     </div>
-
-    <!-- WhatsApp floating button -->
-    <div style="position:fixed; bottom:20px; right:20px; z-index:999;">
-        <a href="https://wa.me/2613XXXXXXXX" target="_blank"
-           style="background:#25d366; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 5px 15px rgba(0,0,0,0.3);">
-            <i class="fab fa-whatsapp" style="font-size:30px;"></i>
-        </a>
-    </div>
-</footer>
+</div>
 
 
 <!-- ========================================
@@ -1197,116 +1449,138 @@ button, select, input { font-family: var(--font); }
     <div id="notif-list"></div>
 </div>
 
-
 <!-- ========================================
-     PROFILE MODAL
+     MODAL — CONDITIONS D'UTILISATION
      ======================================== -->
-<div id="modal-profile" class="modal">
-    <div class="modal-box">
-        <h3 class="modal-title">Paramètres du profil</h3>
-        <div style="position:relative; display:inline-block; margin-bottom:20px;">
-            <img id="modal-pp-view" src="https://placehold.co/100x100/1a1d2e/00c8a0?text=TC"
-                 style="width:90px; height:90px; border-radius:50%; border:3px solid var(--yellow); object-fit:cover;">
-            <label for="file-pp"
-                   style="position:absolute; bottom:3px; right:0; background:var(--yellow); color:#13151e;
-                          width:28px; height:28px; border-radius:50%; display:flex; align-items:center;
-                          justify-content:center; cursor:pointer; border:2px solid var(--bg-card);">
-                <i class="fa-solid fa-camera" style="font-size:12px;"></i>
-            </label>
-            <input type="file" id="file-pp" accept="image/*" style="display:none;" onchange="previewImage(this)">
+<div id="modal-conditions" class="modal-legal" style="display:none;">
+    <div class="modal-legal-box">
+        <h2 class="modal-legal-title">Conditions d'Utilisation</h2>
+        <div class="modal-legal-body">
+            <p style="color:#aaa; font-style:italic; font-size:11px; margin-bottom:20px;">Dernière mise à jour : Mai 2026</p>
+            <p style="color:#ccc;">Bienvenue sur <strong>TakaloCash</strong>. En accédant à notre plateforme et en utilisant nos services, vous acceptez sans réserve les présentes Conditions d'Utilisation. Veuillez les lire attentivement.</p>
+            <h3 style="margin-top:20px;">1. Objet du Service</h3>
+            <p>TakaloCash est une plateforme technologique d'échange et de transfert agissant comme intermédiaire indépendant. Nous facilitons les transactions entre les systèmes de monnaies électroniques (Mobile Money), les actifs numériques (Crypto-monnaies) et les recharges de plateformes de paris sportifs partenaires. TakaloCash n'est ni une banque, ni un émetteur de monnaie électronique direct.</p>
+            <h3>2. Éligibilité et Propriété du Compte</h3>
+            <p>L'accès aux services est réservé aux personnes physiques majeures. Vous vous engagez à fournir des informations exactes et réelles lors de votre inscription. Votre compte est strictement personnel : vous êtes l'unique responsable de la confidentialité de vos identifiants et de toutes les activités générées par votre compte.</p>
+            <h3>3. Exécution des Transactions</h3>
+            <p><strong>A. Irréversibilité :</strong> En raison de la nature des réseaux Blockchain et des transferts mobiles, toute transaction validée et confirmée par l'utilisateur est <strong>définitive et irréversible</strong>. Aucune annulation ou remboursement ne pourra être effectué après traitement.</p>
+            <p><strong>B. Responsabilité des adresses :</strong> L'utilisateur est seul responsable de l'exactitude des coordonnées de destination fournies (Adresse de Wallet Crypto, numéro Mobile Money, ou ID Betting). TakaloCash décline toute responsabilité en cas de perte de fonds due à une erreur de saisie de l'utilisateur.</p>
+            <p><strong>C. Délais de traitement :</strong> Les transactions sont généralement traitées dans un délai de 15 minutes à 2 heures. Ce délai peut être prolongé en cas de saturation des réseaux blockchain ou de congestion des réseaux de télécommunication.</p>
+            <h3>4. Frais de Service</h3>
+            <p>Des frais de service sont applicables à chaque transaction. Ces frais sont calculés automatiquement et affichés clairement dans le résumé avant la confirmation. Aucun frais caché ne sera appliqué après validation.</p>
+            <h3>5. Interdictions et Lutte contre la Fraude</h3>
+            <p>L'utilisation de TakaloCash pour des activités illicites (blanchiment d'argent, financement du terrorisme, escroquerie, recel) est strictement interdite et constitue une infraction pénale. Tout comportement suspect entraînera le blocage immédiat et définitif du compte utilisateur et un signalement aux autorités compétentes.</p>
+            <h3>6. Modifications des Conditions</h3>
+            <p>TakaloCash se réserve le droit de modifier les présentes conditions à tout moment. Les utilisateurs seront notifiés de tout changement significatif. L'utilisation continue du service après notification vaut acceptation des nouvelles conditions.</p>
         </div>
-        <div style="text-align:left;">
-            <label class="form-label" style="display:block; margin-bottom:4px;">Nom complet :</label>
-            <input type="text" id="edit-full-name" class="styled-input" style="margin-top:0; margin-bottom:12px;">
-            <label class="form-label" style="display:block; margin-bottom:4px;">Téléphone :</label>
-            <input type="tel"  id="edit-phone"     class="styled-input" style="margin-top:0;">
-        </div>
-        <button class="btn-valider" onclick="updateProfile()">Enregistrer</button>
-        <p onclick="closeProfile()"
-           style="text-align:center; cursor:pointer; color:var(--gray); margin-top:14px; font-size:13px;">
-            Fermer
-        </p>
+        <button class="modal-legal-btn" onclick="closeConditionsModal()">J'ai compris et j'accepte</button>
     </div>
 </div>
 
+<!-- ========================================
+     MODAL — POLITIQUE DE CONFIDENTIALITÉ
+     ======================================== -->
+<div id="modal-politique" class="modal-legal" style="display:none;">
+    <div class="modal-legal-box">
+        <h2 class="modal-legal-title">Politique de Confidentialité</h2>
+        <div class="modal-legal-body">
+            <p style="color:#aaa; font-style:italic; font-size:11px; margin-bottom:20px;">Dernière mise à jour : Mai 2026</p>
+            <p style="color:#ccc;">TakaloCash s'engage à protéger la vie privée de ses utilisateurs. La présente politique décrit la manière dont nous collectons, utilisons et protégeons vos données personnelles.</p>
+            <h3 style="margin-top:20px;">1. Collecte des Données</h3>
+            <p>Pour assurer la sécurité et le bon fonctionnement de vos échanges, nous collectons uniquement les données strictement nécessaires :</p>
+            <p>• Votre <strong>Nom complet</strong> et <strong>Numéro de téléphone</strong> (pour les liaisons Mobile Money)</p>
+            <p>• Vos <strong>Adresses de Portefeuilles</strong> (Wallet Crypto) et <strong>ID de comptes de paris</strong></p>
+            <p>• L'<strong>Historique de vos transactions</strong> sur la plateforme</p>
+            <p>• Votre <strong>Adresse email</strong> liée à votre compte TakaloCash</p>
+            <h3>2. Utilisation des Données</h3>
+            <p>Vos informations personnelles sont exclusivement utilisées pour :</p>
+            <p>• Traiter vos demandes d'échange et de transfert</p>
+            <p>• Optimiser le support client et la résolution de litiges</p>
+            <p>• Assurer la sécurité et prévenir la fraude sur la plateforme</p>
+            <p>• Vous envoyer des notifications relatives à vos transactions</p>
+            <h3>3. Non-Partage des Données</h3>
+            <p>TakaloCash s'engage formellement à <strong>ne jamais vendre, louer ou partager</strong> vos données avec des tiers à des fins commerciales. Vos informations ne seront transmises à des tiers que si la loi l'exige (réquisition judiciaire).</p>
+            <h3>4. Sécurité de l'Infrastructure</h3>
+            <p>Vos données sont stockées de manière hautement sécurisée via l'infrastructure <strong>Supabase</strong>. Grâce au protocole <strong>Row Level Security (RLS)</strong>, vous êtes le seul utilisateur autorisé à accéder à l'historique complet de vos données financières privées. Les communications sont chiffrées via le protocole TLS/HTTPS.</p>
+            <h3>5. Vos Droits (RGPD)</h3>
+            <p>Conformément à la réglementation applicable, vous disposez des droits suivants :</p>
+            <p>• <strong>Droit d'accès</strong> : consulter l'ensemble de vos données personnelles</p>
+            <p>• <strong>Droit de rectification</strong> : corriger des informations inexactes</p>
+            <p>• <strong>Droit à l'effacement</strong> : demander la suppression définitive de vos données</p>
+            <p>Pour exercer ces droits, contactez-nous à <strong>takalocash@gmail.com</strong> ou fermez votre compte depuis les paramètres.</p>
+        </div>
+        <button class="modal-legal-btn" onclick="closePolitiqueModal()">J'ai compris</button>
+    </div>
+</div>
 
 <!-- ========================================
-     HELP MODAL
+     MODAL — CENTRE D'AIDE
      ======================================== -->
-<div id="modal-help" class="modal-large">
-    <div class="modal-large-box">
-        <h2 style="color:white; font-size:18px; text-align:center; margin-top:0;">Centre d'Aide &amp; Support</h2>
+<div id="modal-help" class="modal-legal" style="display:none;">
+    <div class="modal-legal-box">
+        <h2 class="modal-legal-title">Centre d'Aide &amp; FAQ</h2>
+        <div class="modal-legal-body">
+            <p style="color:#7a8299; font-size:13px; margin-bottom:20px; text-align:center;">Retrouvez les réponses aux questions les plus fréquentes pour vous guider dans vos échanges.</p>
 
-        <div style="overflow-y:auto; margin:15px 0; padding-right:10px;">
-            <div style="margin-bottom:20px;">
-                <h3 style="color:#f39c12; font-size:14px;">Questions Fréquentes</h3>
-                <details style="color:#ccc; font-size:12px; margin-bottom:10px; background:#252525; padding:10px; border-radius:8px;">
-                    <summary style="cursor:pointer; font-weight:bold;">Délais de transaction</summary>
-                    <p style="margin-top:5px;">Le traitement prend généralement entre 15 min et 2 heures.</p>
-                </details>
-                <details style="color:#ccc; font-size:12px; margin-bottom:10px; background:#252525; padding:10px; border-radius:8px;">
-                    <summary style="cursor:pointer; font-weight:bold;">Sécurité des fonds</summary>
-                    <p style="margin-top:5px;">Vos fonds sont sécurisés via nos protocoles de vérification manuelle et automatique.</p>
-                </details>
-            </div>
+            <details style="background:#0e101a; border:1px solid #222; border-radius:10px; padding:12px; margin-bottom:12px;">
+                <summary style="color:#fff; font-size:13px; font-weight:bold; cursor:pointer;">💡 Comment effectuer un échange sur TakaloCash ?</summary>
+                <p style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">
+                    C'est simple :<br>
+                    1. Choisissez le mode (Crypto, Wallet ou Betting) et l'actif (USDT, Mvola, 1XBet...).<br>
+                    2. Sélectionnez l'action (Envoyer ou Recevoir).<br>
+                    3. Saisissez le montant et l'adresse de destination (Wallet ou ID).<br>
+                    4. Cochez la case d'acceptation des conditions et validez l'opération.
+                </p>
+            </details>
 
-            <div style="text-align:center; padding:15px; background:rgba(243,156,18,0.1); border:1px dashed #f39c12; border-radius:10px;">
-                <p style="color:white; font-size:13px; margin-bottom:10px;">Besoin d'une discussion en direct ?</p>
-                <a href="https://wa.me/2613XXXXXXXX"
-                   style="display:inline-block; background:#25d366; color:white; padding:10px 20px; border-radius:8px; font-weight:bold; font-size:13px;">
-                    WhatsApp Support
+            <details style="background:#0e101a; border:1px solid #222; border-radius:10px; padding:12px; margin-bottom:12px;">
+                <summary style="color:#fff; font-size:13px; font-weight:bold; cursor:pointer;">🕒 Quels sont les délais de traitement ?</summary>
+                <p style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">
+                    Le traitement d'une transaction prend généralement entre <strong>15 minutes et 2 heures</strong>. Ce délai dépend de la rapidité de validation sur la Blockchain ou de la stabilité des réseaux de télécommunication mobiles (Mobile Money).
+                </p>
+            </details>
+
+            <details style="background:#0e101a; border:1px solid #222; border-radius:10px; padding:12px; margin-bottom:12px;">
+                <summary style="color:#fff; font-size:13px; font-weight:bold; cursor:pointer;">⚠️ Que faire si je me suis trompé d'adresse ou d'ID ?</summary>
+                <p style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">
+                    En raison de la nature irréversible de la Blockchain et des transferts monétaires, <strong>aucune modification ou annulation n'est possible</strong> une fois la transaction validée. Veuillez toujours revérifier vos coordonnées avant de confirmer.
+                </p>
+            </details>
+
+            <details style="background:#0e101a; border:1px solid #222; border-radius:10px; padding:12px; margin-bottom:12px;">
+                <summary style="color:#fff; font-size:13px; font-weight:bold; cursor:pointer;">💵 Comment sont calculés les frais ?</summary>
+                <p style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">
+                    Les frais dépendent de l'actif choisi et des frais de réseau du moment. Ils sont calculés automatiquement et s'affichent clairement dans le résumé avant que vous ne cliquiez sur le bouton de confirmation. Il n'y a aucun frais caché.
+                </p>
+            </details>
+
+            <details style="background:#0e101a; border:1px solid #222; border-radius:10px; padding:12px; margin-bottom:12px;">
+                <summary style="color:#fff; font-size:13px; font-weight:bold; cursor:pointer;">🔒 Mes données et mes fonds sont-ils sécurisés ?</summary>
+                <p style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">
+                    Oui, absolument. Nous utilisons l'infrastructure Supabase sécurisée avec le protocole RLS (Row Level Security). Vos informations de transaction sont chiffrées et vous êtes le seul à pouvoir consulter votre historique personnel.
+                </p>
+            </details>
+
+            <div style="margin-top:20px; padding:15px; background:rgba(245,197,24,0.05); border:1px dashed var(--yellow); border-radius:12px; text-align:center;">
+                <p style="color:#fff; font-size:12px; margin:0 0 10px 0;">Vous ne trouvez pas de réponse à votre problème ?</p>
+                <a href="https://wa.me/261347451051" target="_blank" style="color:var(--yellow); text-decoration:none; font-size:13px; font-weight:bold;">
+                    <i class="fa-brands fa-whatsapp"></i>&nbsp; Contacter le Support en Direct
                 </a>
             </div>
         </div>
-
-        <button onclick="document.getElementById('modal-help').style.display='none'"
-                style="background:#333; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; width:100%; margin-top:10px;">
-            Fermer
-        </button>
+        <button class="modal-legal-btn" onclick="closeHelpModal()">Fermer</button>
     </div>
 </div>
-
-
 <!-- ========================================
-     TERMS MODAL
-     ======================================== -->
-<div id="modal-terms" class="modal-large">
-    <div class="modal-large-box">
-        <h2 style="color:white; margin-top:0; border-bottom:1px solid #333; padding-bottom:15px; font-size:18px; text-align:center;">
-            Conditions &amp; Confidentialité
-        </h2>
-
-        <div style="overflow-y:auto; color:#ccc; font-size:13px; line-height:1.6; padding-right:10px; margin:15px 0; text-align:left;">
-            <h3 style="color:#f39c12; font-size:14px;">1. Conditions d'Utilisation</h3>
-            <p><strong>Nature du Service :</strong> TakaloCash est une plateforme intermédiaire d'échange de monnaies électroniques, crypto-monnaies (TRX, USDT) et recharges betting. Nous ne sommes pas une institution bancaire.</p>
-            <p><strong>Responsabilité :</strong> Vous êtes responsable de l'exactitude des informations fournies. Toute erreur d'adresse de destination (Wallet/ID) est irréversible.</p>
-            <p><strong>Délais :</strong> Les transactions sont traitées entre 15 min et 2 heures selon la validation du réseau.</p>
-            <p><strong>Sécurité :</strong> L'usage du service pour fraude ou blanchiment entraînera un blocage immédiat.</p>
-
-            <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
-
-            <h3 style="color:#f39c12; font-size:14px;">2. Politique de Confidentialité</h3>
-            <p><strong>Données :</strong> Nous collectons votre Nom, Téléphone, et Historique pour le bon fonctionnement de vos échanges.</p>
-            <p><strong>Partage :</strong> Vos informations ne sont jamais partagées avec des tiers à des fins commerciales.</p>
-            <p><strong>Protection :</strong> Nous utilisons Supabase RLS pour garantir la sécurité de vos données privées.</p>
-        </div>
-
-        <button onclick="closeTermsModal()"
-                style="background:#f39c12; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold; width:100%;">
-            J'ai compris et j'accepte
-        </button>
-    </div>
-</div>
-
-
-<!-- ========================================
-     JAVASCRIPT
+     JAVASCRIPT — all logic preserved exactly
      ======================================== -->
 <script>
 
 // =========================================================
-// CONFIG
+// CONFIG  (merged from config.js)
 // =========================================================
+let USD_TO_MGA = 4700;
+
 const CURRENT_TAUX = {
     TRX: 600, USDT: 4700, BNB: 1800000, BTC: 280000000,
     PAYPAL: 4700, SKRILL: 4700, NETELLER: 4700,
@@ -1330,9 +1604,9 @@ const ASSETS_DATA = {
     crypto: {
         label: "Adresse crypto destinataire :", allowRecevoir: true,
         items: [
-            { val:"TRX",  txt:"TRX (TRC20)",   frais:0.05, logo:"https://cryptologos.cc/logos/tron-trx-logo.svg" },
-            { val:"USDT", txt:"USDT (TRC20)",  frais:0.03, logo:"https://cryptologos.cc/logos/tether-usdt-logo.svg" },
-            { val:"BNB",  txt:"BNB (BEP20)",   frais:0.05, logo:"https://cryptologos.cc/logos/bnb-bnb-logo.svg" },
+            { val:"TRX",  txt:"TRX (TRC20)",  frais:0.05, logo:"https://cryptologos.cc/logos/tron-trx-logo.svg" },
+            { val:"USDT", txt:"USDT (TRC20)", frais:0.03, logo:"https://cryptologos.cc/logos/tether-usdt-logo.svg" },
+            { val:"BNB",  txt:"BNB (BEP20)",  frais:0.05, logo:"https://cryptologos.cc/logos/bnb-bnb-logo.svg" },
             { val:"BTC",  txt:"Bitcoin (BTC)", frais:0.04, logo:"https://cryptologos.cc/logos/bitcoin-btc-logo.svg" }
         ]
     },
@@ -1363,11 +1637,12 @@ const ASSETS_DATA = {
     }
 };
 
+// Title map (updated to match screenshot language)
 const TITLE_MAP = {
-    crypto:     { Envoyer:"Crypto",         Recevoir:"Crypto"         },
-    wallet:     { Envoyer:"Porte-feuille",  Recevoir:"Porte-feuille"  },
-    betting:    { Envoyer:"Paris sportifs", Recevoir:"Paris sportifs" },
-    abonnement: { Envoyer:"Abonnement",     Recevoir:"Abonnement"     }
+    crypto:     { Envoyer:"Crypto",          Recevoir:"Crypto"          },
+    wallet:     { Envoyer:"Porte-feuille",   Recevoir:"Porte-feuille"   },
+    betting:    { Envoyer:"Paris sportifs",  Recevoir:"Paris sportifs"  },
+    abonnement: { Envoyer:"Abonnement",      Recevoir:"Abonnement"      }
 };
 
 // =========================================================
@@ -1387,7 +1662,7 @@ let currentMode     = 'crypto';
 let currentAction   = 'Envoyer';
 
 // =========================================================
-// RATES
+// CONFIG HELPERS
 // =========================================================
 async function updateTaux() {
     try {
@@ -1454,7 +1729,7 @@ async function handleLogin() {
     const pass  = document.getElementById('login-pass').value;
     if (!email || !pass) return alert("Veuillez entrer votre email et mot de passe.");
     const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-    if (error) alert("Email ou mot de passe incorrect.");
+    if (error) return alert("Email ou mot de passe incorrect.");
     // onAuthStateChange handles initApp()
 }
 
@@ -1474,9 +1749,8 @@ async function initApp() {
     if (!user) return;
     currentUserId = user.id;
 
-    // FIX: use 'flex' for header (flex container) and 'block' for the others
     document.getElementById('auth-container').style.display = 'none';
-    document.getElementById('nav-header').style.display     = 'flex';
+    document.getElementById('nav-header').style.display     = 'block';
     document.getElementById('main-app').style.display       = 'block';
     document.getElementById('app-footer').style.display     = 'block';
 
@@ -1497,9 +1771,8 @@ async function fetchData() {
         document.getElementById('form-solde-hint').innerText = solde;
         document.getElementById('side-full-name').innerText  = u.full_name || '';
         document.getElementById('side-tk-id').innerText      = "ID: " + (u.tk_id || '');
-        const avatarUrl = u.avatar_url || "https://placehold.co/35x35/1a1d2e/00c8a0?text=TC";
-        document.getElementById('header-avatar').src         = avatarUrl;
-        document.getElementById('side-avatar').src           = u.avatar_url || "https://placehold.co/50x50/1a1d2e/00c8a0?text=TC";
+        document.getElementById('header-avatar').src         = u.avatar_url || "https://via.placeholder.com/35";
+        document.getElementById('side-avatar').src           = u.avatar_url || "https://via.placeholder.com/50";
     }
     const { data: ts, error: tErr } = await supabaseClient
         .from('transactions').select('*').eq('user_id', currentUserId)
@@ -1536,11 +1809,12 @@ function getCategoryBadge(t) {
 
 function generateHistRow(t) {
     try {
-        const dateStr = new Date(t.created_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' });
-        const label   = buildServiceLabel(t);
-        const amount  = buildAmount(t);
-        const isNeg   = isNegativeTransaction(t);
-        const badge   = getCategoryBadge(t);
+        const dateObj    = new Date(t.created_at);
+        const dateStr    = dateObj.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' });
+        const label      = buildServiceLabel(t);
+        const amount     = buildAmount(t);
+        const isNeg      = isNegativeTransaction(t);
+        const badge      = getCategoryBadge(t);
 
         let statusClass = 'pending', statusIcon = 'clock', statusLabel = 'En attente';
         if (t.status === 'confirmé') { statusClass = 'confirmed'; statusIcon = 'check'; statusLabel = 'Confirmé'; }
@@ -1549,7 +1823,12 @@ function generateHistRow(t) {
         return `
         <tr>
             <td class="hist-date">${dateStr}</td>
-            <td><div class="hist-svc-cell">${badge}<span class="hist-svc-name">${label}</span></div></td>
+            <td>
+                <div class="hist-svc-cell">
+                    ${badge}
+                    <span class="hist-svc-name">${label}</span>
+                </div>
+            </td>
             <td class="hist-type">${t.type || ''}</td>
             <td class="hist-amount ${isNeg ? 'negative' : 'positive'}">
                 ${isNeg ? '-' : '+'}${Number(amount).toLocaleString('fr-FR')} Ar
@@ -1582,7 +1861,8 @@ function renderHistory(dataToRender = allTransactions) {
     // Full history page
     if (fullContainer) {
         if (!dataToRender || dataToRender.length === 0) {
-            fullContainer.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray);font-size:13px;">Aucune transaction trouvée.</div>';
+            fullContainer.innerHTML =
+                '<div style="text-align:center;padding:40px;color:var(--gray);font-size:13px;">Aucune transaction trouvée.</div>';
             return;
         }
         const groups = dataToRender.reduce((acc, t) => {
@@ -1648,29 +1928,22 @@ function goToFullHistory() {
 function openMobile(mode) {
     currentMode   = mode;
     currentAction = mode;
-
-    // Close sidebar if open
     const sidebar = document.getElementById('sidebar');
     if (sidebar && sidebar.classList.contains('active')) {
         sidebar.classList.remove('active');
         document.getElementById('overlay').style.display = 'none';
     }
-
-    document.getElementById('trans-action-label').innerText          = mode;
-    document.getElementById('trans-title').innerText                 = "Mobile Money";
-    document.getElementById('crypto-select-container').style.display = 'none';
-    document.getElementById('label-right').innerText                 = "Montant (Ar) :";
-    document.getElementById('unit-suffix').innerText                 = "Ar";
-    document.getElementById('label-addr').innerText                  = "Numéro mobile (Airtel / Orange / MVola) :";
-    document.getElementById('input-addr').value                      = "";
-    document.getElementById('input-addr').readOnly                   = false;
-    document.getElementById('copy-btn').style.display                = 'none';
-    document.getElementById('calc-container').style.display          = 'none';
-    document.getElementById('frais-info').innerText                  = '';
-
-    // FIX: update submit button label
-    document.getElementById('btn-submit').innerText = mode === 'Dépôt' ? 'Valider Dépôt' : 'Valider Retrait';
-
+    document.getElementById('trans-action-label').innerText              = mode;
+    document.getElementById('trans-title').innerText                     = "Mobile Money";
+    document.getElementById('crypto-select-container').style.display     = 'none';
+    document.getElementById('label-right').innerText                     = "Montant (Ar) :";
+    document.getElementById('unit-suffix').innerText                     = "Ar";
+    document.getElementById('label-addr').innerText                      = "Numéro mobile (Airtel / Orange / MVola) :";
+    document.getElementById('input-addr').value                          = "";
+    document.getElementById('input-addr').readOnly                       = false;
+    document.getElementById('copy-btn').style.display                    = 'none';
+    document.getElementById('calc-container').style.display              = 'none';
+    document.getElementById('frais-info').innerText                      = '';
     document.querySelector('.trans-box').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -1688,7 +1961,7 @@ function selectCategory(category) {
 
     document.getElementById('crypto-select-container').style.display = 'block';
 
-    const cryptoSelect     = document.getElementById('crypto-select');
+    const cryptoSelect    = document.getElementById('crypto-select');
     cryptoSelect.innerHTML = data.items.map(i => `<option value="${i.val}">${i.txt}</option>`).join('');
     document.getElementById('label-addr').innerText = data.label;
 
@@ -1717,7 +1990,7 @@ function switchAction(action) {
     if (btnEnv) btnEnv.style.opacity = action === 'Envoyer'  ? '1' : '0.6';
     if (btnRec) btnRec.style.opacity = action === 'Recevoir' ? '1' : '0.6';
 
-    const modeData    = TITLE_MAP[currentMode] || {};
+    const modeData   = TITLE_MAP[currentMode] || {};
     const actionLabel = document.getElementById('trans-action-label');
     const modeLabel   = document.getElementById('trans-title');
     if (actionLabel) actionLabel.innerText = action === 'Envoyer' ? 'Envoyer' : 'Recevoir';
@@ -1733,7 +2006,6 @@ function switchAction(action) {
         labelRight.innerText = "Montant à envoyer (Ar) :";
         unitSuffix.innerText = "Ar";
     } else {
-        // In Recevoir mode: user enters the crypto amount they want to receive
         let unitLabel = assetKey;
         if (currentMode === 'wallet' && assetKey === 'PAYPAL') unitLabel = 'USD';
         else if (currentMode === 'wallet')                      unitLabel = 'EUR';
@@ -1754,12 +2026,6 @@ function switchAction(action) {
         if (catData) labelAddr.innerText = catData.label;
     }
 
-    // FIX: update submit button label
-    const btnSubmit = document.getElementById('btn-submit');
-    if (btnSubmit) {
-        btnSubmit.innerText = action === 'Envoyer' ? 'Valider Envoi' : 'Valider Réception';
-    }
-
     updateCalc();
 }
 
@@ -1771,24 +2037,9 @@ function updateCalc() {
     const res           = document.getElementById('calc-res');
     const fraisEl       = document.getElementById('frais-info');
 
-    // Hide calc for mobile money modes
     if (currentMode === 'Dépôt' || currentMode === 'Retrait') {
-        calcContainer.style.display = 'none';
-        return;
+        calcContainer.style.display = 'none'; return;
     }
-
-    // FIX: for abonnement (rate=1), hide calculator as it's Ar → Ar, not meaningful
-    if (currentMode === 'abonnement') {
-        calcContainer.style.display = 'none';
-        fraisEl.innerText = '';
-        const assetKey = document.getElementById('crypto-select').value;
-        const item = ASSETS_DATA.abonnement.items.find(i => i.val === assetKey);
-        if (item && item.frais > 0) {
-            fraisEl.innerText = `Frais : ${(item.frais * 100).toFixed(0)}% inclus`;
-        }
-        return;
-    }
-
     calcContainer.style.display = 'flex';
 
     const assetKey = document.getElementById('crypto-select').value;
@@ -1797,23 +2048,18 @@ function updateCalc() {
 
     let frais = 0;
     const catData = ASSETS_DATA[currentMode];
-    if (catData) {
-        const item = catData.items.find(i => i.val === assetKey);
-        if (item) frais = item.frais;
-    }
+    if (catData) { const item = catData.items.find(i => i.val === assetKey); if (item) frais = item.frais; }
 
     if (currentAction === 'Envoyer') {
-        // val is in Ar → convert to crypto after fees
         const netAr = val * (1 - frais);
         res.innerText = rate > 1
             ? (netAr / rate).toFixed(assetKey === 'USDT' ? 2 : 6) + " " + assetKey
             : netAr.toLocaleString('fr-FR') + " Ar";
     } else {
-        // val is in crypto → convert to Ar equivalent
         res.innerText = Math.floor(val * rate * (1 - frais)).toLocaleString('fr-FR') + " Ar";
     }
 
-    fraisEl.innerText = frais > 0 ? `Frais : ${(frais * 100).toFixed(0)}% inclus` : '';
+    fraisEl.innerText = frais > 0 ? `Frais : ${(frais*100).toFixed(0)}% inclus` : '';
 }
 
 // =========================================================
@@ -1826,21 +2072,17 @@ async function handleTransaction() {
     const solde   = userData?.solde || 0;
 
     if (!amount || amount <= 0) return alert("Ampidiro ny montant azafady.");
-    if (!address)               return alert("Ampidiro ny adiresy na ID.");
+    if (!address)               return alert("Ampidiro ny adiresy na ID handefasana azy.");
 
     const check = document.getElementById('check-conditions');
     if (!check || !check.checked) return alert("Azafady ekeo ny fepetra (Terms & Conditions).");
 
     let frais = 0;
     const catData = ASSETS_DATA[currentMode];
-    if (catData) {
-        const item = catData.items.find(i => i.val === asset);
-        if (item) frais = item.frais;
-    }
+    if (catData) { const item = catData.items.find(i => i.val === asset); if (item) frais = item.frais; }
     const feesAr = Math.round(amount * frais);
     const total  = amount + feesAr;
 
-    // Only check balance for operations that debit the account
     if (currentAction === 'Envoyer' && total > solde) {
         return alert(`Tsy ampy ny solde-nao.\nIlaina: ${total.toLocaleString()} Ar\nAnananao: ${solde.toLocaleString()} Ar`);
     }
@@ -1866,7 +2108,6 @@ async function handleTransaction() {
         }]);
         if (txErr) throw txErr;
 
-        // Debit balance only for Envoyer actions
         if (currentAction === 'Envoyer') {
             const newSolde = solde - total;
             const { error: soldeErr } = await supabaseClient.from('users').update({ solde: newSolde }).eq('id', currentUserId);
@@ -1899,12 +2140,11 @@ function previewImage(input) {
         r.readAsDataURL(input.files[0]);
     }
 }
-
 function openProfile() {
     if (!userData) return;
     document.getElementById('edit-full-name').value = userData.full_name || '';
     document.getElementById('edit-phone').value     = userData.phone     || '';
-    document.getElementById('modal-pp-view').src    = userData.avatar_url || "https://placehold.co/100x100/1a1d2e/00c8a0?text=TC";
+    document.getElementById('modal-pp-view').src    = userData.avatar_url || "https://via.placeholder.com/100";
     document.getElementById('modal-profile').style.display = 'flex';
 }
 function closeProfile() { document.getElementById('modal-profile').style.display = 'none'; }
@@ -1963,17 +2203,45 @@ function toggleNotif() {
     if (panel.style.display === 'block') fetchNotifications();
 }
 
-function showTerms() {
-    document.getElementById('modal-terms').style.display = 'flex';
-}
-function closeTermsModal() {
-    document.getElementById('modal-terms').style.display = 'none';
-}
-
 async function markAllRead() {
     await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUserId);
     fetchNotifications();
 }
+
+// =========================================================
+// MODALS — LÉGAL & AIDE
+// =========================================================
+function openConditionsModal() {
+    const m = document.getElementById('modal-conditions');
+    m.style.display = 'flex';
+}
+function closeConditionsModal() {
+    document.getElementById('modal-conditions').style.display = 'none';
+}
+
+function openPolitiqueModal() {
+    const m = document.getElementById('modal-politique');
+    m.style.display = 'flex';
+}
+function closePolitiqueModal() {
+    document.getElementById('modal-politique').style.display = 'none';
+}
+
+function openHelpModal() {
+    const m = document.getElementById('modal-help');
+    m.style.display = 'flex';
+}
+function closeHelpModal() {
+    document.getElementById('modal-help').style.display = 'none';
+}
+
+// Close modals when clicking the dark backdrop
+document.addEventListener('click', function(e) {
+    ['modal-conditions','modal-politique','modal-help'].forEach(id => {
+        const modal = document.getElementById(id);
+        if (modal && e.target === modal) modal.style.display = 'none';
+    });
+});
 
 // =========================================================
 // LOGOUT
