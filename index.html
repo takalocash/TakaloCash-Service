@@ -1797,7 +1797,7 @@ async function initApp() {
             .channel('realtime-ledger')
             .on(
                 'postgres_changes',
-                { event: '*', schema: 'public', table: 'transactions' },
+                { event: '*', filter: `user_id=eq.${currentUserId}`, schema: 'public', table: 'transactions' },
                 () => { fetchData(); }
             )
             .subscribe();
@@ -2281,7 +2281,10 @@ function calculateCryptoConversion() {
     const outputAriary  = document.getElementById('output-amount-ariary');
     if (!selectCrypto || !inputAmount || !outputAriary) return;
     const selectedOption = selectCrypto.options[selectCrypto.selectedIndex];
-    if (!selectedOption || !selectedOption.value) return;
+    if (!selectedOption || !selectedOption.value) {
+        outputAriary.value = '';
+        return;
+    }
     const rate = parseFloat(selectedOption.getAttribute('data-rate'));
     const qty  = parseFloat(inputAmount.value) || 0;
     outputAriary.value = Math.round(qty * rate).toLocaleString('fr-FR') + ' Ar';
@@ -2302,6 +2305,10 @@ function toggleNotificationDropdown() {
 // 2. Maka ireo notifications avy ao amin'ny Supabase
 async function loadUserNotifications() {
     if (typeof currentUserId === 'undefined' || !currentUserId) return;
+    try {
+        const { data, error } = await supabaseClient
+            .from('notifications')
+            .select('*')
             .eq('user_id', currentUserId)
             .order('created_at', { ascending: false })
             .limit(10);
@@ -2339,6 +2346,9 @@ async function loadUserNotifications() {
 // 3. Manova ny notif rehetra ho "Vakiana"
 async function markAllNotificationsAsRead() {
     if (typeof currentUserId === 'undefined' || !currentUserId) return;
+    try {
+        const { error } = await supabaseClient
+            .from('notifications')
             .update({ is_read: true })
             .eq('user_id', currentUserId)
             .eq('is_read', false);
