@@ -815,45 +815,6 @@ select, input { font-family: var(--font); }
 }
 
 /* =====================================================
-   NOTIFICATIONS PANEL
-   ===================================================== */
-#notif-panel {
-    position:      fixed;
-    top:           66px;
-    right:         16px;
-    width:         310px;
-    background:    var(--bg-card);
-    border:        1px solid var(--border-md);
-    border-radius: 14px;
-    display:       none;
-    z-index:       8000;
-    max-height:    400px;
-    overflow-y:    auto;
-    box-shadow:    0 16px 48px rgba(0,0,0,0.6);
-}
-.notif-panel-header {
-    padding:         14px 16px;
-    font-weight:     700;
-    font-size:       14px;
-    border-bottom:   1px solid var(--border);
-    display:         flex;
-    justify-content: space-between;
-    align-items:     center;
-    position:        sticky;
-    top:             0;
-    background:      var(--bg-card);
-}
-.notif-item {
-    padding:       13px 16px;
-    border-bottom: 1px solid var(--border);
-    font-size:     13px;
-    transition:    background 0.15s;
-}
-.notif-item:last-child { border-bottom: none; }
-.notif-item.unread { background: rgba(245,197,24,.04); }
-.notif-item:hover  { background: rgba(255,255,255,0.03); }
-
-/* =====================================================
    MODAL (profile)
    ===================================================== */
 .modal {
@@ -1110,9 +1071,19 @@ select, input { font-family: var(--font); }
             <div class="header-icon-btn" onclick="showPage('history')" title="Historique">
                 <i class="fa-regular fa-envelope"></i>
             </div>
-            <div class="header-icon-btn" onclick="toggleNotif()" title="Notifications">
-                <i class="fa-solid fa-bell"></i>
-                <span id="notif-count" class="notif-badge" style="display:none;">0</span>
+            <div style="position:relative; display:inline-block;">
+                <i id="bell-icon" class="fa-solid fa-bell" onclick="toggleNotificationDropdown()" style="cursor:pointer; position:relative; font-size:18px; color:var(--gray);">
+                    <span id="bell-badge" style="display:none; position:absolute; top:-5px; right:-5px; width:8px; height:8px; background:var(--red); border-radius:50%;"></span>
+                </i>
+                <div id="notification-dropdown" style="display:none; position:absolute; top:30px; right:0; width:300px; max-height:350px; background:var(--bg-card); border:1px solid #222; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.5); z-index:9999; flex-direction:column; padding:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 10px 10px 10px; border-bottom:1px solid #222;">
+                        <span style="color:#fff; font-size:13px; font-weight:bold; font-family:'Exo 2',sans-serif;">Notifications</span>
+                        <span onclick="markAllNotificationsAsRead()" style="color:var(--yellow); font-size:11px; cursor:pointer; font-family:sans-serif;">Tout lire</span>
+                    </div>
+                    <div id="notification-list-container" style="overflow-y:auto; flex-grow:1; margin-top:5px; max-height:280px;">
+                        <p style="color:var(--gray); font-size:11px; text-align:center; margin:20px 0;">Aucune notification</p>
+                    </div>
+                </div>
             </div>
             <img id="header-avatar"
                  src="https://via.placeholder.com/35"
@@ -1215,6 +1186,47 @@ select, input { font-family: var(--font); }
                 </div>
             </div>
         </div>
+
+        <!-- ===== CONVERTISSEUR BINANCE ===== -->
+        <div id="binance-converter-card" style="background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:18px 16px; margin-bottom:16px;">
+
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+                <div style="width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,#f5c518,#d4a800); display:flex; align-items:center; justify-content:flex-start; padding-left:6px;">
+                    <i class="fa-solid fa-chart-line" style="color:#13151e; font-size:12px;"></i>
+                </div>
+                <span style="font-size:14px; font-weight:800; color:#fff; font-family:'Exo 2',sans-serif;">Convertisseur Binance</span>
+                <span style="font-size:10px; color:var(--green); background:rgba(29,184,122,0.1); border:1px solid rgba(29,184,122,0.3); border-radius:20px; padding:2px 8px; margin-left:auto;">LIVE</span>
+            </div>
+
+            <!-- Crypto select -->
+            <div style="margin-bottom:14px; text-align:left;">
+                <label style="color:var(--gray); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Choisir l'Actif Crypto</label>
+                <div style="position:relative;">
+                    <select id="crypto-asset-select" onchange="calculateCryptoConversion()" style="width:100%; padding:14px; background:var(--bg-input); border:1px solid #222; border-radius:12px; color:#fff; font-size:14px; font-weight:600; font-family:'Rajdhani',sans-serif; cursor:pointer;">
+                        <option value="">-- Chargement des cryptos de Binance... --</option>
+                    </select>
+                    <div style="position:absolute; right:14px; top:50%; transform:translateY(-50%); color:var(--gray); pointer-events:none;">
+                        <i class="fas fa-chevron-down" style="font-size:11px;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inputs grid -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; text-align:left;">
+                <div>
+                    <label style="color:var(--gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; display:block;">Montant Crypto</label>
+                    <input type="number" id="input-amount-crypto" oninput="calculateCryptoConversion()" placeholder="0.00"
+                        style="width:100%; padding:11px 12px; background:var(--bg-input); border:1px solid #222; border-radius:10px; color:#fff; font-size:14px; font-weight:bold; font-family:var(--font); outline:none; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="color:var(--gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; display:block;">Équivalent (Ariary)</label>
+                    <input type="text" id="output-amount-ariary" readonly placeholder="0 Ar"
+                        style="width:100%; padding:11px 12px; background:rgba(245,197,24,0.04); border:1px solid rgba(245,197,24,0.2); border-radius:10px; color:var(--yellow); font-size:14px; font-weight:bold; font-family:var(--font); box-sizing:border-box;">
+                </div>
+            </div>
+
+        </div>
+        <!-- ===== FIN CONVERTISSEUR ===== -->
 
         <!-- Transaction form -->
         <div class="trans-box">
@@ -1436,18 +1448,6 @@ select, input { font-family: var(--font); }
 </div>
 
 
-<!-- ========================================
-     NOTIFICATIONS PANEL
-     ======================================== -->
-<div id="notif-panel">
-    <div class="notif-panel-header">
-        Notifications
-        <small style="color:var(--yellow); cursor:pointer; font-size:12px;" onclick="markAllRead()">
-            Tout marquer lu
-        </small>
-    </div>
-    <div id="notif-list"></div>
-</div>
 
 <!-- ========================================
      MODAL — CONDITIONS D'UTILISATION
@@ -1770,7 +1770,26 @@ async function initApp() {
     setInterval(updateTaux, 3_600_000);
 
     selectCategory('crypto');
-    fetchData();
+    await fetchData();
+
+    // 1. Alaina avy hatrany ny notifications rehefa tafiditra ny mpampiasa
+    await loadUserNotifications();
+
+    // 2. MAMPIPASIDITRA NY CRYPTO REHETRA AVY AMIN'NY BINANCE AO AMIN'NY CHOIX
+    await chargerToutesLesCryptosBinance();
+
+    // 3. Mihaino en temps réel ny fahatongavan'ny notification vaovao
+    supabaseClient
+        .channel('realtime-notifications')
+        .on(
+            'postgres_changes',
+            { event: 'INSERT', filter: `user_id=eq.${currentUserId}`, schema: 'public', table: 'notifications' },
+            (payload) => {
+                console.log('Notification vaovao voaray!', payload.new);
+                loadUserNotifications();
+            }
+        )
+        .subscribe();
 }
 
 async function fetchData() {
@@ -1792,7 +1811,6 @@ async function fetchData() {
     if (tErr) console.error("fetchData/transactions:", tErr.message);
     allTransactions = ts || [];
     renderHistory(allTransactions);
-    fetchNotifications();
 }
 
 // =========================================================
@@ -2185,45 +2203,147 @@ function copyText() {
 }
 
 // =========================================================
+// FITANTANANA NY REKIPITRA SY NY LISITRA CRYPTO GLOBALE
+// =========================================================
+const coursDollarEnAriary = 4600;  // Taux conversion 1$ = 4600 Ar
+const margeFraisService   = 1.05;  // 5% ny frais alainao amin'ny mpanjifa
+const prioritairesCryptos = ['USDT','TRX','BTC','ETH','BNB','SOL'];
+let listeCoursCalcules = {};
+
+async function chargerToutesLesCryptosBinance() {
+    const selectElement = document.getElementById('crypto-asset-select');
+    if (!selectElement) return;
+    try {
+        const response = await fetch('https://api.binance.com/api/v3/ticker/price');
+        const tickers  = await response.json();
+
+        selectElement.innerHTML = '<option value="">-- Choisir une crypto --</option>';
+        listeCoursCalcules = {};
+
+        listeCoursCalcules['USDT'] = coursDollarEnAriary * margeFraisService;
+
+        tickers.forEach(t => {
+            if (t.symbol.endsWith('USDT')) {
+                const tickerName  = t.symbol.replace('USDT', '');
+                const priceUsd    = parseFloat(t.price);
+                if (priceUsd > 0) {
+                    listeCoursCalcules[tickerName] = (priceUsd * coursDollarEnAriary) * margeFraisService;
+                }
+            }
+        });
+
+        // A. Prioritaires en premier
+        prioritairesCryptos.forEach(symbole => {
+            if (listeCoursCalcules[symbole]) creerOptionHTML(selectElement, symbole, listeCoursCalcules[symbole]);
+        });
+
+        // Séparateur
+        const diviseur = document.createElement('option');
+        diviseur.disabled     = true;
+        diviseur.textContent  = '──────────────────────────────';
+        selectElement.appendChild(diviseur);
+
+        // B. Tout le reste (350+) par ordre alphabétique
+        Object.keys(listeCoursCalcules).sort().forEach(symbole => {
+            if (!prioritairesCryptos.includes(symbole)) creerOptionHTML(selectElement, symbole, listeCoursCalcules[symbole]);
+        });
+
+        console.log("Tafiditra avokoa ny crypto rehetra avy amin'ny Binance!");
+    } catch (error) {
+        console.error("Erreur teo am-pampidirana crypto:", error);
+        selectElement.innerHTML = '<option value="">Impossible de charger les cours</option>';
+    }
+}
+
+function creerOptionHTML(select, symbol, rateAriary) {
+    const opt = document.createElement('option');
+    opt.value = symbol;
+    opt.setAttribute('data-rate', rateAriary);
+    opt.textContent = `${symbol} (${Math.round(rateAriary).toLocaleString('fr-FR')} Ar)`;
+    select.appendChild(opt);
+}
+
+function calculateCryptoConversion() {
+    const selectCrypto  = document.getElementById('crypto-asset-select');
+    const inputAmount   = document.getElementById('input-amount-crypto');
+    const outputAriary  = document.getElementById('output-amount-ariary');
+    if (!selectCrypto || !inputAmount || !outputAriary) return;
+    const selectedOption = selectCrypto.options[selectCrypto.selectedIndex];
+    if (!selectedOption || !selectedOption.value) return;
+    const rate = parseFloat(selectedOption.getAttribute('data-rate'));
+    const qty  = parseFloat(inputAmount.value) || 0;
+    outputAriary.value = Math.round(qty * rate).toLocaleString('fr-FR') + ' Ar';
+}
+
+// =========================================================
 // NOTIFICATIONS
 // =========================================================
-async function fetchNotifications() {
-    const { data: notifs } = await supabaseClient
-        .from('notifications').select('*')
-        .eq('user_id', currentUserId)
-        .order('created_at', { ascending: false });
-    if (!notifs) return;
 
-    const list        = document.getElementById('notif-list');
-    const countBadge  = document.getElementById('notif-count');
-    const unreadCount = notifs.filter(n => !n.is_read).length;
-    countBadge.innerText     = unreadCount;
-    countBadge.style.display = unreadCount > 0 ? 'block' : 'none';
-
-    list.innerHTML = notifs.length
-        ? notifs.map(n => `
-            <div class="notif-item ${n.is_read ? '' : 'unread'}">
-                <b style="color:var(--yellow);font-size:13px;">${n.title}</b><br>
-                <span style="color:var(--gray);font-size:12px;line-height:1.4;">${n.message}</span><br>
-                <small style="font-size:10px;color:rgba(255,255,255,0.3);">
-                    ${new Date(n.created_at).toLocaleString('fr-FR', {
-                        timeZone: 'Indian/Antananarivo',
-                        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
-                    })}
-                </small>
-            </div>`).join('')
-        : '<p style="text-align:center;padding:28px;color:var(--gray);font-size:13px;">Aucune notification.</p>';
+// 1. Mampiseho na manafina ilay boaty fampandrenesana
+function toggleNotificationDropdown() {
+    const dropdown = document.getElementById('notification-dropdown');
+    if (!dropdown) return;
+    if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+        dropdown.style.display = 'flex';
+        loadUserNotifications();
+    } else {
+        dropdown.style.display = 'none';
+    }
 }
 
-function toggleNotif() {
-    const panel = document.getElementById('notif-panel');
-    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-    if (panel.style.display === 'block') fetchNotifications();
+// 2. Maka ireo notifications avy ao amin'ny Supabase
+async function loadUserNotifications() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('notifications')
+            .select('*')
+            .eq('user_id', currentUserId)
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+        if (error) throw error;
+
+        const container = document.getElementById('notification-list-container');
+        const badge     = document.getElementById('bell-badge');
+        if (!container) return;
+
+        if (!data || data.length === 0) {
+            container.innerHTML = '<p style="color:var(--gray); font-size:11px; text-align:center; margin:20px 0;">Aucune notification</p>';
+            if (badge) badge.style.display = 'none';
+            return;
+        }
+
+        const hasUnread = data.some(n => n.is_read === false);
+        if (badge) badge.style.display = hasUnread ? 'block' : 'none';
+
+        container.innerHTML = data.map(n => `
+            <div style="padding:10px; background:${n.is_read ? 'transparent' : 'rgba(245,197,24,0.03)'}; border-bottom:1px solid #1a1d2e; border-left:3px solid ${n.is_read ? 'transparent' : 'var(--yellow)'}; transition:0.3s; margin-bottom:2px;">
+                <div style="display:flex; justify-content:space-between; align-items:start;">
+                    <b style="color:#fff; font-size:12px; font-family:'Rajdhani',sans-serif;">${n.title}</b>
+                    <span style="color:#444; font-size:9px;">${new Date(n.created_at).toLocaleString('fr-FR', { timeZone:'Indian/Antananarivo', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}</span>
+                </div>
+                <p style="color:${n.is_read ? 'var(--gray)' : '#ccc'}; font-size:11px; margin:4px 0 0 0; line-height:1.4; text-align:left; font-family:sans-serif;">${n.message}</p>
+            </div>
+        `).join('');
+
+    } catch (err) {
+        console.error("Erreur de chargement des notifications:", err);
+    }
 }
 
-async function markAllRead() {
-    await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUserId);
-    fetchNotifications();
+// 3. Manova ny notif rehetra ho "Vakiana"
+async function markAllNotificationsAsRead() {
+    try {
+        const { error } = await supabaseClient
+            .from('notifications')
+            .update({ is_read: true })
+            .eq('user_id', currentUserId)
+            .eq('is_read', false);
+        if (error) throw error;
+        loadUserNotifications();
+    } catch (err) {
+        console.error("Erreur lors de la mise à jour des notifications:", err);
+    }
 }
 
 // =========================================================
@@ -2255,10 +2375,17 @@ function closeHelpModal() {
 
 // Close modals when clicking the dark backdrop
 document.addEventListener('click', function(e) {
+    // Legal modals
     ['modal-conditions','modal-politique','modal-help'].forEach(id => {
         const modal = document.getElementById(id);
         if (modal && e.target === modal) modal.style.display = 'none';
     });
+    // Notification dropdown
+    const dropdown = document.getElementById('notification-dropdown');
+    const bell     = document.getElementById('bell-icon');
+    if (dropdown && bell && !dropdown.contains(e.target) && !bell.contains(e.target)) {
+        dropdown.style.display = 'none';
+    }
 });
 
 // =========================================================
