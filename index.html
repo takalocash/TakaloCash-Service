@@ -80,24 +80,28 @@ select, input { font-family: var(--font); }
     display:         flex;
     align-items:     center;
     justify-content: center;
-    gap:             12px;
+    gap:             14px;
     margin-bottom:   28px;
 }
 .auth-logo-icon {
-    width:           68px;
-    height:          68px;
+    width:           72px;
+    height:          72px;
     background:      var(--bg);
-    border-radius:   14px;
+    border-radius:   18px;
     display:         flex;
     align-items:     center;
     justify-content: center;
     flex-shrink:     0;
+    box-shadow:      0 0 0 2px rgba(245,197,24,0.25);
 }
 .auth-logo-text {
-    font-size:   20px;
-    font-weight: 800;
-    color:       white;
-    letter-spacing: -0.5px;
+    font-size:        26px;
+    font-weight:      900;
+    letter-spacing:  -1px;
+    background:       linear-gradient(135deg, #f5c518 0%, #fbbf24 40%, #34d399 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .auth-box {
@@ -203,20 +207,24 @@ select, input { font-family: var(--font); }
     cursor:      pointer;
 }
 .header-logo-icon {
-    width:           46px;
-    height:          46px;
+    width:           48px;
+    height:          48px;
     background:      var(--bg);
-    border-radius:   10px;
+    border-radius:   12px;
     display:         flex;
     align-items:     center;
     justify-content: center;
     flex-shrink:     0;
+    box-shadow:      0 0 0 1.5px rgba(245,197,24,0.2);
 }
 .header-logo-text {
-    font-size:      14px;
-    font-weight:    800;
-    color:          white;
-    letter-spacing: -0.5px;
+    font-size:        17px;
+    font-weight:      900;
+    letter-spacing:  -0.5px;
+    background:       linear-gradient(135deg, #f5c518 0%, #fbbf24 45%, #34d399 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .header-actions {
@@ -513,13 +521,10 @@ select, input { font-family: var(--font); }
 .trans-body { padding: 16px 18px 18px; }
 
 .trans-row2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 14px;
-}
-@media (max-width: 400px) {
-    .trans-row2 { grid-template-columns: 1fr; }
+    display:        flex;
+    flex-direction: column;
+    gap:            12px;
+    margin-bottom:  14px;
 }
 
 /* =====================================================
@@ -534,7 +539,7 @@ select, input { font-family: var(--font); }
 .hist-table {
     min-width:  480px;
 }
- { display: flex; flex-direction: column; gap: 6px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-label { font-size: 11px; color: var(--gray); font-weight: 600; letter-spacing: 0.3px; }
 
 /* asset selector with icon */
@@ -1256,6 +1261,113 @@ select, input { font-family: var(--font); }
                 <div id="bookmaker-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
             </div>
 
+            <!-- MODE ABONNEMENT : 4 brands → plans expandables -->
+            <div id="conv-abonnement" style="display:none;">
+
+                <!-- Grille des 4 marques -->
+                <p style="color:var(--gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 12px 0; font-weight:600;">Choisir un abonnement</p>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:4px;">
+
+                    <div class="abon-brand-card" id="brand-canalplus" onclick="_toggleBrand('canalplus')"
+                         style="padding:14px 12px; background:#0a0a0a; border:2px solid #444; border-radius:12px; cursor:pointer; transition:all 0.2s; text-align:center;">
+                        <div style="font-size:20px; font-weight:900; color:#fff; font-family:'Exo 2',sans-serif; letter-spacing:-1px;">CANAL<span style="color:#f5c518;">+</span></div>
+                        <div style="font-size:10px; color:#888; margin-top:2px;">TV · Options</div>
+                    </div>
+
+                    <div class="abon-brand-card" id="brand-netflix" onclick="_toggleBrand('netflix')"
+                         style="padding:14px 12px; background:#1a0000; border:2px solid #444; border-radius:12px; cursor:pointer; transition:all 0.2s; text-align:center;">
+                        <div style="font-size:20px; font-weight:900; color:#e50914; font-family:'Exo 2',sans-serif; letter-spacing:-1px;">NETFLIX</div>
+                        <div style="font-size:10px; color:#888; margin-top:2px;">Streaming vidéo</div>
+                    </div>
+
+                    <div class="abon-brand-card" id="brand-spotify" onclick="_toggleBrand('spotify')"
+                         style="padding:14px 12px; background:#001a06; border:2px solid #444; border-radius:12px; cursor:pointer; transition:all 0.2s; text-align:center;">
+                        <div style="font-size:20px; font-weight:900; color:#1db954; font-family:'Exo 2',sans-serif; letter-spacing:-1px;">SPOTIFY</div>
+                        <div style="font-size:10px; color:#888; margin-top:2px;">Musique streaming</div>
+                    </div>
+
+                    <div class="abon-brand-card" id="brand-dstv" onclick="_toggleBrand('dstv')"
+                         style="padding:14px 12px; background:#00091a; border:2px solid #444; border-radius:12px; cursor:pointer; transition:all 0.2s; text-align:center;">
+                        <div style="font-size:20px; font-weight:900; color:#0057b7; font-family:'Exo 2',sans-serif; letter-spacing:-1px;">DStv</div>
+                        <div style="font-size:10px; color:#888; margin-top:2px;">TV satellite</div>
+                    </div>
+
+                </div>
+
+                <!-- Plans expandables par brand -->
+                <div id="abon-plans-container" style="margin-top:10px; display:none;">
+
+                    <!-- Canal+ plans -->
+                    <div id="plans-canalplus" class="abon-plans-group" style="display:none;">
+                        <p style="color:#f5c518; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 8px 0;">CANAL+ · Choisir le plan</p>
+                        <div class="abon-plan-list"></div>
+                    </div>
+
+                    <!-- Netflix plans -->
+                    <div id="plans-netflix" class="abon-plans-group" style="display:none;">
+                        <p style="color:#e50914; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 8px 0;">NETFLIX · Choisir le plan</p>
+                        <div class="abon-plan-list"></div>
+                    </div>
+
+                    <!-- Spotify plans -->
+                    <div id="plans-spotify" class="abon-plans-group" style="display:none;">
+                        <p style="color:#1db954; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 8px 0;">SPOTIFY · Choisir le plan</p>
+                        <div class="abon-plan-list"></div>
+                    </div>
+
+                    <!-- DStv plans -->
+                    <div id="plans-dstv" class="abon-plans-group" style="display:none;">
+                        <p style="color:#0057b7; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 8px 0;">DStv · Choisir le plan</p>
+                        <div class="abon-plan-list"></div>
+                    </div>
+
+                </div>
+
+                <!-- Formulaire commande (caché jusqu'à sélection) -->
+                <div id="abon-form" style="display:none; margin-top:12px;">
+                    <div style="background:rgba(245,197,24,0.05); border:1px solid rgba(245,197,24,0.2); border-radius:10px; padding:10px 14px; margin-bottom:12px;">
+                        <div id="abon-selected-info" style="font-size:13px; color:var(--yellow); font-weight:700; font-family:'Rajdhani',sans-serif;"></div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <div>
+                            <label style="color:var(--gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; display:block;">Nom complet</label>
+                            <input id="abon-nom" type="text" placeholder="Ex : Jean Rakoto" style="width:100%; padding:11px 12px; background:var(--bg-input); border:1px solid #222; border-radius:10px; color:#fff; font-size:13px; font-family:var(--font); outline:none; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="color:var(--gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; display:block;">Email (ou compte)</label>
+                            <input id="abon-email" type="email" placeholder="votre@email.com" style="width:100%; padding:11px 12px; background:var(--bg-input); border:1px solid #222; border-radius:10px; color:#fff; font-size:13px; font-family:var(--font); outline:none; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="color:var(--gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; display:block;">Nombre de TV / Appareils</label>
+                            <select id="abon-nb-tv" style="width:100%; padding:11px 12px; background:var(--bg-input); border:1px solid #222; border-radius:10px; color:#fff; font-size:13px; font-family:var(--font); outline:none; box-sizing:border-box;">
+                                <option value="1">1 appareil / TV</option>
+                                <option value="2">2 appareils / TV</option>
+                                <option value="3">3 appareils / TV</option>
+                                <option value="4">4 appareils / TV</option>
+                                <option value="6">6 appareils / TV</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="color:var(--gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; display:block;">Mobile Money (paiement)</label>
+                            <input id="abon-mobile" type="tel" placeholder="032 / 033 / 034 ..." style="width:100%; padding:11px 12px; background:var(--bg-input); border:1px solid #222; border-radius:10px; color:#fff; font-size:13px; font-family:var(--font); outline:none; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="color:var(--gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; display:block;">Durée</label>
+                            <select id="abon-duree" style="width:100%; padding:11px 12px; background:var(--bg-input); border:1px solid #222; border-radius:10px; color:#fff; font-size:13px; font-family:var(--font); outline:none; box-sizing:border-box;">
+                                <option value="1">1 mois</option>
+                                <option value="3">3 mois</option>
+                                <option value="6">6 mois</option>
+                                <option value="12">12 mois</option>
+                            </select>
+                        </div>
+                        <button onclick="_submitAbonnement()" style="width:100%; padding:13px; background:var(--yellow); color:#13151e; border:none; border-radius:10px; font-weight:800; font-size:14px; font-family:var(--font); cursor:pointer; letter-spacing:0.3px; transition:background 0.2s;">
+                            Commander cet abonnement
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
         <style>
             @media(max-width:400px){#converter-inputs-grid{grid-template-columns:1fr;}}
@@ -1392,59 +1504,58 @@ select, input { font-family: var(--font); }
      FOOTER
      ======================================== -->
 <footer class="app-footer" id="app-footer" style="display:none;">
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px 12px; max-width:520px; margin:0 auto 16px;">
 
-    <!-- Légal -->
-    <p class="footer-section-title">⚖️ Légal</p>
-    <div class="footer-btn-group">
-        <button class="footer-btn yellow" onclick="openConditionsModal()">
-            <i class="fa-regular fa-file-lines"></i> Conditions d'utilisation
-        </button>
-        <button class="footer-btn yellow" onclick="openPolitiqueModal()">
-            <i class="fa-solid fa-shield-halved"></i> Politique de confidentialité
-        </button>
+        <!-- Colonne 1 : Légal + Aide -->
+        <div>
+            <p class="footer-section-title">⚖️ Légal</p>
+            <div style="display:flex; flex-direction:column; gap:7px;">
+                <button class="footer-btn yellow" onclick="openConditionsModal()" style="justify-content:flex-start;">
+                    <i class="fa-regular fa-file-lines"></i> Conditions
+                </button>
+                <button class="footer-btn yellow" onclick="openPolitiqueModal()" style="justify-content:flex-start;">
+                    <i class="fa-solid fa-shield-halved"></i> Confidentialité
+                </button>
+            </div>
+            <p class="footer-section-title" style="margin-top:14px;">🛟 Aide</p>
+            <div style="display:flex; flex-direction:column; gap:7px;">
+                <button class="footer-btn cyan" onclick="openHelpModal()" style="justify-content:flex-start;">
+                    <i class="fa-solid fa-headset"></i> Centre d'aide
+                </button>
+            </div>
+        </div>
+
+        <!-- Colonne 2 : Contact -->
+        <div>
+            <p class="footer-section-title">📬 Contact</p>
+            <div style="display:flex; flex-direction:column; gap:7px;">
+                <a class="footer-btn" href="mailto:takalocash@gmail.com" style="justify-content:flex-start;">
+                    <i class="fa-regular fa-envelope"></i> Email
+                </a>
+                <a class="footer-btn green" href="https://wa.me/261347451051" target="_blank" style="justify-content:flex-start;">
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                </a>
+            </div>
+        </div>
+
+        <!-- Colonne 3 : Réseaux -->
+        <div>
+            <p class="footer-section-title">🌐 Réseaux</p>
+            <div style="display:flex; flex-direction:column; gap:7px;">
+                <a class="footer-btn blue" href="https://www.facebook.com/TakaloCash-Service" target="_blank" style="justify-content:flex-start;">
+                    <i class="fa-brands fa-facebook-f"></i> Facebook
+                </a>
+                <a class="footer-btn" href="https://t.me/TakaloCashService" target="_blank" style="justify-content:flex-start;">
+                    <i class="fa-brands fa-telegram"></i> Telegram
+                </a>
+                <a class="footer-btn purple" href="https://www.facebook.com/TakaloCash-Service" target="_blank" style="justify-content:flex-start;">
+                    <i class="fa-brands fa-facebook-messenger"></i> Messenger
+                </a>
+            </div>
+        </div>
+
     </div>
-
-    <hr class="footer-divider">
-
-    <!-- Aide -->
-    <p class="footer-section-title">🛟 Aide & Support</p>
-    <div class="footer-btn-group">
-        <button class="footer-btn cyan" onclick="openHelpModal()">
-            <i class="fa-solid fa-headset"></i> Centre d'aide
-        </button>
-        <a class="footer-btn purple" href="https://www.facebook.com/TakaloCash-Service" target="_blank">
-            <i class="fa-brands fa-facebook-messenger"></i> Discussion
-        </a>
-    </div>
-
-    <hr class="footer-divider">
-
-    <!-- Contact -->
-    <p class="footer-section-title">📬 Contact</p>
-    <div class="footer-btn-group">
-        <a class="footer-btn" href="mailto:takalocash@gmail.com">
-            <i class="fa-regular fa-envelope"></i> takalocash@gmail.com
-        </a>
-        <a class="footer-btn green" href="https://wa.me/261347451051" target="_blank">
-            <i class="fa-brands fa-whatsapp"></i> WhatsApp
-        </a>
-    </div>
-
-    <hr class="footer-divider">
-
-    <!-- Réseaux sociaux -->
-    <p class="footer-section-title">🌐 Suivez-nous</p>
-    <div class="footer-btn-group">
-        <a class="footer-btn blue" href="https://www.facebook.com/TakaloCash-Service" target="_blank">
-            <i class="fa-brands fa-facebook-f"></i> Facebook
-        </a>
-        <a class="footer-btn" href="https://t.me/TakaloCashService" target="_blank">
-            <i class="fa-brands fa-telegram"></i> Telegram
-        </a>
-    </div>
-
     <p class="footer-copy">© 2026 TakaloCash · Tous droits réservés</p>
-
 </footer>
 
 
@@ -2163,24 +2274,29 @@ function selectCategory(category) {
 }
 
 function _switchConverterPanel(category) {
-    const panels = { crypto: 'conv-crypto', wallet: 'conv-wallet', betting: 'conv-betting' };
+    const panels = {
+        crypto:      'conv-crypto',
+        wallet:      'conv-wallet',
+        betting:     'conv-betting',
+        abonnement:  'conv-abonnement'
+    };
     const titles = {
-        crypto:  { icon:'fa-chart-line', color:'#f5c518', bg:'linear-gradient(135deg,#f5c518,#d4a800)', label:'Convertisseur Binance', badge:'LIVE' },
-        wallet:  { icon:'fa-dollar-sign', color:'#a78bfa', bg:'linear-gradient(135deg,#7c3aed,#a78bfa)', label:'Convertisseur Devises', badge:'LIVE' },
-        betting: { icon:'fa-trophy',     color:'#fb923c', bg:'linear-gradient(135deg,#ea580c,#fb923c)', label:'Bookmakers',          badge:'DIRECT' }
+        crypto:     { icon:'fa-chart-line',  bg:'linear-gradient(135deg,#f5c518,#d4a800)', label:'Convertisseur Binance', badge:'LIVE'   },
+        wallet:     { icon:'fa-dollar-sign', bg:'linear-gradient(135deg,#7c3aed,#a78bfa)', label:'Convertisseur Devises', badge:'LIVE'   },
+        betting:    { icon:'fa-trophy',      bg:'linear-gradient(135deg,#ea580c,#fb923c)', label:'Bookmakers',           badge:'DIRECT' },
+        abonnement: { icon:'fa-star',        bg:'linear-gradient(135deg,#0ea5e9,#6366f1)', label:'Abonnements',          badge:'PROMO'  }
     };
 
-    // Show correct panel, hide others
-    ['conv-crypto','conv-wallet','conv-betting'].forEach(id => {
+    // Show/hide all panels
+    ['conv-crypto','conv-wallet','conv-betting','conv-abonnement'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = 'none';
     });
-    const activePanel = panels[category] || 'conv-crypto';
-    const activePanelEl = document.getElementById(activePanel);
+    const activePanelEl = document.getElementById(panels[category] || 'conv-crypto');
     if (activePanelEl) activePanelEl.style.display = 'block';
 
-    // Update header
-    const info = titles[category] || titles.crypto;
+    // Update converter card header
+    const info     = titles[category] || titles.crypto;
     const iconEl   = document.getElementById('conv-icon');
     const iconWrap = document.getElementById('conv-icon-wrap');
     const titleEl  = document.getElementById('conv-title');
@@ -2190,11 +2306,104 @@ function _switchConverterPanel(category) {
     if (titleEl)  titleEl.innerText = info.label;
     if (badgeEl)  badgeEl.innerText = info.badge;
 
-    // Build betting grid if needed
-    if (category === 'betting') _buildBettingGrid();
+    if (category === 'betting')    _buildBettingGrid();
+    if (category === 'wallet')     _initWalletConverter();
+    if (category === 'abonnement') _buildAbonnementPlans();
+}
 
-    // Init wallet converter if needed
-    if (category === 'wallet') _initWalletConverter();
+// =========================================================
+// ABONNEMENTS — PLANS ET FORMULAIRE
+// =========================================================
+const ABONNEMENTS = [
+    { val:'NETFLIX_1M',  service:'Netflix',  plan:'1 Mois',   prix:25000, color:'#e50914', emoji:'🎬' },
+    { val:'NETFLIX_3M',  service:'Netflix',  plan:'3 Mois',   prix:70000, color:'#e50914', emoji:'🎬' },
+    { val:'NETFLIX_6M',  service:'Netflix',  plan:'6 Mois',   prix:130000,color:'#e50914', emoji:'🎬' },
+    { val:'SPOTIFY_1M',  service:'Spotify',  plan:'1 Mois',   prix:15000, color:'#1db954', emoji:'🎵' },
+    { val:'SPOTIFY_3M',  service:'Spotify',  plan:'3 Mois',   prix:42000, color:'#1db954', emoji:'🎵' },
+    { val:'DSTV_1M',     service:'DStv',     plan:'1 Mois',   prix:30000, color:'#0066cc', emoji:'📺' },
+    { val:'CANAL_1M',    service:'Canal+',   plan:'1 Mois',   prix:35000, color:'#003087', emoji:'📡' },
+    { val:'CANAL_3M',    service:'Canal+',   plan:'3 Mois',   prix:95000, color:'#003087', emoji:'📡' },
+];
+
+let _selectedAbon = null;
+
+function _buildAbonnementPlans() {
+    const grid = document.getElementById('abon-plan-grid');
+    if (!grid || grid.dataset.built) return;
+    grid.dataset.built = '1';
+
+    grid.innerHTML = ABONNEMENTS.map(a => `
+        <button onclick="_selectPlan('${a.val}')" id="abon-btn-${a.val}"
+            style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;
+                   padding:10px 12px; background:var(--bg-input); border:1.5px solid #222;
+                   border-radius:12px; cursor:pointer; text-align:left; transition:0.2s; width:100%;">
+            <span style="font-size:16px;">${a.emoji}</span>
+            <span style="color:#fff; font-size:12px; font-weight:700; font-family:'Rajdhani',sans-serif; line-height:1.2;">${a.service}</span>
+            <span style="color:var(--gray); font-size:10px;">${a.plan}</span>
+            <span style="color:${a.color}; font-size:12px; font-weight:800; margin-top:3px;">${a.prix.toLocaleString('fr-FR')} Ar</span>
+        </button>
+    `).join('');
+}
+
+function _selectPlan(val) {
+    _selectedAbon = ABONNEMENTS.find(a => a.val === val);
+    if (!_selectedAbon) return;
+
+    // Reset all buttons
+    ABONNEMENTS.forEach(a => {
+        const btn = document.getElementById('abon-btn-' + a.val);
+        if (btn) { btn.style.borderColor = '#222'; btn.style.background = 'var(--bg-input)'; }
+    });
+    // Highlight selected
+    const active = document.getElementById('abon-btn-' + val);
+    if (active) { active.style.borderColor = _selectedAbon.color; active.style.background = _selectedAbon.color + '18'; }
+
+    // Show form
+    const info = document.getElementById('abon-selected-info');
+    if (info) info.innerHTML = `${_selectedAbon.emoji} ${_selectedAbon.service} — ${_selectedAbon.plan} &nbsp;|&nbsp; <span style="font-size:14px;">${_selectedAbon.prix.toLocaleString('fr-FR')} Ar</span>`;
+    const form = document.getElementById('abon-form');
+    if (form) form.style.display = 'block';
+}
+
+async function _submitAbonnement() {
+    if (!_selectedAbon) return;
+    const nom    = document.getElementById('abon-nom')?.value.trim();
+    const email  = document.getElementById('abon-email')?.value.trim();
+    const mobile = document.getElementById('abon-mobile')?.value.trim();
+    if (!nom)    return alert('Ampidiro ny anaranao.');
+    if (!email)  return alert('Ampidiro ny email na code activation.');
+    if (!mobile) return alert('Ampidiro ny numéro Mobile Money.');
+
+    // Save to Supabase transactions table
+    try {
+        const { error } = await supabaseClient.from('transactions').insert({
+            user_id:     currentUserId,
+            type:        'Abonnement',
+            service:     _selectedAbon.service,
+            plan:        _selectedAbon.plan,
+            montant:     _selectedAbon.prix,
+            email:       email,
+            nom:         nom,
+            mobile:      mobile,
+            statut:      'En attente',
+            created_at:  new Date().toISOString()
+        });
+        if (error) throw error;
+        alert(`✅ Commande ${_selectedAbon.service} (${_selectedAbon.plan}) enregistrée ! Notre équipe vous contacte sous peu.`);
+        // Reset
+        document.getElementById('abon-nom').value = '';
+        document.getElementById('abon-email').value = '';
+        document.getElementById('abon-mobile').value = '';
+        document.getElementById('abon-form').style.display = 'none';
+        _selectedAbon = null;
+        ABONNEMENTS.forEach(a => {
+            const btn = document.getElementById('abon-btn-' + a.val);
+            if (btn) { btn.style.borderColor = '#222'; btn.style.background = 'var(--bg-input)'; }
+        });
+        await fetchData();
+    } catch(e) {
+        alert('Erreur : ' + e.message);
+    }
 }
 
 // =========================================================
@@ -2408,8 +2617,142 @@ function calculateCryptoConversion() {
 
 
 // =========================================================
-// CONVERTISSEUR DEVISES (WALLET — $ / €)
+// ABONNEMENTS — DATA + LOGIQUE
 // =========================================================
+const ABONNEMENT_DATA = {
+    canalplus: {
+        color: '#f5c518',
+        plans: [
+            { id:'cp_tongasoa',  nom:'Tongasoa',       prix:'25 000 Ar/mois',   tv:1, desc:'Chaînes fototra' },
+            { id:'cp_access',    nom:'Access',         prix:'36 000 Ar/mois',   tv:1, desc:'Sport sy divertissement' },
+            { id:'cp_essentiel', nom:'Essentiel+',     prix:'70 000 Ar/mois',   tv:1, desc:'Sport premium' },
+            { id:'cp_accessp',   nom:'Access+',        prix:'80 000 Ar/mois',   tv:1, desc:'Chaînes maro kokoa' },
+            { id:'cp_evasion',   nom:'Évasion+',       prix:'100 000 Ar/mois',  tv:1, desc:'Pack famille' },
+            { id:'cp_tout',      nom:'Tout CANAL+',    prix:'130 000 Ar/mois',  tv:1, desc:'Formule complète' },
+            { id:'cp_sport',     nom:'Option Sport',   prix:'+28 000 Ar/mois',  tv:1, desc:'Football, NBA, F1' },
+            { id:'cp_cinema',    nom:'Option Cinéma',  prix:'+22 000 Ar/mois',  tv:1, desc:'Films sy séries' },
+            { id:'cp_bolly',     nom:'Option Bollywood',prix:'+28 000 Ar/mois', tv:1, desc:'Films indiens' },
+            { id:'cp_nfbasic',   nom:'Netflix Basic',  prix:'+20 000 Ar/mois',  tv:1, desc:'1 écran · HD' },
+            { id:'cp_nfstd',     nom:'Netflix Standard',prix:'+30 000 Ar/mois', tv:2, desc:'2 écrans · Full HD' },
+            { id:'cp_nfprem',    nom:'Netflix Premium',prix:'+35 000 Ar/mois',  tv:4, desc:'4 écrans · 4K Ultra HD' }
+        ]
+    },
+    netflix: {
+        color: '#e50914',
+        plans: [
+            { id:'nf_pub',   nom:'Standard avec pub', prix:'~9$/mois',  tv:2, desc:'2 écrans · misy pub' },
+            { id:'nf_std',   nom:'Standard',          prix:'~20$/mois', tv:2, desc:'2 écrans · tsy misy pub' },
+            { id:'nf_prem',  nom:'Premium',           prix:'~27$/mois', tv:4, desc:'4 écrans · 4K Ultra HD' }
+        ]
+    },
+    spotify: {
+        color: '#1db954',
+        plans: [
+            { id:'sp_free',   nom:'Free',               prix:'Gratuit',    tv:1, desc:'1 appareil · misy pub' },
+            { id:'sp_indiv',  nom:'Premium Individual', prix:'~13$/mois',  tv:1, desc:'1 appareil' },
+            { id:'sp_stud',   nom:'Premium Student',    prix:'~7$/mois',   tv:1, desc:'Ho an\'ny mpianatra' },
+            { id:'sp_duo',    nom:'Premium Duo',        prix:'~19$/mois',  tv:2, desc:'2 appareils' },
+            { id:'sp_fam',    nom:'Premium Family',     prix:'~22$/mois',  tv:6, desc:'6 appareils' }
+        ]
+    },
+    dstv: {
+        color: '#0057b7',
+        plans: [
+            { id:'dstv_easy',    nom:'EasyView / Lite', prix:'~5$/mois',     tv:1, desc:'Chaînes fototra' },
+            { id:'dstv_access',  nom:'Access',          prix:'~12$/mois',    tv:1, desc:'Sport sy films' },
+            { id:'dstv_fam',     nom:'Family',          prix:'~20-26$/mois', tv:1, desc:'Ankohonana' },
+            { id:'dstv_compact', nom:'Compact',         prix:'~40$/mois',    tv:1, desc:'Sport + divertissement' },
+            { id:'dstv_compp',   nom:'Compact Plus',    prix:'~55-60$/mois', tv:1, desc:'Football maro' },
+            { id:'dstv_prem',    nom:'Premium',         prix:'~82$/mois',    tv:1, desc:'Sport premium rehetra' }
+        ]
+    }
+};
+
+let _currentBrand = null;
+
+function _toggleBrand(brand) {
+    const wasOpen = _currentBrand === brand;
+
+    // Reset all cards
+    Object.keys(ABONNEMENT_DATA).forEach(b => {
+        const card = document.getElementById('brand-' + b);
+        if (card) {
+            const color = ABONNEMENT_DATA[b].color;
+            card.style.borderColor = '#444';
+            card.style.boxShadow   = 'none';
+        }
+        const pg = document.getElementById('plans-' + b);
+        if (pg) pg.style.display = 'none';
+    });
+
+    const container = document.getElementById('abon-plans-container');
+    const form      = document.getElementById('abon-form');
+
+    if (wasOpen) {
+        _currentBrand = null;
+        if (container) container.style.display = 'none';
+        if (form) form.style.display = 'none';
+        return;
+    }
+
+    _currentBrand = brand;
+    const data  = ABONNEMENT_DATA[brand];
+    const card  = document.getElementById('brand-' + brand);
+    const pg    = document.getElementById('plans-' + brand);
+
+    if (card) {
+        card.style.borderColor = data.color;
+        card.style.boxShadow   = `0 0 12px ${data.color}44`;
+    }
+
+    // Build plans list if not already built
+    if (pg) {
+        const listEl = pg.querySelector('.abon-plan-list');
+        if (listEl && listEl.children.length === 0) {
+            data.plans.forEach(plan => {
+                const div = document.createElement('div');
+                div.style.cssText = `display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-input); border:1px solid #1f2236; border-radius:10px; margin-bottom:8px; cursor:pointer; transition:all 0.2s;`;
+                div.innerHTML = `
+                    <div style="min-width:0; flex:1;">
+                        <div style="color:#fff; font-weight:700; font-size:13px; font-family:'Rajdhani',sans-serif;">${plan.nom}</div>
+                        <div style="color:var(--gray); font-size:11px; margin-top:2px;">${plan.desc} · <span style="color:#888;">${plan.tv} TV</span></div>
+                    </div>
+                    <div style="text-align:right; flex-shrink:0; margin-left:10px;">
+                        <div style="color:${data.color}; font-weight:800; font-size:13px; font-family:'Exo 2',sans-serif;">${plan.prix}</div>
+                    </div>`;
+                div.onmouseenter = () => { div.style.borderColor = data.color + '88'; div.style.background = data.color + '0f'; };
+                div.onmouseleave = () => { div.style.borderColor = '#1f2236'; div.style.background = 'var(--bg-input)'; };
+                div.onclick = () => _selectAbonPlan(brand, plan);
+                listEl.appendChild(div);
+            });
+        }
+        pg.style.display = 'block';
+    }
+
+    if (container) container.style.display = 'block';
+    if (form) form.style.display = 'none';
+}
+
+function _selectAbonPlan(brand, plan) {
+    const infoEl = document.getElementById('abon-selected-info');
+    const form   = document.getElementById('abon-form');
+    if (infoEl) infoEl.innerHTML =
+        `${ABONNEMENT_DATA[brand].plans.find(p=>p.id===plan.id)?.nom || plan.nom} · <span style="opacity:0.8;">${plan.prix}</span> · ${plan.tv} TV · ${plan.desc}`;
+    if (form) { form.style.display = 'block'; form.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+}
+
+function _submitAbonnement() {
+    const nom    = document.getElementById('abon-nom')?.value.trim();
+    const email  = document.getElementById('abon-email')?.value.trim();
+    const mobile = document.getElementById('abon-mobile')?.value.trim();
+    const nbTv   = document.getElementById('abon-nb-tv')?.value;
+    const duree  = document.getElementById('abon-duree')?.value;
+    if (!nom || !mobile) return alert("Ampidiro ny anaranao sy ny laharana Mobile Money.");
+    alert(`✅ Fangatahana voaray!\n\n${nom} · ${nbTv} TV · ${duree} volana\nHandefa notification rehefa vita ny fijerena.`);
+}
+
+// =========================================================
+// CONVERTISSEUR DEVISES
 let _currentDevise = 'USD';
 let _tauxDevise    = { USD: 4600, EUR: 5000 }; // valeurs initiales, mises à jour Binance
 
