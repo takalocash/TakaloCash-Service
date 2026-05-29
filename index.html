@@ -829,8 +829,111 @@ select, input { font-family: var(--font); }
 }
 
 /* =====================================================
-   MODAL (profile)
+   RESPONSIVE — ALL DEVICES
+   Mobile (<480px) · Tablet (481-900px) · Desktop (>900px)
    ===================================================== */
+
+/* ── TABLET & DESKTOP: widen the layout ─────────────── */
+@media (min-width: 520px) {
+    .header-inner  { max-width: 900px; }
+    .container     { max-width: 900px; padding: 20px 28px; }
+    .auth-box      { max-width: 440px; }
+    .modal-legal-box { max-width: 620px; }
+
+    /* Services: 4 colonnes sur tablette/desktop */
+    .services-grid { grid-template-columns: repeat(4, 1fr); }
+
+    /* Convertisseur + Transaction côte à côte */
+    #binance-converter-card { max-width: 100%; }
+
+    /* Inputs en 2 colonnes toujours */
+    .trans-row2    { display: grid; grid-template-columns: 1fr 1fr; }
+
+    /* Footer 3 col déjà géré inline — ok */
+}
+
+@media (min-width: 900px) {
+    .container     { max-width: 1080px; padding: 24px 40px; }
+    .header-inner  { max-width: 1080px; }
+
+    #main-layout-grid {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        gap: 24px;
+        align-items: start;
+    }
+
+    #section-top    { grid-column: 1 / -1; }
+    #section-hist   { grid-column: 1 / -1; }
+    #app-footer     { grid-column: 1 / -1; }
+
+    .services-grid  { grid-template-columns: repeat(4, 1fr); }
+    .solde-amount   { font-size: 46px; }
+    .modal-legal-box { max-width: 700px; }
+    #bot-messages   { height: 300px; }
+
+    /* Footer 3 cols full width */
+    #footer-grid    { max-width: 900px; }
+}
+
+/* ── SMALL MOBILE (<400px): stack everything ────────── */
+@media (max-width: 480px) {
+    .header-logo-text { font-size: 13px; }
+
+    /* Services: 2 cols (déjà le cas) — keep */
+
+    /* Buttons action */
+    .btn-action    { padding: 12px 8px; font-size: 13px; }
+
+    /* Converter inputs: single column */
+    #converter-inputs-grid { grid-template-columns: 1fr !important; }
+
+    /* Trans row: single column */
+    .trans-row2    { display: flex; flex-direction: column; }
+
+    /* Abonnement brands: 2×2 already — keep */
+
+    /* Footer: single column on very small */
+    #footer-grid   { grid-template-columns: 1fr 1fr !important; }
+
+    /* Solde */
+    .solde-amount  { font-size: 30px; }
+    .solde-label   { font-size: 10px; }
+
+    /* Hist table font */
+    .hist-table    { font-size: 11px; }
+    .hist-table thead th { padding: 9px 8px; }
+    .hist-table tbody td { padding: 10px 8px; }
+
+    /* Modals full width */
+    .modal-legal   { padding: 10px; }
+    .modal-legal-box { padding: 18px 14px; }
+
+    /* Notification dropdown */
+    #notification-dropdown { width: 280px !important; right: -60px !important; }
+}
+
+/* ── TOUCH: remove hover flicker ───────────────────── */
+@media (hover: none) {
+    .service-item:hover   { border-color: var(--border); background: var(--bg-card); }
+    .footer-btn:hover     { background: rgba(255,255,255,0.05); border-color: var(--border-md); }
+}
+
+/* ── LANDSCAPE PHONE (height < 500px) ──────────────── */
+@media (max-height: 500px) and (orientation: landscape) {
+    #nav-header     { height: 48px; }
+    .auth-box       { padding: 20px 24px; }
+    .auth-logo      { margin-bottom: 16px; }
+    .auth-logo-icon { width: 48px; height: 48px; }
+    .auth-logo-text { font-size: 18px; }
+}
+
+/* ── PRINT / LARGE SCREENS ──────────────────────────── */
+@media (min-width: 1400px) {
+    .container    { max-width: 1200px; }
+    .header-inner { max-width: 1200px; }
+}
+
 .modal {
     display:         none;
     position:        fixed;
@@ -1170,6 +1273,7 @@ select, input { font-family: var(--font); }
         </div>
 
         <!-- Category cards -->
+        <div id="section-top"></div>
         <div class="services-grid">
             <div class="service-item active" id="btn-crypto" onclick="selectCategory('crypto')">
                 <div class="svc-icon-wrap gold"><i class="fa-brands fa-bitcoin"></i></div>
@@ -1200,6 +1304,9 @@ select, input { font-family: var(--font); }
                 </div>
             </div>
         </div>
+
+        <!-- ===== GRILLE PRINCIPALE (Convertisseur | Formulaire) ===== -->
+        <div id="main-layout-grid">
 
         <!-- ===== CONVERTISSEUR DYNAMIQUE ===== -->
         <div id="binance-converter-card" style="background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:18px 16px; margin-bottom:16px;">
@@ -1333,19 +1440,9 @@ select, input { font-family: var(--font); }
                             <label style="color:var(--gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; display:block;">Nom complet</label>
                             <input id="abon-nom" type="text" placeholder="Ex : Jean Rakoto" style="width:100%; padding:11px 12px; background:var(--bg-input); border:1px solid #222; border-radius:10px; color:#fff; font-size:13px; font-family:var(--font); outline:none; box-sizing:border-box;">
                         </div>
-                        <div>
+                        <div id="abon-email-wrap">
                             <label style="color:var(--gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; display:block;">Email (ou compte)</label>
                             <input id="abon-email" type="email" placeholder="votre@email.com" style="width:100%; padding:11px 12px; background:var(--bg-input); border:1px solid #222; border-radius:10px; color:#fff; font-size:13px; font-family:var(--font); outline:none; box-sizing:border-box;">
-                        </div>
-                        <div>
-                            <label style="color:var(--gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; display:block;">Nombre de TV / Appareils</label>
-                            <select id="abon-nb-tv" style="width:100%; padding:11px 12px; background:var(--bg-input); border:1px solid #222; border-radius:10px; color:#fff; font-size:13px; font-family:var(--font); outline:none; box-sizing:border-box;">
-                                <option value="1">1 appareil / TV</option>
-                                <option value="2">2 appareils / TV</option>
-                                <option value="3">3 appareils / TV</option>
-                                <option value="4">4 appareils / TV</option>
-                                <option value="6">6 appareils / TV</option>
-                            </select>
                         </div>
                         <div>
                             <label style="color:var(--gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; display:block;">Mobile Money (paiement)</label>
@@ -1359,6 +1456,13 @@ select, input { font-family: var(--font); }
                                 <option value="6">6 mois</option>
                                 <option value="12">12 mois</option>
                             </select>
+                        </div>
+                        <!-- Conditions -->
+                        <div style="display:flex; align-items:flex-start; gap:10px; background:rgba(255,255,255,0.04); padding:12px; border-radius:10px;">
+                            <input type="checkbox" id="abon-check" style="width:18px; height:18px; cursor:pointer; flex-shrink:0; margin-top:1px;">
+                            <label for="abon-check" style="font-size:12px; color:#aaa; cursor:pointer; line-height:1.5;">
+                                J'accepte les <span onclick="openConditionsModal()" style="color:var(--yellow); text-decoration:underline; font-weight:bold; cursor:pointer;">Conditions d'Utilisation</span> &amp; la <span onclick="openPolitiqueModal()" style="color:var(--yellow); text-decoration:underline; font-weight:bold; cursor:pointer;">Politique de Confidentialité</span> de TakaloCash.
+                            </label>
                         </div>
                         <button onclick="_submitAbonnement()" style="width:100%; padding:13px; background:var(--yellow); color:#13151e; border:none; border-radius:10px; font-weight:800; font-size:14px; font-family:var(--font); cursor:pointer; letter-spacing:0.3px; transition:background 0.2s;">
                             Commander cet abonnement
@@ -1444,8 +1548,10 @@ select, input { font-family: var(--font); }
 
             </div><!-- /.trans-body -->
         </div><!-- /.trans-box -->
+        </div><!-- /#main-layout-grid -->
 
         <!-- Recent transactions preview -->
+        <div id="section-hist">
         <div class="section-header">
             <span class="section-title">Historique des transferts</span>
             <span class="section-link" onclick="goToFullHistory()">Voir tout</span>
@@ -1469,6 +1575,7 @@ select, input { font-family: var(--font); }
             </table>
             </div>
         </div>
+        </div><!-- /#section-hist -->
 
     </div><!-- /#page-home -->
 
@@ -1504,7 +1611,7 @@ select, input { font-family: var(--font); }
      FOOTER
      ======================================== -->
 <footer class="app-footer" id="app-footer" style="display:none;">
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px 12px; max-width:520px; margin:0 auto 16px;">
+    <div id="footer-grid" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px 12px; max-width:520px; margin:0 auto 16px;">
 
         <!-- Colonne 1 : Légal + Aide -->
         <div>
@@ -1661,59 +1768,77 @@ select, input { font-family: var(--font); }
 </div>
 
 <!-- ========================================
-     MODAL — CENTRE D'AIDE
+     MODAL — CENTRE D'AIDE + BOT GEMINI
      ======================================== -->
 <div id="modal-help" class="modal-legal" style="display:none;">
-    <div class="modal-legal-box">
+    <div class="modal-legal-box" style="max-width:600px;">
         <h2 class="modal-legal-title">Centre d'Aide &amp; FAQ</h2>
-        <div class="modal-legal-body">
-            <p style="color:#7a8299; font-size:13px; margin-bottom:20px; text-align:center;">Retrouvez les réponses aux questions les plus fréquentes pour vous guider dans vos échanges.</p>
+        <div class="modal-legal-body" style="padding-right:4px;">
 
-            <details style="background:#0e101a; border:1px solid #222; border-radius:10px; padding:12px; margin-bottom:12px;">
-                <summary style="color:#fff; font-size:13px; font-weight:bold; cursor:pointer;">💡 Comment effectuer un échange sur TakaloCash ?</summary>
-                <p style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">
-                    C'est simple :<br>
-                    1. Choisissez le mode (Crypto, Wallet ou Betting) et l'actif (USDT, Mvola, 1XBet...).<br>
-                    2. Sélectionnez l'action (Envoyer ou Recevoir).<br>
-                    3. Saisissez le montant et l'adresse de destination (Wallet ou ID).<br>
-                    4. Cochez la case d'acceptation des conditions et validez l'opération.
-                </p>
+            <!-- FAQ -->
+            <details style="background:#0e101a; border:1px solid #222; border-radius:10px; padding:12px; margin-bottom:10px;">
+                <summary style="color:#fff; font-size:13px; font-weight:bold; cursor:pointer;">💡 Comment effectuer un échange ?</summary>
+                <p style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">1. Choisissez le mode et l'actif. 2. Sélectionnez Envoyer ou Recevoir. 3. Saisissez le montant et l'adresse. 4. Acceptez les conditions et validez.</p>
+            </details>
+            <details style="background:#0e101a; border:1px solid #222; border-radius:10px; padding:12px; margin-bottom:10px;">
+                <summary style="color:#fff; font-size:13px; font-weight:bold; cursor:pointer;">🕒 Quels sont les délais ?</summary>
+                <p style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">Entre <strong>15 minutes et 2 heures</strong>, selon la validation Blockchain ou le réseau Mobile Money.</p>
+            </details>
+            <details style="background:#0e101a; border:1px solid #222; border-radius:10px; padding:12px; margin-bottom:10px;">
+                <summary style="color:#fff; font-size:13px; font-weight:bold; cursor:pointer;">⚠️ Erreur d'adresse ou d'ID ?</summary>
+                <p style="margin-top:10px; border-top:1px solid #222; padding-top:10px;"><strong>Aucune annulation possible</strong> après validation. Revérifiez toujours vos coordonnées avant de confirmer.</p>
+            </details>
+            <details style="background:#0e101a; border:1px solid #222; border-radius:10px; padding:12px; margin-bottom:14px;">
+                <summary style="color:#fff; font-size:13px; font-weight:bold; cursor:pointer;">🔒 Mes données sont-elles sécurisées ?</summary>
+                <p style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">Oui. Infrastructure Supabase + protocole RLS. Vous seul accédez à votre historique privé.</p>
             </details>
 
-            <details style="background:#0e101a; border:1px solid #222; border-radius:10px; padding:12px; margin-bottom:12px;">
-                <summary style="color:#fff; font-size:13px; font-weight:bold; cursor:pointer;">🕒 Quels sont les délais de traitement ?</summary>
-                <p style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">
-                    Le traitement d'une transaction prend généralement entre <strong>15 minutes et 2 heures</strong>. Ce délai dépend de la rapidité de validation sur la Blockchain ou de la stabilité des réseaux de télécommunication mobiles (Mobile Money).
-                </p>
-            </details>
+            <!-- Bot Gemini -->
+            <div style="background:#0e101a; border:1px solid #1f2236; border-radius:12px; overflow:hidden; margin-bottom:12px;">
+                <div style="display:flex; align-items:center; gap:8px; padding:10px 14px; background:#13151e; border-bottom:1px solid #1f2236;">
+                    <div style="width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,#4285f4,#34a853,#fbbc04,#ea4335); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:900; color:#fff; font-family:sans-serif; flex-shrink:0;">G</div>
+                    <div>
+                        <div style="color:#fff; font-size:13px; font-weight:700; font-family:'Exo 2',sans-serif;">Assistant Gemini</div>
+                        <div id="bot-status-label" style="color:#1db954; font-size:10px;">● En ligne</div>
+                    </div>
+                    <div style="margin-left:auto;">
+                        <button onclick="_escalateToHuman()" id="btn-human" style="background:rgba(245,197,24,0.12); border:1px solid rgba(245,197,24,0.3); border-radius:8px; color:var(--yellow); font-size:11px; font-weight:700; padding:5px 10px; cursor:pointer; font-family:var(--font);">👤 Parler à un humain</button>
+                    </div>
+                </div>
 
-            <details style="background:#0e101a; border:1px solid #222; border-radius:10px; padding:12px; margin-bottom:12px;">
-                <summary style="color:#fff; font-size:13px; font-weight:bold; cursor:pointer;">⚠️ Que faire si je me suis trompé d'adresse ou d'ID ?</summary>
-                <p style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">
-                    En raison de la nature irréversible de la Blockchain et des transferts monétaires, <strong>aucune modification ou annulation n'est possible</strong> une fois la transaction validée. Veuillez toujours revérifier vos coordonnées avant de confirmer.
-                </p>
-            </details>
+                <!-- Messages -->
+                <div id="bot-messages" style="height:220px; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; gap:8px; align-items:flex-start;">
+                        <div style="width:22px; height:22px; border-radius:6px; background:linear-gradient(135deg,#4285f4,#34a853); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:900; color:#fff; flex-shrink:0;">G</div>
+                        <div style="background:#1a1d2e; border-radius:0 10px 10px 10px; padding:9px 12px; max-width:85%; font-size:12px; color:#ccc; line-height:1.5;">Bonjour ! Je suis l'assistant TakaloCash. Posez-moi vos questions sur les échanges, les frais, ou toute autre rubrique. 😊</div>
+                    </div>
+                </div>
 
-            <details style="background:#0e101a; border:1px solid #222; border-radius:10px; padding:12px; margin-bottom:12px;">
-                <summary style="color:#fff; font-size:13px; font-weight:bold; cursor:pointer;">💵 Comment sont calculés les frais ?</summary>
-                <p style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">
-                    Les frais dépendent de l'actif choisi et des frais de réseau du moment. Ils sont calculés automatiquement et s'affichent clairement dans le résumé avant que vous ne cliquiez sur le bouton de confirmation. Il n'y a aucun frais caché.
-                </p>
-            </details>
-
-            <details style="background:#0e101a; border:1px solid #222; border-radius:10px; padding:12px; margin-bottom:12px;">
-                <summary style="color:#fff; font-size:13px; font-weight:bold; cursor:pointer;">🔒 Mes données et mes fonds sont-ils sécurisés ?</summary>
-                <p style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">
-                    Oui, absolument. Nous utilisons l'infrastructure Supabase sécurisée avec le protocole RLS (Row Level Security). Vos informations de transaction sont chiffrées et vous êtes le seul à pouvoir consulter votre historique personnel.
-                </p>
-            </details>
-
-            <div style="margin-top:20px; padding:15px; background:rgba(245,197,24,0.05); border:1px dashed var(--yellow); border-radius:12px; text-align:center;">
-                <p style="color:#fff; font-size:12px; margin:0 0 10px 0;">Vous ne trouvez pas de réponse à votre problème ?</p>
-                <a href="https://wa.me/261347451051" target="_blank" style="color:var(--yellow); text-decoration:none; font-size:13px; font-weight:bold;">
-                    <i class="fa-brands fa-whatsapp"></i>&nbsp; Contacter le Support en Direct
-                </a>
+                <!-- Input -->
+                <div style="display:flex; gap:8px; padding:10px 12px; border-top:1px solid #1f2236; background:#0a0c14;">
+                    <input id="bot-input" type="text" placeholder="Posez votre question..." onkeydown="if(event.key==='Enter')_sendBotMessage()"
+                        style="flex:1; padding:9px 12px; background:#13151e; border:1px solid #2a2d40; border-radius:8px; color:#fff; font-size:13px; font-family:var(--font); outline:none;">
+                    <button onclick="_sendBotMessage()" style="padding:9px 14px; background:var(--yellow); color:#13151e; border:none; border-radius:8px; font-weight:800; cursor:pointer; font-family:var(--font); font-size:13px;">➤</button>
+                </div>
             </div>
+
+            <!-- Escalade humain (cachée par défaut) -->
+            <div id="human-escalade" style="display:none; padding:14px; background:rgba(245,197,24,0.05); border:1px solid rgba(245,197,24,0.2); border-radius:12px; text-align:center;">
+                <p style="color:#fff; font-size:13px; font-weight:700; margin:0 0 6px 0;">👤 Support humain TakaloCash</p>
+                <p style="color:var(--gray); font-size:12px; margin:0 0 12px 0;">Un agent vous répondra dès que possible.</p>
+                <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+                    <a href="https://wa.me/261347451051" target="_blank" style="display:flex; align-items:center; gap:6px; background:#25d366; color:#fff; text-decoration:none; border-radius:8px; padding:9px 16px; font-size:12px; font-weight:700;">
+                        <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                    </a>
+                    <a href="https://www.facebook.com/TakaloCash-Service" target="_blank" style="display:flex; align-items:center; gap:6px; background:#1877f2; color:#fff; text-decoration:none; border-radius:8px; padding:9px 16px; font-size:12px; font-weight:700;">
+                        <i class="fa-brands fa-facebook-messenger"></i> Messenger
+                    </a>
+                    <a href="mailto:takalocash@gmail.com" style="display:flex; align-items:center; gap:6px; background:#444; color:#fff; text-decoration:none; border-radius:8px; padding:9px 16px; font-size:12px; font-weight:700;">
+                        <i class="fa-regular fa-envelope"></i> Email
+                    </a>
+                </div>
+            </div>
+
         </div>
         <button class="modal-legal-btn" onclick="closeHelpModal()">Fermer</button>
     </div>
@@ -2743,13 +2868,105 @@ function _selectAbonPlan(brand, plan) {
 
 function _submitAbonnement() {
     const nom    = document.getElementById('abon-nom')?.value.trim();
-    const email  = document.getElementById('abon-email')?.value.trim();
     const mobile = document.getElementById('abon-mobile')?.value.trim();
-    const nbTv   = document.getElementById('abon-nb-tv')?.value;
-    const duree  = document.getElementById('abon-duree')?.value;
-    if (!nom || !mobile) return alert("Ampidiro ny anaranao sy ny laharana Mobile Money.");
-    alert(`✅ Fangatahana voaray!\n\n${nom} · ${nbTv} TV · ${duree} volana\nHandefa notification rehefa vita ny fijerena.`);
+    const check  = document.getElementById('abon-check');
+    if (!nom || !mobile)   return alert("Ampidiro ny anaranao sy ny laharana Mobile Money.");
+    if (!check?.checked)   return alert("Ekeo ny Conditions d'Utilisation aloha.");
+    const duree  = document.getElementById('abon-duree')?.value || '1';
+    alert(`✅ Fangatahana voaray!\n\n${nom} · ${duree} volana\nHandefa notification rehefa vita ny fijerena.`);
 }
+
+// =========================================================
+// BOT GEMINI — CENTRE D'AIDE
+// =========================================================
+const _GEMINI_API = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const _GEMINI_KEY = 'AIzaSyDemo_RemplacezParVotreCleAPI'; // ← remplacez par votre clé API Gemini
+const _BOT_CONTEXT = `Tu es l'assistant virtuel de TakaloCash, une plateforme malgache d'échange de crypto-monnaies, Mobile Money et recharges de paris sportifs. 
+Tu réponds uniquement aux questions liées à TakaloCash : échanges, frais, délais, abonnements (CANAL+, Netflix, Spotify, DStv), crypto (USDT, TRX, BTC...), Mobile Money (Mvola, Airtel, Orange), et bookmakers (1xBet, Melbet, Betway...).
+Pour toute question hors sujet, redirige poliment vers le support humain.
+Réponds toujours en français, de manière concise (3-4 phrases max). Si tu ne peux pas répondre, dis-le clairement.`;
+
+let _botHistory = [];
+
+async function _sendBotMessage() {
+    const input   = document.getElementById('bot-input');
+    const msgBox  = document.getElementById('bot-messages');
+    if (!input || !msgBox) return;
+
+    const userText = input.value.trim();
+    if (!userText) return;
+    input.value = '';
+
+    // Affiche le message utilisateur
+    _appendBotMsg(msgBox, userText, 'user');
+
+    // Indicateur de frappe
+    const typingId = 'bot-typing-' + Date.now();
+    msgBox.insertAdjacentHTML('beforeend', `<div id="${typingId}" style="display:flex;gap:8px;align-items:flex-start;"><div style="width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#4285f4,#34a853);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;flex-shrink:0;">G</div><div style="background:#1a1d2e;border-radius:0 10px 10px 10px;padding:9px 12px;font-size:12px;color:#888;">...</div></div>`);
+    msgBox.scrollTop = msgBox.scrollHeight;
+
+    // Appel Gemini
+    try {
+        _botHistory.push({ role: 'user', parts: [{ text: userText }] });
+
+        const body = {
+            system_instruction: { parts: [{ text: _BOT_CONTEXT }] },
+            contents: _botHistory
+        };
+
+        const res  = await fetch(`${_GEMINI_API}?key=${_GEMINI_KEY}`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(body)
+        });
+        const data = await res.json();
+        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || null;
+
+        document.getElementById(typingId)?.remove();
+
+        if (reply) {
+            _botHistory.push({ role: 'model', parts: [{ text: reply }] });
+            _appendBotMsg(msgBox, reply, 'bot');
+            _checkEscalation(reply);
+        } else {
+            _appendBotMsg(msgBox, "Je n'ai pas pu traiter votre demande. Souhaitez-vous parler à un agent humain ?", 'bot', true);
+        }
+    } catch (e) {
+        document.getElementById(typingId)?.remove();
+        _appendBotMsg(msgBox, "Problème de connexion. Cliquez sur « Parler à un humain » pour contacter notre équipe.", 'bot', true);
+    }
+}
+
+function _appendBotMsg(container, text, role, showEscalate = false) {
+    const isUser = role === 'user';
+    const html = isUser
+        ? `<div style="display:flex;justify-content:flex-end;"><div style="background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.2);border-radius:10px 0 10px 10px;padding:9px 12px;max-width:85%;font-size:12px;color:#fff;line-height:1.5;">${_escHtml(text)}</div></div>`
+        : `<div style="display:flex;gap:8px;align-items:flex-start;"><div style="width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#4285f4,#34a853);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;flex-shrink:0;">G</div><div style="background:#1a1d2e;border-radius:0 10px 10px 10px;padding:9px 12px;max-width:85%;font-size:12px;color:#ccc;line-height:1.5;">${_escHtml(text)}${showEscalate ? ' <span onclick="_escalateToHuman()" style="color:var(--yellow);cursor:pointer;font-weight:700;text-decoration:underline;">→ Support humain</span>' : ''}</div></div>`;
+    container.insertAdjacentHTML('beforeend', html);
+    container.scrollTop = container.scrollHeight;
+}
+
+function _escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+function _checkEscalation(reply) {
+    const escalateKeywords = ['je ne peux pas', 'hors de ma portée', 'contacter le support', 'agent humain', 'impossible de répondre'];
+    if (escalateKeywords.some(k => reply.toLowerCase().includes(k))) {
+        _escalateToHuman();
+    }
+}
+
+function _escalateToHuman() {
+    const el = document.getElementById('human-escalade');
+    const lbl = document.getElementById('bot-status-label');
+    if (el) { el.style.display = 'block'; el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+    if (lbl) { lbl.style.color = '#f59e0b'; lbl.textContent = '● Transfert vers agent…'; }
+}
+
+// Reset bot when modal closes
+const _origCloseHelp = closeHelpModal;
+closeHelpModal = function() { _origCloseHelp(); };
 
 // =========================================================
 // CONVERTISSEUR DEVISES
