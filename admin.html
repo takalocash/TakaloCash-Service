@@ -1,0 +1,1319 @@
+cat > /home/claude/admin.html << 'HTMLEOF'
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TakaloCash — Tableau de bord Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+/* ==========================================
+   TOKENS — identiques transactions.html
+   ========================================== */
+:root {
+  --bg:        #0d0d0f;
+  --surface:   #141417;
+  --card:      #1a1a1f;
+  --card2:     #202028;
+  --border:    #2a2a35;
+  --gold:      #f5c518;
+  --gold-dim:  #c9a010;
+  --gold-glow: rgba(245,197,24,.15);
+  --green:     #22c55e;
+  --green-dim: #16a34a;
+  --red:       #ef4444;
+  --blue:      #3b82f6;
+  --purple:    #a855f7;
+  --orange:    #f97316;
+  --txt:       #e8e8f0;
+  --txt-muted: #8888a0;
+  --txt-dim:   #55556a;
+  --radius:    14px;
+  --radius-sm: 8px;
+  --shadow:    0 4px 24px rgba(0,0,0,.45);
+  --shadow-gold: 0 0 20px rgba(245,197,24,.18);
+  --sidebar-w: 260px;
+  --topbar-h:  64px;
+  --transition: .22s cubic-bezier(.4,0,.2,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg); color: var(--txt);
+  min-height: 100vh; overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+input, select, textarea {
+  font: inherit; color: var(--txt);
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: .55rem .9rem;
+  outline: none; transition: border-color var(--transition);
+}
+input:focus, select:focus, textarea:focus { border-color: var(--gold); }
+select option { background: var(--card); }
+ul { list-style: none; }
+
+/* ==========================================
+   LAYOUT
+   ========================================== */
+.layout { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: var(--sidebar-w); background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; bottom: 0;
+  z-index: 200; transition: transform var(--transition);
+  overflow-y: auto;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.sidebar-logo {
+  display: flex; align-items: center; gap: .75rem;
+  padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+  min-height: var(--topbar-h);
+}
+.logo-icon {
+  width: 36px; height: 36px; background: var(--gold);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; color: #000; font-weight: 900;
+  box-shadow: var(--shadow-gold); flex-shrink: 0;
+}
+.logo-text { font-size: 1.05rem; font-weight: 700; letter-spacing: .02em; }
+.logo-text span { color: var(--gold); }
+.badge-admin {
+  margin-left: auto; font-size: .6rem; background: var(--gold);
+  color: #000; border-radius: 4px; padding: 2px 6px;
+  font-weight: 700; letter-spacing: .05em; flex-shrink: 0;
+}
+
+.sidebar-nav { flex: 1; padding: 1rem 0; }
+.nav-section { margin-bottom: .25rem; }
+.nav-label {
+  font-size: .65rem; letter-spacing: .1em; color: var(--txt-dim);
+  font-weight: 700; text-transform: uppercase; padding: .6rem 1.5rem .3rem;
+}
+.nav-item {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .6rem 1.5rem; cursor: pointer;
+  color: var(--txt-muted); font-size: .88rem;
+  transition: background var(--transition), color var(--transition);
+  position: relative;
+}
+.nav-item:hover { background: rgba(255,255,255,.04); color: var(--txt); }
+.nav-item.active { background: var(--gold-glow); color: var(--gold); font-weight: 600; }
+.nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 10%; height: 80%;
+  width: 3px; background: var(--gold); border-radius: 0 2px 2px 0;
+}
+.nav-item i { width: 18px; text-align: center; font-size: .9rem; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto; font-size: .65rem; background: var(--red);
+  color: #fff; border-radius: 20px; padding: 1px 7px; font-weight: 700;
+}
+.nav-badge.gold { background: var(--gold); color: #000; }
+.sidebar-footer {
+  padding: 1rem 1.5rem; border-top: 1px solid var(--border);
+  font-size: .78rem; color: var(--txt-dim); text-align: center;
+}
+
+.main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+.topbar {
+  height: var(--topbar-h); background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0 1.75rem; position: sticky; top: 0; z-index: 100;
+}
+.topbar-hamburger {
+  display: none; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
+  color: var(--txt-muted); font-size: 1.1rem;
+  transition: background var(--transition), color var(--transition);
+}
+.topbar-hamburger:hover { background: var(--card2); color: var(--txt); }
+.topbar-search { flex: 1; max-width: 380px; position: relative; }
+.topbar-search i { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); color: var(--txt-dim); font-size: .85rem; pointer-events: none; }
+.topbar-search input { width: 100%; padding: .5rem .9rem .5rem 2.3rem; font-size: .85rem; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: .75rem; }
+.topbar-icon-btn {
+  position: relative; width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm); color: var(--txt-muted); font-size: 1rem;
+  transition: background var(--transition), color var(--transition);
+}
+.topbar-icon-btn:hover { background: var(--card2); color: var(--txt); }
+.topbar-icon-btn .dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--red); border-radius: 50%; border: 2px solid var(--surface); }
+.topbar-divider { width: 1px; height: 28px; background: var(--border); }
+.admin-profile { display: flex; align-items: center; gap: .6rem; cursor: pointer; padding: .3rem .5rem; border-radius: var(--radius-sm); transition: background var(--transition); }
+.admin-profile:hover { background: var(--card2); }
+.admin-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #ff9900); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; color: #000; flex-shrink: 0; }
+.admin-info { display: flex; flex-direction: column; }
+.admin-name { font-size: .82rem; font-weight: 600; line-height: 1.2; }
+.admin-role { font-size: .68rem; color: var(--gold); font-weight: 500; }
+.btn-logout { display: flex; align-items: center; gap: .45rem; padding: .45rem .9rem; background: rgba(239,68,68,.1); color: var(--red); border: 1px solid rgba(239,68,68,.2); border-radius: var(--radius-sm); font-size: .8rem; font-weight: 600; transition: background var(--transition); }
+.btn-logout:hover { background: rgba(239,68,68,.2); }
+
+/* ==========================================
+   PAGE CONTENT
+   ========================================== */
+.page-content {
+  flex: 1; padding: 2rem 1.75rem;
+  display: flex; flex-direction: column; gap: 1.5rem;
+  animation: fadeIn .25s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.page-title { font-size: 1.45rem; font-weight: 700; }
+.page-subtitle { font-size: .82rem; color: var(--txt-muted); margin-top: .2rem; }
+.page-actions { display: flex; gap: .6rem; flex-wrap: wrap; }
+
+/* ==========================================
+   BUTTONS
+   ========================================== */
+.btn { display: inline-flex; align-items: center; gap: .45rem; padding: .55rem 1.1rem; border-radius: var(--radius-sm); font-size: .83rem; font-weight: 600; transition: all var(--transition); flex-shrink: 0; }
+.btn-primary { background: var(--gold); color: #000; }
+.btn-primary:hover { background: var(--gold-dim); box-shadow: var(--shadow-gold); }
+.btn-secondary { background: var(--card2); color: var(--txt); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--border); }
+.btn-danger { background: rgba(239,68,68,.15); color: var(--red); border: 1px solid rgba(239,68,68,.25); }
+.btn-danger:hover { background: rgba(239,68,68,.25); }
+.btn-success { background: rgba(34,197,94,.15); color: var(--green); border: 1px solid rgba(34,197,94,.25); }
+.btn-success:hover { background: rgba(34,197,94,.25); }
+.btn-sm { padding: .35rem .75rem; font-size: .76rem; }
+.btn-xs { padding: .22rem .55rem; font-size: .7rem; }
+
+/* ==========================================
+   CARDS
+   ========================================== */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.4rem; box-shadow: var(--shadow); }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+.card-title { font-size: .95rem; font-weight: 700; }
+.card-title i { color: var(--gold); margin-right: .45rem; }
+
+/* ==========================================
+   STATS GRID PRINCIPALE
+   ========================================== */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+
+.kpi-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.25rem;
+  display: flex; flex-direction: column; gap: .5rem;
+  box-shadow: var(--shadow); position: relative; overflow: hidden;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,.5); }
+.kpi-card::after {
+  content: ''; position: absolute; bottom: -20px; right: -20px;
+  width: 90px; height: 90px; border-radius: 50%; opacity: .06;
+}
+.kpi-card.gold::after { background: var(--gold); }
+.kpi-card.green::after { background: var(--green); }
+.kpi-card.red::after { background: var(--red); }
+.kpi-card.blue::after { background: var(--blue); }
+.kpi-card.purple::after { background: var(--purple); }
+.kpi-card.orange::after { background: var(--orange); }
+
+.kpi-top { display: flex; align-items: center; justify-content: space-between; }
+.kpi-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+.kpi-icon.gold { background: rgba(245,197,24,.15); color: var(--gold); }
+.kpi-icon.green { background: rgba(34,197,94,.15); color: var(--green); }
+.kpi-icon.red { background: rgba(239,68,68,.15); color: var(--red); }
+.kpi-icon.blue { background: rgba(59,130,246,.15); color: var(--blue); }
+.kpi-icon.purple { background: rgba(168,85,247,.15); color: var(--purple); }
+.kpi-icon.orange { background: rgba(249,115,22,.15); color: var(--orange); }
+
+.kpi-trend {
+  display: flex; align-items: center; gap: .25rem;
+  font-size: .7rem; font-weight: 700; padding: .2rem .5rem;
+  border-radius: 20px;
+}
+.kpi-trend.up { background: rgba(34,197,94,.12); color: var(--green); }
+.kpi-trend.down { background: rgba(239,68,68,.12); color: var(--red); }
+.kpi-trend.flat { background: rgba(136,136,160,.1); color: var(--txt-muted); }
+
+.kpi-value { font-size: 1.65rem; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+.kpi-value.sm { font-size: 1.15rem; }
+.kpi-label { font-size: .72rem; color: var(--txt-muted); font-weight: 500; }
+.kpi-sub { font-size: .7rem; color: var(--txt-dim); margin-top: -.1rem; }
+
+/* ==========================================
+   BADGES
+   ========================================== */
+.badge { display: inline-flex; align-items: center; gap: .3rem; padding: .25rem .65rem; border-radius: 20px; font-size: .72rem; font-weight: 700; white-space: nowrap; }
+.badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.badge-success { background: rgba(34,197,94,.12); color: var(--green); }
+.badge-success::before { background: var(--green); }
+.badge-pending { background: rgba(245,197,24,.12); color: var(--gold); }
+.badge-pending::before { background: var(--gold); }
+.badge-danger { background: rgba(239,68,68,.12); color: var(--red); }
+.badge-danger::before { background: var(--red); }
+.badge-info { background: rgba(59,130,246,.12); color: var(--blue); }
+.badge-info::before { background: var(--blue); }
+.badge-purple { background: rgba(168,85,247,.12); color: var(--purple); }
+.badge-purple::before { background: var(--purple); }
+.badge-orange { background: rgba(249,115,22,.12); color: var(--orange); }
+.badge-orange::before { background: var(--orange); }
+
+/* ==========================================
+   GRID 2 COLONNES
+   ========================================== */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; }
+
+/* ==========================================
+   CHART AREA (canvas mini)
+   ========================================== */
+.chart-wrap { position: relative; height: 180px; }
+.chart-wrap canvas { width: 100% !important; }
+
+/* ==========================================
+   MINI CHART BARS
+   ========================================== */
+.bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 60px; }
+.bar-col { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1; }
+.bar { width: 100%; border-radius: 3px 3px 0 0; transition: opacity .2s; cursor: default; }
+.bar:hover { opacity: .8; }
+.bar-label { font-size: .55rem; color: var(--txt-dim); white-space: nowrap; }
+
+/* ==========================================
+   RECENT TRANSACTIONS TABLE
+   ========================================== */
+.data-table { border-collapse: collapse; width: 100%; }
+.data-table th, .data-table td { padding: .65rem .85rem; text-align: left; font-size: .81rem; }
+.data-table thead tr { background: var(--card2); border-bottom: 1px solid var(--border); }
+.data-table thead th { color: var(--txt-muted); font-weight: 600; font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+.data-table tbody tr { border-bottom: 1px solid rgba(42,42,53,.5); transition: background var(--transition); cursor: pointer; }
+.data-table tbody tr:hover { background: rgba(245,197,24,.04); }
+.data-table tbody tr:last-child { border-bottom: none; }
+.data-table td { vertical-align: middle; }
+.table-wrap { overflow-x: auto; }
+.table-wrap::-webkit-scrollbar { height: 5px; }
+.table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ==========================================
+   USER CELL
+   ========================================== */
+.user-cell { display: flex; align-items: center; gap: .55rem; }
+.user-av { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 700; flex-shrink: 0; }
+.user-av.a { background: linear-gradient(135deg,#f5c518,#ff9900); color:#000; }
+.user-av.b { background: linear-gradient(135deg,#22c55e,#059669); color:#000; }
+.user-av.c { background: linear-gradient(135deg,#3b82f6,#7c3aed); color:#fff; }
+.user-av.d { background: linear-gradient(135deg,#ef4444,#ec4899); color:#fff; }
+.user-av.e { background: linear-gradient(135deg,#a855f7,#6366f1); color:#fff; }
+.user-name { font-size: .82rem; font-weight: 600; }
+.user-email { font-size: .7rem; color: var(--txt-muted); }
+
+.mono { font-family: 'Courier New', monospace; font-size: .76rem; color: var(--txt-muted); }
+
+/* ==========================================
+   ACTIVITY FEED
+   ========================================== */
+.activity-feed { display: flex; flex-direction: column; gap: 0; }
+.activity-item {
+  display: flex; align-items: flex-start; gap: .75rem;
+  padding: .75rem 0; border-bottom: 1px solid rgba(42,42,53,.5);
+}
+.activity-item:last-child { border-bottom: none; }
+.act-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .78rem; flex-shrink: 0; }
+.act-body { flex: 1; }
+.act-title { font-size: .82rem; font-weight: 600; line-height: 1.3; }
+.act-meta { font-size: .72rem; color: var(--txt-muted); margin-top: .15rem; }
+.act-time { font-size: .7rem; color: var(--txt-dim); white-space: nowrap; margin-left: auto; }
+
+/* ==========================================
+   CRYPTO RATES WIDGET
+   ========================================== */
+.rates-grid { display: flex; flex-direction: column; gap: .5rem; }
+.rate-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .6rem .85rem; background: var(--card2);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  transition: background var(--transition);
+}
+.rate-row:hover { background: rgba(245,197,24,.05); }
+.rate-coin { display: flex; align-items: center; gap: .6rem; }
+.coin-dot { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 800; flex-shrink: 0; }
+.coin-dot.usdt { background: rgba(38,161,123,.2); color: #26a17b; }
+.coin-dot.btc  { background: rgba(247,147,26,.2); color: #f7931a; }
+.coin-dot.eth  { background: rgba(98,126,234,.2); color: #627eea; }
+.coin-dot.bnb  { background: rgba(243,186,47,.2); color: #f3ba2f; }
+.coin-dot.trx  { background: rgba(239,68,68,.2); color: #ef4444; }
+.coin-name { font-size: .82rem; font-weight: 700; }
+.coin-net  { font-size: .68rem; color: var(--txt-dim); }
+.rate-mga { font-size: .88rem; font-weight: 700; }
+.rate-change { font-size: .72rem; font-weight: 700; }
+.rate-change.up   { color: var(--green); }
+.rate-change.down { color: var(--red); }
+
+/* ==========================================
+   QUICK ACTIONS
+   ========================================== */
+.quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; }
+.quick-btn {
+  display: flex; align-items: center; gap: .7rem;
+  padding: .8rem 1rem; border-radius: var(--radius-sm);
+  background: var(--card2); border: 1px solid var(--border);
+  cursor: pointer; transition: all var(--transition);
+  font-size: .82rem; font-weight: 600;
+}
+.quick-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
+.quick-btn i { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: .85rem; flex-shrink: 0; }
+
+/* ==========================================
+   PROGRESS BAR
+   ========================================== */
+.progress-bar { background: var(--card2); border-radius: 20px; height: 6px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 20px; transition: width .6s ease; }
+
+/* ==========================================
+   TOP CLIENTS TABLE
+   ========================================== */
+.top-item {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .6rem 0; border-bottom: 1px solid rgba(42,42,53,.5);
+}
+.top-item:last-child { border-bottom: none; }
+.top-rank { width: 22px; font-size: .75rem; font-weight: 800; color: var(--txt-dim); text-align: center; flex-shrink: 0; }
+.top-rank.gold-rank { color: var(--gold); }
+.top-info { flex: 1; }
+.top-name { font-size: .82rem; font-weight: 600; }
+.top-vol  { font-size: .7rem; color: var(--txt-muted); }
+.top-amount { font-size: .85rem; font-weight: 700; color: var(--green); }
+
+/* ==========================================
+   ALERT BANNER
+   ========================================== */
+.alert-banner {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .85rem 1.1rem; border-radius: var(--radius-sm);
+  font-size: .83rem; margin-bottom: .25rem;
+}
+.alert-banner.warning { background: rgba(249,115,22,.1); border: 1px solid rgba(249,115,22,.25); color: var(--orange); }
+.alert-banner.danger  { background: rgba(239,68,68,.1);  border: 1px solid rgba(239,68,68,.25);  color: var(--red); }
+.alert-banner.info    { background: rgba(59,130,246,.1); border: 1px solid rgba(59,130,246,.25); color: var(--blue); }
+.alert-banner i { flex-shrink: 0; }
+.alert-close { margin-left: auto; cursor: pointer; opacity: .6; transition: opacity .2s; }
+.alert-close:hover { opacity: 1; }
+
+/* ==========================================
+   TOAST
+   ========================================== */
+#toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: .5rem; }
+.toast {
+  display: flex; align-items: center; gap: .7rem;
+  padding: .8rem 1.1rem; border-radius: var(--radius-sm);
+  background: var(--card); border: 1px solid var(--border);
+  box-shadow: var(--shadow); min-width: 260px; max-width: 360px;
+  animation: slideInRight .3s ease; font-size: .83rem; font-weight: 500;
+}
+@keyframes slideInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error   { border-left: 3px solid var(--red); }
+.toast.info    { border-left: 3px solid var(--blue); }
+.toast.warning { border-left: 3px solid var(--gold); }
+.toast i { font-size: 1rem; flex-shrink: 0; }
+.toast.success i { color: var(--green); }
+.toast.error i   { color: var(--red); }
+.toast.info i    { color: var(--blue); }
+.toast.warning i { color: var(--gold); }
+
+/* ==========================================
+   SIDEBAR OVERLAY
+   ========================================== */
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 199; }
+
+/* ==========================================
+   SCROLLBAR
+   ========================================== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ==========================================
+   SKELETON
+   ========================================== */
+@keyframes shimmer { from { background-position: -400px 0; } to { background-position: 400px 0; } }
+.skeleton { background: linear-gradient(90deg, var(--card2) 25%, var(--border) 50%, var(--card2) 75%); background-size: 400px 100%; animation: shimmer 1.4s infinite; border-radius: 4px; }
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (max-width: 1100px) {
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 960px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); box-shadow: 4px 0 40px rgba(0,0,0,.6); }
+  .sidebar-overlay.show { display: block; }
+  .main { margin-left: 0; }
+  .topbar-hamburger { display: flex; }
+  .page-content { padding: 1.25rem 1rem; }
+  .admin-info { display: none; }
+  .btn-logout span { display: none; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .page-title { font-size: 1.15rem; }
+  .topbar { padding: 0 1rem; gap: .6rem; }
+  .topbar-search { max-width: 150px; }
+  .quick-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="layout">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">TC</div>
+      <span class="logo-text">Takalo<span>Cash</span></span>
+      <span class="badge-admin">ADMIN</span>
+    </div>
+    <nav class="sidebar-nav">
+      <ul class="nav-section">
+        <li class="nav-label">Principal</li>
+        <li class="nav-item active"><i class="fa fa-chart-pie"></i> Tableau de bord</li>
+        <li class="nav-item" onclick="window.location='transactions.html'"><i class="fa fa-arrow-right-arrow-left"></i> Transactions <span class="nav-badge" id="nb-pending">–</span></li>
+        <li class="nav-item"><i class="fa fa-users"></i> Utilisateurs</li>
+        <li class="nav-item"><i class="fa fa-id-card"></i> KYC <span class="nav-badge gold" id="nb-kyc">–</span></li>
+      </ul>
+      <ul class="nav-section">
+        <li class="nav-label">Finance</li>
+        <li class="nav-item"><i class="fa fa-chart-line"></i> Taux</li>
+        <li class="nav-item"><i class="fa fa-percent"></i> Frais</li>
+        <li class="nav-item"><i class="fa fa-vault"></i> Réserves</li>
+        <li class="nav-item"><i class="fa fa-wallet"></i> Wallets</li>
+      </ul>
+      <ul class="nav-section">
+        <li class="nav-label">Communication</li>
+        <li class="nav-item"><i class="fa fa-bell"></i> Notifications</li>
+        <li class="nav-item"><i class="fa fa-file-lines"></i> Contenu du site</li>
+        <li class="nav-item"><i class="fa fa-star"></i> Témoignages</li>
+        <li class="nav-item"><i class="fa fa-handshake"></i> Partenaires</li>
+      </ul>
+      <ul class="nav-section">
+        <li class="nav-label">Système</li>
+        <li class="nav-item"><i class="fa fa-file-chart-column"></i> Rapports</li>
+        <li class="nav-item"><i class="fa fa-gear"></i> Paramètres</li>
+        <li class="nav-item"><i class="fa fa-shield-halved"></i> Sécurité</li>
+        <li class="nav-item"><i class="fa fa-database"></i> Sauvegardes</li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">v2.4.1 &nbsp;·&nbsp; TakaloCash © 2025</div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="topbar-hamburger" onclick="openSidebar()"><i class="fa fa-bars"></i></button>
+      <div class="topbar-search">
+        <i class="fa fa-magnifying-glass"></i>
+        <input type="text" placeholder="Recherche globale…">
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-icon-btn" title="Actualiser" onclick="loadDashboard()">
+          <i class="fa fa-arrows-rotate" id="refresh-icon"></i>
+        </button>
+        <button class="topbar-icon-btn"><i class="fa fa-bell"></i><span class="dot"></span></button>
+        <div class="topbar-divider"></div>
+        <div class="admin-profile">
+          <div class="admin-avatar">AD</div>
+          <div class="admin-info">
+            <span class="admin-name">Admin Chief</span>
+            <span class="admin-role">Super Admin</span>
+          </div>
+        </div>
+        <button class="btn-logout"><i class="fa fa-right-from-bracket"></i><span>Déconnexion</span></button>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+      <!-- ALERTS -->
+      <div id="alerts-zone"></div>
+
+      <!-- PAGE HEADER -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">
+            <i class="fa fa-chart-pie" style="color:var(--gold);margin-right:.45rem"></i>Tableau de bord
+          </h1>
+          <p class="page-subtitle" id="last-update">Chargement en cours…</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-secondary btn-sm" onclick="loadDashboard()"><i class="fa fa-arrows-rotate"></i> Actualiser</button>
+          <button class="btn btn-primary btn-sm" onclick="window.location='transactions.html'"><i class="fa fa-arrow-right-arrow-left"></i> Transactions</button>
+        </div>
+      </div>
+
+      <!-- KPI CARDS -->
+      <div class="kpi-grid" id="kpi-grid">
+        <!-- Rempli par JS -->
+      </div>
+
+      <!-- LIGNE 1 : Chart volume + Activité récente -->
+      <div class="grid-2">
+
+        <!-- Volume Chart (7 derniers jours) -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fa fa-chart-bar"></i>Volume — 7 derniers jours</span>
+            <div style="display:flex;gap:.4rem">
+              <button class="btn btn-secondary btn-xs" id="vol-usdt-btn" onclick="switchVolChart('usdt')">USDT</button>
+              <button class="btn btn-xs" id="vol-mga-btn" style="background:var(--gold);color:#000" onclick="switchVolChart('mga')">MGA</button>
+            </div>
+          </div>
+          <div class="chart-wrap" id="vol-chart-wrap">
+            <!-- Barres SVG générées en JS -->
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)">
+            <div>
+              <div style="font-size:.7rem;color:var(--txt-muted)">Total semaine</div>
+              <div style="font-size:1rem;font-weight:700;color:var(--green)" id="vol-week-total">–</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:.7rem;color:var(--txt-muted)">Meilleur jour</div>
+              <div style="font-size:1rem;font-weight:700;color:var(--gold)" id="vol-best-day">–</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Répartition par statut -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fa fa-pie-chart"></i>Répartition des statuts</span>
+            <span style="font-size:.72rem;color:var(--txt-dim)">ce mois</span>
+          </div>
+          <div id="status-donut-wrap" style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
+            <!-- SVG donut + légende -->
+          </div>
+          <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div style="font-size:.7rem;color:var(--txt-muted);margin-bottom:.5rem">Taux de complétion</div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="completion-bar" style="background:var(--green);width:0%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:.35rem">
+              <span style="font-size:.7rem;color:var(--txt-dim)" id="completion-label">–</span>
+              <span style="font-size:.7rem;font-weight:700;color:var(--green)" id="completion-pct">–</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- LIGNE 2 : Transactions récentes + Taux crypto -->
+      <div class="grid-2">
+
+        <!-- Transactions récentes -->
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span class="card-title" style="margin:0"><i class="fa fa-clock-rotate-left"></i>Transactions récentes</span>
+            <button class="btn btn-secondary btn-sm" onclick="window.location='transactions.html'">Voir tout <i class="fa fa-arrow-right" style="font-size:.7rem"></i></button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="recent-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Client</th>
+                  <th>Type</th>
+                  <th>Montant</th>
+                  <th>Statut</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="recent-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--txt-dim)"><i class="fa fa-spinner fa-spin"></i></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Taux crypto live -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fa fa-coins"></i>Taux de change</span>
+            <span style="font-size:.68rem;padding:.2rem .55rem;background:rgba(34,197,94,.12);color:var(--green);border-radius:20px;font-weight:700">
+              <i class="fa fa-circle" style="font-size:.45rem;margin-right:.2rem"></i>LIVE
+            </span>
+          </div>
+          <div class="rates-grid" id="rates-grid">
+            <!-- Rempli par JS -->
+          </div>
+          <div style="margin-top:.85rem;padding-top:.85rem;border-top:1px solid var(--border);font-size:.72rem;color:var(--txt-dim);display:flex;align-items:center;gap:.4rem">
+            <i class="fa fa-circle-info"></i>
+            Source : Binance Spot · Mise à jour toutes les 30s
+          </div>
+        </div>
+
+      </div>
+
+      <!-- LIGNE 3 : Top clients + Actions rapides + Activité -->
+      <div class="grid-3">
+
+        <!-- Top clients -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fa fa-trophy"></i>Top Clients</span>
+            <span style="font-size:.72rem;color:var(--txt-dim)">volume USDT</span>
+          </div>
+          <div id="top-clients-list">
+            <!-- Rempli par JS -->
+          </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fa fa-bolt"></i>Actions rapides</span>
+          </div>
+          <div class="quick-grid">
+            <button class="quick-btn" onclick="window.location='transactions.html'">
+              <i class="fa fa-plus" style="background:rgba(245,197,24,.15);color:var(--gold)"></i>
+              Nouvelle transaction
+            </button>
+            <button class="quick-btn" onclick="showToast('KYC — disponible prochainement','info')">
+              <i class="fa fa-id-card" style="background:rgba(59,130,246,.15);color:var(--blue)"></i>
+              Valider KYC
+            </button>
+            <button class="quick-btn" onclick="showToast('Rapport en cours de génération…','info')">
+              <i class="fa fa-file-pdf" style="background:rgba(239,68,68,.15);color:var(--red)"></i>
+              Exporter rapport
+            </button>
+            <button class="quick-btn" onclick="showToast('Envoi de notification…','info')">
+              <i class="fa fa-bell" style="background:rgba(168,85,247,.15);color:var(--purple)"></i>
+              Notification push
+            </button>
+            <button class="quick-btn" onclick="showToast('Wallets — disponible prochainement','info')">
+              <i class="fa fa-wallet" style="background:rgba(34,197,94,.15);color:var(--green)"></i>
+              Gérer wallets
+            </button>
+            <button class="quick-btn" onclick="showToast('Sécurité — disponible prochainement','info')">
+              <i class="fa fa-shield-halved" style="background:rgba(249,115,22,.15);color:var(--orange)"></i>
+              Journal sécurité
+            </button>
+          </div>
+        </div>
+
+        <!-- Activité récente -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fa fa-timeline"></i>Activité</span>
+            <span class="badge badge-info" style="font-size:.65rem">Aujourd'hui</span>
+          </div>
+          <div class="activity-feed" id="activity-feed">
+            <!-- Rempli par JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- LIGNE 4 : Répartition Mobile Money + Crypto -->
+      <div class="grid-2">
+
+        <!-- Répartition Mobile Money -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fa fa-mobile-screen"></i>Mobile Money</span>
+            <span style="font-size:.72rem;color:var(--txt-dim)">volume transactions</span>
+          </div>
+          <div id="mm-chart" style="display:flex;flex-direction:column;gap:.6rem"></div>
+        </div>
+
+        <!-- Répartition Crypto -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fa fa-bitcoin-sign"></i>Répartition Crypto</span>
+            <span style="font-size:.72rem;color:var(--txt-dim)">par volume USDT</span>
+          </div>
+          <div id="crypto-chart" style="display:flex;flex-direction:column;gap:.6rem"></div>
+        </div>
+
+      </div>
+
+    </div><!-- /page-content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- ==========================================
+     JAVASCRIPT
+     ========================================== -->
+<script>
+/* ============================================
+   CONFIG SUPABASE
+   ============================================ */
+const SUPABASE_URL = 'https://VOTRE_PROJECT.supabase.co';
+const SUPABASE_KEY = 'VOTRE_ANON_KEY';
+const DEMO_MODE = SUPABASE_URL.includes('VOTRE_PROJECT');
+
+const sb = {
+  async req(method, path, body = null, params = '') {
+    const url = `${SUPABASE_URL}/rest/v1/${path}${params}`;
+    const opts = {
+      method,
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      }
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const r = await fetch(url, opts);
+    if (!r.ok) { const e = await r.json(); throw new Error(e.message || r.statusText); }
+    const txt = await r.text();
+    return txt ? JSON.parse(txt) : [];
+  },
+  select: (table, params='') => sb.req('GET', table, null, params)
+};
+
+/* ============================================
+   DEMO DATA (partagé avec transactions.html)
+   ============================================ */
+const DEMO_TX = [
+  { id:'TXN-10001', created_at:'2025-07-04T09:12:00Z', client:'Rija Ndriana',  telephone:'+261 34 12 345 67', type:'depot',   crypto:'USDT', reseau:'TRC-20',  wallet:'TKf3eMYj4T1oM7h8KdLmQ9uPnH6bVRsX2w', mobile_money:'MVola',        numero_mm:'034 12 345 67', montant_crypto:500,  montant_mga:2425000,  frais:0.5,  benefice:11.2,  status:'completed' },
+  { id:'TXN-10002', created_at:'2025-07-04T08:55:00Z', client:'Aina Olivia',   telephone:'+261 33 98 765 43', type:'retrait', crypto:'USDT', reseau:'BEP-20',  wallet:'0x9f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a', mobile_money:'Orange Money', numero_mm:'033 98 765 43', montant_crypto:250,  montant_mga:1212500,  frais:2.5,  benefice:5.6,   status:'pending' },
+  { id:'TXN-10003', created_at:'2025-07-04T08:30:00Z', client:'Tahina M.',     telephone:'+261 32 45 678 90', type:'depot',   crypto:'USDT', reseau:'TRC-20',  wallet:'TLmXf8jK9nPqR5sW2vY1uA3bC6dE4fG7hJ0', mobile_money:'MVola',        numero_mm:'032 45 678 90', montant_crypto:1200, montant_mga:5820000,  frais:1.0,  benefice:26.88, status:'completed' },
+  { id:'TXN-10004', created_at:'2025-07-04T07:48:00Z', client:'Fara Koto',     telephone:'+261 34 11 222 33', type:'retrait', crypto:'USDT', reseau:'ERC-20',  wallet:'0x4a8b2c7f9e1d3a5b7c9e0f2a4b6d8e0f2a4b6d8', mobile_money:'Airtel Money', numero_mm:'034 11 222 33', montant_crypto:80,   montant_mga:388000,   frais:5.0,  benefice:1.8,   status:'rejected' },
+  { id:'TXN-10005', created_at:'2025-07-04T07:10:00Z', client:'Ny Ravo',       telephone:'+261 34 00 112 23', type:'depot',   crypto:'USDT', reseau:'TRC-20',  wallet:'TGhK5mNpQ8rS1tU4vW7xY2zA3bC6dE9fJ0', mobile_money:'MVola',        numero_mm:'034 00 112 23', montant_crypto:3000, montant_mga:14550000, frais:2.0,  benefice:67.2,  status:'completed' },
+  { id:'TXN-10006', created_at:'2025-07-03T22:15:00Z', client:'Mamy Lalaina',  telephone:'+261 32 88 999 00', type:'retrait', crypto:'BTC',  reseau:'Bitcoin', wallet:'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', mobile_money:'Orange Money', numero_mm:'032 88 999 00', montant_crypto:0.015,montant_mga:15120000, frais:0.0001,benefice:2.1,   status:'processing' },
+  { id:'TXN-10007', created_at:'2025-07-03T20:40:00Z', client:'Tahina M.',     telephone:'+261 32 45 678 90', type:'retrait', crypto:'USDT', reseau:'TRC-20',  wallet:'TLmXf8jK9nPqR5sW2vY1uA3bC6dE4fG7hJ0', mobile_money:'MVola',        numero_mm:'032 45 678 90', montant_crypto:600,  montant_mga:2910000,  frais:1.5,  benefice:13.44, status:'pending' },
+  { id:'TXN-10008', created_at:'2025-07-03T18:00:00Z', client:'Ny Ravo',       telephone:'+261 34 00 112 23', type:'depot',   crypto:'ETH',  reseau:'ERC-20',  wallet:'0x4a8b2c7f9e1d3a5b7c9e0f2a4b6d8e0f2a4b6d8', mobile_money:'MVola',        numero_mm:'034 00 112 23', montant_crypto:1.5,  montant_mga:24394500, frais:5.0,  benefice:33.0,  status:'completed' },
+  { id:'TXN-10009', created_at:'2025-07-02T14:30:00Z', client:'Rija Ndriana',  telephone:'+261 34 12 345 67', type:'depot',   crypto:'BNB',  reseau:'BEP-20',  wallet:'0x9f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a', mobile_money:'Airtel Money', numero_mm:'034 12 345 67', montant_crypto:2.5,  montant_mga:7396250,  frais:0.5,  benefice:15.6,  status:'cancelled' },
+  { id:'TXN-10010', created_at:'2025-07-02T11:00:00Z', client:'Aina Olivia',   telephone:'+261 33 98 765 43', type:'depot',   crypto:'USDT', reseau:'TRC-20',  wallet:'TKf3eMYj4T1oM7h8KdLmQ9uPnH6bVRsX2w', mobile_money:'MVola',        numero_mm:'033 98 765 43', montant_crypto:150,  montant_mga:727500,   frais:0.5,  benefice:3.36,  status:'completed' },
+  { id:'TXN-10011', created_at:'2025-07-01T09:00:00Z', client:'Fara Koto',     telephone:'+261 34 11 222 33', type:'depot',   crypto:'USDT', reseau:'BEP-20',  wallet:'0x4a8b2c7f9e1d3a5b7c9e0f2a4b6d8e0f2a4b6d8', mobile_money:'Orange Money', numero_mm:'034 11 222 33', montant_crypto:400,  montant_mga:1940000,  frais:1.0,  benefice:8.96,  status:'pending' },
+  { id:'TXN-10012', created_at:'2025-07-01T08:00:00Z', client:'Mamy Lalaina',  telephone:'+261 32 88 999 00', type:'retrait', crypto:'USDT', reseau:'TRC-20',  wallet:'TGhK5mNpQ8rS1tU4vW7xY2zA3bC6dE9fJ0', mobile_money:'MVola',        numero_mm:'032 88 999 00', montant_crypto:750,  montant_mga:3637500,  frais:1.0,  benefice:16.8,  status:'completed' }
+];
+
+const STATUS_CFG = {
+  pending:    { label:'En attente',  badge:'badge-pending', icon:'fa-clock',          color:'#f5c518' },
+  processing: { label:'En cours',    badge:'badge-info',    icon:'fa-spinner fa-spin', color:'#3b82f6' },
+  completed:  { label:'Validée',     badge:'badge-success', icon:'fa-circle-check',   color:'#22c55e' },
+  rejected:   { label:'Refusée',     badge:'badge-danger',  icon:'fa-circle-xmark',   color:'#ef4444' },
+  cancelled:  { label:'Annulée',     badge:'badge-purple',  icon:'fa-ban',            color:'#a855f7' }
+};
+
+const AV_COLORS = ['a','b','c','d','e'];
+const AV_MAP = { 'Rija Ndriana':'a','Aina Olivia':'b','Tahina M.':'c','Fara Koto':'d','Ny Ravo':'e','Mamy Lalaina':'a' };
+function avClass(n) { return AV_MAP[n] || AV_COLORS[Math.abs(hashCode(n))%AV_COLORS.length]; }
+function hashCode(s) { let h=0; for(let c of s) h=(h<<5)-h+c.charCodeAt(0)|0; return h; }
+function initials(n) { return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+
+/* ============================================
+   ETAT
+   ============================================ */
+let allTx = [];
+let volMode = 'mga'; // 'usdt' | 'mga'
+
+/* ============================================
+   INIT
+   ============================================ */
+window.addEventListener('DOMContentLoaded', () => {
+  loadDashboard();
+  // Refresh taux toutes les 30s
+  setInterval(fetchRates, 30000);
+});
+
+/* ============================================
+   CHARGEMENT PRINCIPAL
+   ============================================ */
+async function loadDashboard() {
+  const icon = document.getElementById('refresh-icon');
+  icon.classList.add('fa-spin');
+  try {
+    if (DEMO_MODE) {
+      await new Promise(r => setTimeout(r, 500));
+      allTx = JSON.parse(JSON.stringify(DEMO_TX));
+    } else {
+      allTx = await sb.select('transactions', '?select=*&order=created_at.desc');
+    }
+    renderAlerts();
+    renderKPIs();
+    renderRecentTable();
+    renderVolChart();
+    renderStatusDonut();
+    renderTopClients();
+    renderActivityFeed();
+    renderMMChart();
+    renderCryptoChart();
+    await fetchRates();
+
+    const nbPending = allTx.filter(t=>t.status==='pending').length;
+    document.getElementById('nb-pending').textContent = nbPending;
+    document.getElementById('nb-kyc').textContent = '5'; // demo
+
+    document.getElementById('last-update').textContent =
+      `Dernière mise à jour : ${new Date().toLocaleString('fr-FR')} · ${allTx.length} transactions`;
+  } catch(e) {
+    showToast('Erreur de chargement : '+e.message, 'error');
+  } finally {
+    icon.classList.remove('fa-spin');
+  }
+}
+
+/* ============================================
+   ALERTS
+   ============================================ */
+function renderAlerts() {
+  const pending = allTx.filter(t=>t.status==='pending').length;
+  const zone = document.getElementById('alerts-zone');
+  const alerts = [];
+  if (pending >= 3) {
+    alerts.push(`<div class="alert-banner warning">
+      <i class="fa fa-triangle-exclamation"></i>
+      <span><strong>${pending} transactions en attente</strong> nécessitent une validation.</span>
+      <button class="alert-close" onclick="this.parentElement.remove()"><i class="fa fa-xmark"></i></button>
+    </div>`);
+  }
+  zone.innerHTML = alerts.join('');
+}
+
+/* ============================================
+   KPI CARDS
+   ============================================ */
+function renderKPIs() {
+  const today = new Date().toISOString().slice(0,10);
+  const month = new Date().toISOString().slice(0,7);
+
+  const todayTx  = allTx.filter(t=>t.created_at.startsWith(today));
+  const monthTx  = allTx.filter(t=>t.created_at.startsWith(month));
+  const completed = monthTx.filter(t=>t.status==='completed');
+  const pending   = allTx.filter(t=>t.status==='pending');
+  const processing= allTx.filter(t=>t.status==='processing');
+
+  const ca      = completed.reduce((s,t)=>s+t.montant_crypto,0);
+  const profit  = completed.reduce((s,t)=>s+(t.benefice||0),0);
+  const volMGA  = allTx.reduce((s,t)=>s+t.montant_mga,0);
+  const users   = new Set(allTx.map(t=>t.user_id)).size;
+
+  const kpis = [
+    { color:'blue',   icon:'fa-calendar-day', label:"Aujourd'hui",   value: todayTx.length,         unit:'transactions',   trend:'+2', dir:'up' },
+    { color:'gold',   icon:'fa-clock',        label:'En attente',     value: pending.length,         unit:'à traiter',      trend: pending.length>0?'!':'OK', dir: pending.length>3?'down':'flat' },
+    { color:'blue',   icon:'fa-spinner',      label:'En cours',       value: processing.length,      unit:'en traitement',  trend:'', dir:'flat' },
+    { color:'green',  icon:'fa-circle-check', label:'Validées',       value: completed.length,       unit:'ce mois',        trend:'+5', dir:'up' },
+    { color:'purple', icon:'fa-dollar-sign',  label:"Chiffre d'aff.", value: fmtN(ca)+' USDT',       unit:'ce mois',        trend:'+12%', dir:'up', sm:true },
+    { color:'orange', icon:'fa-sack-dollar',  label:'Bénéfice net',   value: fmtN(profit)+' USDT',   unit:'ce mois',        trend:'+8%', dir:'up', sm:true },
+    { color:'green',  icon:'fa-money-bill',   label:'Volume MGA',     value: fmtMGA(volMGA),         unit:'total',          trend:'', dir:'flat', sm:true },
+    { color:'red',    icon:'fa-users',        label:'Utilisateurs',   value: users,                  unit:'clients actifs', trend:'+1', dir:'up' }
+  ];
+
+  document.getElementById('kpi-grid').innerHTML = kpis.map(k => `
+    <div class="kpi-card ${k.color}">
+      <div class="kpi-top">
+        <div class="kpi-icon ${k.color}"><i class="fa ${k.icon}"></i></div>
+        ${k.trend ? `<span class="kpi-trend ${k.dir}">
+          <i class="fa fa-arrow-${k.dir==='up'?'up':k.dir==='down'?'down':'right'}"></i>${k.trend}
+        </span>` : ''}
+      </div>
+      <div class="kpi-value${k.sm?' sm':''}">${k.value}</div>
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-sub">${k.unit}</div>
+    </div>
+  `).join('');
+}
+
+/* ============================================
+   RECENT TRANSACTIONS TABLE
+   ============================================ */
+function renderRecentTable() {
+  const recent = allTx.slice(0, 8);
+  const tbody = document.getElementById('recent-tbody');
+  if (!recent.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--txt-dim)">Aucune transaction</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = recent.map(t => {
+    const cfg = STATUS_CFG[t.status]||STATUS_CFG.pending;
+    return `<tr onclick="window.location='transactions.html'">
+      <td><span style="font-family:monospace;font-size:.72rem;color:var(--gold);font-weight:700">${t.id}</span></td>
+      <td>
+        <div class="user-cell">
+          <div class="user-av ${avClass(t.client)}">${initials(t.client)}</div>
+          <span class="user-name">${t.client}</span>
+        </div>
+      </td>
+      <td><span class="badge ${t.type==='depot'?'badge-info':'badge-orange'}">${t.type==='depot'?'Dépôt':'Retrait'}</span></td>
+      <td><span style="font-weight:700;font-size:.82rem;color:${t.type==='depot'?'var(--green)':'var(--red)'}">${t.type==='depot'?'+':'–'}${fmtN(t.montant_crypto)} ${t.crypto}</span></td>
+      <td><span class="badge ${cfg.badge}"><i class="fa ${cfg.icon}" style="font-size:.6rem"></i>${cfg.label}</span></td>
+      <td style="font-size:.75rem;color:var(--txt-muted)">${fmtDateShort(t.created_at)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ============================================
+   VOLUME CHART (barres SVG)
+   ============================================ */
+function renderVolChart() {
+  const days = getLast7Days();
+  const wrap = document.getElementById('vol-chart-wrap');
+
+  // Calcul data
+  const data = days.map(d => {
+    const dayTx = allTx.filter(t => t.created_at.startsWith(d.iso));
+    return {
+      label: d.label,
+      usdt:  dayTx.reduce((s,t)=>s+t.montant_crypto,0),
+      mga:   dayTx.reduce((s,t)=>s+t.montant_mga,0),
+      count: dayTx.length
+    };
+  });
+
+  const key = volMode;
+  const vals = data.map(d=>d[key]);
+  const max  = Math.max(...vals) || 1;
+
+  const total = vals.reduce((s,v)=>s+v,0);
+  const bestIdx = vals.indexOf(Math.max(...vals));
+
+  document.getElementById('vol-week-total').textContent = key==='mga' ? fmtMGA(total) : fmtN(total)+' USDT';
+  document.getElementById('vol-best-day').textContent = data[bestIdx]?.label || '–';
+
+  const barColor = key==='mga' ? '#f5c518' : '#22c55e';
+
+  const svgH = 140;
+  const svgW = 560;
+  const barW = 56;
+  const gap  = 24;
+  const padL = 10;
+  const padB = 28;
+  const chartH = svgH - padB;
+
+  const bars = data.map((d,i) => {
+    const pct = d[key]/max;
+    const bh  = Math.max(4, pct*chartH);
+    const x   = padL + i*(barW+gap);
+    const y   = chartH - bh;
+    const isToday = i === data.length-1;
+    return `
+      <rect x="${x}" y="${y}" width="${barW}" height="${bh}"
+            rx="4" fill="${isToday ? barColor : barColor+'55'}"
+            style="transition:all .4s ease"/>
+      <text x="${x+barW/2}" y="${svgH-8}" text-anchor="middle"
+            font-size="10" fill="var(--txt-dim)">${d.label}</text>
+      <text x="${x+barW/2}" y="${y-5}" text-anchor="middle"
+            font-size="9" fill="${isToday ? barColor : 'var(--txt-dim)'}"
+            font-weight="${isToday?700:400}">
+        ${d.count > 0 ? d.count+'tx' : ''}
+      </text>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:${svgH}px;display:block">
+      ${bars}
+    </svg>`;
+}
+
+function switchVolChart(mode) {
+  volMode = mode;
+  const btnU = document.getElementById('vol-usdt-btn');
+  const btnM = document.getElementById('vol-mga-btn');
+  if (mode==='usdt') {
+    btnU.style.cssText='background:var(--gold);color:#000';
+    btnM.className='btn btn-secondary btn-xs';
+    btnM.style.cssText='';
+  } else {
+    btnM.style.cssText='background:var(--gold);color:#000';
+    btnU.className='btn btn-secondary btn-xs';
+    btnU.style.cssText='';
+  }
+  renderVolChart();
+}
+
+/* ============================================
+   STATUS DONUT (SVG)
+   ============================================ */
+function renderStatusDonut() {
+  const month = new Date().toISOString().slice(0,7);
+  const monthTx = allTx.filter(t=>t.created_at.startsWith(month));
+  if (!monthTx.length) { document.getElementById('status-donut-wrap').innerHTML='<p style="color:var(--txt-dim);font-size:.82rem">Aucune donnée ce mois.</p>'; return; }
+
+  const counts = {};
+  monthTx.forEach(t=>{ counts[t.status]=(counts[t.status]||0)+1; });
+
+  const total = monthTx.length;
+  const completed = counts['completed']||0;
+  const pct = Math.round(completed/total*100);
+
+  document.getElementById('completion-bar').style.width = pct+'%';
+  document.getElementById('completion-label').textContent = `${completed} validées sur ${total}`;
+  document.getElementById('completion-pct').textContent = pct+'%';
+
+  // SVG donut
+  const r = 50, cx = 65, cy = 65, stroke = 18;
+  const colors = { completed:'#22c55e', pending:'#f5c518', processing:'#3b82f6', rejected:'#ef4444', cancelled:'#a855f7' };
+  const circum = 2*Math.PI*r;
+
+  let offset = 0;
+  const arcs = Object.entries(counts).map(([s,c]) => {
+    const pct = c/total;
+    const dash = pct*circum;
+    const arc = `<circle cx="${cx}" cy="${cy}" r="${r}"
+      fill="none" stroke="${colors[s]||'#555'}" stroke-width="${stroke}"
+      stroke-dasharray="${dash} ${circum-dash}"
+      stroke-dashoffset="${-offset}" stroke-linecap="butt"
+      style="transition:stroke-dasharray .6s ease"/>`;
+    offset += dash;
+    return arc;
+  }).join('');
+
+  const legend = Object.entries(counts).map(([s,c]) => {
+    const cfg = STATUS_CFG[s]||STATUS_CFG.pending;
+    return `<div style="display:flex;align-items:center;gap:.45rem;margin-bottom:.3rem">
+      <div style="width:10px;height:10px;border-radius:3px;background:${colors[s]||'#555'};flex-shrink:0"></div>
+      <span style="font-size:.75rem;color:var(--txt-muted)">${cfg.label}</span>
+      <span style="font-size:.75rem;font-weight:700;margin-left:auto;min-width:24px;text-align:right">${c}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('status-donut-wrap').innerHTML = `
+    <svg width="130" height="130" viewBox="0 0 130 130" style="flex-shrink:0;transform:rotate(-90deg)">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--card2)" stroke-width="${stroke}"/>
+      ${arcs}
+    </svg>
+    <div style="flex:1">
+      <div style="font-size:.68rem;color:var(--txt-dim);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.07em">Répartition</div>
+      ${legend}
+      <div style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--border);font-size:.7rem;color:var(--txt-dim)">
+        Total ce mois : <strong style="color:var(--txt)">${total} transactions</strong>
+      </div>
+    </div>`;
+}
+
+/* ============================================
+   TOP CLIENTS
+   ============================================ */
+function renderTopClients() {
+  const volByClient = {};
+  allTx.forEach(t => {
+    if (!volByClient[t.client]) volByClient[t.client] = { name:t.client, usdt:0, count:0 };
+    volByClient[t.client].usdt += t.montant_crypto;
+    volByClient[t.client].count++;
+  });
+  const sorted = Object.values(volByClient).sort((a,b)=>b.usdt-a.usdt).slice(0,5);
+  const maxV = sorted[0]?.usdt||1;
+
+  document.getElementById('top-clients-list').innerHTML = sorted.map((c,i) => `
+    <div class="top-item">
+      <div class="top-rank ${i===0?'gold-rank':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)}</div>
+      <div class="user-av ${avClass(c.name)}" style="width:28px;height:28px;font-size:.65rem">${initials(c.name)}</div>
+      <div class="top-info">
+        <div class="top-name">${c.name}</div>
+        <div class="top-vol">${c.count} transaction${c.count>1?'s':''}</div>
+        <div class="progress-bar" style="margin-top:.3rem">
+          <div class="progress-fill" style="background:var(--gold);width:${Math.round(c.usdt/maxV*100)}%"></div>
+        </div>
+      </div>
+      <div class="top-amount">${fmtN(c.usdt)} USDT</div>
+    </div>
+  `).join('');
+}
+
+/* ============================================
+   ACTIVITY FEED
+   ============================================ */
+function renderActivityFeed() {
+  const acts = [
+    { icon:'fa-circle-check', bg:'rgba(34,197,94,.15)', color:'var(--green)',  title:'TXN-10001 validée',            meta:'Rija Ndriana · 500 USDT', time:'09:45' },
+    { icon:'fa-user-plus',    bg:'rgba(59,130,246,.15)',color:'var(--blue)',   title:'Nouvel utilisateur inscrit',   meta:'Aina Olivia · MVola',     time:'09:20' },
+    { icon:'fa-clock',        bg:'rgba(245,197,24,.15)',color:'var(--gold)',   title:'TXN-10002 en attente',         meta:'250 USDT · BEP-20',       time:'08:55' },
+    { icon:'fa-circle-xmark', bg:'rgba(239,68,68,.15)', color:'var(--red)',   title:'TXN-10004 refusée',            meta:'KYC non conforme',        time:'08:10' },
+    { icon:'fa-circle-check', bg:'rgba(34,197,94,.15)', color:'var(--green)', title:'TXN-10003 validée',            meta:'Tahina M. · 1 200 USDT',  time:'08:50' },
+    { icon:'fa-shield-check', bg:'rgba(168,85,247,.15)',color:'var(--purple)','title':'Connexion Admin détectée',    meta:'Admin Chief · 192.168.x',  time:'07:00' }
+  ];
+  document.getElementById('activity-feed').innerHTML = acts.map(a => `
+    <div class="activity-item">
+      <div class="act-icon" style="background:${a.bg};color:${a.color}"><i class="fa ${a.icon}"></i></div>
+      <div class="act-body">
+        <div class="act-title">${a.title}</div>
+        <div class="act-meta">${a.meta}</div>
+      </div>
+      <div class="act-time">${a.time}</div>
+    </div>
+  `).join('');
+}
+
+/* ============================================
+   MOBILE MONEY CHART
+   ============================================ */
+function renderMMChart() {
+  const mmVol = {};
+  allTx.forEach(t => { mmVol[t.mobile_money]=(mmVol[t.mobile_money]||0)+t.montant_mga; });
+  const total = Object.values(mmVol).reduce((s,v)=>s+v,0)||1;
+  const colors = { 'MVola':'#f5c518', 'Orange Money':'#f97316', 'Airtel Money':'#ef4444' };
+
+  document.getElementById('mm-chart').innerHTML = Object.entries(mmVol).sort((a,b)=>b[1]-a[1]).map(([name,vol]) => `
+    <div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:.3rem">
+        <span style="font-size:.8rem;font-weight:600">${name}</span>
+        <span style="font-size:.8rem;color:var(--txt-muted)">${fmtMGA(vol)} · ${Math.round(vol/total*100)}%</span>
+      </div>
+      <div class="progress-bar" style="height:8px">
+        <div class="progress-fill" style="background:${colors[name]||'var(--blue)'};width:${Math.round(vol/total*100)}%"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ============================================
+   CRYPTO CHART
+   ============================================ */
+function renderCryptoChart() {
+  const cVol = {};
+  allTx.forEach(t => { cVol[t.crypto]=(cVol[t.crypto]||0)+t.montant_crypto; });
+  const total = Object.values(cVol).reduce((s,v)=>s+v,0)||1;
+  const colors = { USDT:'#26a17b', BTC:'#f7931a', ETH:'#627eea', BNB:'#f3ba2f', TRX:'#ef4444' };
+
+  document.getElementById('crypto-chart').innerHTML = Object.entries(cVol).sort((a,b)=>b[1]-a[1]).map(([coin,vol]) => `
+    <div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:.3rem">
+        <span style="font-size:.8rem;font-weight:700">${coin}</span>
+        <span style="font-size:.8rem;color:var(--txt-muted)">${fmtN(vol)} · ${Math.round(vol/total*100)}%</span>
+      </div>
+      <div class="progress-bar" style="height:8px">
+        <div class="progress-fill" style="background:${colors[coin]||'var(--blue)'};width:${Math.round(vol/total*100)}%"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ============================================
+   TAUX CRYPTO LIVE (Binance)
+   ============================================ */
+async function fetchRates() {
+  const COINS = [
+    { id:'USDTMGA', symbol:'USDT', cls:'usdt', label:'USDT', net:'TRC-20 / BEP-20' },
+    { id:'BTCUSDT', symbol:'BTC',  cls:'btc',  label:'BTC',  net:'Bitcoin' },
+    { id:'ETHUSDT', symbol:'ETH',  cls:'eth',  label:'ETH',  net:'ERC-20' },
+    { id:'BNBUSDT', symbol:'BNB',  cls:'bnb',  label:'BNB',  net:'BEP-20' }
+  ];
+
+  // Taux USDT/MGA fixe (depuis settings/localStorage en prod)
+  const tauxUSDT = parseFloat(localStorage.getItem('TC_TAUX_USDT')||'4850');
+
+  // En mode demo, on génère des taux fictifs
+  if (DEMO_MODE) {
+    const mockPrices = { BTCUSDT:67234.5, ETHUSDT:3521.8, BNBUSDT:612.4 };
+    renderRates(COINS, mockPrices, tauxUSDT);
+    return;
+  }
+
+  try {
+    const symbols = ['BTCUSDT','ETHUSDT','BNBUSDT'];
+    const results = await Promise.all(symbols.map(s =>
+      fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${s}`)
+        .then(r=>r.json())
+    ));
+    const prices = {};
+    results.forEach(r => { prices[r.symbol] = parseFloat(r.price); });
+    renderRates(COINS, prices, tauxUSDT);
+  } catch(e) {
+    console.warn('Binance fetch failed:', e.message);
+  }
+}
+
+function renderRates(coins, prices, tauxUSDT) {
+  const changes = { USDTMGA:+0.2, BTCUSDT:-1.4, ETHUSDT:+2.1, BNBUSDT:+0.8 };
+
+  document.getElementById('rates-grid').innerHTML = coins.map(c => {
+    let mga;
+    if (c.symbol==='USDT') {
+      mga = tauxUSDT;
+    } else {
+      const usdtPrice = prices[c.id]||0;
+      mga = usdtPrice * tauxUSDT;
+    }
+    const chg = changes[c.id]||0;
+    return `
+      <div class="rate-row">
+        <div class="rate-coin">
+          <div class="coin-dot ${c.cls}">${c.label}</div>
+          <div>
+            <div class="coin-name">${c.label}</div>
+            <div class="coin-net">${c.net}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="rate-mga">${fmtMGA(mga)}</div>
+          <div class="rate-change ${chg>=0?'up':'down'}">
+            <i class="fa fa-arrow-${chg>=0?'up':'down'}" style="font-size:.6rem"></i>
+            ${Math.abs(chg)}%
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ============================================
+   HELPERS DATE
+   ============================================ */
+function getLast7Days() {
+  const days = [];
+  for (let i=6; i>=0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate()-i);
+    days.push({
+      iso:   d.toISOString().slice(0,10),
+      label: d.toLocaleDateString('fr-FR',{weekday:'short'}).slice(0,3)
+    });
+  }
+  return days;
+}
+
+/* ============================================
+   FORMATTERS
+   ============================================ */
+function fmtN(n) {
+  if (n===undefined||n===null) return '–';
+  const f = parseFloat(n);
+  return f<1 ? f.toFixed(6).replace(/\.?0+$/,'') : f.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2});
+}
+function fmtMGA(n) {
+  if (!n&&n!==0) return '–';
+  if (n>=1e9)  return (n/1e9).toFixed(2)+' Md MGA';
+  if (n>=1e6)  return (n/1e6).toFixed(2)+' M MGA';
+  return n.toLocaleString('fr-FR')+' MGA';
+}
+function fmtDate(iso) {
+  if (!iso) return '–';
+  return new Date(iso).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});
+}
+function fmtDateShort(iso) {
+  if (!iso) return '–';
+  const d = new Date(iso);
+  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+}
+
+/* ============================================
+   UI HELPERS
+   ============================================ */
+function openSidebar()  { document.getElementById('sidebar').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+
+function showToast(msg, type='info') {
+  const icons = { success:'fa-circle-check', error:'fa-circle-exclamation', info:'fa-circle-info', warning:'fa-triangle-exclamation' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fa ${icons[type]||icons.info}"></i><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(40px)'; t.style.transition='all .3s ease'; setTimeout(()=>t.remove(),300); }, 3500);
+}
+</script>
+</body>
+</html>
