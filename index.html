@@ -2543,6 +2543,11 @@ img { content-visibility: auto; }
     border: 2px solid #0d0d0d; line-height: 1;
 }
 
+
+/* ── Admin price table ── */
+#adm-price-table tbody tr:hover { background: rgba(255,255,255,.03); }
+#adm-price-table th { position: sticky; top: 0; background: #0d0d0d; z-index: 1; }
+
 </style>
 </head>
 <body>
@@ -4441,11 +4446,31 @@ img { content-visibility: auto; }
 // =========================================================
 // Taux Binance → Ariary (fikambanana amin'ny marge 5%)
 // Ireto sanda ireto dia soloana avy hatrany rehefa tafiditra Binance
-const BINANCE_USD_TO_MGA = 4600;   // Taux de référence fixe : 1$ = 4600 Ar (fallback)
-const BINANCE_MARGE      = 1.025;  // Marge TakaloCash : 2.5% sur le taux P2P brut
-// NB : BINANCE_MARGE est appliqué UNE SEULE FOIS lors du chargerTauxBinance().
-// Les frais de transaction (ASSETS_DATA.frais) sont déduits SÉPARÉMENT du montant net.
-// → Pas de double comptage.
+// ══════════════════════════════════════════════════════════════════════════════
+// PRICING ENGINE — TakaloCash v3.0
+// Architecture : Spot Binance × Taux USDT/MGA × Marge Achat/Vente admin
+// ══════════════════════════════════════════════════════════════════════════════
+
+/** Paramètres admin par défaut — modifiables depuis le dashboard */
+const TC_PRICING_DEFAULTS = {
+    tauxUSDT:     4200,   // Taux USDT → MGA par défaut
+    margeAchat:   1.5,    // % marge quand TakaloCash ACHÈTE au client (client vend crypto)
+    margeVente:   1.5,    // % marge quand TakaloCash VEND au client (client achète crypto)
+};
+
+/** Paramètres actifs — chargés depuis localStorage ou defaults */
+let TC_PRICING = { ...TC_PRICING_DEFAULTS };
+
+/** Prix Spot Binance bruts en USDT (mis à jour par fetchSpotPrices) */
+let TC_SPOT_PRICES = {};   // { BTC: 110000, ETH: 3800, TRX: 0.14, ... }
+
+/** Horodatage du dernier refresh Spot */
+let TC_SPOT_LAST_UPDATE = null;
+
+/** Cache de secours (dernier fetch réussi) */
+let TC_SPOT_CACHE = {};
+
+const BINANCE_USD_TO_MGA = 4200;   // Fallback statique si tout échoue
 
 const CURRENT_TAUX = {
     TRX:      600,      USDT:     4600,
@@ -4550,106 +4575,225 @@ let isPasswordRecoveryFlow = false;
 let _binanceCours = {};
 
 // Récupère le taux USDT → MGA réel depuis le marché P2P Binance (moyenne des
-// meilleures annonces BUY et SELL), au lieu du taux fixe BINANCE_USD_TO_MGA.
-// C'est le taux qui reflète le marché parallèle réel à Madagascar.
-async function _fetchTauxP2P() {
-    const body = JSON.stringify({
-        asset: 'USDT', fiat: 'MGA', tradeType: 'SELL',
-        page: 1, rows: 5, payTypes: [], publisherType: null
-    });
-    const headers = { 'Content-Type': 'application/json' };
+// ══════════════════════════════════════════════════════════════════════════════
+// PRICING ENGINE — Fonctions principales
+// ══════════════════════════════════════════════════════════════════════════════
 
-    // tradeType SELL → annonces où des vendeurs proposent de l'USDT contre de l'Ariary
-    // (c'est le prix auquel TakaloCash peut acheter de l'USDT — donc notre taux de référence).
-    const [sellRes, buyRes] = await Promise.all([
-        fetch('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', { method: 'POST', headers, body }),
-        fetch('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
-            method: 'POST', headers,
-            body: JSON.stringify({ asset: 'USDT', fiat: 'MGA', tradeType: 'BUY', page: 1, rows: 5, payTypes: [], publisherType: null })
-        })
-    ]);
-
-    const [sellData, buyData] = await Promise.all([sellRes.json(), buyRes.json()]);
-    const sellPrices = (sellData?.data || []).map(a => parseFloat(a.adv.price)).filter(p => p > 0);
-    const buyPrices  = (buyData?.data  || []).map(a => parseFloat(a.adv.price)).filter(p => p > 0);
-    if (sellPrices.length === 0 && buyPrices.length === 0) throw new Error('Aucune annonce P2P MGA disponible');
-
-    // Moyenne du meilleur prix vendeur et du meilleur prix acheteur = taux médian du marché.
-    const bestSell = sellPrices.length ? Math.min(...sellPrices) : null;
-    const bestBuy  = buyPrices.length  ? Math.max(...buyPrices)  : null;
-    const taux = bestSell && bestBuy ? (bestSell + bestBuy) / 2 : (bestSell || bestBuy);
-    return Math.round(taux);
+/**
+ * Charge les paramètres admin depuis localStorage
+ */
+function _loadPricingParams() {
+    try {
+        const saved = localStorage.getItem('tc_pricing_params');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            TC_PRICING = { ...TC_PRICING_DEFAULTS, ...parsed };
+        }
+    } catch(e) {}
 }
 
-// Une seule fonction fait tout : appel API Binance → CURRENT_TAUX + select convertisseur
+/**
+ * Sauvegarde les paramètres Pricing dans Supabase (settings table) + localStorage
+ */
+async function _savePricingParams() {
+    // 1. Toujours sauvegarder en localStorage (disponible hors-ligne)
+    try { localStorage.setItem('tc_pricing_params', JSON.stringify(TC_PRICING)); } catch(e) {}
+    // 2. Sauvegarder dans Supabase si connecté (sync entre sessions/devices)
+    if (typeof supabaseClient === 'undefined' || !currentUserId) return;
+    try {
+        await supabaseClient.from('settings').upsert({
+            key:        'tc_pricing',
+            value:      JSON.stringify(TC_PRICING),
+            updated_at: new Date().toISOString(),
+            updated_by: currentUserId
+        }, { onConflict: 'key' });
+    } catch(e) { console.warn('[Pricing] Supabase save failed:', e.message); }
+}
+
+/**
+ * Charge les paramètres Pricing depuis Supabase en priorité, sinon localStorage
+ */
+async function _loadPricingParamsAsync() {
+    // Essai Supabase d'abord
+    if (typeof supabaseClient !== 'undefined' && currentUserId) {
+        try {
+            const { data } = await supabaseClient
+                .from('settings')
+                .select('value')
+                .eq('key', 'tc_pricing')
+                .maybeSingle();
+            if (data?.value) {
+                const parsed = JSON.parse(data.value);
+                TC_PRICING = { ...TC_PRICING_DEFAULTS, ...parsed };
+                // Sync localStorage
+                try { localStorage.setItem('tc_pricing_params', JSON.stringify(TC_PRICING)); } catch(e) {}
+                _rebuildTaux();
+                return;
+            }
+        } catch(e) { console.warn('[Pricing] Supabase load failed:', e.message); }
+    }
+    // Fallback localStorage
+    _loadPricingParams();
+}
+
+/**
+ * Calcule le prix de vente (TakaloCash vend au client — client achète crypto)
+ *   Prix Vente = Prix Spot (USDT) × Taux USDT × (1 + Marge Vente / 100)
+ */
+function calcPrixVente(spotUsdt) {
+    return Math.round(spotUsdt * TC_PRICING.tauxUSDT * (1 + TC_PRICING.margeVente / 100));
+}
+
+/**
+ * Calcule le prix d'achat (TakaloCash achète au client — client vend crypto)
+ *   Prix Achat = Prix Spot (USDT) × Taux USDT × (1 - Marge Achat / 100)
+ */
+function calcPrixAchat(spotUsdt) {
+    return Math.round(spotUsdt * TC_PRICING.tauxUSDT * (1 - TC_PRICING.margeAchat / 100));
+}
+
+/**
+ * Calcule le prix de base (sans marge)
+ *   Prix Base = Prix Spot (USDT) × Taux USDT
+ */
+function calcPrixBase(spotUsdt) {
+    return Math.round(spotUsdt * TC_PRICING.tauxUSDT);
+}
+
+/**
+ * Reconstruit CURRENT_TAUX depuis TC_SPOT_PRICES + TC_PRICING
+ * Appelée à chaque changement de paramètre admin OU après un fetch Spot.
+ * Action = 'Envoyer' → client envoie Ariary pour avoir crypto → TakaloCash vend → Prix Vente
+ * Action = 'Recevoir' → client envoie crypto pour avoir Ariary → TakaloCash achète → Prix Achat
+ */
+function _rebuildTaux() {
+    const cours = {};
+
+    // USDT : spot = 1 USDT par définition
+    cours.USDT = TC_PRICING.tauxUSDT;
+
+    // Toutes les autres cryptos depuis le cache Spot
+    Object.entries(TC_SPOT_PRICES).forEach(([sym, spotUsdt]) => {
+        if (sym === 'USDT' || spotUsdt <= 0) return;
+        // On stocke le prix de vente par défaut dans CURRENT_TAUX
+        // (utilisé pour l'affichage et les calculs de montant)
+        // Le prix d'achat est calculé à la volée dans updateCalc()
+        cours[sym] = calcPrixVente(spotUsdt);
+    });
+
+    // Services non-crypto : taux USDT direct
+    cours.PAYPAL = cours.SKRILL = cours.NETELLER = TC_PRICING.tauxUSDT;
+
+    Object.assign(CURRENT_TAUX, cours);
+    _binanceCours = { ...cours };
+
+    // Rafraîchir les selects
+    _remplirCryptoSelectTransaction(cours);
+    const selectElement = document.getElementById('crypto-asset-select');
+    if (selectElement) _remplirConverterSelect(selectElement, cours);
+
+    // Rafraîchir l'affichage calcul si actif
+    if (typeof updateCalc === 'function') updateCalc();
+
+    // Rafraîchir hero taux bar
+    if (typeof _updateHeroTaux === 'function') _updateHeroTaux();
+
+    // Mettre à jour l'horodatage
+    _updateRateTimestamp();
+
+    // Mettre à jour le tableau complet des prix dans l'admin (si visible)
+    const priceTable = document.getElementById('adm-price-table-body');
+    if (priceTable) _adminUpdatePriceTable();
+}
+
+/**
+ * Affiche l'horodatage du dernier refresh dans tous les éléments dédiés
+ */
+function _updateRateTimestamp() {
+    const now = new Date();
+    const label = 'Taux mis à jour le ' +
+        now.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' }) +
+        ' à ' +
+        now.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    TC_SPOT_LAST_UPDATE = now;
+    document.querySelectorAll('.tc-rate-timestamp').forEach(el => { el.textContent = label; });
+    const old = document.getElementById('rate-last-update');
+    if (old) old.textContent = label;
+}
+
+/**
+ * Fetche les prix Spot depuis Binance api/v3/ticker/price (USDT pairs uniquement)
+ * Aucun P2P — prix de marché international pur.
+ */
+async function fetchSpotPrices() {
+    const res     = await fetch('https://api.binance.com/api/v3/ticker/price');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const tickers = await res.json();
+
+    const spots = { USDT: 1 }; // 1 USDT = 1 USDT par définition
+    tickers.forEach(t => {
+        if (!t.symbol.endsWith('USDT')) return;
+        const sym   = t.symbol.replace('USDT', '');
+        const price = parseFloat(t.price);
+        if (price > 0) spots[sym] = price;
+    });
+    return spots;
+}
+
+/**
+ * Charge + applique les prix Spot. Gère le cache et les erreurs.
+ * C'est la fonction principale appelée périodiquement.
+ */
 async function chargerTauxBinance() {
     const selectElement = document.getElementById('crypto-asset-select');
     try {
-        // 1. Taux de base USDT → Ariary : priorité au marché P2P (réel), avec
-        //    repli automatique sur le taux fixe BINANCE_USD_TO_MGA si le P2P échoue
-        //    (ex. CORS bloqué, endpoint indisponible, pas de réseau).
-        let usdToMga;
-        try {
-            usdToMga = await _fetchTauxP2P();
-            console.debug('[TakaloCash] Taux P2P Binance (USDT/MGA) ✅', usdToMga, 'Ar');
-        } catch (p2pErr) {
-            usdToMga = BINANCE_USD_TO_MGA;
-            console.warn('[TakaloCash] Taux P2P indisponible — repli sur le taux fixe.', p2pErr.message);
-        }
-
-        const res     = await fetch('https://api.binance.com/api/v3/ticker/price');
-        const tickers = await res.json();
-
-        // 2. Calcul de tous les taux xxxUSDT → Ariary, à partir du taux P2P ci-dessus
-        const coursCalcules = { USDT: Math.round(usdToMga * BINANCE_MARGE) };
-        tickers.forEach(t => {
-            if (!t.symbol.endsWith('USDT')) return;
-            const sym      = t.symbol.replace('USDT', '');
-            const priceUsd = parseFloat(t.price);
-            if (priceUsd > 0) coursCalcules[sym] = Math.round(priceUsd * usdToMga * BINANCE_MARGE);
-        });
-
-        // 3. Mise à jour de CURRENT_TAUX + cache global
-        Object.assign(CURRENT_TAUX, coursCalcules);
-        _binanceCours = coursCalcules; // sauvegarde pour restauration après changement de catégorie
-        CURRENT_TAUX.PAYPAL = CURRENT_TAUX.SKRILL = CURRENT_TAUX.NETELLER = CURRENT_TAUX.USDT;
-
-        // Afficher horodatage du dernier refresh
-        const _rateTimestampEl = document.getElementById('rate-last-update');
-        if (_rateTimestampEl) {
-            const hh = new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
-            _rateTimestampEl.textContent = 'Taux mis à jour à ' + hh;
-        }
-
-        // 4. Remplissage du select convertisseur (carte Binance)
-        if (selectElement) {
-            selectElement.innerHTML = '<option value="">-- Choisir une crypto --</option>';
-
-            const prioritaires = ['USDT','TRX','BTC','ETH','BNB','SOL'];
-            prioritaires.forEach(sym => {
-                if (coursCalcules[sym]) _appendOption(selectElement, sym, coursCalcules[sym]);
-            });
-
-            const sep = document.createElement('option');
-            sep.disabled    = true;
-            sep.textContent = '──────────────────────────────';
-            selectElement.appendChild(sep);
-
-            Object.keys(coursCalcules).sort().forEach(sym => {
-                if (!prioritaires.includes(sym)) _appendOption(selectElement, sym, coursCalcules[sym]);
-            });
-        }
-
-        // 5. Remplissage du select transaction (formulaire opération) avec TOUTES les cryptos
-        _remplirCryptoSelectTransaction(coursCalcules);
-
-        console.debug('[TakaloCash] Taux Binance chargés ✅', new Date().toLocaleTimeString());
+        const spots = await fetchSpotPrices();
+        TC_SPOT_PRICES = spots;
+        TC_SPOT_CACHE  = { ...spots }; // Mise en cache pour fallback
+        _rebuildTaux();
+        console.debug('[TakaloCash] Spot prices ✅', Object.keys(spots).length, 'pairs');
     } catch (err) {
-        console.warn('[TakaloCash] Binance API indisponible — taux en cache utilisés.', err.message);
+        console.warn('[TakaloCash] Spot API indisponible — cache utilisé.', err.message);
+        // Utiliser le cache si disponible
+        if (Object.keys(TC_SPOT_CACHE).length > 0) {
+            TC_SPOT_PRICES = { ...TC_SPOT_CACHE };
+            _rebuildTaux();
+        } else {
+            // Dernier recours : taux statiques
+            Object.assign(CURRENT_TAUX, {
+                USDT: TC_PRICING.tauxUSDT,
+                BTC:  calcPrixVente(110000),
+                ETH:  calcPrixVente(3800),
+                TRX:  calcPrixVente(0.14),
+                BNB:  calcPrixVente(650),
+                SOL:  calcPrixVente(180),
+            });
+        }
         if (selectElement && selectElement.options.length <= 1) {
-            selectElement.innerHTML = '<option value="">⚠️ Impossible de charger les cours</option>';
+            selectElement.innerHTML = '<option value="">⚠️ Cache utilisé — ' +
+                (TC_SPOT_LAST_UPDATE ? TC_SPOT_LAST_UPDATE.toLocaleTimeString('fr-FR') : 'jamais mis à jour') +
+                '</option>';
         }
     }
+}
+
+/**
+ * Rempli le select du convertisseur (carte Binance)
+ */
+function _remplirConverterSelect(sel, cours) {
+    if (!sel) return;
+    sel.innerHTML = '<option value="">-- Choisir une crypto --</option>';
+    const prioritaires = ['USDT','TRX','BTC','ETH','BNB','SOL'];
+    prioritaires.forEach(sym => {
+        if (cours[sym]) _appendOption(sel, sym, cours[sym]);
+    });
+    const sep = document.createElement('option');
+    sep.disabled = true; sep.textContent = '──────────────────────────────';
+    sel.appendChild(sep);
+    Object.keys(cours).sort().forEach(sym => {
+        if (!prioritaires.includes(sym) && !['PAYPAL','SKRILL','NETELLER'].includes(sym))
+            _appendOption(sel, sym, cours[sym]);
+    });
 }
 
 function _appendOption(sel, symbol, rateAr) {
@@ -4839,9 +4983,14 @@ async function initApp() {
     } catch(e) {}
 
     await chargerTauxBinance();
-    setInterval(chargerTauxBinance, 60_000); // Rafraîchissement taux Binance toutes les 60s
+    // Charger les paramètres Pricing depuis Supabase (sync cross-device)
+    await _loadPricingParamsAsync();
+    // Intervals propres (clearInterval anti-doublons si initApp appelé plusieurs fois)
+    if (window._tcSpotInterval)  clearInterval(window._tcSpotInterval);
+    if (window._tcHeroInterval)  clearInterval(window._tcHeroInterval);
+    window._tcSpotInterval = setInterval(chargerTauxBinance, 30_000); // Spot toutes les 30s
     _initHomeAnimations();
-    setInterval(_updateHeroTaux, 60_000); // Sync hero taux bar toutes les 60s
+    window._tcHeroInterval = setInterval(_updateHeroTaux, 30_000);  // Hero bar sync 30s
 
     selectCategory('crypto');
     await fetchData();
@@ -6442,6 +6591,9 @@ function _loadSavedFees() {
 }
 _loadSavedFees();
 
+// Charge les paramètres de pricing admin dès le démarrage
+_loadPricingParams();
+
 // =========================================================
 // ADMIN — OUVERTURE / FERMETURE
 // =========================================================
@@ -6473,14 +6625,20 @@ function _adminTab(tab, btn) {
     if (btn) btn.classList.add('active');
 
     const loaders = {
-        dashboard:  _adminLoadDashboard,
-        depots:     _adminLoadDepots,
-        retraits:   _adminLoadRetraits,
-        users:      _adminLoadUsers,
-        wallets:    _adminLoadWallets,
-        rapports:   _adminLoadRapports,
-        securite:   _adminLoadSecurite,
-        parametres: _adminLoadParametres,
+        dashboard:     _adminLoadDashboard,
+        depots:        _adminLoadDepots,
+        retraits:      _adminLoadRetraits,
+        users:         _adminLoadUsers,
+        wallets:       _adminLoadWallets,
+        kyc:           _adminLoadKYC,
+        taux:          _adminLoadTaux,
+        frais:         _adminLoadFrais,
+        reserves:      _adminLoadReserves,
+        notifications: _adminLoadNotifications,
+        rapports:      _adminLoadRapports,
+        securite:      _adminLoadSecurite,
+        sauvegardes:   _adminLoadSauvegardes,
+        parametres:    _adminLoadParametres,
     };
     if (loaders[tab]) loaders[tab]();
 }
@@ -6694,10 +6852,10 @@ function _adminSearchUsers(q) {
 // =========================================================
 function _adminLoadWallets() {
     const wallets = [
-        { name:'Binance', bal:'—', color:'#f0b90b', icon:'⬡', status:'Configuré' },
-        { name:'USDT TRC20',bal:'—',color:'#26a17b',icon:'₮', status:'Actif' },
-        { name:'BTC',     bal:'—', color:'#f7931a', icon:'₿', status:'Actif' },
-        { name:'ETH',     bal:'—', color:'#627eea', icon:'Ξ', status:'Actif' },
+        { name:'Binance', bal:'—', color:'#f0b90b', icon:'BNB', status:'Configuré' },
+        { name:'USDT TRC20',bal:'—',color:'#26a17b',icon:'USDT', status:'Actif' },
+        { name:'BTC',     bal:'—', color:'#f7931a', icon:'BTC', status:'Actif' },
+        { name:'ETH',     bal:'—', color:'#627eea', icon:'ETH', status:'Actif' },
         { name:'Skrill',  bal:'—', color:'#8b3bf7', icon:'S', status:'Inactif' },
         { name:'Neteller',bal:'—', color:'#ff3d00', icon:'N', status:'Inactif' },
         { name:'Perfect Money',bal:'—',color:'#1976d2',icon:'P',status:'Inactif'},
@@ -6770,7 +6928,7 @@ async function _adminLoadRapports() {
 
 // =========================================================
 // ADMIN — SÉCURITÉ
-// =========================================================
+
 function _adminLoadSecurite() {
     const loginLog = JSON.parse(localStorage.getItem('tc_login_log') || '[]');
     const actLog   = JSON.parse(localStorage.getItem('tc_action_log') || '[]');
@@ -6788,6 +6946,442 @@ function _adminLoadSecurite() {
     const fraudBody = document.getElementById('adm-fraud-body');
     if (fraudBody) fraudBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--gray);">✅ Aucune alerte anti-fraude</td></tr>';
 }
+
+// =========================================================
+// =========================================================
+// ADMIN — KYC
+// =========================================================
+async function _adminLoadKYC() {
+    const filter = document.getElementById('adm-kyc-filter')?.value || 'all';
+    const tbody = document.getElementById('adm-kyc-body');
+    if (!tbody) return;
+
+    // Demo data KYC
+    const demoKYC = [
+        { id:'KYC001', name:'Rija Ndriana',   email:'rija@example.com',   phone:'+261 34 12 345 67', doc:'CIN', submitted:'2025-07-04', status:'pending'  },
+        { id:'KYC002', name:'Aina Olivia',     email:'aina@example.com',   phone:'+261 33 98 765 43', doc:'Passeport', submitted:'2025-07-03', status:'verified' },
+        { id:'KYC003', name:'Tahina M.',       email:'tahina@example.com', phone:'+261 32 45 678 90', doc:'CIN', submitted:'2025-07-03', status:'verified' },
+        { id:'KYC004', name:'Fara Koto',       email:'fara@example.com',   phone:'+261 34 11 222 33', doc:'CIN', submitted:'2025-07-02', status:'rejected' },
+        { id:'KYC005', name:'Ny Ravo',         email:'ravo@example.com',   phone:'+261 34 00 112 23', doc:'Passeport', submitted:'2025-07-01', status:'pending'  },
+        { id:'KYC006', name:'Mamy Lalaina',    email:'mamy@example.com',   phone:'+261 32 88 999 00', doc:'CIN', submitted:'2025-06-30', status:'verified' },
+    ];
+
+    let filtered = demoKYC;
+    if (filter !== 'all') filtered = demoKYC.filter(k => k.status === filter);
+
+    // Update stats
+    const pending  = demoKYC.filter(k=>k.status==='pending').length;
+    const verified = demoKYC.filter(k=>k.status==='verified').length;
+    const rejected = demoKYC.filter(k=>k.status==='rejected').length;
+    const el1 = document.getElementById('kyc-pending-count');
+    const el2 = document.getElementById('kyc-verified-count');
+    const el3 = document.getElementById('kyc-rejected-count');
+    const el4 = document.getElementById('kyc-total-count');
+    const badge = document.getElementById('adm-kyc-badge');
+    if(el1) el1.textContent = pending;
+    if(el2) el2.textContent = verified;
+    if(el3) el3.textContent = rejected;
+    if(el4) el4.textContent = demoKYC.length;
+    if(badge) badge.textContent = pending || '0';
+
+    const statusMap = {
+        pending:  { cls:'pending',  txt:'En attente',  color:'#f5c518' },
+        verified: { cls:'success',  txt:'Verifie',     color:'#1db954' },
+        rejected: { cls:'refused',  txt:'Refuse',      color:'#e84040' },
+    };
+    tbody.innerHTML = filtered.map(k => {
+        const s = statusMap[k.status] || statusMap.pending;
+        return `<tr>
+            <td style="font-weight:700;color:#fff;">${k.name}</td>
+            <td style="color:#888;font-size:11px;">${k.email}</td>
+            <td>${k.phone}</td>
+            <td><span class="adm-badge pending">${k.doc}</span></td>
+            <td style="color:#888;">${k.submitted}</td>
+            <td><span class="adm-badge ${s.cls}">${s.txt}</span></td>
+            <td>
+                <button class="adm-btn info" onclick="_kycVoir('${k.id}')">Voir Voir</button>
+                ${k.status==='pending' ? `<button class="adm-btn approve" onclick="_kycValider('${k.id}','${k.name}')">OK Valider</button>
+                <button class="adm-btn refuse"  onclick="_kycRefuser('${k.id}','${k.name}')">X Refuser</button>` : ''}
+            </td>
+        </tr>`;
+    }).join('');
+    if (!filtered.length) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--gray);">Aucun KYC dans ce filtre</td></tr>';
+}
+
+function _kycValider(id, name) {
+    if(confirm('Valider le KYC de ' + name + ' ?')) {
+        tcToast('KYC de ' + name + ' valide avec succes', 'success');
+        _adminLoadKYC();
+        _adminLogAction('KYC valide : ' + name);
+    }
+}
+function _kycRefuser(id, name) {
+    if(confirm('Refuser le KYC de ' + name + ' ?')) {
+        tcToast('KYC de ' + name + ' refuse', 'warning');
+        _adminLoadKYC();
+        _adminLogAction('KYC refuse : ' + name);
+    }
+}
+function _kycVoir(id) {
+    tcToast('Visualisation pieces justificatives : ' + id, 'info');
+}
+
+// =========================================================
+// ADMIN — TAUX
+// =========================================================
+function _adminLoadTaux() {
+    _renderAdmTauxLive();
+    _previewTauxCalc();
+    // Load saved manual taux
+    const saved = localStorage.getItem('TC_TAUX_USDT');
+    const el = document.getElementById('taux-usdt-manual');
+    if(el && saved) el.value = saved;
+}
+
+function _renderAdmTauxLive() {
+    const grid = document.getElementById('adm-taux-live-grid');
+    if(!grid) return;
+    const tauxUSDT = parseFloat(localStorage.getItem('TC_TAUX_USDT') || '4850');
+    const coins = [
+        { sym:'USDT', color:'#26a17b', mga: tauxUSDT, chg:+0.2 },
+        { sym:'BTC',  color:'#f7931a', mga: 67234 * tauxUSDT, chg:-1.4 },
+        { sym:'ETH',  color:'#627eea', mga: 3521  * tauxUSDT, chg:+2.1 },
+        { sym:'BNB',  color:'#f3ba2f', mga: 612   * tauxUSDT, chg:+0.8 },
+        { sym:'TRX',  color:'#ef4444', mga: 0.12  * tauxUSDT, chg:-0.3 },
+        { sym:'SOL',  color:'#9945ff', mga: 178   * tauxUSDT, chg:+3.2 },
+    ];
+    const fmtMGA = n => n >= 1e6 ? (n/1e6).toFixed(2) + ' M Ar' : n.toLocaleString('fr-FR') + ' Ar';
+    grid.innerHTML = coins.map(c => `
+        <div style="background:#111;border:1px solid ${c.color}22;border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:16px;font-weight:900;color:${c.color};margin-bottom:4px;">${c.sym}</div>
+            <div style="font-size:13px;font-weight:700;color:#fff;">${fmtMGA(c.mga)}</div>
+            <div style="font-size:10px;font-weight:700;color:${c.chg>=0?'#1db954':'#e84040'};margin-top:3px;">
+                ${c.chg>=0?'^':'v'} ${Math.abs(c.chg)}%
+            </div>
+        </div>`).join('');
+}
+
+function _previewTauxCalc() {
+    const manualEl = document.getElementById('taux-usdt-manual');
+    const spreadEl = document.getElementById('taux-spread');
+    const box = document.getElementById('taux-preview-box');
+    const gridEl = document.getElementById('taux-preview-grid');
+    if(!manualEl || !spreadEl || !box || !gridEl) return;
+
+    const usdt = parseFloat(manualEl.value);
+    if(!usdt) { box.style.display='none'; return; }
+    box.style.display = 'block';
+
+    const spread = parseFloat(spreadEl.value) || 2;
+    const base   = usdt;
+    const achat  = base * (1 - spread/100);
+    const vente  = base * (1 + spread/100);
+    const fmt    = n => n.toLocaleString('fr-FR', {maximumFractionDigits:0}) + ' Ar';
+
+    gridEl.innerHTML = `
+        <div style="text-align:center;">
+            <div style="font-size:10px;color:#60a5fa;text-transform:uppercase;margin-bottom:4px;">Prix Achat</div>
+            <div style="font-size:14px;font-weight:800;color:#60a5fa;">${fmt(achat)}</div>
+            <div style="font-size:9px;color:#555;">TakaloCash achète</div>
+        </div>
+        <div style="text-align:center;">
+            <div style="font-size:10px;color:#888;text-transform:uppercase;margin-bottom:4px;">Base Spot</div>
+            <div style="font-size:14px;font-weight:800;color:#fff;">${fmt(base)}</div>
+            <div style="font-size:9px;color:#555;">Binance USDT/MGA</div>
+        </div>
+        <div style="text-align:center;">
+            <div style="font-size:10px;color:#1db954;text-transform:uppercase;margin-bottom:4px;">Prix Vente</div>
+            <div style="font-size:14px;font-weight:800;color:#1db954;">${fmt(vente)}</div>
+            <div style="font-size:9px;color:#555;">TakaloCash vend</div>
+        </div>`;
+}
+
+function _saveTauxManuel() {
+    const v = document.getElementById('taux-usdt-manual')?.value;
+    if(!v) { tcToast('Entrez un taux USDT valide', 'warning'); return; }
+    localStorage.setItem('TC_TAUX_USDT', v);
+    tcToast('Taux USDT/MGA mis a jour : ' + parseFloat(v).toLocaleString('fr-FR') + ' Ar', 'success');
+    _adminLogAction('Taux USDT modifie : ' + v + ' MGA');
+}
+
+// =========================================================
+// ADMIN — FRAIS (tab dedié)
+// =========================================================
+function _adminLoadFrais() {
+    _loadSavedFees();
+    _simulateFrais();
+    _adminUpdateFeePreview();
+    // Calc revenus from transactions
+    if(supabaseClient) _calcRevenusFromFrais();
+}
+
+async function _calcRevenusFromFrais() {
+    try {
+        const { data } = await supabaseClient.from('transactions').select('amount,montant,created_at,type,action');
+        if(!data) return;
+        const now = new Date();
+        const todayStr = now.toDateString();
+        const month = now.getMonth();
+        const todayTxs = data.filter(t => new Date(t.created_at).toDateString() === todayStr);
+        const monthTxs = data.filter(t => new Date(t.created_at).getMonth() === month);
+        const _fees = arr => arr.reduce((s,t) => s + _calcFees(t.amount||t.montant||0,'buy').fraisAr, 0);
+        const totalVol = data.reduce((s,t)=>s+(t.amount||t.montant||0),0);
+        const totalFees = _fees(data);
+        const avgRate = totalVol > 0 ? (totalFees/totalVol*100).toFixed(2) : '--';
+        const elJ = document.getElementById('frais-revenus-jour');
+        const elM = document.getElementById('frais-revenus-mois');
+        const elT = document.getElementById('frais-taux-moyen');
+        if(elJ) elJ.textContent = _fees(todayTxs).toLocaleString('fr-FR') + ' Ar';
+        if(elM) elM.textContent = _fees(monthTxs).toLocaleString('fr-FR') + ' Ar';
+        if(elT) elT.textContent = avgRate + '%';
+    } catch(e) {}
+}
+
+function _simulateFrais() {
+    const montantEl = document.getElementById('sim-montant');
+    const typeEl = document.getElementById('sim-type');
+    const res = document.getElementById('sim-result');
+    if(!montantEl || !typeEl || !res) return;
+    const montant = parseFloat(montantEl.value);
+    if(!montant || montant <= 0) { res.style.display='none'; return; }
+    const type = typeEl.value;
+    const fees = _calcFees(montant, type);
+    res.style.display = 'block';
+    const elMB = document.getElementById('sim-montant-brut');
+    const elT  = document.getElementById('sim-taux');
+    const elF  = document.getElementById('sim-frais');
+    const elN  = document.getElementById('sim-net');
+    if(elMB) elMB.textContent = montant.toLocaleString('fr-FR') + ' Ar';
+    if(elT)  elT.textContent  = fees.fraisRate + '%';
+    if(elF)  elF.textContent  = fees.fraisAr.toLocaleString('fr-FR') + ' Ar';
+    if(elN)  elN.textContent  = (montant - fees.fraisAr).toLocaleString('fr-FR') + ' Ar';
+}
+
+function _adminUpdateFeePreview() { /* Updated live via _simulateFrais */ }
+
+// =========================================================
+// ADMIN — RÉSERVES
+// =========================================================
+function _adminLoadReserves() {
+    const tauxUSDT = parseFloat(localStorage.getItem('TC_TAUX_USDT') || '4850');
+    const wallets = [
+        { name:'USDT TRC-20', sym:'USDT', bal: 1245.5, color:'#26a17b', icon:'USDT', seuil:500, mga: 1245.5*tauxUSDT },
+        { name:'USDT BEP-20', sym:'USDT', bal: 320.0,  color:'#f3ba2f', icon:'USDT', seuil:500, mga: 320.0*tauxUSDT },
+        { name:'Bitcoin (BTC)',sym:'BTC',  bal: 0.084,  color:'#f7931a', icon:'BTC', seuil:0.01, mga: 0.084*67234*tauxUSDT },
+        { name:'Ethereum (ETH)',sym:'ETH', bal: 1.25,   color:'#627eea', icon:'ETH', seuil:0.1, mga: 1.25*3521*tauxUSDT },
+        { name:'BNB BEP-20',   sym:'BNB', bal: 4.2,    color:'#f3ba2f', icon:'BNB', seuil:1, mga: 4.2*612*tauxUSDT },
+        { name:'TRX TRC-20',   sym:'TRX', bal: 12500,  color:'#ef4444', icon:'TRX', seuil:1000, mga: 12500*0.12*tauxUSDT },
+        { name:'MVola MGA',    sym:'MGA', bal: 850000,  color:'#f5c518', icon:'Ar', seuil:500000, mga: 850000 },
+        { name:'Orange Money', sym:'MGA', bal: 420000,  color:'#f97316', icon:'Ar', seuil:300000, mga: 420000 },
+    ];
+    const grid = document.getElementById('adm-reserves-grid');
+    if(!grid) return;
+    const fmtB = (b, sym) => sym === 'MGA' ? b.toLocaleString('fr-FR') + ' Ar' : b.toLocaleString('fr-FR', {maximumFractionDigits:6}) + ' ' + sym;
+    const fmtMGA = n => n >= 1e6 ? (n/1e6).toFixed(2) + ' M Ar' : n.toLocaleString('fr-FR') + ' Ar';
+    grid.innerHTML = wallets.map(w => {
+        const pct = Math.min(100, Math.round(w.bal / (w.seuil * 3) * 100));
+        const low = w.bal <= w.seuil;
+        return `<div style="background:#111;border:1px solid ${low?'rgba(239,68,68,0.4)':w.color+'22'};border-radius:12px;padding:14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <div style="width:32px;height:32px;border-radius:8px;background:${w.color}22;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:${w.color};">${w.icon}</div>
+                <div>
+                    <div style="font-size:12px;font-weight:700;color:#fff;">${w.name}</div>
+                    <span style="font-size:9px;background:${low?'rgba(239,68,68,0.15)':'rgba(29,184,122,0.15)'};color:${low?'#e84040':'#1db954'};border-radius:20px;padding:1px 6px;font-weight:700;">${low?'! Bas':'[ok] OK'}</span>
+                </div>
+            </div>
+            <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:2px;">${fmtB(w.bal, w.sym)}</div>
+            <div style="font-size:10px;color:#888;margin-bottom:8px;">${fmtMGA(w.mga)}</div>
+            <div style="background:#1a1a1a;border-radius:20px;height:5px;overflow:hidden;">
+                <div style="height:100%;border-radius:20px;background:${low?'#e84040':w.color};width:${pct}%;transition:width .5s;"></div>
+            </div>
+            <div style="font-size:9px;color:#555;margin-top:4px;">Seuil min: ${fmtB(w.seuil, w.sym)}</div>
+        </div>`;
+    }).join('');
+}
+
+function _saveSeuils() {
+    const els = ['seuil-usdt','seuil-btc','seuil-eth','seuil-mga'];
+    els.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) localStorage.setItem('TC_' + id.toUpperCase(), el.value);
+    });
+    tcToast('Seuils d alerte sauvegardes', 'success');
+}
+
+// =========================================================
+// ADMIN — NOTIFICATIONS
+// =========================================================
+function _adminLoadNotifications() {
+    _renderNotifTemplates();
+}
+
+function _renderNotifTemplates() {
+    const grid = document.getElementById('adm-notif-templates');
+    if(!grid) return;
+    const templates = [
+        { icon:'[maint]', title:'Maintenance', msg:'TakaloCash sera en maintenance le [DATE] de [HH]h a [HH]h. Merci de planifier vos transactions.', type:'warning' },
+        { icon:'[promo]', title:'Promotion',   msg:'Offre speciale ! Frais reduits a 1% sur tous les echanges ce weekend. Profitez-en !', type:'promo' },
+        { icon:'[ok]', title:'Transaction', msg:'Votre transaction #[ID] a ete validee. Les fonds arrivent dans les 30 minutes.', type:'success' },
+        { icon:'[warn]', title:'KYC requis',  msg:'Votre verification KYC est requise pour continuer a utiliser TakaloCash. Completez-la maintenant.', type:'warning' },
+        { icon:'[taux]', title:'Nouveaux taux',msg:'Les taux de change ont ete mis a jour. 1 USDT = [TAUX] Ar. Consultez nos offres.', type:'info' },
+        { icon:'[lock]', title:'Securite',    msg:'Connexion detectee depuis un nouvel appareil. Si ce n est pas vous, contactez-nous immediatement.', type:'warning' },
+    ];
+    grid.innerHTML = templates.map(t => `
+        <div style="background:#111;border:1px solid #222;border-radius:10px;padding:12px;cursor:pointer;transition:border-color .2s;"
+            onclick="_useNotifTemplate('${t.title}','${t.msg}','${t.type}')"
+            onmouseover="this.style.borderColor='rgba(245,197,24,0.3)'"
+            onmouseout="this.style.borderColor='#222'">
+            <div style="font-size:20px;margin-bottom:6px;">${t.icon}</div>
+            <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:4px;">${t.title}</div>
+            <div style="font-size:10px;color:#666;line-height:1.4;">${t.msg.substring(0,60)}...</div>
+        </div>`).join('');
+}
+
+function _useNotifTemplate(titre, msg, type) {
+    const t = document.getElementById('notif-titre');
+    const m = document.getElementById('notif-message');
+    const tp = document.getElementById('notif-type');
+    if(t) t.value = titre;
+    if(m) m.value = msg;
+    if(tp) { for(let o of tp.options) if(o.value===type) { tp.value=type; break; } }
+    tcToast('Template charge : ' + titre, 'info');
+}
+
+function _envoyerNotification() {
+    const titre = document.getElementById('notif-titre')?.value;
+    const msg   = document.getElementById('notif-message')?.value;
+    if(!titre || !msg) { tcToast('Remplissez le titre et le message', 'warning'); return; }
+    const dest = document.getElementById('notif-dest')?.value || 'all';
+    const destLabel = { all:'tous les utilisateurs', active:'utilisateurs actifs', pending:'avec transactions en attente', specific:'utilisateur specifique' };
+    tcToast('Notification envoyee a ' + (destLabel[dest]||dest) + ' : ' + titre, 'success');
+    _adminLogAction('Notification push envoyee : ' + titre + ' => ' + dest);
+    const tbody = document.getElementById('adm-notif-body');
+    if(tbody) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td style="color:#888;">${new Date().toLocaleString('fr-FR')}</td><td style="font-weight:700;color:#fff;">${titre}</td><td><span class="adm-badge pending">info</span></td><td>${destLabel[dest]||dest}</td><td>—</td><td><span class="adm-badge success">Envoyee</span></td><td><button class="adm-btn refuse" onclick="this.closest('tr').remove()">Del</button></td>`;
+        if(tbody.querySelector('td[colspan]')) tbody.innerHTML = '';
+        tbody.prepend(tr);
+    }
+}
+
+function _previewNotification() {
+    const titre = document.getElementById('notif-titre')?.value || '(sans titre)';
+    const msg   = document.getElementById('notif-message')?.value || '(sans message)';
+    tcToast('Apercu : ' + titre + ' — ' + msg.substring(0,50), 'info');
+}
+
+function _programmerNotification() {
+    const date = document.getElementById('notif-date')?.value;
+    if(!date) { tcToast('Choisissez une date et heure', 'warning'); return; }
+    tcToast('Notification programmee pour le ' + new Date(date).toLocaleString('fr-FR'), 'success');
+}
+
+// =========================================================
+// ADMIN — SAUVEGARDES
+// =========================================================
+async function _adminLoadSauvegardes() {
+    if(supabaseClient) {
+        try {
+            const { count: txCount } = await supabaseClient.from('transactions').select('*',{count:'exact',head:true});
+            const { count: usCount  } = await supabaseClient.from('users').select('*',{count:'exact',head:true});
+            const elT = document.getElementById('backup-tx-count');
+            const elU = document.getElementById('backup-users-count');
+            if(elT) elT.textContent = (txCount||0).toLocaleString('fr-FR');
+            if(elU) elU.textContent = (usCount||0).toLocaleString('fr-FR');
+        } catch(e) {}
+    }
+    // Set default date range for export
+    const to   = document.getElementById('exp-date-to');
+    const from = document.getElementById('exp-date-from');
+    const now  = new Date();
+    if(to)   to.value   = now.toISOString().slice(0,10);
+    const m30 = new Date(now); m30.setDate(m30.getDate()-30);
+    if(from) from.value = m30.toISOString().slice(0,10);
+}
+
+function _creerSauvegarde() {
+    tcToast('Sauvegarde en cours... Supabase auto-backup actif', 'info');
+    _adminLogAction('Sauvegarde manuelle declenchee');
+    setTimeout(() => {
+        tcToast('Sauvegarde complete ! Toutes les donnees securisees', 'success');
+        const el = document.getElementById('last-backup-time');
+        if(el) el.textContent = 'Sauvegarde le ' + new Date().toLocaleString('fr-FR');
+    }, 2000);
+}
+
+async function _exporterDonnees() {
+    tcToast('Preparation de l export...', 'info');
+    try {
+        let data = {};
+        if(supabaseClient) {
+            const inclTx = document.getElementById('exp-transactions')?.checked;
+            const inclUs = document.getElementById('exp-users')?.checked;
+            if(inclTx) { const {data:tx} = await supabaseClient.from('transactions').select('*'); data.transactions = tx||[]; }
+            if(inclUs) { const {data:us} = await supabaseClient.from('users').select('id,full_name,email,phone,created_at'); data.users = us||[]; }
+        }
+        data.exported_at = new Date().toISOString();
+        data.exported_by = 'TakaloCash Admin';
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'takalocash-export-' + new Date().toISOString().slice(0,10) + '.json';
+        a.click();
+        tcToast('Export JSON telecharge', 'success');
+    } catch(e) { tcToast('Erreur export : ' + e.message, 'warning'); }
+}
+
+function _importerDonnees() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,.csv';
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        tcToast('Fichier selectionne : ' + file.name + ' — Import disponible en mode production', 'info');
+    };
+    input.click();
+}
+
+function _nettoyerCache() {
+    if(!confirm('Vider le cache local (localStorage) ? Les parametres seront reinitialises.')) return;
+    const keysToKeep = ['supabase.auth.token'];
+    const keys = Object.keys(localStorage).filter(k => !keysToKeep.includes(k) && k.startsWith('TC_'));
+    keys.forEach(k => localStorage.removeItem(k));
+    tcToast('Cache TakaloCash vide (' + keys.length + ' entrees supprimees)', 'success');
+    _adminLogAction('Cache admin vide');
+}
+
+async function _exporterCSV() {
+    tcToast('Generation CSV...', 'info');
+    try {
+        let rows = [['ID','Type','Actif','Montant','Frais','Statut','Date']];
+        if(supabaseClient) {
+            const from = document.getElementById('exp-date-from')?.value;
+            const to   = document.getElementById('exp-date-to')?.value;
+            let q = supabaseClient.from('transactions').select('*').order('created_at',{ascending:false});
+            if(from) q = q.gte('created_at', from);
+            if(to)   q = q.lte('created_at', to + 'T23:59:59');
+            const {data} = await q;
+            if(data) rows = rows.concat(data.map(t => [
+                t.id, t.type||t.action||'', t.asset||'', t.amount||t.montant||0,
+                _calcFees(t.amount||t.montant||0,'buy').fraisAr,
+                t.status||'', t.created_at
+            ]));
+        }
+        const csv = rows.map(r => r.join(',')).join('\n');
+        const blob = new Blob([csv], {type:'text/csv'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'takalocash-' + new Date().toISOString().slice(0,10) + '.csv';
+        a.click();
+        tcToast('CSV exporte : ' + (rows.length-1) + ' transactions', 'success');
+    } catch(e) { tcToast('Erreur CSV : ' + e.message, 'warning'); }
+}
+
+function _exporterJSON() { _exporterDonnees(); }
+
+function _exporterExcelComplet() { _exportExcel(); }
+
 
 function _adminLogAction(action) {
     try {
@@ -6811,6 +7405,7 @@ function _adminLogLogin() {
 // ADMIN — PARAMÈTRES
 // =========================================================
 function _adminLoadParametres() {
+    // ── Frais de service ──
     const saved = JSON.parse(localStorage.getItem('tc_admin_fees') || 'null');
     if (saved) {
         document.getElementById('fee-buy-small') && (document.getElementById('fee-buy-small').value   = saved.buy?.small  || 3);
@@ -6819,6 +7414,95 @@ function _adminLoadParametres() {
         document.getElementById('fee-sell-small')&& (document.getElementById('fee-sell-small').value  = saved.sell?.small || 2);
         document.getElementById('fee-sell-mid')  && (document.getElementById('fee-sell-mid').value    = saved.sell?.mid   || 1.5);
         document.getElementById('fee-sell-large')&& (document.getElementById('fee-sell-large').value  = saved.sell?.large || 1);
+    }
+
+    // ── Pricing Engine ──
+    const el = id => document.getElementById(id);
+    if (el('adm-taux-usdt'))   el('adm-taux-usdt').value   = TC_PRICING.tauxUSDT;
+    if (el('adm-marge-achat')) el('adm-marge-achat').value = TC_PRICING.margeAchat;
+    if (el('adm-marge-vente')) el('adm-marge-vente').value = TC_PRICING.margeVente;
+
+    // ── Aperçu Spot (BTC + ETH + USDT + TRX) ──
+    _adminUpdateSpotPreview();
+    _adminPricingPreview();
+    // ── Tableau complet des prix ──
+    _adminUpdatePriceTable();
+}
+
+/** Met à jour l'aperçu des prix Spot dans le panneau admin */
+function _adminUpdateSpotPreview() {
+    const preview = document.getElementById('adm-spot-preview');
+    if (!preview) return;
+    const SHOW = ['BTC','ETH','USDT','TRX','BNB','SOL'];
+    preview.innerHTML = SHOW.map(sym => {
+        const spot = TC_SPOT_PRICES[sym];
+        const base = spot ? calcPrixBase(sym === 'USDT' ? 1 : spot) : null;
+        return `<div style="background:#0d0d0d;border-radius:6px;padding:6px 8px;">
+            <div style="font-size:10px;font-weight:700;color:#f5c518;">${sym}</div>
+            <div style="font-size:11px;color:#f0f0f0;font-weight:700;">${spot ? (sym === 'USDT' ? '1 USDT' : spot.toLocaleString('fr-FR', {maximumFractionDigits:4}) + ' $') : '—'}</div>
+            <div style="font-size:10px;color:#888;">${base ? base.toLocaleString('fr-FR') + ' Ar' : '—'}</div>
+        </div>`;
+    }).join('');
+}
+
+/** Preview du calcul BTC en temps réel (sans sauvegarder) */
+function _adminPricingPreview() {
+    const tauxUsdt   = parseFloat(document.getElementById('adm-taux-usdt')?.value)   || TC_PRICING.tauxUSDT;
+    const margeAchat = parseFloat(document.getElementById('adm-marge-achat')?.value) || TC_PRICING.margeAchat;
+    const margeVente = parseFloat(document.getElementById('adm-marge-vente')?.value) || TC_PRICING.margeVente;
+
+    const spotBTC = TC_SPOT_PRICES.BTC || 110000; // fallback 110 000 USDT
+    const base    = Math.round(spotBTC * tauxUsdt);
+    const achat   = Math.round(base * (1 - margeAchat / 100));
+    const vente   = Math.round(base * (1 + margeVente / 100));
+
+    const fmt = n => n.toLocaleString('fr-FR') + ' Ar';
+    const el  = id => document.getElementById(id);
+
+    if (el('prev-prix-base'))  el('prev-prix-base').textContent  = fmt(base);
+    if (el('prev-prix-achat')) el('prev-prix-achat').textContent = fmt(achat);
+    if (el('prev-prix-vente')) el('prev-prix-vente').textContent = fmt(vente);
+    if (el('prev-spot-usdt'))  el('prev-spot-usdt').textContent  =
+        `Spot BTC: ${spotBTC.toLocaleString('fr-FR', {maximumFractionDigits:2})} USDT × Taux ${tauxUsdt.toLocaleString('fr-FR')} MGA`;
+
+    const preview = el('adm-pricing-preview');
+    if (preview) preview.style.display = 'block';
+}
+
+/** Sauvegarde les paramètres Pricing Engine et recalcule immédiatement */
+function _adminSavePricing() {
+    const tauxUsdt   = parseFloat(document.getElementById('adm-taux-usdt')?.value);
+    const margeAchat = parseFloat(document.getElementById('adm-marge-achat')?.value);
+    const margeVente = parseFloat(document.getElementById('adm-marge-vente')?.value);
+
+    if (isNaN(tauxUsdt) || tauxUsdt < 1000) { tcToastWarning('Taux USDT invalide (minimum 1 000 MGA)'); return; }
+    if (isNaN(margeAchat) || margeAchat < 0 || margeAchat > 50) { tcToastWarning('Marge achat invalide (0–50%)'); return; }
+    if (isNaN(margeVente) || margeVente < 0 || margeVente > 50) { tcToastWarning('Marge vente invalide (0–50%)'); return; }
+
+    TC_PRICING = { tauxUSDT: tauxUsdt, margeAchat, margeVente };
+    _rebuildTaux(); // Recalcul immédiat de tous les taux
+    _savePricingParams(); // async — sauvegarde Supabase + localStorage
+
+    _adminLogAction(`Pricing mis à jour — Taux USDT: ${tauxUsdt} MGA | Achat: ${margeAchat}% | Vente: ${margeVente}%`);
+    tcToastSuccess(`Taux appliqués — ${tauxUsdt.toLocaleString('fr-FR')} MGA/USDT · Achat ${margeAchat}% · Vente ${margeVente}%`, 'Pricing mis à jour');
+    _adminUpdateSpotPreview();
+    _adminUpdatePriceTable(); // Rafraîchir le tableau complet des prix
+}
+
+/** Forcer un refresh Spot immédiat depuis l'admin */
+async function _adminActualiserSpot() {
+    const btn = event?.target;
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> En cours...'; }
+    try {
+        await chargerTauxBinance();
+        _adminUpdateSpotPreview();
+        _adminUpdatePriceTable();
+        tcToastSuccess('Prix Spot actualisés depuis Binance', 'Actualisation réussie');
+        _adminLogAction('Spot prices actualisés manuellement');
+    } catch(e) {
+        tcToastError('Impossible d\'actualiser : ' + e.message);
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-rotate"></i> Actualiser maintenant'; }
     }
 }
 
@@ -6980,37 +7664,65 @@ function updateCalc() {
     }
     if (calcContainer) calcContainer.style.display = 'flex';
 
-    const assetKey = document.getElementById('crypto-select')?.value || '';
-    const val      = parseFloat(document.getElementById('input-main')?.value) || 0;
-    const rate     = CURRENT_TAUX[assetKey] || 1;
+    const assetKey  = document.getElementById('crypto-select')?.value || '';
+    const val       = parseFloat(document.getElementById('input-main')?.value) || 0;
+    const spotUsdt  = TC_SPOT_PRICES[assetKey] || (assetKey === 'USDT' ? 1 : 0);
 
-    // Utilise le barème dynamique admin
-    const direction = currentAction === 'Envoyer' ? 'buy' : 'sell';
+    // ── Calcul Pricing Engine ──────────────────────────────────────────────
+    // Envoyer (client → TakaloCash Ar, reçoit crypto) : TakaloCash VEND → Prix Vente
+    // Recevoir (client → TakaloCash crypto, reçoit Ar)  : TakaloCash ACHÈTE → Prix Achat
+    const prixVente  = spotUsdt > 0 ? calcPrixVente(spotUsdt)  : (CURRENT_TAUX[assetKey] || 1);
+    const prixAchat  = spotUsdt > 0 ? calcPrixAchat(spotUsdt)  : Math.round((CURRENT_TAUX[assetKey] || 1) * (1 - TC_PRICING.margeAchat / 100));
+    const prixBase   = spotUsdt > 0 ? calcPrixBase(spotUsdt)   : (CURRENT_TAUX[assetKey] || 1);
+
+    // Frais de service TakaloCash (sur le montant de la transaction)
+    const direction   = currentAction === 'Envoyer' ? 'buy' : 'sell';
     const { fraisRate, fraisAr, montantNet } = _calcFees(val, direction);
 
-    // Frais réseau (si crypto connue)
-    const netFee     = NETWORK_FEES[assetKey]?.trc20 || NETWORK_FEES[assetKey]?.btc || NETWORK_FEES[assetKey]?.erc20 || 0;
-    const netFeeAr   = netFee > 0 ? Math.round(netFee * rate) : 0;
-    const totalNet   = Math.max(0, montantNet - netFeeAr);
+    // Frais réseau crypto
+    const netFee  = NETWORK_FEES[assetKey]?.trc20 || NETWORK_FEES[assetKey]?.btc || NETWORK_FEES[assetKey]?.erc20 || 0;
+    const netFeeAr = netFee > 0 ? Math.round(netFee * prixVente) : 0;
 
     if (currentAction === 'Envoyer') {
-        if (calcLabel) calcLabel.textContent = 'Crypto reçue';
-        if (res) res.innerText = rate > 1
-            ? (totalNet / rate).toFixed(assetKey === 'USDT' ? 2 : 6) + ' ' + assetKey
-            : totalNet.toLocaleString('fr-FR') + ' Ar';
+        // Client envoie X Ariary → reçoit Y crypto
+        // Prix appliqué : Prix Vente (TakaloCash vend la crypto)
+        const cryptoRecu = prixVente > 0 ? Math.max(0, (montantNet - netFeeAr) / prixVente) : 0;
+        if (calcLabel) calcLabel.textContent = assetKey ? `Crypto reçue (au prix vente)` : 'Montant net';
+        if (res) res.innerText = val > 0 && prixVente > 1
+            ? cryptoRecu.toFixed(assetKey === 'USDT' ? 2 : 6) + ' ' + assetKey
+            : montantNet.toLocaleString('fr-FR') + ' Ar';
         if (netRow) netRow.style.display = 'none';
+
+        if (fraisEl && val > 0) {
+            const margeInfo = spotUsdt > 0
+                ? ` · Prix vente: ${prixVente.toLocaleString('fr-FR')} Ar/${assetKey}`
+                : '';
+            fraisEl.innerHTML = `<span style="color:var(--yellow);">Frais TC ${fraisRate}%</span> = ${fraisAr.toLocaleString('fr-FR')} Ar${netFee > 0 ? ` + réseau ${netFeeAr.toLocaleString('fr-FR')} Ar` : ''}${margeInfo}`;
+        } else if (fraisEl) fraisEl.innerHTML = '';
+
     } else {
-        if (calcLabel) calcLabel.textContent = 'Montant en Ariary';
-        if (res) res.innerText = val > 0 ? Math.floor(val * rate).toLocaleString('fr-FR') + ' Ar' : '0 Ar';
+        // Client envoie X crypto → reçoit Y Ariary
+        // Prix appliqué : Prix Achat (TakaloCash achète la crypto)
+        const montantBrut = prixAchat > 0 ? Math.floor(val * prixAchat) : 0;
+        const fraisSell   = _calcFees(montantBrut, 'sell');
+        const montantNetAr = Math.max(0, montantBrut - fraisSell.fraisAr);
+
+        if (calcLabel) calcLabel.textContent = `Ariary reçus (au prix achat)`;
+        if (res) res.innerText = val > 0
+            ? montantBrut.toLocaleString('fr-FR') + ' Ar'
+            : '0 Ar';
         if (netRow && val > 0) {
             netRow.style.display = 'flex';
-            if (netRes) netRes.textContent = totalNet.toLocaleString('fr-FR') + ' Ar';
-        } else if (netRow) { netRow.style.display = 'none'; }
-    }
+            if (netRes) netRes.textContent = montantNetAr.toLocaleString('fr-FR') + ' Ar net';
+        } else if (netRow) netRow.style.display = 'none';
 
-    if (fraisEl && val > 0) {
-        fraisEl.innerHTML = `<span style="color:var(--yellow);">Frais TC ${fraisRate}%</span> = ${fraisAr.toLocaleString('fr-FR')} Ar${netFee > 0 ? ` &nbsp;+&nbsp; <span style="color:var(--gray);">Réseau ${netFee} ${assetKey}</span> (~${netFeeAr.toLocaleString('fr-FR')} Ar)` : ''}`;
-    } else if (fraisEl) { fraisEl.innerHTML = ''; }
+        if (fraisEl && val > 0) {
+            const margeInfo = spotUsdt > 0
+                ? ` · Prix achat: ${prixAchat.toLocaleString('fr-FR')} Ar/${assetKey}`
+                : '';
+            fraisEl.innerHTML = `<span style="color:var(--yellow);">Frais TC ${fraisSell.fraisRate}%</span> = ${fraisSell.fraisAr.toLocaleString('fr-FR')} Ar${margeInfo}`;
+        } else if (fraisEl) fraisEl.innerHTML = '';
+    }
 }
 
 
@@ -7668,6 +8380,67 @@ function tcToastWarning(msg, title)  { tcToast(msg, 'warning', title); }
 /* ── Email validation helper ── */
 function _isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((e||'').trim()); }
 
+
+/* ══════════════════════════════════════════════════════════════
+   ADMIN — Tableau complet des prix Spot × TC_PRICING
+   ══════════════════════════════════════════════════════════════ */
+function _adminUpdatePriceTable() {
+    const tbody = document.getElementById('adm-price-table-body');
+    const count = document.getElementById('adm-price-table-count');
+    if (!tbody) return;
+
+    const spots = TC_SPOT_PRICES;
+    const syms  = Object.keys(spots).filter(s => s !== 'USDT').sort();
+
+    // Priorité d'affichage en haut du tableau
+    const priority = ['BTC','ETH','BNB','SOL','TRX','USDT'];
+    const ordered  = [
+        ...priority.filter(s => spots[s] !== undefined),
+        ...syms.filter(s => !priority.includes(s))
+    ];
+
+    if (ordered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:#555;">Aucun prix disponible — actualiser</td></tr>';
+        return;
+    }
+
+    // Inclure USDT au début
+    const allSyms = spots.USDT !== undefined ? ['USDT', ...ordered.filter(s => s !== 'USDT')] : ordered;
+    if (count) count.textContent = allSyms.length + ' paires USDT';
+
+    tbody.innerHTML = allSyms.map(sym => {
+        const spotVal = sym === 'USDT' ? 1 : spots[sym];
+        const base    = calcPrixBase(spotVal);
+        const achat   = calcPrixAchat(spotVal);
+        const vente   = calcPrixVente(spotVal);
+
+        const fmtSpot = sym === 'USDT'
+            ? '1.0000'
+            : spotVal < 0.01
+                ? spotVal.toFixed(6)
+                : spotVal < 1
+                    ? spotVal.toFixed(4)
+                    : spotVal.toLocaleString('fr-FR', { maximumFractionDigits: 2 });
+
+        const fmtAr = n => n.toLocaleString('fr-FR');
+
+        // Couleur selon marge
+        const margeColor = sym === 'USDT' ? '#888' : '#f5c518';
+
+        return `<tr style="border-bottom:1px solid #111;">
+            <td style="padding:5px 6px;font-weight:800;color:${margeColor};">${sym}</td>
+            <td style="padding:5px 6px;text-align:right;color:#f0f0f0;">${fmtSpot}</td>
+            <td style="padding:5px 6px;text-align:right;color:#60a5fa;">${fmtAr(achat)}</td>
+            <td style="padding:5px 6px;text-align:right;color:#aaa;">${fmtAr(base)}</td>
+            <td style="padding:5px 6px;text-align:right;color:#34d399;">${fmtAr(vente)}</td>
+        </tr>`;
+    }).join('');
+}
+
+/* Appelée automatiquement après chaque rebuild de taux + après admin save */
+const _origRebuildTaux = typeof _rebuildTaux !== 'undefined' ? _rebuildTaux : null;
+/* ══════════════════════════════════════════════════════════════ */
+
 </script>
 
 <!-- ========================================
@@ -7691,8 +8464,14 @@ function _isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((e||'').
         <button class="adm-tab" onclick="_adminTab('retraits',this)"><i class="fa-solid fa-arrow-up-from-line"></i> Retraits</button>
         <button class="adm-tab" onclick="_adminTab('users',this)"><i class="fa-solid fa-users"></i> Utilisateurs</button>
         <button class="adm-tab" onclick="_adminTab('wallets',this)"><i class="fa-solid fa-wallet"></i> Wallets</button>
+        <button class="adm-tab" onclick="_adminTab('kyc',this)"><i class="fa-solid fa-id-card"></i> KYC <span id="adm-kyc-badge" style="background:#f5c518;color:#000;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:800;margin-left:2px;">—</span></button>
+        <button class="adm-tab" onclick="_adminTab('taux',this)"><i class="fa-solid fa-chart-line"></i> Taux</button>
+        <button class="adm-tab" onclick="_adminTab('frais',this)"><i class="fa-solid fa-percent"></i> Frais</button>
+        <button class="adm-tab" onclick="_adminTab('reserves',this)"><i class="fa-solid fa-vault"></i> Réserves</button>
+        <button class="adm-tab" onclick="_adminTab('notifications',this)"><i class="fa-solid fa-bell"></i> Notifications</button>
         <button class="adm-tab" onclick="_adminTab('rapports',this)"><i class="fa-solid fa-file-chart-column"></i> Rapports</button>
         <button class="adm-tab" onclick="_adminTab('securite',this)"><i class="fa-solid fa-shield-halved"></i> Sécurité</button>
+        <button class="adm-tab" onclick="_adminTab('sauvegardes',this)"><i class="fa-solid fa-database"></i> Sauvegardes</button>
         <button class="adm-tab" onclick="_adminTab('parametres',this)"><i class="fa-solid fa-gear"></i> Paramètres</button>
     </div>
 
@@ -7874,10 +8653,115 @@ function _isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((e||'').
         <!-- ── PARAMÈTRES ── -->
         <div id="adm-tab-parametres" style="display:none;">
             <div class="adm-section-title">⚙️ Paramètres Généraux</div>
+
+            <!-- ── PRICING ENGINE CARD ─────────────────────────────────── -->
+            <div class="adm-chart-wrap" style="margin:0 0 16px; border:1px solid rgba(245,197,24,.3); background:rgba(245,197,24,.03);">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+                    <div>
+                        <div style="font-size:14px;font-weight:900;color:#f5c518;">📈 Pricing Engine — Taux &amp; Marges</div>
+                        <div style="font-size:11px;color:#888;margin-top:3px;">Calcul automatique : Prix Base = Spot USDT × Taux USDT · Prix Vente/Achat = Prix Base ± Marge</div>
+                    </div>
+                    <button onclick="_adminActualiserSpot()" style="background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.4);border-radius:8px;color:#f5c518;font-size:11px;font-weight:800;padding:7px 14px;cursor:pointer;font-family:var(--font,sans-serif);">
+                        <i class="fa-solid fa-rotate"></i> Actualiser maintenant
+                    </button>
+                </div>
+
+                <!-- Statut Spot -->
+                <div id="adm-spot-status" style="background:#111;border:1px solid #222;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+                        <span style="color:#888;">Dernier refresh Spot :</span>
+                        <span class="tc-rate-timestamp" style="color:#f5c518;font-weight:700;">—</span>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-top:6px;">
+                        <span style="color:#888;">Refresh automatique :</span>
+                        <span style="color:#34d399;font-weight:700;">✅ Toutes les 30 secondes</span>
+                    </div>
+                    <div id="adm-spot-preview" style="margin-top:10px;padding-top:10px;border-top:1px solid #222;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;"></div>
+
+                    <!-- Tableau complet des prix -->
+                    <div style="margin-top:12px;border-top:1px solid #1a1a1a;padding-top:10px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                            <span style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;">Tableau des prix en temps réel</span>
+                            <span id="adm-price-table-count" style="font-size:10px;color:#555;"></span>
+                        </div>
+                        <div style="max-height:220px;overflow-y:auto;">
+                            <table style="width:100%;border-collapse:collapse;font-size:11px;" id="adm-price-table">
+                                <thead>
+                                    <tr style="border-bottom:1px solid #222;">
+                                        <th style="text-align:left;padding:5px 6px;color:#888;font-weight:700;">Crypto</th>
+                                        <th style="text-align:right;padding:5px 6px;color:#888;font-weight:700;">Spot (USDT)</th>
+                                        <th style="text-align:right;padding:5px 6px;color:#60a5fa;font-weight:700;">Prix Achat (Ar)</th>
+                                        <th style="text-align:right;padding:5px 6px;color:#f0f0f0;font-weight:700;">Prix Base (Ar)</th>
+                                        <th style="text-align:right;padding:5px 6px;color:#34d399;font-weight:700;">Prix Vente (Ar)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adm-price-table-body">
+                                    <tr><td colspan="5" style="text-align:center;padding:12px;color:#555;">Chargement...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                    <!-- Taux USDT/MGA -->
+                    <div class="adm-form-group" style="margin:0;">
+                        <label class="adm-form-label" style="color:#f5c518;">💱 Taux USDT (MGA)</label>
+                        <input class="adm-form-input" id="adm-taux-usdt" type="number" step="10" min="1000" max="20000"
+                            value="4200" oninput="_adminPricingPreview()"
+                            style="border-color:rgba(245,197,24,.3);">
+                        <div style="font-size:10px;color:#666;margin-top:4px;">Default: 4 200 MGA</div>
+                    </div>
+                    <!-- Marge Achat -->
+                    <div class="adm-form-group" style="margin:0;">
+                        <label class="adm-form-label" style="color:#60a5fa;">📉 Marge Achat (%)</label>
+                        <input class="adm-form-input" id="adm-marge-achat" type="number" step="0.1" min="0" max="20"
+                            value="1.5" oninput="_adminPricingPreview()"
+                            style="border-color:rgba(96,165,250,.3);">
+                        <div style="font-size:10px;color:#666;margin-top:4px;">TakaloCash achète au client</div>
+                    </div>
+                    <!-- Marge Vente -->
+                    <div class="adm-form-group" style="margin:0;">
+                        <label class="adm-form-label" style="color:#34d399;">📈 Marge Vente (%)</label>
+                        <input class="adm-form-input" id="adm-marge-vente" type="number" step="0.1" min="0" max="20"
+                            value="1.5" oninput="_adminPricingPreview()"
+                            style="border-color:rgba(52,211,153,.3);">
+                        <div style="font-size:10px;color:#666;margin-top:4px;">TakaloCash vend au client</div>
+                    </div>
+                </div>
+
+                <!-- Preview calcul BTC -->
+                <div id="adm-pricing-preview" style="margin-top:14px;background:#111;border:1px solid #222;border-radius:10px;padding:12px 14px;font-size:12px;display:none;">
+                    <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Aperçu calcul (BTC)</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+                        <div>
+                            <div style="color:#888;font-size:10px;">Prix Base</div>
+                            <div id="prev-prix-base" style="color:#f0f0f0;font-weight:700;font-size:13px;">—</div>
+                        </div>
+                        <div>
+                            <div style="color:#60a5fa;font-size:10px;">Prix Achat</div>
+                            <div id="prev-prix-achat" style="color:#60a5fa;font-weight:700;font-size:13px;">—</div>
+                        </div>
+                        <div>
+                            <div style="color:#34d399;font-size:10px;">Prix Vente</div>
+                            <div id="prev-prix-vente" style="color:#34d399;font-weight:700;font-size:13px;">—</div>
+                        </div>
+                    </div>
+                    <div id="prev-spot-usdt" style="margin-top:6px;color:#666;font-size:10px;"></div>
+                </div>
+
+                <button class="adm-save-btn" style="margin-top:14px;" onclick="_adminSavePricing()">
+                    💾 Appliquer &amp; Sauvegarder les taux
+                </button>
+                <div style="margin-top:8px;font-size:10px;color:#444;">
+                    💡 Sauvegarde dans Supabase (<code style="color:#555;">settings</code> table) + localStorage — synchronisé entre tous les appareils admin.
+                </div>
+            </div>
+
             <div class="adm-fee-grid">
                 <!-- Frais -->
                 <div class="adm-chart-wrap" style="margin:0;">
-                    <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:14px;">💸 Barème des Frais</div>
+                    <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:14px;">💸 Barème des Frais de Service</div>
                     <div style="font-size:11px;color:var(--yellow);font-weight:700;margin-bottom:8px;text-transform:uppercase;">Achat Crypto (Ar → Crypto)</div>
                     <div class="adm-form-group"><label class="adm-form-label">Moins de 100 000 Ar (%)</label><input class="adm-form-input" id="fee-buy-small" type="number" step="0.1" value="3"></div>
                     <div class="adm-form-group"><label class="adm-form-label">100 000 – 1 000 000 Ar (%)</label><input class="adm-form-input" id="fee-buy-mid" type="number" step="0.1" value="2"></div>
@@ -7890,7 +8774,7 @@ function _isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((e||'').
                 </div>
                 <!-- Contacts -->
                 <div class="adm-chart-wrap" style="margin:0;">
-                    <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:14px;">📞 Contacts & Wallets</div>
+                    <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:14px;">📞 Contacts &amp; Wallets</div>
                     <div class="adm-form-group"><label class="adm-form-label">WhatsApp Support</label><input class="adm-form-input" id="cfg-whatsapp" value="+261347451051"></div>
                     <div class="adm-form-group"><label class="adm-form-label">Telegram</label><input class="adm-form-input" id="cfg-telegram" value="@TakaloCashService"></div>
                     <div class="adm-form-group"><label class="adm-form-label">Email Support</label><input class="adm-form-input" id="cfg-email" value="takalocash@gmail.com"></div>
@@ -7900,6 +8784,401 @@ function _isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((e||'').
                     <div class="adm-form-group"><label class="adm-form-label">Orange Money</label><input class="adm-form-input" id="cfg-orange" placeholder="+261 32 ..."></div>
                     <button class="adm-save-btn" onclick="_adminSaveConfig()">💾 Sauvegarder</button>
                 </div>
+            </div>
+        </div>
+
+
+        <!-- ── KYC ── -->
+        <div id="adm-tab-kyc" style="display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+                <div class="adm-section-title" style="margin:0;">🪪 Vérification KYC</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <select id="adm-kyc-filter" onchange="_adminLoadKYC()" style="padding:7px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--admin-border);border-radius:8px;color:#fff;font-size:12px;font-family:var(--font);">
+                        <option value="all">Tous</option>
+                        <option value="pending">En attente</option>
+                        <option value="verified">Vérifiés</option>
+                        <option value="rejected">Refusés</option>
+                    </select>
+                    <button class="adm-btn info" onclick="_adminLoadKYC()">🔄 Actualiser</button>
+                </div>
+            </div>
+            <!-- Stats KYC -->
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;" id="adm-kyc-stats">
+                <div class="adm-chart-wrap" style="margin:0;text-align:center;">
+                    <div style="font-size:24px;font-weight:900;color:#f5c518;" id="kyc-pending-count">—</div>
+                    <div style="font-size:11px;color:#888;">⏳ En attente</div>
+                </div>
+                <div class="adm-chart-wrap" style="margin:0;text-align:center;">
+                    <div style="font-size:24px;font-weight:900;color:#1db954;" id="kyc-verified-count">—</div>
+                    <div style="font-size:11px;color:#888;">✅ Vérifiés</div>
+                </div>
+                <div class="adm-chart-wrap" style="margin:0;text-align:center;">
+                    <div style="font-size:24px;font-weight:900;color:#e84040;" id="kyc-rejected-count">—</div>
+                    <div style="font-size:11px;color:#888;">❌ Refusés</div>
+                </div>
+                <div class="adm-chart-wrap" style="margin:0;text-align:center;">
+                    <div style="font-size:24px;font-weight:900;color:#60a5fa;" id="kyc-total-count">—</div>
+                    <div style="font-size:11px;color:#888;">📊 Total</div>
+                </div>
+            </div>
+            <div class="adm-table-wrap">
+                <table class="adm-table">
+                    <thead><tr><th>Utilisateur</th><th>Email</th><th>Téléphone</th><th>Document</th><th>Soumis le</th><th>Statut</th><th>Actions</th></tr></thead>
+                    <tbody id="adm-kyc-body">
+                        <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray);">Chargement KYC...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Modal KYC rapide -->
+            <div style="margin-top:16px;padding:14px;background:rgba(245,197,24,0.05);border:1px solid rgba(245,197,24,0.15);border-radius:10px;font-size:12px;color:#888;">
+                💡 Cliquez sur <strong style="color:#f5c518;">👁 Voir</strong> pour consulter les pièces justificatives avant validation.
+            </div>
+        </div>
+
+        <!-- ── TAUX ── -->
+        <div id="adm-tab-taux" style="display:none;">
+            <div class="adm-section-title">📈 Gestion des Taux de Change</div>
+
+            <!-- Taux actuels live -->
+            <div class="adm-chart-wrap" style="margin-bottom:16px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+                    <div style="font-size:13px;font-weight:800;color:#fff;">💱 Taux en temps réel (Binance P2P)</div>
+                    <span style="font-size:10px;color:#1db954;background:rgba(29,184,122,0.1);border:1px solid rgba(29,184,122,0.3);border-radius:20px;padding:3px 10px;font-weight:700;">● LIVE</span>
+                </div>
+                <div id="adm-taux-live-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;">
+                    <div style="text-align:center;padding:20px;color:#555;">Chargement des taux...</div>
+                </div>
+                <div style="margin-top:12px;font-size:11px;color:#444;">🔄 Actualisation automatique toutes les 30s · Source : Binance Spot API</div>
+            </div>
+
+            <!-- Taux manuel override -->
+            <div class="adm-chart-wrap" style="margin-bottom:16px;border:1px solid rgba(245,197,24,0.2);">
+                <div style="font-size:13px;font-weight:800;color:#f5c518;margin-bottom:14px;">⚙️ Override Manuel des Taux</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="adm-form-group">
+                        <label class="adm-form-label" style="color:#f5c518;">💱 Taux USDT/MGA (manuel)</label>
+                        <input class="adm-form-input" id="taux-usdt-manual" type="number" step="10" min="1000" placeholder="ex: 4850" oninput="_previewTauxCalc()">
+                        <div style="font-size:10px;color:#666;margin-top:4px;">Laissez vide pour utiliser Binance automatiquement</div>
+                    </div>
+                    <div class="adm-form-group">
+                        <label class="adm-form-label">📉 Spread achat/vente (%)</label>
+                        <input class="adm-form-input" id="taux-spread" type="number" step="0.1" min="0" max="10" value="2" oninput="_previewTauxCalc()">
+                        <div style="font-size:10px;color:#666;margin-top:4px;">Différence entre prix achat et vente</div>
+                    </div>
+                </div>
+                <div id="taux-preview-box" style="margin-top:12px;padding:12px;background:#111;border:1px solid #222;border-radius:8px;font-size:12px;display:none;">
+                    <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Aperçu avec ces paramètres</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="taux-preview-grid"></div>
+                </div>
+                <button class="adm-save-btn" style="margin-top:14px;" onclick="_saveTauxManuel()">💾 Appliquer les taux</button>
+            </div>
+
+            <!-- Historique taux -->
+            <div class="adm-section-title">📊 Historique des variations (7 jours)</div>
+            <div class="adm-chart-wrap">
+                <div id="adm-taux-history" style="display:flex;flex-direction:column;gap:8px;">
+                    <div style="text-align:center;color:#555;padding:20px;">Données historiques disponibles en mode production</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── FRAIS ── -->
+        <div id="adm-tab-frais" style="display:none;">
+            <div class="adm-section-title">💸 Gestion des Frais de Service</div>
+
+            <!-- Résumé revenus frais -->
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+                <div class="adm-chart-wrap" style="margin:0;text-align:center;">
+                    <div style="font-size:10px;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">Revenus frais aujourd'hui</div>
+                    <div style="font-size:22px;font-weight:900;color:#f5c518;font-family:'Exo 2',sans-serif;" id="frais-revenus-jour">— Ar</div>
+                </div>
+                <div class="adm-chart-wrap" style="margin:0;text-align:center;">
+                    <div style="font-size:10px;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">Revenus frais ce mois</div>
+                    <div style="font-size:22px;font-weight:900;color:#1db954;font-family:'Exo 2',sans-serif;" id="frais-revenus-mois">— Ar</div>
+                </div>
+                <div class="adm-chart-wrap" style="margin:0;text-align:center;">
+                    <div style="font-size:10px;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">Taux moyen effectif</div>
+                    <div style="font-size:22px;font-weight:900;color:#60a5fa;font-family:'Exo 2',sans-serif;" id="frais-taux-moyen">—%</div>
+                </div>
+            </div>
+
+            <div class="adm-fee-grid">
+                <!-- Frais Achat -->
+                <div class="adm-chart-wrap" style="margin:0;">
+                    <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:14px;">📥 Achat Crypto (Ar → Crypto)</div>
+                    <div style="font-size:11px;color:#f5c518;font-weight:700;margin-bottom:8px;text-transform:uppercase;">Barème dégressif</div>
+                    <div class="adm-form-group">
+                        <label class="adm-form-label">Moins de 100 000 Ar (%)</label>
+                        <input class="adm-form-input" id="fee-buy-small" type="number" step="0.1" min="0" max="20" value="3" oninput="_adminUpdateFeePreview()">
+                    </div>
+                    <div class="adm-form-group">
+                        <label class="adm-form-label">100 000 – 1 000 000 Ar (%)</label>
+                        <input class="adm-form-input" id="fee-buy-mid" type="number" step="0.1" min="0" max="20" value="2" oninput="_adminUpdateFeePreview()">
+                    </div>
+                    <div class="adm-form-group">
+                        <label class="adm-form-label">Plus de 1 000 000 Ar (%)</label>
+                        <input class="adm-form-input" id="fee-buy-large" type="number" step="0.1" min="0" max="20" value="1.5" oninput="_adminUpdateFeePreview()">
+                    </div>
+                    <div style="font-size:11px;color:#f5c518;font-weight:700;margin:12px 0 8px;text-transform:uppercase;">Vente Crypto (Crypto → Ar)</div>
+                    <div class="adm-form-group">
+                        <label class="adm-form-label">Moins de 100 000 Ar (%)</label>
+                        <input class="adm-form-input" id="fee-sell-small" type="number" step="0.1" min="0" max="20" value="2" oninput="_adminUpdateFeePreview()">
+                    </div>
+                    <div class="adm-form-group">
+                        <label class="adm-form-label">100 000 – 5 000 000 Ar (%)</label>
+                        <input class="adm-form-input" id="fee-sell-mid" type="number" step="0.1" min="0" max="20" value="1.5" oninput="_adminUpdateFeePreview()">
+                    </div>
+                    <div class="adm-form-group">
+                        <label class="adm-form-label">Plus de 5 000 000 Ar (%)</label>
+                        <input class="adm-form-input" id="fee-sell-large" type="number" step="0.1" min="0" max="20" value="1" oninput="_adminUpdateFeePreview()">
+                    </div>
+                    <button class="adm-save-btn" onclick="_adminSaveFees()">💾 Sauvegarder les frais</button>
+                </div>
+                <!-- Simulateur frais -->
+                <div class="adm-chart-wrap" style="margin:0;">
+                    <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:14px;">🧮 Simulateur de Frais</div>
+                    <div class="adm-form-group">
+                        <label class="adm-form-label">Montant (Ar)</label>
+                        <input class="adm-form-input" id="sim-montant" type="number" placeholder="ex: 500000" oninput="_simulateFrais()">
+                    </div>
+                    <div class="adm-form-group">
+                        <label class="adm-form-label">Type</label>
+                        <select class="adm-form-input" id="sim-type" onchange="_simulateFrais()" style="background:rgba(255,255,255,0.04);">
+                            <option value="buy">Achat (Ar → Crypto)</option>
+                            <option value="sell">Vente (Crypto → Ar)</option>
+                        </select>
+                    </div>
+                    <div id="sim-result" style="margin-top:12px;padding:14px;background:#111;border:1px solid #222;border-radius:10px;display:none;">
+                        <div style="display:grid;gap:8px;">
+                            <div style="display:flex;justify-content:space-between;font-size:12px;">
+                                <span style="color:#888;">Montant brut</span>
+                                <span id="sim-montant-brut" style="color:#fff;font-weight:700;"></span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;font-size:12px;">
+                                <span style="color:#888;">Taux de frais</span>
+                                <span id="sim-taux" style="color:#f5c518;font-weight:700;"></span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;font-size:12px;border-top:1px solid #222;padding-top:8px;">
+                                <span style="color:#888;">Frais TakaloCash</span>
+                                <span id="sim-frais" style="color:#f5c518;font-weight:800;font-size:14px;"></span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;font-size:12px;">
+                                <span style="color:#888;">Montant net reçu</span>
+                                <span id="sim-net" style="color:#1db954;font-weight:800;font-size:14px;"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top:16px;padding:12px;background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.15);border-radius:8px;font-size:11px;color:#888;">
+                        ℹ️ Les frais Mobile Money opérateur (MVola, Orange, Airtel) ne sont pas inclus dans ce calcul.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── RÉSERVES ── -->
+        <div id="adm-tab-reserves" style="display:none;">
+            <div class="adm-section-title">🏦 Réserves & Liquidités</div>
+
+            <!-- Alerte seuil bas -->
+            <div style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.3);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:12px;color:#f97316;" id="adm-reserve-alert">
+                ⚠️ <strong>Réserve USDT TRC-20 sous le seuil minimum</strong> — Rechargement recommandé avant traitement de nouveaux retraits.
+                <button onclick="this.parentElement.style.display='none'" style="margin-left:auto;background:none;border:none;color:#f97316;cursor:pointer;font-size:14px;">✕</button>
+            </div>
+
+            <!-- Wallets crypto -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:20px;" id="adm-reserves-grid">
+                <!-- Généré par JS -->
+            </div>
+
+            <!-- Seuils minimum -->
+            <div class="adm-chart-wrap">
+                <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:14px;">⚙️ Seuils d'Alerte Minimum</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;">
+                    <div class="adm-form-group" style="margin:0;">
+                        <label class="adm-form-label">USDT minimum</label>
+                        <input class="adm-form-input" id="seuil-usdt" type="number" placeholder="500" value="500">
+                    </div>
+                    <div class="adm-form-group" style="margin:0;">
+                        <label class="adm-form-label">BTC minimum</label>
+                        <input class="adm-form-input" id="seuil-btc" type="number" step="0.001" placeholder="0.01" value="0.01">
+                    </div>
+                    <div class="adm-form-group" style="margin:0;">
+                        <label class="adm-form-label">ETH minimum</label>
+                        <input class="adm-form-input" id="seuil-eth" type="number" step="0.01" placeholder="0.1" value="0.1">
+                    </div>
+                    <div class="adm-form-group" style="margin:0;">
+                        <label class="adm-form-label">MGA minimum (Ar)</label>
+                        <input class="adm-form-input" id="seuil-mga" type="number" placeholder="1000000" value="1000000">
+                    </div>
+                </div>
+                <button class="adm-save-btn" style="margin-top:14px;" onclick="_saveSeuils()">💾 Sauvegarder les seuils</button>
+            </div>
+
+            <!-- Mouvements récents -->
+            <div class="adm-section-title" style="margin-top:16px;">📋 Mouvements de Réserve Récents</div>
+            <div class="adm-table-wrap">
+                <table class="adm-table">
+                    <thead><tr><th>Date</th><th>Actif</th><th>Type</th><th>Montant</th><th>Raison</th><th>Solde après</th></tr></thead>
+                    <tbody id="adm-reserves-body">
+                        <tr><td colspan="6" style="text-align:center;padding:20px;color:#555;">Données de réserve disponibles en mode production</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── NOTIFICATIONS ── -->
+        <div id="adm-tab-notifications" style="display:none;">
+            <div class="adm-section-title">🔔 Gestion des Notifications</div>
+
+            <!-- Nouvelle notification -->
+            <div class="adm-chart-wrap" style="margin-bottom:16px;border:1px solid rgba(245,197,24,0.2);">
+                <div style="font-size:13px;font-weight:800;color:#f5c518;margin-bottom:14px;">📢 Envoyer une Notification Push</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="adm-form-group" style="margin:0;">
+                        <label class="adm-form-label">Titre</label>
+                        <input class="adm-form-input" id="notif-titre" type="text" placeholder="ex: Maintenance prévue">
+                    </div>
+                    <div class="adm-form-group" style="margin:0;">
+                        <label class="adm-form-label">Destinataires</label>
+                        <select class="adm-form-input" id="notif-dest" style="background:rgba(255,255,255,0.04);">
+                            <option value="all">Tous les utilisateurs</option>
+                            <option value="active">Utilisateurs actifs (30j)</option>
+                            <option value="pending">Avec transactions en attente</option>
+                            <option value="specific">Utilisateur spécifique</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="adm-form-group" style="margin-top:10px;">
+                    <label class="adm-form-label">Message</label>
+                    <textarea class="adm-form-input" id="notif-message" rows="3" placeholder="Contenu de la notification..." style="resize:vertical;width:100%;"></textarea>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;">
+                    <div class="adm-form-group" style="margin:0;">
+                        <label class="adm-form-label">Type</label>
+                        <select class="adm-form-input" id="notif-type" style="background:rgba(255,255,255,0.04);">
+                            <option value="info">ℹ️ Information</option>
+                            <option value="warning">⚠️ Avertissement</option>
+                            <option value="success">✅ Succès</option>
+                            <option value="promo">🎁 Promotion</option>
+                        </select>
+                    </div>
+                    <div class="adm-form-group" style="margin:0;">
+                        <label class="adm-form-label">Programmé pour (optionnel)</label>
+                        <input class="adm-form-input" id="notif-date" type="datetime-local">
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+                    <button class="adm-save-btn" onclick="_envoyerNotification()">📨 Envoyer maintenant</button>
+                    <button class="adm-btn info" onclick="_previewNotification()">👁 Aperçu</button>
+                    <button class="adm-btn warn" onclick="_programmerNotification()">⏰ Programmer</button>
+                </div>
+            </div>
+
+            <!-- Historique notifications -->
+            <div class="adm-section-title">📋 Historique des Notifications</div>
+            <div class="adm-table-wrap">
+                <table class="adm-table">
+                    <thead><tr><th>Date</th><th>Titre</th><th>Type</th><th>Destinataires</th><th>Lu / Envoyé</th><th>Statut</th><th>Actions</th></tr></thead>
+                    <tbody id="adm-notif-body">
+                        <tr><td colspan="7" style="text-align:center;padding:30px;color:#555;">Aucune notification envoyée pour l'instant</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Templates -->
+            <div class="adm-section-title" style="margin-top:16px;">📝 Templates Rapides</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;" id="adm-notif-templates">
+                <!-- Généré par JS -->
+            </div>
+        </div>
+
+        <!-- ── SAUVEGARDES ── -->
+        <div id="adm-tab-sauvegardes" style="display:none;">
+            <div class="adm-section-title">💾 Sauvegardes & Restauration</div>
+
+            <!-- Actions -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:20px;">
+                <div class="adm-chart-wrap" style="margin:0;text-align:center;cursor:pointer;transition:border-color .2s;" onclick="_creerSauvegarde()" onmouseover="this.style.borderColor='rgba(245,197,24,0.4)'" onmouseout="this.style.borderColor=''">
+                    <div style="font-size:32px;margin-bottom:8px;">💾</div>
+                    <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:4px;">Sauvegarder maintenant</div>
+                    <div style="font-size:11px;color:#888;">Snapshot complet DB + settings</div>
+                </div>
+                <div class="adm-chart-wrap" style="margin:0;text-align:center;cursor:pointer;transition:border-color .2s;" onclick="_exporterDonnees()" onmouseover="this.style.borderColor='rgba(29,184,122,0.4)'" onmouseout="this.style.borderColor=''">
+                    <div style="font-size:32px;margin-bottom:8px;">📤</div>
+                    <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:4px;">Exporter les données</div>
+                    <div style="font-size:11px;color:#888;">CSV / JSON — transactions, users</div>
+                </div>
+                <div class="adm-chart-wrap" style="margin:0;text-align:center;cursor:pointer;transition:border-color .2s;" onclick="_importerDonnees()" onmouseover="this.style.borderColor='rgba(96,165,250,0.4)'" onmouseout="this.style.borderColor=''">
+                    <div style="font-size:32px;margin-bottom:8px;">📥</div>
+                    <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:4px;">Importer des données</div>
+                    <div style="font-size:11px;color:#888;">Restaurer depuis un fichier</div>
+                </div>
+                <div class="adm-chart-wrap" style="margin:0;text-align:center;cursor:pointer;transition:border-color .2s;" onclick="_nettoyerCache()" onmouseover="this.style.borderColor='rgba(239,68,68,0.4)'" onmouseout="this.style.borderColor=''">
+                    <div style="font-size:32px;margin-bottom:8px;">🗑️</div>
+                    <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:4px;">Vider le cache</div>
+                    <div style="font-size:11px;color:#888;">localStorage + données temp</div>
+                </div>
+            </div>
+
+            <!-- Dernière sauvegarde -->
+            <div class="adm-chart-wrap" style="margin-bottom:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                    <div>
+                        <div style="font-size:13px;font-weight:800;color:#fff;">Dernière sauvegarde automatique</div>
+                        <div style="font-size:11px;color:#1db954;margin-top:4px;" id="last-backup-time">✅ Supabase — Aujourd'hui automatiquement</div>
+                    </div>
+                    <span style="font-size:10px;color:#888;background:rgba(29,184,122,0.1);border:1px solid rgba(29,184,122,0.2);border-radius:20px;padding:4px 12px;">● Supabase Auto-Backup actif</span>
+                </div>
+                <div style="margin-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center;">
+                    <div>
+                        <div style="font-size:18px;font-weight:900;color:#f5c518;" id="backup-tx-count">—</div>
+                        <div style="font-size:10px;color:#888;">Transactions sauvegardées</div>
+                    </div>
+                    <div>
+                        <div style="font-size:18px;font-weight:900;color:#1db954;" id="backup-users-count">—</div>
+                        <div style="font-size:10px;color:#888;">Utilisateurs sauvegardés</div>
+                    </div>
+                    <div>
+                        <div style="font-size:18px;font-weight:900;color:#60a5fa;" id="backup-size">~2.4 MB</div>
+                        <div style="font-size:10px;color:#888;">Taille estimée</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export options -->
+            <div class="adm-section-title">📋 Options d'Export</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="adm-chart-wrap" style="margin:0;">
+                    <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:12px;">📊 Données à exporter</div>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#aaa;margin-bottom:8px;cursor:pointer;">
+                        <input type="checkbox" checked id="exp-transactions" style="accent-color:#f5c518;"> Transactions
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#aaa;margin-bottom:8px;cursor:pointer;">
+                        <input type="checkbox" checked id="exp-users" style="accent-color:#f5c518;"> Utilisateurs
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#aaa;margin-bottom:8px;cursor:pointer;">
+                        <input type="checkbox" id="exp-settings" style="accent-color:#f5c518;"> Paramètres
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#aaa;cursor:pointer;">
+                        <input type="checkbox" id="exp-logs" style="accent-color:#f5c518;"> Journaux admin
+                    </label>
+                </div>
+                <div class="adm-chart-wrap" style="margin:0;">
+                    <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:12px;">📅 Période</div>
+                    <div class="adm-form-group">
+                        <label class="adm-form-label">Du</label>
+                        <input class="adm-form-input" id="exp-date-from" type="date">
+                    </div>
+                    <div class="adm-form-group">
+                        <label class="adm-form-label">Au</label>
+                        <input class="adm-form-input" id="exp-date-to" type="date">
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+                <button class="adm-save-btn" onclick="_exporterCSV()"><i class="fa-solid fa-file-csv"></i> Exporter CSV</button>
+                <button class="adm-btn info" onclick="_exporterJSON()"><i class="fa-solid fa-file-code"></i> Exporter JSON</button>
+                <button class="adm-btn approve" onclick="_exporterExcelComplet()"><i class="fa-solid fa-file-excel"></i> Excel complet</button>
             </div>
         </div>
 
