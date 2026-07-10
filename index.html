@@ -5795,14 +5795,80 @@ function _toggleBrand(brand) {
     if (form) form.style.display = 'none';
 }
 
-function _submitAbonnement() {
+async function _submitAbonnement() {
     const nom    = document.getElementById('abon-nom')?.value.trim();
     const mobile = document.getElementById('abon-mobile')?.value.trim();
     const check  = document.getElementById('abon-check');
-    if (!nom || !mobile)   tcToastWarning("Ampidiro ny anaranao sy ny laharana Mobile Money."); return;
-    if (!check?.checked)   tcToastWarning("Ekeo ny Conditions d'Utilisation aloha."); return;
-    const duree  = document.getElementById('abon-duree')?.value || '1';
-    tcToastSuccess('Fangatahana voaray!\n\n${nom} · ${duree} volana\nHandefa notification rehefa vita ny fijerena.');
+    if (!nom || !mobile) { tcToastWarning("Ampidiro ny anaranao sy ny laharana Mobile Money."); return; }
+    if (!check?.checked) { tcToastWarning("Ekeo ny Conditions d'Utilisation aloha."); return; }
+    if (!_abonPlanCurrent) { tcToastWarning("Misafidiana plan abonnement aloha."); return; }
+
+    const plan   = _abonPlanCurrent;
+    const brand  = _currentBrand || 'abonnement';
+    const duree  = _abonNbMois || 1;
+    const email  = document.getElementById('abon-email')?.value.trim() || null;
+
+    // Calcul du montant total
+    let montantAr = 0;
+    const dolMatch = plan.prix.match(/~?([\d.]+)\$/);
+    if (dolMatch) {
+        montantAr = Math.round(parseFloat(dolMatch[1]) * (CURRENT_TAUX.USDT || 4600) * duree);
+    } else {
+        const arMatch = plan.prix.match(/([\d ]+)\s*Ar/);
+        if (arMatch) montantAr = parseInt(arMatch[1].replace(/\s/g, '')) * duree;
+    }
+
+    // Génération référence TC
+    let reference;
+    try {
+        const { count } = await supabaseClient.from('transactions').select('*', { count: 'exact', head: true });
+        const seq = String((count || 0) + 1).padStart(6, '0');
+        reference = 'TC-' + new Date().getFullYear() + '-' + seq;
+    } catch(_) {
+        reference = 'TC-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-6);
+    }
+
+    const _now = new Date().toISOString();
+
+    try {
+        // INSERT dans la table transactions
+        const { error: txErr } = await supabaseClient.from('transactions').insert([{
+            user_id:        currentUserId || null,
+            category:       'abonnement',
+            type:           'Envoyer',
+            asset:          brand.toUpperCase(),
+            amount_input:   montantAr,
+            montant:        montantAr,
+            frais:          Math.round(montantAr * 0.02),   // 2% frais abonnement
+            address_dest:   mobile,
+            status:         'en attente',
+            reference:      reference,
+            tc_id:          reference,
+            currency_input: 'Ar',
+            tx_date:        _now.slice(0, 10),
+            tx_time:        _now.slice(11, 19),
+            updated_at:     _now
+        }]);
+        if (txErr) throw txErr;
+
+        // Notification Supabase
+        if (currentUserId) {
+            await supabaseClient.from('notifications').insert([{
+                user_id:    currentUserId,
+                title:      'Abonnement en cours',
+                message:    `Votre abonnement ${brand} (${plan.nom}) · ${duree} mois a bien été reçu. Ref: ${reference}`,
+                type:       'abonnement',
+                read:       false,
+                created_at: _now
+            }]);
+        }
+
+        tcToastSuccess(`Fangatahana voaray!\n\n${nom} · ${plan.nom} · ${duree} mois\nRef: ${reference}\nHandefa notification rehefa vita ny fijerena.`);
+        fetchData();
+
+    } catch(err) {
+        tcToastError("Erreur lors de l'envoi : " + err.message);
+    }
 }
 
 // =========================================================
@@ -6390,16 +6456,104 @@ function _calcMMNet(mode) {
     }
 }
 
-function _submitMM(mode) {
+async function _submitMM(mode) {
     const montant = document.getElementById(`mm-montant-${mode}`)?.value;
     const numero  = document.getElementById(`mm-numero-${mode}`)?.value;
     const prefix  = document.getElementById(`mm-prefix-${mode}`)?.value;
     const nom     = document.getElementById(`mm-nom-${mode}`)?.value.trim();
     const check   = document.getElementById(`mm-check-${mode}`)?.checked;
-    if (!montant || !numero || numero.replace(/\s/g,'').length !== 7) tcToastWarning('Ampidiro ny numéro complet (7 chiffres); return.');
-    if (!nom)   tcToastWarning('Ampidiro ny anarana.'); return;
-    if (!check) tcToastWarning('Ekeo ny Conditions aloha.'); return;
-    tcToastSuccess('${mode === `depot` ? `Dépôt` : `Retrait`} voaray!\n\n${prefix} ${numero}\n${nom}\nMontant: ${parseInt(montant).toLocaleString(`fr-FR`)} Ar\n\nHavoaka avy hatrany ny notification.');
+
+    // --- Validations ---
+    if (!montant || parseFloat(montant) <= 0) { tcToastWarning('Ampidiro ny montant.'); return; }
+    if (!numero || numero.replace(/\s/g, '').length !== 7) { tcToastWarning('Ampidiro ny numéro complet (7 chiffres).'); return; }
+    if (!nom)   { tcToastWarning('Ampidiro ny anarana.'); return; }
+    if (!check) { tcToastWarning('Ekeo ny Conditions aloha.'); return; }
+
+    const montantNum    = parseInt(montant, 10);
+    const fraisAr       = Math.floor(montantNum * 0.01);   // 1% frais Mobile Money
+    const montantNet    = montantNum - fraisAr;
+    const operateur     = _mmProvider || 'MOBILE_MONEY';
+    const actionLabel   = mode === 'depot' ? 'Dépôt' : 'Retrait';
+    const fullNumero    = (prefix || '') + ' ' + numero;
+
+    // --- Génération référence TC ---
+    let reference;
+    try {
+        const { count } = await supabaseClient.from('transactions').select('*', { count: 'exact', head: true });
+        const seq = String((count || 0) + 1).padStart(6, '0');
+        reference = 'TC-' + new Date().getFullYear() + '-' + seq;
+    } catch (_) {
+        reference = 'TC-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-6);
+    }
+
+    const _now = new Date().toISOString();
+
+    try {
+        // --- INSERT dans la table transactions ---
+        const { error: txErr } = await supabaseClient.from('transactions').insert([{
+            user_id:        currentUserId || null,
+            category:       'wallet',               // Mobile Money = catégorie wallet
+            type:           actionLabel,             // 'Dépôt' ou 'Retrait'
+            asset:          operateur.toUpperCase(), // ex: 'MVOLA', 'ORANGE', 'AIRTEL'
+            amount_input:   montantNum,
+            montant:        montantNum,
+            frais:          fraisAr,
+            address_dest:   fullNumero,             // numéro Mobile Money destination
+            status:         'en attente',
+            reference:      reference,
+            tc_id:          reference,
+            currency_input: 'Ar',
+            tx_date:        _now.slice(0, 10),
+            tx_time:        _now.slice(11, 19),
+            updated_at:     _now
+        }]);
+        if (txErr) throw txErr;
+
+        // --- Mise à jour solde si Dépôt ---
+        if (mode === 'depot' && currentUserId && userData) {
+            const newSolde = (userData.solde || 0) + montantNet;
+            const { error: sErr } = await supabaseClient.from('users').update({ solde: newSolde }).eq('id', currentUserId);
+            if (!sErr) {
+                userData.solde = newSolde;
+                const fmt = newSolde.toLocaleString('fr-FR') + ' Ar';
+                const elS = document.getElementById('display-solde');
+                const elH = document.getElementById('form-solde-hint');
+                if (elS) elS.innerText = fmt;
+                if (elH) elH.innerText = fmt;
+            }
+        }
+
+        // --- Notification Supabase ---
+        if (currentUserId) {
+            await supabaseClient.from('notifications').insert([{
+                user_id:    currentUserId,
+                title:      `${actionLabel} Mobile Money reçu`,
+                message:    `${actionLabel} de ${montantNum.toLocaleString('fr-FR')} Ar via ${operateur} (${fullNumero}). Net: ${montantNet.toLocaleString('fr-FR')} Ar. Ref: ${reference}`,
+                type:       'transaction',
+                read:       false,
+                created_at: _now
+            }]);
+        }
+
+        tcToastSuccess(`${actionLabel} voaray!\n\n${fullNumero}\n${nom}\nMontant: ${montantNum.toLocaleString('fr-FR')} Ar\nRef: ${reference}\n\nHavoaka avy hatrany ny notification.`);
+
+        // Réinitialiser le formulaire
+        const elMontant = document.getElementById(`mm-montant-${mode}`);
+        const elNumero  = document.getElementById(`mm-numero-${mode}`);
+        const elNom     = document.getElementById(`mm-nom-${mode}`);
+        const elCheck   = document.getElementById(`mm-check-${mode}`);
+        if (elMontant) elMontant.value = '';
+        if (elNumero)  elNumero.value  = '';
+        if (elNom)     elNom.value     = '';
+        if (elCheck)   elCheck.checked = false;
+        const netRow = document.getElementById(`mm-net-row-${mode}`);
+        if (netRow) netRow.style.display = 'none';
+
+        fetchData();
+
+    } catch(err) {
+        tcToastError('Erreur : ' + err.message);
+    }
 }
 
 // =========================================================
