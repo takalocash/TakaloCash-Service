@@ -4903,12 +4903,22 @@ async function handleSignUp() {
         });
         if (authError) throw authError;
         if (authData.user) {
+            // Tenter d'insérer le profil (peut échouer si email non confirmé selon config Supabase)
             const { error: dbError } = await supabaseClient.from('users').insert([{
                 id: authData.user.id, full_name: name, phone, email, tk_id: tkId, solde: 0
             }]);
-            if (dbError) throw dbError;
-            tcToastSuccess("Compte créé ! Votre ID : " + tkId, "Inscription réussie");
-            showAuth('login');
+            // On ignore l'erreur d'insert ici : fetchData() recrée le profil automatiquement à la première connexion
+            if (dbError) console.warn('[SignUp] users insert:', dbError.message);
+
+            // Si session active immédiatement (email confirmation désactivée)
+            if (authData.session) {
+                tcToastSuccess("Compte créé ! Votre ID : " + tkId, "Inscription réussie");
+                // onAuthStateChange va déclencher initApp()
+            } else {
+                // Email de confirmation envoyé
+                tcToastSuccess("Compte créé ! Vérifiez votre email pour confirmer votre compte.", "Inscription réussie");
+                showAuth('login');
+            }
         }
     } catch (err) { tcToastError('Erreur : ' + err.message); }
 }
@@ -5015,8 +5025,38 @@ async function initApp() {
 }
 
 async function fetchData() {
-    const { data: u, error: uErr } = await supabaseClient.from('users').select('*').eq('id', currentUserId).single();
-    if (uErr) { console.error("fetchData/user:", uErr.message); return; }
+    let u, uErr;
+    ({ data: u, error: uErr } = await supabaseClient.from('users').select('*').eq('id', currentUserId).single());
+
+    // Si row manquant (PGRST116 = 0 rows), on le crée automatiquement
+    if (uErr && (uErr.code === 'PGRST116' || uErr.message?.includes('0 rows'))) {
+        try {
+            const { data: { user: authUser } } = await supabaseClient.auth.getUser();
+            const meta   = authUser?.user_metadata || {};
+            const tkId   = 'TK-' + Math.floor(1000 + Math.random() * 9000);
+            const newRow = {
+                id        : currentUserId,
+                full_name : meta.full_name || authUser?.email?.split('@')[0] || 'Utilisateur',
+                phone     : meta.phone || '',
+                email     : authUser?.email || '',
+                tk_id     : tkId,
+                solde     : 0
+            };
+            const { data: inserted, error: insErr } = await supabaseClient.from('users').insert([newRow]).select().single();
+            if (insErr) {
+                tcToastError('Erreur profil : ' + insErr.message);
+                return;
+            }
+            u = inserted;
+        } catch(e) {
+            tcToastError('Impossible de charger votre profil. Reconnectez-vous.');
+            return;
+        }
+    } else if (uErr) {
+        tcToastError('Erreur profil : ' + uErr.message);
+        return;
+    }
+
     if (u) {
         userData = u;
         const solde = (u.solde || 0).toLocaleString('fr-FR') + " Ar";
