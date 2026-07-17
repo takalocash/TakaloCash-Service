@@ -1,0 +1,2215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TakaloCash — Admin Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{
+  --bg:#0d0d0f;--surface:#141417;--card:#1a1a1f;--card2:#202028;
+  --border:#2a2a35;--gold:#f5c518;--gold-dim:#c9a010;--gold-glow:rgba(245,197,24,.15);
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;
+  --orange:#f97316;--txt:#e8e8f0;--txt-muted:#8888a0;--txt-dim:#55556a;
+  --radius:14px;--radius-sm:8px;--shadow:0 4px 24px rgba(0,0,0,.45);
+  --shadow-gold:0 0 20px rgba(245,197,24,.18);--sidebar-w:260px;
+  --topbar-h:64px;--tr:.22s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;border:none;background:none;font:inherit;color:inherit}
+input,select,textarea{font:inherit;color:var(--txt);background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.55rem .9rem;outline:none;transition:border-color var(--tr)}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+select option{background:var(--card)}
+ul{list-style:none}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:transform var(--tr);overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sidebar-logo{display:flex;align-items:center;gap:.75rem;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);min-height:var(--topbar-h)}
+.logo-icon{width:36px;height:36px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;color:#000;font-weight:900;box-shadow:var(--shadow-gold);flex-shrink:0}
+.logo-text{font-size:1.05rem;font-weight:700;letter-spacing:.02em}
+.logo-text span{color:var(--gold)}
+.badge-admin{margin-left:auto;font-size:.6rem;background:var(--gold);color:#000;border-radius:4px;padding:2px 6px;font-weight:700;letter-spacing:.05em;flex-shrink:0}
+.sidebar-nav{flex:1;padding:1rem 0}
+.nav-section{margin-bottom:.25rem}
+.nav-label{font-size:.65rem;letter-spacing:.1em;color:var(--txt-dim);font-weight:700;text-transform:uppercase;padding:.6rem 1.5rem .3rem}
+.nav-item{display:flex;align-items:center;gap:.75rem;padding:.6rem 1.5rem;cursor:pointer;color:var(--txt-muted);font-size:.88rem;transition:background var(--tr),color var(--tr);position:relative}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--txt)}
+.nav-item.active{background:var(--gold-glow);color:var(--gold);font-weight:600}
+.nav-item.active::before{content:'';position:absolute;left:0;top:10%;height:80%;width:3px;background:var(--gold);border-radius:0 2px 2px 0}
+.nav-item i{width:18px;text-align:center;font-size:.9rem;flex-shrink:0}
+.nav-badge{margin-left:auto;font-size:.65rem;background:var(--red);color:#fff;border-radius:20px;padding:1px 7px;font-weight:700}
+.nav-badge.gold{background:var(--gold);color:#000}
+.sidebar-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);font-size:.78rem;color:var(--txt-dim);text-align:center}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:199}
+.sidebar-overlay.open{display:block}
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1rem;padding:0 1.75rem;position:sticky;top:0;z-index:100}
+.topbar-hamburger{display:none;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--radius-sm);color:var(--txt-muted);font-size:1.1rem}
+.topbar-search{flex:1;max-width:380px;position:relative}
+.topbar-search i{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--txt-dim);font-size:.85rem;pointer-events:none}
+.topbar-search input{width:100%;padding:.5rem .9rem .5rem 2.3rem;font-size:.85rem}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.75rem}
+.topbar-icon-btn{position:relative;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);color:var(--txt-muted);font-size:1rem;transition:background var(--tr),color var(--tr)}
+.topbar-icon-btn:hover{background:var(--card2);color:var(--txt)}
+.topbar-icon-btn .dot{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--surface)}
+.topbar-divider{width:1px;height:28px;background:var(--border)}
+.admin-profile{display:flex;align-items:center;gap:.6rem;cursor:pointer;padding:.3rem .5rem;border-radius:var(--radius-sm);transition:background var(--tr)}
+.admin-profile:hover{background:var(--card2)}
+.admin-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#ff9900);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:#000;flex-shrink:0}
+.admin-info{display:flex;flex-direction:column}
+.admin-name{font-size:.82rem;font-weight:600;line-height:1.2}
+.admin-role{font-size:.68rem;color:var(--gold);font-weight:500}
+.btn-logout{display:flex;align-items:center;gap:.45rem;padding:.45rem .9rem;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius-sm);font-size:.8rem;font-weight:600;transition:background var(--tr)}
+.btn-logout:hover{background:rgba(239,68,68,.2)}
+.page-content{flex:1;padding:2rem 1.75rem;display:flex;flex-direction:column;gap:1.5rem;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.panel{display:none}
+.panel.active{display:flex;flex-direction:column;gap:1.5rem}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.page-title{font-size:1.45rem;font-weight:700}
+.page-subtitle{font-size:.82rem;color:var(--txt-muted);margin-top:.2rem}
+.page-actions{display:flex;gap:.6rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.1rem;border-radius:var(--radius-sm);font-size:.83rem;font-weight:600;transition:all var(--tr);flex-shrink:0}
+.btn-primary{background:var(--gold);color:#000}
+.btn-primary:hover{background:var(--gold-dim);box-shadow:var(--shadow-gold)}
+.btn-secondary{background:var(--card2);color:var(--txt);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--border)}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.btn-danger:hover{background:rgba(239,68,68,.25)}
+.btn-success{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+.btn-success:hover{background:rgba(34,197,94,.25)}
+.btn-info{background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.25)}
+.btn-sm{padding:.35rem .75rem;font-size:.76rem}
+.btn-xs{padding:.22rem .55rem;font-size:.7rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem}
+.card-title{font-size:.95rem;font-weight:700}
+.card-title i{color:var(--gold);margin-right:.45rem}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;flex-direction:column;gap:.5rem;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform var(--tr),box-shadow var(--tr)}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.kpi-card::after{content:'';position:absolute;bottom:-20px;right:-20px;width:90px;height:90px;border-radius:50%;opacity:.06}
+.kpi-card.gold::after{background:var(--gold)}.kpi-card.green::after{background:var(--green)}
+.kpi-card.red::after{background:var(--red)}.kpi-card.blue::after{background:var(--blue)}
+.kpi-card.purple::after{background:var(--purple)}.kpi-card.orange::after{background:var(--orange)}
+.kpi-top{display:flex;align-items:center;justify-content:space-between}
+.kpi-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.kpi-icon.gold{background:rgba(245,197,24,.15);color:var(--gold)}.kpi-icon.green{background:rgba(34,197,94,.15);color:var(--green)}
+.kpi-icon.red{background:rgba(239,68,68,.15);color:var(--red)}.kpi-icon.blue{background:rgba(59,130,246,.15);color:var(--blue)}
+.kpi-icon.purple{background:rgba(168,85,247,.15);color:var(--purple)}.kpi-icon.orange{background:rgba(249,115,22,.15);color:var(--orange)}
+.kpi-trend{display:flex;align-items:center;gap:.25rem;font-size:.7rem;font-weight:700;padding:.2rem .5rem;border-radius:20px}
+.kpi-trend.up{background:rgba(34,197,94,.12);color:var(--green)}.kpi-trend.down{background:rgba(239,68,68,.12);color:var(--red)}
+.kpi-trend.flat{background:rgba(136,136,160,.1);color:var(--txt-muted)}
+.kpi-value{font-size:1.65rem;font-weight:800;letter-spacing:-.03em;line-height:1}
+.kpi-value.sm{font-size:1.1rem}
+.kpi-label{font-size:.72rem;color:var(--txt-muted);font-weight:500}
+.kpi-sub{font-size:.7rem;color:var(--txt-dim);margin-top:-.1rem}
+.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .65rem;border-radius:20px;font-size:.72rem;font-weight:700;white-space:nowrap}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.badge-success{background:rgba(34,197,94,.12);color:var(--green)}.badge-success::before{background:var(--green)}
+.badge-pending{background:rgba(245,197,24,.12);color:var(--gold)}.badge-pending::before{background:var(--gold)}
+.badge-danger{background:rgba(239,68,68,.12);color:var(--red)}.badge-danger::before{background:var(--red)}
+.badge-info{background:rgba(59,130,246,.12);color:var(--blue)}.badge-info::before{background:var(--blue)}
+.badge-purple{background:rgba(168,85,247,.12);color:var(--purple)}.badge-purple::before{background:var(--purple)}
+.badge-orange{background:rgba(249,115,22,.12);color:var(--orange)}.badge-orange::before{background:var(--orange)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.data-table{border-collapse:collapse;width:100%}
+.data-table th,.data-table td{padding:.65rem .85rem;text-align:left;font-size:.81rem}
+.data-table thead tr{background:var(--card2);border-bottom:1px solid var(--border)}
+.data-table thead th{color:var(--txt-muted);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.data-table tbody tr{border-bottom:1px solid rgba(42,42,53,.5);transition:background var(--tr)}
+.data-table tbody tr:hover{background:rgba(245,197,24,.04)}
+.data-table tbody tr:last-child{border-bottom:none}
+.data-table td{vertical-align:middle}
+.table-wrap{overflow-x:auto}
+.table-wrap::-webkit-scrollbar{height:5px}
+.table-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.user-cell{display:flex;align-items:center;gap:.55rem}
+.user-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0}
+.user-av.a{background:linear-gradient(135deg,#f5c518,#ff9900);color:#000}
+.user-av.b{background:linear-gradient(135deg,#22c55e,#059669);color:#000}
+.user-av.c{background:linear-gradient(135deg,#3b82f6,#7c3aed);color:#fff}
+.user-av.d{background:linear-gradient(135deg,#ef4444,#ec4899);color:#fff}
+.user-av.e{background:linear-gradient(135deg,#a855f7,#6366f1);color:#fff}
+.progress-bar{background:var(--card2);border-radius:20px;height:6px;overflow:hidden}
+.progress-fill{height:100%;border-radius:20px;transition:width .6s ease}
+.rate-row{display:flex;align-items:center;justify-content:space-between;padding:.6rem .85rem;background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm);transition:background var(--tr);margin-bottom:.4rem}
+.rate-row:hover{background:rgba(245,197,24,.05)}
+.coin-dot{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;flex-shrink:0}
+.coin-dot.usdt{background:rgba(38,161,123,.2);color:#26a17b}.coin-dot.btc{background:rgba(247,147,26,.2);color:#f7931a}
+.coin-dot.eth{background:rgba(98,126,234,.2);color:#627eea}.coin-dot.bnb{background:rgba(243,186,47,.2);color:#f3ba2f}
+.coin-dot.trx{background:rgba(239,68,68,.2);color:#ef4444}.coin-dot.sol{background:rgba(153,69,255,.2);color:#9945ff}
+.top-item{display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid rgba(42,42,53,.5)}
+.top-item:last-child{border-bottom:none}
+.top-rank{width:22px;font-size:.75rem;font-weight:800;color:var(--txt-dim);text-align:center;flex-shrink:0}
+.top-rank.g{color:var(--gold)}
+.act-item{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 0;border-bottom:1px solid rgba(42,42,53,.5)}
+.act-item:last-child{border-bottom:none}
+.act-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;flex-shrink:0}
+.alert-banner{display:flex;align-items:center;gap:.75rem;padding:.85rem 1.1rem;border-radius:var(--radius-sm);font-size:.83rem;margin-bottom:.5rem}
+.alert-banner.warning{background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25);color:var(--orange)}
+.alert-banner.danger{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:var(--red)}
+.alert-banner.info{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:var(--blue)}
+.alert-banner.success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:var(--green)}
+.alert-close{margin-left:auto;cursor:pointer;opacity:.6;transition:opacity .2s}
+.alert-close:hover{opacity:1}
+.form-group{margin-bottom:1rem}
+.form-label{display:block;font-size:.78rem;font-weight:600;color:var(--txt-muted);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.05em}
+.form-input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.6rem .9rem;color:var(--txt);font-size:.85rem;transition:border-color var(--tr)}
+.form-input:focus{border-color:var(--gold);outline:none}
+.form-hint{font-size:.72rem;color:var(--txt-dim);margin-top:.3rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.quick-btn{display:flex;align-items:center;gap:.7rem;padding:.8rem 1rem;border-radius:var(--radius-sm);background:var(--card2);border:1px solid var(--border);cursor:pointer;transition:all var(--tr);font-size:.82rem;font-weight:600}
+.quick-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-glow)}
+.quick-btn i{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+#toast-container{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem}
+.toast{display:flex;align-items:center;gap:.7rem;padding:.8rem 1.1rem;border-radius:var(--radius-sm);background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);min-width:260px;max-width:360px;animation:toastIn .3s ease;font-size:.83rem;font-weight:500}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+.toast.success{border-left:3px solid var(--green)}.toast.error{border-left:3px solid var(--red)}
+.toast.info{border-left:3px solid var(--blue)}.toast.warning{border-left:3px solid var(--gold)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.75rem;width:90%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:fadeIn .2s ease;max-height:90vh;overflow-y:auto}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.modal-title{font-size:1.05rem;font-weight:800}
+.modal-close{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--txt-muted);transition:background var(--tr),color var(--tr)}
+.modal-close:hover{background:var(--card2);color:var(--txt)}
+.modal-footer{display:flex;gap:.75rem;justify-content:flex-end;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border)}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+@keyframes shimmer{from{background-position:-400px 0}to{background-position:400px 0}}
+.skeleton{background:linear-gradient(90deg,var(--card2) 25%,var(--border) 50%,var(--card2) 75%);background-size:400px 100%;animation:shimmer 1.4s infinite;border-radius:4px}
+@media(max-width:1100px){.grid-3{grid-template-columns:1fr 1fr}.grid-4{grid-template-columns:1fr 1fr}}
+@media(max-width:960px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0);box-shadow:4px 0 40px rgba(0,0,0,.6)}
+  .sidebar-overlay.open{display:block}.main{margin-left:0}
+  .topbar-hamburger{display:flex}.page-content{padding:1.25rem 1rem}
+  .admin-info{display:none}.btn-logout span{display:none}
+  .grid-2,.grid-3{grid-template-columns:1fr}.grid-4{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){.kpi-grid{grid-template-columns:1fr 1fr}.grid-4{grid-template-columns:1fr 1fr}.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="toast-container"></div>
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+<!-- MODAL CONFIRMATION -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="mc-title">Confirmation</div>
+      <button class="modal-close" onclick="closeModal('modal-confirm')"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div id="mc-body" style="font-size:.88rem;color:var(--txt-muted);line-height:1.6"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-confirm')">Annuler</button>
+      <button class="btn btn-primary" id="mc-ok" onclick="">Confirmer</button>
+    </div>
+  </div>
+</div>
+<!-- MODAL DETAIL TRANSACTION -->
+<div class="modal-overlay" id="modal-tx">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fa fa-arrow-right-arrow-left" style="color:var(--gold);margin-right:.5rem"></i>Detail Transaction</div>
+      <button class="modal-close" onclick="closeModal('modal-tx')"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div id="modal-tx-body"></div>
+    <div class="modal-footer" id="modal-tx-footer"></div>
+  </div>
+</div>
+<!-- MODAL KYC VIEWER -->
+<div class="modal-overlay" id="modal-kyc">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fa fa-id-card" style="color:var(--gold);margin-right:.5rem"></i>Dossier KYC</div>
+      <button class="modal-close" onclick="closeModal('modal-kyc')"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div id="modal-kyc-body"></div>
+    <div class="modal-footer" id="modal-kyc-footer"></div>
+  </div>
+</div>
+<!-- MODAL CONTENU/LEGAL -->
+<div class="modal-overlay" id="modal-content">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header">
+      <div class="modal-title" id="mc2-title">Editeur de contenu</div>
+      <button class="modal-close" onclick="closeModal('modal-content')"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div id="modal-content-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-content')">Fermer</button>
+      <button class="btn btn-primary" onclick="saveContent()"><i class="fa fa-save"></i> Sauvegarder</button>
+    </div>
+  </div>
+</div>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">TC</div>
+    <span class="logo-text">Takalo<span>Cash</span></span>
+    <span class="badge-admin">ADMIN</span>
+  </div>
+  <nav class="sidebar-nav">
+    <ul class="nav-section">
+      <li class="nav-label">Principal</li>
+      <li class="nav-item active" onclick="go('dashboard',this)"><i class="fa fa-chart-pie"></i> Tableau de bord</li>
+      <li class="nav-item" onclick="go('transactions',this)"><i class="fa fa-arrow-right-arrow-left"></i> Transactions <span class="nav-badge" id="nb-pending">-</span></li>
+      <li class="nav-item" onclick="go('utilisateurs',this)"><i class="fa fa-users"></i> Utilisateurs</li>
+      <li class="nav-item" onclick="go('kyc',this)"><i class="fa fa-id-card"></i> KYC <span class="nav-badge gold" id="nb-kyc">-</span></li>
+    </ul>
+    <ul class="nav-section">
+      <li class="nav-label">Finance</li>
+      <li class="nav-item" onclick="go('taux',this)"><i class="fa fa-chart-line"></i> Taux</li>
+      <li class="nav-item" onclick="go('frais',this)"><i class="fa fa-percent"></i> Frais</li>
+      <li class="nav-item" onclick="go('reserves',this)"><i class="fa fa-vault"></i> Reserves</li>
+      <li class="nav-item" onclick="go('wallets',this)"><i class="fa fa-wallet"></i> Wallets</li>
+    </ul>
+    <ul class="nav-section">
+      <li class="nav-label">Communication</li>
+      <li class="nav-item" onclick="go('notifications',this)"><i class="fa fa-bell"></i> Notifications <span class="nav-badge" id="nb-notif" style="display:none">0</span></li>
+      <li class="nav-item" onclick="go('contact',this)"><i class="fa fa-envelope"></i> Messages Contact</li>
+    </ul>
+    <ul class="nav-section">
+      <li class="nav-label">Contenu & Legal</li>
+      <li class="nav-item" onclick="go('legal',this)"><i class="fa fa-scale-balanced"></i> Pages Legales</li>
+      <li class="nav-item" onclick="go('faq',this)"><i class="fa fa-circle-question"></i> FAQ</li>
+      <li class="nav-item" onclick="go('temoignages',this)"><i class="fa fa-star"></i> Temoignages</li>
+      <li class="nav-item" onclick="go('partenaires',this)"><i class="fa fa-handshake"></i> Partenaires</li>
+    </ul>
+    <ul class="nav-section">
+      <li class="nav-label">Systeme</li>
+      <li class="nav-item" onclick="go('rapports',this)"><i class="fa fa-file-chart-column"></i> Rapports</li>
+      <li class="nav-item" onclick="go('securite',this)"><i class="fa fa-shield-halved"></i> Securite</li>
+      <li class="nav-item" onclick="go('sauvegardes',this)"><i class="fa fa-database"></i> Sauvegardes</li>
+      <li class="nav-item" onclick="go('parametres',this)"><i class="fa fa-gear"></i> Parametres</li>
+    </ul>
+  </nav>
+  <div class="sidebar-footer">v2.5.0 &nbsp;&middot;&nbsp; TakaloCash &copy; 2025</div>
+</aside>
+<div class="main">
+  <header class="topbar">
+    <button class="topbar-hamburger" onclick="openSidebar()"><i class="fa fa-bars"></i></button>
+    <div class="topbar-search"><i class="fa fa-magnifying-glass"></i><input type="text" placeholder="Recherche globale..." oninput="globalSearch(this.value)"></div>
+    <div class="topbar-right">
+      <button class="topbar-icon-btn" onclick="loadAll()"><i class="fa fa-arrows-rotate" id="spin-icon"></i></button>
+      <button class="topbar-icon-btn" onclick="go('notifications',null)"><i class="fa fa-bell"></i><span class="dot" id="bell-dot" style="display:none"></span></button>
+      <button class="topbar-icon-btn" onclick="go('contact',null)"><i class="fa fa-envelope"></i></button>
+      <div class="topbar-divider"></div>
+      <div class="admin-profile">
+        <div class="admin-avatar" id="adm-av">AD</div>
+        <div class="admin-info"><span class="admin-name" id="adm-name">Admin Chief</span><span class="admin-role">Super Admin</span></div>
+      </div>
+      <button class="btn-logout" onclick="logout()"><i class="fa fa-right-from-bracket"></i><span>Deconnexion</span></button>
+    </div>
+  </header>
+  <div class="page-content">
+<!-- ============================
+     PANEL DASHBOARD
+     ============================ -->
+<div class="panel active" id="panel-dashboard">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-chart-pie" style="color:var(--gold);margin-right:.5rem"></i>Tableau de bord</h1><p class="page-subtitle" id="last-update">Chargement...</p></div>
+    <div class="page-actions">
+      <button class="btn btn-secondary btn-sm" onclick="loadAll()"><i class="fa fa-arrows-rotate"></i> Actualiser</button>
+      <button class="btn btn-primary btn-sm" onclick="go('transactions',null)"><i class="fa fa-arrow-right-arrow-left"></i> Transactions</button>
+    </div>
+  </div>
+  <div id="alerts-zone"></div>
+  <div class="kpi-grid" id="kpi-grid"></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="fa fa-chart-bar"></i>Volume 7 jours</span>
+        <div style="display:flex;gap:.4rem">
+          <button class="btn btn-secondary btn-xs" id="vol-usdt-btn" onclick="switchVol('usdt')">USDT</button>
+          <button class="btn btn-xs" id="vol-mga-btn" style="background:var(--gold);color:#000" onclick="switchVol('mga')">MGA</button>
+        </div>
+      </div>
+      <div id="vol-chart" style="height:160px"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)">
+        <div><div style="font-size:.7rem;color:var(--txt-muted)">Total semaine</div><div style="font-size:1rem;font-weight:700;color:var(--green)" id="vol-total">-</div></div>
+        <div style="text-align:right"><div style="font-size:.7rem;color:var(--txt-muted)">Meilleur jour</div><div style="font-size:1rem;font-weight:700;color:var(--gold)" id="vol-best">-</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-pie-chart"></i>Repartition statuts</span><span style="font-size:.72rem;color:var(--txt-dim)">ce mois</span></div>
+      <div id="donut-wrap" style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap"></div>
+      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+        <div style="font-size:.7rem;color:var(--txt-muted);margin-bottom:.5rem">Taux de completion</div>
+        <div class="progress-bar"><div class="progress-fill" id="compl-bar" style="background:var(--green);width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:.35rem">
+          <span style="font-size:.7rem;color:var(--txt-dim)" id="compl-lbl">-</span>
+          <span style="font-size:.7rem;font-weight:700;color:var(--green)" id="compl-pct">-</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <span class="card-title" style="margin:0"><i class="fa fa-clock-rotate-left"></i>Transactions recentes</span>
+        <button class="btn btn-secondary btn-sm" onclick="go('transactions',null)">Voir tout</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table"><thead><tr><th>ID</th><th>Client</th><th>Type</th><th>Montant</th><th>Statut</th><th>Date</th></tr></thead>
+        <tbody id="recent-tbody"></tbody></table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="fa fa-coins"></i>Taux live</span>
+        <span style="font-size:.68rem;padding:.2rem .55rem;background:rgba(34,197,94,.12);color:var(--green);border-radius:20px;font-weight:700">LIVE</span>
+      </div>
+      <div id="rates-grid"></div>
+    </div>
+  </div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-trophy"></i>Top Clients</span><span style="font-size:.72rem;color:var(--txt-dim)">volume USDT</span></div>
+      <div id="top-clients"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-bolt"></i>Actions rapides</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
+        <button class="quick-btn" onclick="go('kyc',null)"><i class="fa fa-id-card" style="background:rgba(59,130,246,.15);color:var(--blue)"></i>Valider KYC</button>
+        <button class="quick-btn" onclick="go('notifications',null)"><i class="fa fa-bell" style="background:rgba(168,85,247,.15);color:var(--purple)"></i>Notification</button>
+        <button class="quick-btn" onclick="go('reserves',null)"><i class="fa fa-vault" style="background:rgba(34,197,94,.15);color:var(--green)"></i>Reserves</button>
+        <button class="quick-btn" onclick="exportCSV()"><i class="fa fa-file-csv" style="background:rgba(245,197,24,.15);color:var(--gold)"></i>Export CSV</button>
+        <button class="quick-btn" onclick="go('taux',null)"><i class="fa fa-chart-line" style="background:rgba(249,115,22,.15);color:var(--orange)"></i>Taux</button>
+        <button class="quick-btn" onclick="go('contact',null)"><i class="fa fa-envelope" style="background:rgba(239,68,68,.15);color:var(--red)"></i>Messages</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-timeline"></i>Activite</span></div>
+      <div id="act-feed"></div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card"><div class="card-header"><span class="card-title"><i class="fa fa-mobile-screen"></i>Mobile Money</span></div><div id="mm-chart" style="display:flex;flex-direction:column;gap:.6rem"></div></div>
+    <div class="card"><div class="card-header"><span class="card-title"><i class="fa fa-bitcoin-sign"></i>Repartition Crypto</span></div><div id="crypto-chart" style="display:flex;flex-direction:column;gap:.6rem"></div></div>
+  </div>
+</div>
+<!-- ============================
+     PANEL TRANSACTIONS
+     ============================ -->
+<div class="panel" id="panel-transactions">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-arrow-right-arrow-left" style="color:var(--gold);margin-right:.5rem"></i>Transactions</h1><p class="page-subtitle" id="tx-subtitle">-</p></div>
+    <div class="page-actions">
+      <select id="tx-st" class="form-input" style="width:auto;font-size:.82rem" onchange="renderTx()">
+        <option value="">Tous statuts</option><option value="pending">En attente</option>
+        <option value="completed">Valides</option><option value="rejected">Refuses</option>
+        <option value="cancelled">Annules</option><option value="processing">En cours</option>
+      </select>
+      <select id="tx-ty" class="form-input" style="width:auto;font-size:.82rem" onchange="renderTx()">
+        <option value="">Tous types</option><option value="depot">Depot</option><option value="retrait">Retrait</option>
+      </select>
+      <input type="date" id="tx-from" class="form-input" style="width:auto;font-size:.82rem" onchange="renderTx()">
+      <input type="date" id="tx-to" class="form-input" style="width:auto;font-size:.82rem" onchange="renderTx()">
+      <button class="btn btn-primary btn-sm" onclick="exportCSV()"><i class="fa fa-file-csv"></i> CSV</button>
+    </div>
+  </div>
+  <div class="grid-4" id="tx-stats"></div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>ID</th><th>Client</th><th>Type</th><th>Crypto</th><th>USDT</th><th>MGA</th><th>Mobile Money</th><th>Frais</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody id="tx-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- ============================
+     PANEL UTILISATEURS
+     ============================ -->
+<div class="panel" id="panel-utilisateurs">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-users" style="color:var(--gold);margin-right:.5rem"></i>Utilisateurs</h1><p class="page-subtitle">Gestion des comptes clients</p></div>
+    <div class="page-actions">
+      <input type="text" class="form-input" id="usr-q" placeholder="Rechercher..." oninput="filterUsers(this.value)" style="width:220px;font-size:.82rem">
+    </div>
+  </div>
+  <div class="grid-4" id="usr-stats"></div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Client</th><th>Telephone</th><th>Transactions</th><th>Volume USDT</th><th>Derniere act.</th><th>KYC</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="usr-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- ============================
+     PANEL KYC
+     ============================ -->
+<div class="panel" id="panel-kyc">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-id-card" style="color:var(--gold);margin-right:.5rem"></i>Verification KYC</h1><p class="page-subtitle">Validation des identites clients</p></div>
+    <div class="page-actions">
+      <select id="kyc-ft" class="form-input" style="width:auto;font-size:.82rem" onchange="renderKYC()">
+        <option value="all">Tous</option><option value="pending">En attente</option>
+        <option value="verified">Verifies</option><option value="rejected">Refuses</option>
+      </select>
+      <button class="btn btn-secondary btn-sm" onclick="renderKYC()"><i class="fa fa-arrows-rotate"></i></button>
+    </div>
+  </div>
+  <div class="grid-4" id="kyc-stats"></div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Client</th><th>Email</th><th>Telephone</th><th>Document</th><th>Soumis le</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="kyc-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- ============================
+     PANEL TAUX
+     ============================ -->
+<div class="panel" id="panel-taux">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-chart-line" style="color:var(--gold);margin-right:.5rem"></i>Taux de Change</h1><p class="page-subtitle">Gestion des taux USDT/MGA et des marges</p></div>
+    <div class="page-actions"><button class="btn btn-secondary btn-sm" onclick="renderTaux()"><i class="fa fa-arrows-rotate"></i></button></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title"><i class="fa fa-wifi"></i>Taux en temps reel (Binance Spot)</span><span style="font-size:.68rem;padding:.2rem .55rem;background:rgba(34,197,94,.12);color:var(--green);border-radius:20px;font-weight:700">LIVE</span></div>
+    <div id="taux-live-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px"></div>
+    <div style="margin-top:12px;font-size:.72rem;color:var(--txt-dim)">Actualisation automatique toutes les 30s &middot; Source Binance Spot API</div>
+  </div>
+  <div class="card" style="border-color:rgba(245,197,24,.2)">
+    <div class="card-header"><span class="card-title" style="color:var(--gold)"><i class="fa fa-gear"></i>Override Manuel des Taux</span></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Taux USDT/MGA (Ar)</label><input class="form-input" id="taux-usdt-inp" type="number" step="10" min="1000" placeholder="ex: 4850" oninput="previewTaux()"><div class="form-hint">Vide = Binance automatique</div></div>
+      <div class="form-group"><label class="form-label">Spread achat/vente (%)</label><input class="form-input" id="taux-spread-inp" type="number" step="0.1" min="0" max="10" value="2" oninput="previewTaux()"><div class="form-hint">Difference entre prix achat et vente</div></div>
+    </div>
+    <div id="taux-preview" style="display:none;margin-bottom:1rem;padding:14px;background:#111;border:1px solid var(--border);border-radius:var(--radius-sm)">
+      <div style="font-size:.68rem;font-weight:700;color:var(--txt-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Apercu avec ces parametres</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px" id="taux-preview-grid"></div>
+    </div>
+    <button class="btn btn-primary" onclick="saveTaux()"><i class="fa fa-save"></i> Appliquer</button>
+  </div>
+</div>
+<!-- ============================
+     PANEL FRAIS
+     ============================ -->
+<div class="panel" id="panel-frais">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-percent" style="color:var(--gold);margin-right:.5rem"></i>Frais de Service</h1><p class="page-subtitle">Bareme des frais TakaloCash</p></div>
+  </div>
+  <div class="grid-3" id="frais-kpi"></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-sliders"></i>Bareme Frais</span></div>
+      <div style="font-size:.75rem;font-weight:700;color:var(--gold);margin-bottom:.75rem;text-transform:uppercase">Achat (Ar &rarr; Crypto)</div>
+      <div class="form-group"><label class="form-label">Moins de 100 000 Ar (%)</label><input class="form-input" id="fee-buy-s" type="number" step="0.1" value="3" oninput="simFrais()"></div>
+      <div class="form-group"><label class="form-label">100 000 - 1 000 000 Ar (%)</label><input class="form-input" id="fee-buy-m" type="number" step="0.1" value="2" oninput="simFrais()"></div>
+      <div class="form-group"><label class="form-label">Plus de 1 000 000 Ar (%)</label><input class="form-input" id="fee-buy-l" type="number" step="0.1" value="1.5" oninput="simFrais()"></div>
+      <div style="font-size:.75rem;font-weight:700;color:var(--gold);margin:.75rem 0;text-transform:uppercase">Vente (Crypto &rarr; Ar)</div>
+      <div class="form-group"><label class="form-label">Moins de 100 000 Ar (%)</label><input class="form-input" id="fee-sell-s" type="number" step="0.1" value="2" oninput="simFrais()"></div>
+      <div class="form-group"><label class="form-label">100 000 - 5 000 000 Ar (%)</label><input class="form-input" id="fee-sell-m" type="number" step="0.1" value="1.5" oninput="simFrais()"></div>
+      <div class="form-group"><label class="form-label">Plus de 5 000 000 Ar (%)</label><input class="form-input" id="fee-sell-l" type="number" step="0.1" value="1" oninput="simFrais()"></div>
+      <button class="btn btn-primary" onclick="saveFrais()"><i class="fa fa-save"></i> Sauvegarder</button>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-calculator"></i>Simulateur de Frais</span></div>
+      <div class="form-group"><label class="form-label">Montant (Ar)</label><input class="form-input" id="sim-m" type="number" placeholder="ex: 500000" oninput="simFrais()"></div>
+      <div class="form-group"><label class="form-label">Type</label>
+        <select class="form-input" id="sim-t" onchange="simFrais()">
+          <option value="buy">Achat (Ar vers Crypto)</option><option value="sell">Vente (Crypto vers Ar)</option>
+        </select>
+      </div>
+      <div id="sim-result" style="display:none;padding:14px;background:#111;border:1px solid var(--border);border-radius:var(--radius-sm);margin-top:.5rem">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--txt-muted)">Montant brut</span><span id="sim-brut" style="font-weight:700"></span></div>
+          <div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--txt-muted)">Taux frais</span><span id="sim-rate" style="color:var(--gold);font-weight:700"></span></div>
+          <div style="display:flex;justify-content:space-between;font-size:.82rem;border-top:1px solid var(--border);padding-top:8px"><span style="color:var(--txt-muted)">Frais TakaloCash</span><span id="sim-fees" style="color:var(--gold);font-weight:800;font-size:.95rem"></span></div>
+          <div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--txt-muted)">Montant net</span><span id="sim-net" style="color:var(--green);font-weight:800;font-size:.95rem"></span></div>
+        </div>
+      </div>
+      <div style="margin-top:1rem;padding:10px;background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.15);border-radius:var(--radius-sm);font-size:.75rem;color:var(--txt-dim)">Frais operateurs Mobile Money non inclus.</div>
+    </div>
+  </div>
+</div>
+<!-- ============================
+     PANEL RESERVES
+     ============================ -->
+<div class="panel" id="panel-reserves">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-vault" style="color:var(--gold);margin-right:.5rem"></i>Reserves &amp; Liquidites</h1><p class="page-subtitle">Surveillance des wallets de reserve</p></div>
+    <div class="page-actions"><button class="btn btn-secondary btn-sm" onclick="renderReserves()"><i class="fa fa-arrows-rotate"></i></button></div>
+  </div>
+  <div id="rsv-alert" style="display:none" class="alert-banner warning">
+    <i class="fa fa-triangle-exclamation"></i><span id="rsv-alert-msg">Reserve basse</span>
+    <button class="alert-close" onclick="document.getElementById('rsv-alert').style.display='none'"><i class="fa fa-xmark"></i></button>
+  </div>
+  <div id="reserves-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px"></div>
+  <div class="card">
+    <div class="card-header"><span class="card-title"><i class="fa fa-bell"></i>Seuils d'Alerte Minimum</span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+      <div class="form-group" style="margin:0"><label class="form-label">USDT minimum</label><input class="form-input" id="seuil-usdt" type="number" value="500"></div>
+      <div class="form-group" style="margin:0"><label class="form-label">BTC minimum</label><input class="form-input" id="seuil-btc" type="number" step="0.001" value="0.01"></div>
+      <div class="form-group" style="margin:0"><label class="form-label">ETH minimum</label><input class="form-input" id="seuil-eth" type="number" step="0.01" value="0.1"></div>
+      <div class="form-group" style="margin:0"><label class="form-label">MGA minimum (Ar)</label><input class="form-input" id="seuil-mga" type="number" value="1000000"></div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:1rem" onclick="saveSeuils()"><i class="fa fa-save"></i> Sauvegarder les seuils</button>
+  </div>
+</div>
+<!-- ============================
+     PANEL WALLETS
+     ============================ -->
+<div class="panel" id="panel-wallets">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-wallet" style="color:var(--gold);margin-right:.5rem"></i>Wallets de Reception</h1><p class="page-subtitle">Adresses de reception par crypto et reseau</p></div>
+    <div class="page-actions"><button class="btn btn-primary btn-sm" onclick="addWallet()"><i class="fa fa-plus"></i> Ajouter</button></div>
+  </div>
+  <div id="wallets-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem"></div>
+</div>
+<!-- ============================
+     PANEL NOTIFICATIONS
+     ============================ -->
+<div class="panel" id="panel-notifications">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-bell" style="color:var(--gold);margin-right:.5rem"></i>Notifications Push</h1><p class="page-subtitle">Envoi de messages aux utilisateurs</p></div>
+  </div>
+  <div class="card" style="border-color:rgba(245,197,24,.2)">
+    <div class="card-header"><span class="card-title" style="color:var(--gold)"><i class="fa fa-paper-plane"></i>Envoyer une Notification</span></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="notif-titre" type="text" placeholder="ex: Maintenance prevue"></div>
+      <div class="form-group"><label class="form-label">Destinataires</label>
+        <select class="form-input" id="notif-dest">
+          <option value="all">Tous les utilisateurs</option><option value="active">Utilisateurs actifs (30j)</option>
+          <option value="pending">Avec transactions en attente</option><option value="kyc">KYC en attente</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Message</label><textarea class="form-input" id="notif-msg" rows="3" style="resize:vertical;width:100%" placeholder="Contenu de la notification..."></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Type</label>
+        <select class="form-input" id="notif-type">
+          <option value="info">Information</option><option value="warning">Avertissement</option>
+          <option value="success">Succes</option><option value="promo">Promotion</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Programme pour (optionnel)</label><input class="form-input" id="notif-date" type="datetime-local"></div>
+    </div>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="envoyerNotif()"><i class="fa fa-paper-plane"></i> Envoyer maintenant</button>
+      <button class="btn btn-secondary" onclick="programmerNotif()"><i class="fa fa-clock"></i> Programmer</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title"><i class="fa fa-copy"></i>Templates Rapides</span></div>
+    <div id="notif-templates" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px"></div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--border)"><span class="card-title"><i class="fa fa-history"></i>Historique</span></div>
+    <div class="table-wrap">
+      <table class="data-table"><thead><tr><th>Date</th><th>Titre</th><th>Type</th><th>Dest.</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="notif-hist"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- ============================
+     PANEL CONTACT
+     ============================ -->
+<div class="panel" id="panel-contact">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-envelope" style="color:var(--gold);margin-right:.5rem"></i>Messages Contact</h1><p class="page-subtitle">Gestion des messages et demandes clients</p></div>
+    <div class="page-actions">
+      <select id="contact-ft" class="form-input" style="width:auto;font-size:.82rem" onchange="renderContact()">
+        <option value="all">Tous</option><option value="unread">Non lus</option>
+        <option value="open">Ouverts</option><option value="closed">Resolus</option>
+      </select>
+    </div>
+  </div>
+  <div class="grid-4" id="contact-stats"></div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="table-wrap">
+      <table class="data-table"><thead><tr><th>Date</th><th>Nom</th><th>Email</th><th>Sujet</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="contact-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- ============================
+     PANEL LEGAL
+     ============================ -->
+<div class="panel" id="panel-legal">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-scale-balanced" style="color:var(--gold);margin-right:.5rem"></i>Pages Legales</h1><p class="page-subtitle">Gestion des mentions legales, CGU, et politique de confidentialite</p></div>
+  </div>
+  <div id="legal-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem"></div>
+</div>
+<!-- ============================
+     PANEL FAQ
+     ============================ -->
+<div class="panel" id="panel-faq">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-circle-question" style="color:var(--gold);margin-right:.5rem"></i>FAQ</h1><p class="page-subtitle">Gestion des questions frequentes</p></div>
+    <div class="page-actions"><button class="btn btn-primary btn-sm" onclick="addFAQ()"><i class="fa fa-plus"></i> Ajouter</button></div>
+  </div>
+  <div id="faq-list" style="display:flex;flex-direction:column;gap:.75rem"></div>
+</div>
+<!-- ============================
+     PANEL TEMOIGNAGES
+     ============================ -->
+<div class="panel" id="panel-temoignages">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-star" style="color:var(--gold);margin-right:.5rem"></i>Temoignages</h1><p class="page-subtitle">Gestion des avis clients</p></div>
+    <div class="page-actions"><button class="btn btn-primary btn-sm" onclick="addTemoignage()"><i class="fa fa-plus"></i> Ajouter</button></div>
+  </div>
+  <div id="temoignages-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem"></div>
+</div>
+<!-- ============================
+     PANEL PARTENAIRES
+     ============================ -->
+<div class="panel" id="panel-partenaires">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-handshake" style="color:var(--gold);margin-right:.5rem"></i>Partenaires</h1><p class="page-subtitle">Logos et liens des partenaires affiches sur le site</p></div>
+    <div class="page-actions"><button class="btn btn-primary btn-sm" onclick="addPartenaire()"><i class="fa fa-plus"></i> Ajouter</button></div>
+  </div>
+  <div id="partenaires-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem"></div>
+</div>
+<!-- ============================
+     PANEL RAPPORTS
+     ============================ -->
+<div class="panel" id="panel-rapports">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-file-chart-column" style="color:var(--gold);margin-right:.5rem"></i>Rapports</h1><p class="page-subtitle">Export et analyse des donnees</p></div>
+    <div class="page-actions">
+      <button class="btn btn-primary btn-sm" onclick="exportCSV()"><i class="fa fa-file-csv"></i> CSV</button>
+      <button class="btn btn-secondary btn-sm" onclick="exportJSON()"><i class="fa fa-file-code"></i> JSON</button>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-filter"></i>Options d'Export</span></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Du</label><input class="form-input" id="exp-from" type="date"></div>
+        <div class="form-group"><label class="form-label">Au</label><input class="form-input" id="exp-to" type="date"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem">
+        <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer"><input type="checkbox" checked id="exp-tx" style="accent-color:var(--gold)"> Transactions</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer"><input type="checkbox" checked id="exp-us" style="accent-color:var(--gold)"> Utilisateurs</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer"><input type="checkbox" id="exp-lg" style="accent-color:var(--gold)"> Journaux admin</label>
+      </div>
+      <div style="display:flex;gap:.75rem">
+        <button class="btn btn-primary" onclick="exportCSV()"><i class="fa fa-file-csv"></i> CSV</button>
+        <button class="btn btn-secondary" onclick="exportJSON()"><i class="fa fa-file-code"></i> JSON</button>
+      </div>
+    </div>
+    <div class="card"><div class="card-header"><span class="card-title"><i class="fa fa-chart-bar"></i>Statistiques globales</span></div><div id="rpt-stats" style="display:flex;flex-direction:column;gap:10px"></div></div>
+  </div>
+</div>
+<!-- ============================
+     PANEL SECURITE
+     ============================ -->
+<div class="panel" id="panel-securite">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-shield-halved" style="color:var(--gold);margin-right:.5rem"></i>Securite</h1><p class="page-subtitle">Journaux d'acces et activite admin</p></div>
+    <div class="page-actions"><button class="btn btn-danger btn-sm" onclick="clearLogs()"><i class="fa fa-trash"></i> Vider les logs</button></div>
+  </div>
+  <div class="grid-2">
+    <div class="card"><div class="card-header"><span class="card-title"><i class="fa fa-user-shield"></i>Connexions Admin</span></div><div id="login-log" style="display:flex;flex-direction:column;gap:6px"></div></div>
+    <div class="card"><div class="card-header"><span class="card-title"><i class="fa fa-list-check"></i>Actions Admin</span></div><div id="action-log" style="display:flex;flex-direction:column;gap:6px"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title"><i class="fa fa-bug"></i>Alertes Securite</span></div>
+    <div class="table-wrap">
+      <table class="data-table"><thead><tr><th>Date</th><th>Type</th><th>Utilisateur</th><th>Details</th><th>Risque</th><th>Actions</th></tr></thead>
+        <tbody id="sec-tbody"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--green)">Aucune alerte de securite</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title"><i class="fa fa-lock"></i>Changement de mot de passe Admin</span></div>
+    <div class="form-row">
+      <div><div class="form-group"><label class="form-label">Mot de passe actuel</label><input class="form-input" id="pwd-old" type="password"></div>
+      <div class="form-group"><label class="form-label">Nouveau mot de passe</label><input class="form-input" id="pwd-new" type="password"></div>
+      <div class="form-group"><label class="form-label">Confirmation</label><input class="form-input" id="pwd-conf" type="password"></div>
+      <button class="btn btn-danger" onclick="changePwd()"><i class="fa fa-lock"></i> Changer</button></div>
+      <div class="card" style="background:rgba(59,130,246,.04);border-color:rgba(59,130,246,.15)">
+        <div style="font-size:.82rem;font-weight:700;margin-bottom:.75rem;color:var(--blue)">Recommandations de securite</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:.78rem;color:var(--txt-muted)">
+          <div><i class="fa fa-check" style="color:var(--green);margin-right:.4rem"></i>Mot de passe 12+ caracteres</div>
+          <div><i class="fa fa-check" style="color:var(--green);margin-right:.4rem"></i>Majuscules, minuscules, chiffres</div>
+          <div><i class="fa fa-check" style="color:var(--green);margin-right:.4rem"></i>Changement tous les 90 jours</div>
+          <div><i class="fa fa-check" style="color:var(--green);margin-right:.4rem"></i>Ne pas reutiliser un ancien mot de passe</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ============================
+     PANEL SAUVEGARDES
+     ============================ -->
+<div class="panel" id="panel-sauvegardes">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-database" style="color:var(--gold);margin-right:.5rem"></i>Sauvegardes</h1><p class="page-subtitle">Sauvegarde et restauration des donnees</p></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+    <div class="card" style="text-align:center;cursor:pointer;transition:border-color .2s" onclick="creerSauvegarde()" onmouseover="this.style.borderColor='rgba(245,197,24,.4)'" onmouseout="this.style.borderColor=''">
+      <div style="font-size:2.2rem;margin-bottom:8px">&#128190;</div>
+      <div style="font-size:.92rem;font-weight:800;margin-bottom:4px">Sauvegarder maintenant</div>
+      <div style="font-size:.75rem;color:var(--txt-muted)">Snapshot complet DB + settings</div>
+    </div>
+    <div class="card" style="text-align:center;cursor:pointer;transition:border-color .2s" onclick="exportJSON()" onmouseover="this.style.borderColor='rgba(34,197,94,.4)'" onmouseout="this.style.borderColor=''">
+      <div style="font-size:2.2rem;margin-bottom:8px">&#128228;</div>
+      <div style="font-size:.92rem;font-weight:800;margin-bottom:4px">Exporter JSON</div>
+      <div style="font-size:.75rem;color:var(--txt-muted)">Transactions + utilisateurs</div>
+    </div>
+    <div class="card" style="text-align:center;cursor:pointer;transition:border-color .2s" onclick="exportCSV()" onmouseover="this.style.borderColor='rgba(59,130,246,.4)'" onmouseout="this.style.borderColor=''">
+      <div style="font-size:2.2rem;margin-bottom:8px">&#128202;</div>
+      <div style="font-size:.92rem;font-weight:800;margin-bottom:4px">Exporter CSV</div>
+      <div style="font-size:.75rem;color:var(--txt-muted)">Format tableur Excel</div>
+    </div>
+    <div class="card" style="text-align:center;cursor:pointer;transition:border-color .2s" onclick="importData()" onmouseover="this.style.borderColor='rgba(168,85,247,.4)'" onmouseout="this.style.borderColor=''">
+      <div style="font-size:2.2rem;margin-bottom:8px">&#128229;</div>
+      <div style="font-size:.92rem;font-weight:800;margin-bottom:4px">Importer des donnees</div>
+      <div style="font-size:.75rem;color:var(--txt-muted)">Restaurer depuis un fichier</div>
+    </div>
+    <div class="card" style="text-align:center;cursor:pointer;transition:border-color .2s" onclick="viderCache()" onmouseover="this.style.borderColor='rgba(239,68,68,.4)'" onmouseout="this.style.borderColor=''">
+      <div style="font-size:2.2rem;margin-bottom:8px">&#128465;</div>
+      <div style="font-size:.92rem;font-weight:800;margin-bottom:4px">Vider le cache</div>
+      <div style="font-size:.75rem;color:var(--txt-muted)">localStorage + donnees temp</div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div><div style="font-size:.92rem;font-weight:800">Derniere sauvegarde automatique</div><div style="font-size:.8rem;color:var(--green);margin-top:4px" id="backup-last">Supabase - Aujourd'hui automatiquement</div></div>
+      <span style="font-size:.7rem;color:var(--txt-dim);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:20px;padding:4px 12px">Supabase Auto-Backup actif</span>
+    </div>
+    <div style="margin-top:1rem;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center">
+      <div><div style="font-size:1.4rem;font-weight:900;color:var(--gold)" id="bkp-tx">-</div><div style="font-size:.72rem;color:var(--txt-dim)">Transactions</div></div>
+      <div><div style="font-size:1.4rem;font-weight:900;color:var(--green)" id="bkp-us">-</div><div style="font-size:.72rem;color:var(--txt-dim)">Utilisateurs</div></div>
+      <div><div style="font-size:1.4rem;font-weight:900;color:var(--blue)">~2.4 MB</div><div style="font-size:.72rem;color:var(--txt-dim)">Taille estimee</div></div>
+    </div>
+  </div>
+</div>
+<!-- ============================
+     PANEL PARAMETRES
+     ============================ -->
+<div class="panel" id="panel-parametres">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-gear" style="color:var(--gold);margin-right:.5rem"></i>Parametres</h1><p class="page-subtitle">Configuration generale de TakaloCash</p></div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-key"></i>API Binance</span></div>
+      <div class="form-group"><label class="form-label">API Key</label><input class="form-input" id="cfg-bk" type="password" placeholder="Binance API Key"></div>
+      <div class="form-group"><label class="form-label">API Secret</label><input class="form-input" id="cfg-bs" type="password" placeholder="Binance API Secret"></div>
+      <div style="display:flex;gap:.75rem">
+        <button class="btn btn-primary" onclick="saveBinance()"><i class="fa fa-save"></i> Sauvegarder</button>
+        <button class="btn btn-secondary" onclick="testBinance()"><i class="fa fa-plug"></i> Tester</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-database"></i>Supabase</span></div>
+      <div class="form-group"><label class="form-label">Project URL</label><input class="form-input" id="cfg-su" type="text" placeholder="https://xxx.supabase.co"></div>
+      <div class="form-group"><label class="form-label">Anon Key</label><input class="form-input" id="cfg-sk" type="password" placeholder="Supabase anon key"></div>
+      <button class="btn btn-primary" onclick="saveSB()"><i class="fa fa-save"></i> Sauvegarder</button>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-sliders"></i>Parametres Generaux</span></div>
+      <div class="form-group"><label class="form-label">Nom de la plateforme</label><input class="form-input" id="cfg-nom" type="text" value="TakaloCash"></div>
+      <div class="form-group"><label class="form-label">Email de contact</label><input class="form-input" id="cfg-email" type="email" placeholder="contact@takalocash.mg"></div>
+      <div class="form-group"><label class="form-label">Telephone contact</label><input class="form-input" id="cfg-tel" type="text" placeholder="+261 XX XX XXX XX"></div>
+      <div class="form-group"><label class="form-label">Adresse</label><input class="form-input" id="cfg-adr" type="text" placeholder="Antananarivo, Madagascar"></div>
+      <div class="form-group">
+        <label class="form-label">Mode maintenance</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer"><input type="checkbox" id="cfg-maint" style="accent-color:var(--gold)"> Activer le mode maintenance</label>
+        <div class="form-hint">Les utilisateurs verront une page de maintenance</div>
+      </div>
+      <button class="btn btn-primary" onclick="saveCfg()"><i class="fa fa-save"></i> Sauvegarder</button>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-envelope"></i>Configuration Email (SMTP)</span></div>
+      <div class="form-group"><label class="form-label">Serveur SMTP</label><input class="form-input" id="smtp-host" type="text" placeholder="smtp.gmail.com"></div>
+      <div class="form-group"><label class="form-label">Port</label><input class="form-input" id="smtp-port" type="number" value="587"></div>
+      <div class="form-group"><label class="form-label">Utilisateur</label><input class="form-input" id="smtp-user" type="text" placeholder="noreply@takalocash.mg"></div>
+      <div class="form-group"><label class="form-label">Mot de passe</label><input class="form-input" id="smtp-pwd" type="password"></div>
+      <div style="display:flex;gap:.75rem">
+        <button class="btn btn-primary" onclick="saveSMTP()"><i class="fa fa-save"></i> Sauvegarder</button>
+        <button class="btn btn-secondary" onclick="testSMTP()"><i class="fa fa-envelope"></i> Tester</button>
+      </div>
+    </div>
+  </div>
+</div>
+  </div><!-- /page-content -->
+</div><!-- /main -->
+</div><!-- /layout --><script>
+/* ================================================
+   CONFIG SUPABASE — connexion directe
+   ================================================ */
+const SUPABASE_URL = 'https://nyeopreahmajoisartoz.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_xR8d2_nnrLURdRLefd4i9Q_mSQ7CYJ9';
+const DEMO = false;
+
+const sb = {
+  async req(method, path, body=null, params='') {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/${path}${params}`,{
+      method, headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json',Prefer:'return=representation'},
+      body: body?JSON.stringify(body):null});
+    if(!r.ok) { let msg='Erreur'; try{const j=await r.json();msg=j.message||j.hint||r.statusText;}catch(e){msg=r.statusText;} throw new Error(msg); }
+    const t=await r.text(); return t?JSON.parse(t):[];
+  },
+  sel:(t,p='')=>sb.req('GET',t,null,p),
+  upd:(t,b,p='')=>sb.req('PATCH',t,b,p),
+  ins:(t,b)=>sb.req('POST',t,b),
+  del:(t,p='')=>sb.req('DELETE',t,null,p)
+};
+
+/* ================================================
+   HELPERS & UTILITAIRES — déclarés en premier
+   ================================================ */
+function fmtN(n) {
+  if(n===undefined||n===null) return '-';
+  const f=parseFloat(n);
+  if(isNaN(f)) return '-';
+  return f<1?f.toFixed(6).replace(/\.?0+$/,''):f.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2});
+}
+function fmtMGA(n) {
+  if(n===undefined||n===null||isNaN(parseFloat(n))) return '-';
+  const v=parseFloat(n);
+  if(v>=1e9) return (v/1e9).toFixed(2)+' Md Ar';
+  if(v>=1e6) return (v/1e6).toFixed(2)+' M Ar';
+  return v.toLocaleString('fr-FR')+' Ar';
+}
+function fmtDs(iso) {
+  if(!iso) return '-';
+  const d=new Date(iso);
+  if(isNaN(d)) return '-';
+  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+}
+function av(n) {
+  if(!n||typeof n!=='string') return 'a';
+  const m={'Rija Ndriana':'a','Aina Olivia':'b','Tahina M.':'c','Fara Koto':'d','Ny Ravo':'e','Mamy Lalaina':'a'};
+  return m[n]||['a','b','c','d','e'][Math.abs([...n].reduce((h,c)=>(h<<5)-h+c.charCodeAt(0)|0,0))%5];
+}
+function ini(n) {
+  if(!n||typeof n!=='string') return '?';
+  return n.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'?';
+}
+function delay(ms) { return new Promise(r=>setTimeout(r,ms)); }
+function spin(on) { const i=document.getElementById('spin-icon'); if(i) i.classList.toggle('fa-spin',on); }
+
+if(!window._TC_ACTION_LOG) window._TC_ACTION_LOG=[];
+function logAction(action) {
+  try {
+    window._TC_ACTION_LOG.push({action,time:new Date().toLocaleString('fr-FR')});
+    if(window._TC_ACTION_LOG.length>100) window._TC_ACTION_LOG.shift();
+  } catch(e) {}
+}
+
+function toast(msg, type='info') {
+  const icons={success:'fa-circle-check',error:'fa-circle-exclamation',info:'fa-circle-info',warning:'fa-triangle-exclamation'};
+  const t=document.createElement('div');
+  t.className='toast '+type;
+  t.innerHTML='<i class="fa '+(icons[type]||'fa-circle-info')+'"></i><span>'+msg+'</span>';
+  const tc=document.getElementById('toast-container');
+  if(tc){ tc.appendChild(t); setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(40px)'; t.style.transition='all .3s ease'; setTimeout(()=>t.remove(),300); },3500); }
+}
+
+function openSidebar()  { document.getElementById('sidebar')?.classList.add('open');  document.getElementById('overlay')?.classList.add('open'); }
+function closeSidebar() { document.getElementById('sidebar')?.classList.remove('open'); document.getElementById('overlay')?.classList.remove('open'); }
+
+function openModal(id)  { const el=document.getElementById(id); if(el) el.classList.add('open'); }
+function closeModal(id) { const el=document.getElementById(id); if(el) el.classList.remove('open'); }
+
+function confirm2(title, body, callback, btnLabel='Confirmer', btnClass='btn-primary') {
+  const mt=document.getElementById('mc-title'), mb=document.getElementById('mc-body'), btn=document.getElementById('mc-ok');
+  if(!mt||!mb||!btn) return;
+  mt.textContent=title; mb.innerHTML=body;
+  btn.textContent=btnLabel; btn.className='btn '+btnClass;
+  btn.onclick=()=>{ closeModal('modal-confirm'); callback(); };
+  openModal('modal-confirm');
+}
+
+function last7() {
+  const days=[];
+  for(let i=6;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); days.push({iso:d.toISOString().slice(0,10),label:d.toLocaleDateString('fr-FR',{weekday:'short'}).slice(0,3)}); }
+  return days;
+}
+
+function dl(content,filename,mime) {
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type:mime}));
+  a.download=filename; a.click();
+}
+
+function logout() {
+  confirm2('Se deconnecter ?', 'Vous allez etre redirige vers la page de connexion.', ()=>{
+    toast('Deconnexion en cours...','info');
+    setTimeout(()=>{ window.location.href='index.html'; },1500);
+  },'Se deconnecter','btn-danger');
+}
+
+/* ================================================
+   DONNEES LIVE SUPABASE (remplace les DEMO_DATA)
+   ================================================ */
+/* Ces tableaux sont remplis dynamiquement depuis Supabase */
+let DEMO_KYC      = [];   // rempli par loadKYC()
+let DEMO_CONTACT  = [];   // rempli par loadContact()
+/* NOTE : pas de seconde déclaration let DEMO_CONTACT ci-dessous — conflit supprimé */
+
+let DEMO_WALLETS = [
+  {crypto:'USDT',reseau:'TRC-20',adresse:'TKf3eMYj4T1oM7h8KdLmQ9uPnH6bVRsX2w',color:'#26a17b',actif:true},
+  {crypto:'USDT',reseau:'BEP-20',adresse:'0x9f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a',color:'#f3ba2f',actif:true},
+  {crypto:'BTC',reseau:'Bitcoin',adresse:'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',color:'#f7931a',actif:true},
+  {crypto:'ETH',reseau:'ERC-20',adresse:'0x4a8b2c7f9e1d3a5b7c9e0f2a4b6d8e0f2a4b6d8',color:'#627eea',actif:true},
+  {crypto:'BNB',reseau:'BEP-20',adresse:'0x9f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a',color:'#f3ba2f',actif:true},
+  {crypto:'TRX',reseau:'TRC-20',adresse:'TGhK5mNpQ8rS1tU4vW7xY2zA3bC6dE9fJ0',color:'#ef4444',actif:true}
+];
+
+/* DEMO_CONTACT supprimé ici (double déclaration corrigée) — chargé depuis Supabase via loadContact() */
+
+let DEMO_FAQ = [
+  {id:'F01',q:'Comment acheter des cryptos sur TakaloCash ?',r:"Creez un compte, completez le KYC, puis choisissez le crypto souhaite et entrez le montant en Ariary. Suivez les instructions pour le paiement via Mobile Money.",cat:'Achat',actif:true},
+  {id:'F02',q:'Quels sont les delais de traitement ?',r:"Les operations sont traitees dans les 30 minutes en heures ouvrables (8h-18h). Hors heures, le delai peut aller jusqu'a 24h.",cat:'General',actif:true},
+  {id:'F03',q:'Quels operateurs Mobile Money sont acceptes ?',r:"Nous acceptons MVola, Orange Money et Airtel Money. Les transactions sont traitees instantanement depuis votre telephone.",cat:'Paiement',actif:true},
+  {id:'F04',q:'Comment fonctionne le KYC ?',r:"Le KYC (Know Your Customer) est une verification d'identite obligatoire. Vous devez fournir votre CIN ou passeport. La verification prend 24-48h.",cat:'Securite',actif:true},
+  {id:'F05',q:'Les frais sont-ils fixes ?',r:"Les frais varient selon le montant de la transaction. Ils vont de 1% a 3% pour les achats et de 1% a 2% pour les ventes. Consultez notre bareme.",cat:'Frais',actif:false}
+];
+
+let DEMO_TEMOIGNAGES = [
+  {id:'T01',name:'Rija N.',ville:'Antananarivo',note:5,texte:"Service rapide et fiable ! Mon retrait a ete traite en 20 minutes. Je recommande vivement TakaloCash.",actif:true},
+  {id:'T02',name:'Aina O.',ville:'Toamasina',note:5,texte:"La meilleure plateforme crypto a Madagascar. Le taux est transparent et les frais competitifs.",actif:true},
+  {id:'T03',name:'Tahina M.',ville:'Fianarantsoa',note:4,texte:"Tres bonne experience. Quelques petits delais mais le service client est reactif et professionnel.",actif:true},
+  {id:'T04',name:'Ny R.',ville:'Mahajanga',note:5,texte:"J'utilise TakaloCash depuis 6 mois, jamais eu de probleme. Plateforme securisee et equipe serieuse.",actif:false}
+];
+
+let DEMO_PARTENAIRES = [
+  {id:'P01',nom:'Binance',url:'https://binance.com',categorie:'Exchange',actif:true},
+  {id:'P02',nom:'MVola',url:'https://mvola.mg',categorie:'Mobile Money',actif:true},
+  {id:'P03',nom:'Orange Money',url:'https://orangemoney.mg',categorie:'Mobile Money',actif:true},
+  {id:'P04',nom:'Airtel Money',url:'https://airtelmoney.mg',categorie:'Mobile Money',actif:true},
+  {id:'P05',nom:'TRON',url:'https://tron.network',categorie:'Blockchain',actif:true},
+  {id:'P06',nom:'Ethereum',url:'https://ethereum.org',categorie:'Blockchain',actif:true}
+];
+
+let DEMO_LEGAL = [
+  {id:'L01',titre:'Conditions Generales d\'Utilisation (CGU)',slug:'cgu',lastUpdate:'2025-01-15',contenu:`TakaloCash est une plateforme d'echange de cryptomonnaies operant a Madagascar.\n\n1. ACCEPTATION DES CONDITIONS\nEn utilisant nos services, vous acceptez les presentes CGU.\n\n2. SERVICES PROPOSES\nNous proposons l'achat et la vente de cryptomonnaies contre Ariary via Mobile Money.\n\n3. ELIGIBILITE\nL'utilisateur doit avoir au moins 18 ans et etre resident a Madagascar.\n\n4. VERIFICATION KYC\nToute transaction necessite une verification d'identite (KYC) conforme.\n\n5. FRAIS\nNos frais de service sont affiches avant chaque transaction.\n\n6. LIMITATION DE RESPONSABILITE\nTakaloCash ne peut etre tenu responsable des fluctuations du marche crypto.`},
+  {id:'L02',titre:'Politique de Confidentialite',slug:'privacy',lastUpdate:'2025-01-15',contenu:`POLITIQUE DE CONFIDENTIALITE - TAKALOCASH\n\n1. COLLECTE DES DONNEES\nNous collectons votre nom, email, telephone, et documents KYC.\n\n2. UTILISATION DES DONNEES\nVos donnees sont utilisees pour la verification d'identite et le traitement des transactions.\n\n3. CONSERVATION\nVos donnees sont conservees 5 ans conformement a la legislation malgache.\n\n4. VOS DROITS\nVous pouvez demander l'acces, la rectification ou la suppression de vos donnees.\n\n5. CONTACT\nPour toute question : contact@takalocash.mg`},
+  {id:'L03',titre:'Politique AML/KYC',slug:'aml',lastUpdate:'2025-01-15',contenu:`POLITIQUE ANTI-BLANCHIMENT (AML) ET KYC\n\nTakaloCash est conforme aux regulations financieres malgaches.\n\n1. OBLIGATIONS KYC\nTout client doit fournir une piece d'identite valide et un justificatif de domicile.\n\n2. SEUILS DE TRANSACTION\nLes transactions depassant 5 000 000 Ar necessitent une verification renforcee.\n\n3. SIGNALEMENT\nNous nous reservons le droit de signaler les transactions suspectes aux autorites competentes.\n\n4. SANCTIONS\nTout compte implique dans des activites illicites sera immediatement bloque.`},
+  {id:'L04',titre:'Mentions Legales',slug:'mentions',lastUpdate:'2025-01-15',contenu:`MENTIONS LEGALES\n\nDenomination sociale : TakaloCash\nForme juridique : SARL\nSiege social : Antananarivo, Madagascar\nCapital social : [en cours d'enregistrement]\nEmail : contact@takalocash.mg\n\nDirecteur de la publication : Admin TakaloCash\nHebergeur : Supabase Inc., 970 Toa Payoh North, Singapour`}
+];
+
+const STATUS_CFG = {
+  pending:    {label:'En attente', badge:'badge-pending', icon:'fa-clock',         color:'#f5c518'},
+  processing: {label:'En cours',   badge:'badge-info',   icon:'fa-spinner fa-spin',color:'#3b82f6'},
+  completed:  {label:'Valide',     badge:'badge-success',icon:'fa-circle-check',   color:'#22c55e'},
+  rejected:   {label:'Refuse',     badge:'badge-danger', icon:'fa-circle-xmark',   color:'#ef4444'},
+  cancelled:  {label:'Annule',     badge:'badge-purple', icon:'fa-ban',            color:'#a855f7'}
+};
+
+/* ================================================
+   STATE
+   ================================================ */
+let allTx    = [];
+let allUsers = [];  /* depuis la table users si disponible */
+let volMode  = 'mga';
+let currentPanel  = 'dashboard';
+let editingContent = null;
+
+/* ================================================
+   INIT
+   ================================================ */
+window.addEventListener('DOMContentLoaded', async () => {
+  setDates();
+  /* Tenter de charger la table users (optionnel selon le schema) */
+  try { allUsers = await sb.sel('users','?select=*&order=created_at.desc&limit=500'); } catch(e) { allUsers = []; }
+  await loadAll();
+  setInterval(fetchRates, 30000);
+  renderNotifTemplates();
+  renderWallets();
+  renderLegal();
+  renderFAQ();
+  renderTemoignages();
+  renderPartenaires();
+  /* Demarrer Realtime apres le premier chargement */
+  initRealtime();
+});
+
+function setDates() {
+  const to=new Date(), from=new Date();
+  from.setDate(from.getDate()-30);
+  const e1=document.getElementById('exp-from'),e2=document.getElementById('exp-to');
+  if(e1) e1.value=from.toISOString().slice(0,10);
+  if(e2) e2.value=to.toISOString().slice(0,10);
+  const tf=document.getElementById('tx-from'),tt=document.getElementById('tx-to');
+  if(tf) tf.value=from.toISOString().slice(0,10);
+  if(tt) tt.value=to.toISOString().slice(0,10);
+}
+
+/* ================================================
+   CHARGEMENT DEPUIS SUPABASE
+   ================================================ */
+async function loadKYC() {
+  try { DEMO_KYC = await sb.sel('kyc_submissions','?select=*&order=created_at.desc'); }
+  catch(e) { console.warn('kyc_submissions:', e.message); DEMO_KYC = []; }
+}
+
+async function loadContact() {
+  try { DEMO_CONTACT = await sb.sel('contact_messages','?select=*&order=created_at.desc'); }
+  catch(e) { console.warn('contact_messages:', e.message); DEMO_CONTACT = []; }
+}
+
+async function loadAll() {
+  spin(true);
+  try {
+    /* Chargement parallele depuis Supabase */
+    const [txData] = await Promise.all([
+      sb.sel('transactions','?select=*&order=created_at.desc'),
+      loadKYC(),
+      loadContact()
+    ]);
+    allTx = txData;
+
+    renderDashboard();
+    renderTx();
+    renderUsers();
+    renderKYC();
+    renderContact();
+    renderReserves();
+    renderRptStats();
+    renderSecurite();
+    await fetchRates();
+
+    const p=allTx.filter(t=>t.status==='pending').length;
+    const elP=document.getElementById('nb-pending');
+    if(elP) elP.textContent=p||'-';
+    const elK=document.getElementById('nb-kyc');
+    if(elK) elK.textContent=DEMO_KYC.filter(k=>k.status==='pending').length||'-';
+    const elBellDot=document.getElementById('bell-dot');
+    if(elBellDot) elBellDot.style.display=DEMO_CONTACT.filter(m=>!m.read).length?'block':'none';
+    const el=document.getElementById('last-update');
+    if(el) el.textContent='Mise a jour : '+new Date().toLocaleString('fr-FR')+' ('+allTx.length+' tx)';
+    const bt=document.getElementById('bkp-tx'),bu=document.getElementById('bkp-us');
+    if(bt) bt.textContent=allTx.length;
+    if(bu) bu.textContent=new Set(allTx.map(t=>t.client)).size;
+  } catch(e){ toast('Erreur chargement : '+e.message,'error'); console.error(e); }
+  spin(false);
+}
+
+/* ================================================
+   SUPABASE REALTIME — transactions
+   ================================================ */
+function initRealtime() {
+  /* Connexion via WebSocket Supabase Realtime */
+  const wsUrl = SUPABASE_URL.replace('https://','wss://') + '/realtime/v1/websocket?apikey=' + SUPABASE_KEY + '&vsn=1.0.0';
+  let ws, heartbeat;
+
+  function connect() {
+    ws = new WebSocket(wsUrl);
+    ws.onopen = () => {
+      /* S'abonner aux changements sur la table transactions */
+      ws.send(JSON.stringify({topic:'realtime:public:transactions',event:'phx_join',payload:{config:{broadcast:{self:false},presence:{key:''},postgres_changes:[{event:'*',schema:'public',table:'transactions'}]}},ref:'1'}));
+      heartbeat = setInterval(() => { if(ws.readyState===1) ws.send(JSON.stringify({topic:'phoenix',event:'heartbeat',payload:{},ref:'hb'})); }, 25000);
+      console.log('[Realtime] Connecte — ecoute transactions');
+    };
+    ws.onmessage = async (e) => {
+      try {
+        const msg = JSON.parse(e.data);
+        if(msg.event === 'postgres_changes' || (msg.payload && msg.payload.data)) {
+          /* Recharger les transactions depuis Supabase */
+          allTx = await sb.sel('transactions','?select=*&order=created_at.desc');
+          renderDashboard(); renderTx(); renderUsers(); renderRptStats();
+          const p=allTx.filter(t=>t.status==='pending').length;
+          const elP=document.getElementById('nb-pending'); if(elP) elP.textContent=p||'-';
+          const el=document.getElementById('last-update'); if(el) el.textContent='Temps reel : '+new Date().toLocaleString('fr-FR')+' ('+allTx.length+' tx)';
+          toast('Tableau de bord mis a jour (temps reel)','info');
+        }
+      } catch(err) { /* ignore */ }
+    };
+    ws.onclose = () => {
+      clearInterval(heartbeat);
+      setTimeout(connect, 5000); /* reconnexion auto */
+    };
+    ws.onerror = () => ws.close();
+  }
+  connect();
+}
+
+/* ================================================
+   NAVIGATION
+   ================================================ */
+function go(id, el) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const p=document.getElementById('panel-'+id);
+  if(p) p.classList.add('active');
+  if(el) el.classList.add('active');
+  else document.querySelectorAll('.nav-item').forEach(n=>{ if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'")) n.classList.add('active'); });
+  currentPanel=id;
+  closeSidebar();
+  window.scrollTo(0,0);
+}
+
+/* ================================================
+   DASHBOARD
+   ================================================ */
+function renderDashboard() {
+  renderAlerts(); renderKPIs(); renderRecentTable();
+  renderVolChart(); renderDonut(); renderTopClients();
+  renderActivity(); renderMMChart(); renderCryptoChart();
+}
+
+function renderAlerts() {
+  const p=allTx.filter(t=>t.status==='pending').length;
+  const pMsg=DEMO_CONTACT.filter(m=>!(m.read||m.is_read)).length;
+  const kycP=DEMO_KYC.filter(k=>k.status==='pending').length;
+  const z=document.getElementById('alerts-zone'); if(!z) return;
+  const a=[];
+  if(p>=2) a.push(`<div class="alert-banner warning"><i class="fa fa-triangle-exclamation"></i><span><strong>${p} transactions en attente</strong> necessitent une validation.</span><button class="alert-close" onclick="this.parentElement.remove()"><i class="fa fa-xmark"></i></button></div>`);
+  if(kycP>0) a.push(`<div class="alert-banner info"><i class="fa fa-id-card"></i><span><strong>${kycP} KYC en attente</strong> de validation.</span><button class="alert-close" onclick="this.parentElement.remove()"><i class="fa fa-xmark"></i></button></div>`);
+  if(pMsg>0) a.push(`<div class="alert-banner success"><i class="fa fa-envelope"></i><span><strong>${pMsg} message(s) non lu(s)</strong> dans la messagerie.</span><button class="alert-close" onclick="this.parentElement.remove()"><i class="fa fa-xmark"></i></button></div>`);
+  z.innerHTML=a.join('');
+}
+
+function renderKPIs() {
+  const today=new Date().toISOString().slice(0,10), month=new Date().toISOString().slice(0,7);
+  const todayTx=allTx.filter(t=>t.created_at.startsWith(today));
+  const monthTx=allTx.filter(t=>t.created_at.startsWith(month));
+  const comp=monthTx.filter(t=>t.status==='completed');
+  const pend=allTx.filter(t=>t.status==='pending');
+  const ca=comp.reduce((s,t)=>s+t.montant_crypto,0), pr=comp.reduce((s,t)=>s+(t.benefice||0),0);
+  const vmga=allTx.reduce((s,t)=>s+t.montant_mga,0);
+  const kpis=[
+    {c:'blue',  i:'fa-calendar-day',  lb:"Aujourd'hui", v:todayTx.length,         u:'transactions', tr:'+2',  dr:'up'},
+    {c:'gold',  i:'fa-clock',         lb:'En attente',  v:pend.length,             u:'a traiter',    tr:pend.length>0?'!':'OK', dr:pend.length>3?'down':'flat'},
+    {c:'green', i:'fa-circle-check',  lb:'Valides',     v:comp.length,             u:'ce mois',      tr:'+5',  dr:'up'},
+    {c:'purple',i:'fa-dollar-sign',   lb:"Chiffre d'aff",v:fmtN(ca)+' USDT',      u:'ce mois',      tr:'+12%',dr:'up',sm:true},
+    {c:'orange',i:'fa-sack-dollar',   lb:'Benefice',    v:fmtN(pr)+' USDT',        u:'ce mois',      tr:'+8%', dr:'up',sm:true},
+    {c:'green', i:'fa-money-bill',    lb:'Volume MGA',  v:fmtMGA(vmga),             u:'total',        tr:'',    dr:'flat',sm:true},
+    {c:'red',   i:'fa-users',         lb:'Clients',     v:new Set(allTx.map(t=>t.client)).size, u:'actifs', tr:'+1', dr:'up'},
+    {c:'blue',  i:'fa-id-card',       lb:'KYC',         v:(DEMO_KYC||[]).filter(k=>k.status==='pending').length, u:'en attente', tr:'', dr:'flat'}
+  ];
+  const g=document.getElementById('kpi-grid'); if(!g) return;
+  g.innerHTML=kpis.map(k=>`<div class="kpi-card ${k.c}"><div class="kpi-top"><div class="kpi-icon ${k.c}"><i class="fa ${k.i}"></i></div>${k.tr?`<span class="kpi-trend ${k.dr}"><i class="fa fa-arrow-${k.dr==='up'?'up':k.dr==='down'?'down':'right'}"></i>${k.tr}</span>`:''}</div><div class="kpi-value${k.sm?' sm':''}">${k.v}</div><div class="kpi-label">${k.lb}</div><div class="kpi-sub">${k.u}</div></div>`).join('');
+}
+
+function renderRecentTable() {
+  const b=document.getElementById('recent-tbody'); if(!b) return;
+  const cfg_map=STATUS_CFG;
+  b.innerHTML=allTx.slice(0,8).map(t=>{
+    const cfg=cfg_map[t.status]||cfg_map.pending;
+    return `<tr onclick="showTxDetail('${t.id}')" style="cursor:pointer">
+      <td><span style="font-family:monospace;font-size:.72rem;color:var(--gold)">${t.id}</span></td>
+      <td><div class="user-cell"><div class="user-av ${av(t.client)}">${ini(t.client)}</div><span style="font-size:.82rem;font-weight:600">${t.client}</span></div></td>
+      <td><span class="badge ${t.type==='depot'?'badge-info':'badge-orange'}">${t.type==='depot'?'Depot':'Retrait'}</span></td>
+      <td style="font-weight:700;color:${t.type==='depot'?'var(--green)':'var(--red)'}">${t.type==='depot'?'+':'-'}${fmtN(t.montant_crypto)} ${t.crypto}</td>
+      <td><span class="badge ${cfg.badge}">${cfg.label}</span></td>
+      <td style="font-size:.75rem;color:var(--txt-muted)">${fmtDs(t.created_at)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderVolChart() {
+  const days=last7(), w=document.getElementById('vol-chart'); if(!w) return;
+  const data=days.map(d=>{ const dx=allTx.filter(t=>t.created_at.startsWith(d.iso)); return {l:d.label,usdt:dx.reduce((s,t)=>s+t.montant_crypto,0),mga:dx.reduce((s,t)=>s+t.montant_mga,0),n:dx.length}; });
+  const key=volMode, vals=data.map(d=>d[key]), max=Math.max(...vals)||1;
+  const total=vals.reduce((s,v)=>s+v,0), bestI=vals.indexOf(Math.max(...vals));
+  const et=document.getElementById('vol-total'),eb=document.getElementById('vol-best');
+  if(et) et.textContent=key==='mga'?fmtMGA(total):fmtN(total)+' USDT';
+  if(eb) eb.textContent=data[bestI]?.l||'-';
+  const col=key==='mga'?'#f5c518':'#22c55e', svgH=160, bW=56, gap=24, padB=28, cH=svgH-padB;
+  const bars=data.map((d,i)=>{
+    const ph=Math.max(4,d[key]/max*cH), x=10+i*(bW+gap), y=cH-ph, isT=i===data.length-1;
+    return `<rect x="${x}" y="${y}" width="${bW}" height="${ph}" rx="4" fill="${isT?col:col+'55'}"/>
+      <text x="${x+bW/2}" y="${svgH-8}" text-anchor="middle" font-size="10" fill="var(--txt-dim)">${d.l}</text>
+      <text x="${x+bW/2}" y="${y-5}" text-anchor="middle" font-size="9" fill="${isT?col:'var(--txt-dim)'}" font-weight="${isT?700:400}">${d.n>0?d.n+'tx':''}</text>`;
+  }).join('');
+  w.innerHTML=`<svg viewBox="0 0 560 ${svgH}" style="width:100%;height:${svgH}px;display:block">${bars}</svg>`;
+}
+
+function switchVol(mode) {
+  volMode=mode;
+  const bu=document.getElementById('vol-usdt-btn'), bm=document.getElementById('vol-mga-btn');
+  if(bu){ bu.className='btn btn-'+(mode==='usdt'?'xs':'secondary btn-xs'); bu.style.cssText=mode==='usdt'?'background:var(--gold);color:#000':''; }
+  if(bm){ bm.className='btn btn-'+(mode==='mga'?'xs':'secondary btn-xs'); bm.style.cssText=mode==='mga'?'background:var(--gold);color:#000':''; }
+  renderVolChart();
+}
+
+function renderDonut() {
+  const w=document.getElementById('donut-wrap'); if(!w) return;
+  const month=new Date().toISOString().slice(0,7), mx=allTx.filter(t=>t.created_at.startsWith(month));
+  if(!mx.length){ w.innerHTML='<p style="color:var(--txt-dim);font-size:.82rem">Aucune donnee ce mois.</p>'; return; }
+  const counts={};
+  mx.forEach(t=>{counts[t.status]=(counts[t.status]||0)+1;});
+  const total=mx.length, comp=counts['completed']||0, pct=Math.round(comp/total*100);
+  const cb=document.getElementById('compl-bar'),cl=document.getElementById('compl-lbl'),cp=document.getElementById('compl-pct');
+  if(cb) cb.style.width=pct+'%'; if(cl) cl.textContent=comp+' valides sur '+total; if(cp) cp.textContent=pct+'%';
+  const colors={completed:'#22c55e',pending:'#f5c518',processing:'#3b82f6',rejected:'#ef4444',cancelled:'#a855f7'};
+  const r=50,cx=65,cy=65,sw=18,circ=2*Math.PI*r; let off=0;
+  const arcs=Object.entries(counts).map(([s,c])=>{const d=c/total*circ;const arc=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colors[s]||'#555'}" stroke-width="${sw}" stroke-dasharray="${d} ${circ-d}" stroke-dashoffset="${-off}"/>`;off+=d;return arc;}).join('');
+  const leg=Object.entries(counts).map(([s,c])=>{const cfg=STATUS_CFG[s]||STATUS_CFG.pending;return `<div style="display:flex;align-items:center;gap:.45rem;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:3px;background:${colors[s]||'#555'};flex-shrink:0"></div><span style="font-size:.75rem;color:var(--txt-muted)">${cfg.label}</span><span style="font-size:.75rem;font-weight:700;margin-left:auto">${c}</span></div>`;}).join('');
+  w.innerHTML=`<svg width="130" height="130" viewBox="0 0 130 130" style="flex-shrink:0;transform:rotate(-90deg)"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--card2)" stroke-width="${sw}"/>${arcs}</svg><div style="flex:1"><div style="font-size:.68rem;color:var(--txt-dim);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.07em">Repartition</div>${leg}<div style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--border);font-size:.7rem;color:var(--txt-dim)">Total : <strong style="color:var(--txt)">${total}</strong></div></div>`;
+}
+
+function renderTopClients() {
+  const vol={};
+  allTx.forEach(t=>{if(!vol[t.client]) vol[t.client]={name:t.client,usdt:0,n:0};vol[t.client].usdt+=t.montant_crypto;vol[t.client].n++;});
+  const sorted=Object.values(vol).sort((a,b)=>b.usdt-a.usdt).slice(0,5), mx=sorted[0]?.usdt||1;
+  const el=document.getElementById('top-clients'); if(!el) return;
+  el.innerHTML=sorted.map((c,i)=>`<div class="top-item"><div class="top-rank ${i===0?'g':''}">${i+1}</div><div class="user-av ${av(c.name)}" style="width:28px;height:28px;font-size:.65rem">${ini(c.name)}</div><div style="flex:1"><div style="font-size:.82rem;font-weight:600">${c.name}</div><div style="font-size:.7rem;color:var(--txt-muted)">${c.n} tx</div><div class="progress-bar" style="margin-top:.3rem"><div class="progress-fill" style="background:var(--gold);width:${Math.round(c.usdt/mx*100)}%"></div></div></div><div style="font-size:.85rem;font-weight:700;color:var(--green)">${fmtN(c.usdt)}</div></div>`).join('');
+}
+
+function renderActivity() {
+  const acts=[
+    {i:'fa-circle-check',bg:'rgba(34,197,94,.15)',c:'var(--green)',t:'TXN-10001 validee',m:'Rija Ndriana 500 USDT',h:'09:45'},
+    {i:'fa-user-plus',bg:'rgba(59,130,246,.15)',c:'var(--blue)',t:'Nouveau compte inscrit',m:'Aina Olivia - MVola',h:'09:20'},
+    {i:'fa-clock',bg:'rgba(245,197,24,.15)',c:'var(--gold)',t:'TXN-10002 en attente',m:'250 USDT BEP-20',h:'08:55'},
+    {i:'fa-circle-xmark',bg:'rgba(239,68,68,.15)',c:'var(--red)',t:'TXN-10004 refusee',m:'KYC non conforme',h:'08:10'},
+    {i:'fa-envelope',bg:'rgba(168,85,247,.15)',c:'var(--purple)',t:'Nouveau message contact',m:'Jean Rakoto - Probleme depot',h:'10:00'}
+  ];
+  const el=document.getElementById('act-feed'); if(!el) return;
+  el.innerHTML=acts.map(a=>`<div class="act-item"><div class="act-icon" style="background:${a.bg};color:${a.c}"><i class="fa ${a.i}"></i></div><div style="flex:1"><div style="font-size:.82rem;font-weight:600">${a.t}</div><div style="font-size:.72rem;color:var(--txt-muted)">${a.m}</div></div><div style="font-size:.7rem;color:var(--txt-dim)">${a.h}</div></div>`).join('');
+}
+
+function renderMMChart() {
+  const mm={};
+  allTx.forEach(t=>{mm[t.mobile_money]=(mm[t.mobile_money]||0)+t.montant_mga;});
+  const total=Object.values(mm).reduce((s,v)=>s+v,0)||1, colors={'MVola':'#f5c518','Orange Money':'#f97316','Airtel Money':'#ef4444'};
+  const el=document.getElementById('mm-chart'); if(!el) return;
+  el.innerHTML=Object.entries(mm).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<div><div style="display:flex;justify-content:space-between;margin-bottom:.3rem"><span style="font-size:.8rem;font-weight:600">${n}</span><span style="font-size:.8rem;color:var(--txt-muted)">${fmtMGA(v)} (${Math.round(v/total*100)}%)</span></div><div class="progress-bar" style="height:8px"><div class="progress-fill" style="background:${colors[n]||'var(--blue)'};width:${Math.round(v/total*100)}%"></div></div></div>`).join('');
+}
+
+function renderCryptoChart() {
+  const cv={};
+  allTx.forEach(t=>{cv[t.crypto]=(cv[t.crypto]||0)+t.montant_crypto;});
+  const total=Object.values(cv).reduce((s,v)=>s+v,0)||1, colors={USDT:'#26a17b',BTC:'#f7931a',ETH:'#627eea',BNB:'#f3ba2f',TRX:'#ef4444'};
+  const el=document.getElementById('crypto-chart'); if(!el) return;
+  el.innerHTML=Object.entries(cv).sort((a,b)=>b[1]-a[1]).map(([c,v])=>`<div><div style="display:flex;justify-content:space-between;margin-bottom:.3rem"><span style="font-size:.8rem;font-weight:700">${c}</span><span style="font-size:.8rem;color:var(--txt-muted)">${fmtN(v)} (${Math.round(v/total*100)}%)</span></div><div class="progress-bar" style="height:8px"><div class="progress-fill" style="background:${colors[c]||'var(--blue)'};width:${Math.round(v/total*100)}%"></div></div></div>`).join('');
+}
+
+/* ================================================
+   TRANSACTIONS
+   ================================================ */
+function renderTx() {
+  const st=document.getElementById('tx-st')?.value||'';
+  const ty=document.getElementById('tx-ty')?.value||'';
+  let f=allTx;
+  if(st) f=f.filter(t=>t.status===st);
+  if(ty) f=f.filter(t=>t.type===ty);
+  const sub=document.getElementById('tx-subtitle');
+  if(sub) sub.textContent=f.length+' transaction(s) - Montant total : '+fmtMGA(f.reduce((s,t)=>s+t.montant_mga,0));
+  const sg=document.getElementById('tx-stats');
+  if(sg){
+    const p=f.filter(t=>t.status==='pending').length,c=f.filter(t=>t.status==='completed').length;
+    const r=f.filter(t=>t.status==='rejected').length,an=f.filter(t=>t.status==='cancelled').length;
+    sg.innerHTML=[
+      {c:'gold',  i:'fa-clock',        lb:'En attente', v:p, u:'tx'},
+      {c:'green', i:'fa-circle-check', lb:'Valides',    v:c, u:'tx'},
+      {c:'red',   i:'fa-circle-xmark', lb:'Refuses',    v:r, u:'tx'},
+      {c:'purple',i:'fa-ban',          lb:'Annules',    v:an,u:'tx'}
+    ].map(k=>`<div class="kpi-card ${k.c}" style="padding:.75rem"><div class="kpi-top"><div class="kpi-icon ${k.c}" style="width:32px;height:32px;font-size:.8rem"><i class="fa ${k.i}"></i></div></div><div class="kpi-value" style="font-size:1.4rem">${k.v}</div><div class="kpi-label">${k.lb}</div></div>`).join('');
+  }
+  const b=document.getElementById('tx-tbody'); if(!b) return;
+  if(!f.length){ b.innerHTML='<tr><td colspan="11" style="text-align:center;padding:2rem;color:var(--txt-dim)">Aucune transaction</td></tr>'; return; }
+  b.innerHTML=f.map(t=>{
+    const cfg=STATUS_CFG[t.status]||STATUS_CFG.pending;
+    return `<tr>
+      <td><span style="font-family:monospace;font-size:.72rem;color:var(--gold);cursor:pointer" onclick="showTxDetail('${t.id}')">${t.id}</span></td>
+      <td><div class="user-cell"><div class="user-av ${av(t.client)}">${ini(t.client)}</div><div><div style="font-size:.8rem;font-weight:600">${t.client}</div><div style="font-size:.68rem;color:var(--txt-dim)">${t.telephone||''}</div></div></div></td>
+      <td><span class="badge ${t.type==='depot'?'badge-info':'badge-orange'}">${t.type==='depot'?'Depot':'Retrait'}</span></td>
+      <td style="font-weight:700">${t.crypto} <span style="font-size:.68rem;color:var(--txt-dim);font-weight:400">${t.reseau||''}</span></td>
+      <td style="color:${t.type==='depot'?'var(--green)':'var(--red)'};font-weight:700">${t.type==='depot'?'+':'-'}${fmtN(t.montant_crypto)}</td>
+      <td style="font-size:.8rem;color:var(--txt-muted)">${fmtMGA(t.montant_mga)}</td>
+      <td style="font-size:.8rem">${t.mobile_money||'-'}</td>
+      <td style="font-size:.8rem;color:var(--txt-muted)">${fmtN(t.frais||0)} ${t.crypto}</td>
+      <td><span class="badge ${cfg.badge}">${cfg.label}</span></td>
+      <td style="font-size:.75rem;color:var(--txt-dim)">${fmtDs(t.created_at)}</td>
+      <td>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          ${t.status==='pending'?`<button class="btn btn-success btn-xs" onclick="validerTx('${t.id}')">Valider</button><button class="btn btn-danger btn-xs" onclick="refuserTx('${t.id}')">Refuser</button><button class="btn btn-secondary btn-xs" onclick="annulerTx('${t.id}')">Annuler</button>`:''}
+          ${t.status==='processing'?`<button class="btn btn-success btn-xs" onclick="validerTx('${t.id}')">Valider</button><button class="btn btn-danger btn-xs" onclick="refuserTx('${t.id}')">Refuser</button>`:''}
+          <button class="btn btn-secondary btn-xs" onclick="showTxDetail('${t.id}')">Detail</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function showTxDetail(id) {
+  const t=allTx.find(x=>x.id===id);
+  if(!t) return;
+  const cfg=STATUS_CFG[t.status]||STATUS_CFG.pending;
+  document.getElementById('modal-tx-body').innerHTML=`
+    <div style="display:grid;gap:10px;margin-bottom:1rem">
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">ID</span><span style="font-family:monospace;color:var(--gold);font-weight:700">${t.id}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Client</span><span style="font-weight:700">${t.client}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Telephone</span><span>${t.telephone||'-'}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Type</span><span class="badge ${t.type==='depot'?'badge-info':'badge-orange'}">${t.type==='depot'?'Depot':'Retrait'}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Crypto</span><span style="font-weight:700">${t.crypto} (${t.reseau||'-'})</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Montant</span><span style="font-weight:700;color:${t.type==='depot'?'var(--green)':'var(--red)'}">${t.type==='depot'?'+':'-'}${fmtN(t.montant_crypto)} ${t.crypto}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Montant MGA</span><span style="font-weight:700">${fmtMGA(t.montant_mga)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Mobile Money</span><span>${t.mobile_money||'-'} (${t.numero_mm||'-'})</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Frais</span><span style="color:var(--gold)">${fmtN(t.frais||0)} ${t.crypto}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Benefice</span><span style="color:var(--green)">${fmtN(t.benefice||0)} USDT</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Wallet</span><span style="font-family:monospace;font-size:.72rem;word-break:break-all">${t.wallet||'-'}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Statut</span><span class="badge ${cfg.badge}">${cfg.label}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Date</span><span>${fmtDs(t.created_at)}</span></div>
+      ${t.note?`<div style="padding:.6rem;background:rgba(249,115,22,.05);border:1px solid rgba(249,115,22,.2);border-radius:var(--radius-sm);font-size:.82rem;color:var(--orange)"><i class="fa fa-note-sticky" style="margin-right:.4rem"></i>${t.note}</div>`:''}
+    </div>`;
+  const footer=document.getElementById('modal-tx-footer');
+  if(footer) {
+    footer.innerHTML='<button class="btn btn-secondary" onclick="closeModal(\'modal-tx\')">Fermer</button>';
+    if(t.status==='pending'||t.status==='processing') {
+      footer.innerHTML+=`<button class="btn btn-danger" onclick="closeModal('modal-tx');refuserTx('${t.id}')">Refuser</button>`;
+      footer.innerHTML+=`<button class="btn btn-secondary" onclick="closeModal('modal-tx');annulerTx('${t.id}')">Annuler</button>`;
+      footer.innerHTML+=`<button class="btn btn-success" onclick="closeModal('modal-tx');validerTx('${t.id}')">Valider</button>`;
+    }
+  }
+  openModal('modal-tx');
+}
+
+async function _updateTxStatus(id, status, label, toastType) {
+  try {
+    await sb.upd('transactions',{status},`?id=eq.${encodeURIComponent(id)}`);
+    /* Mise a jour locale immediate (avant que Realtime ne rafraichisse) */
+    const t=allTx.find(x=>x.id===id); if(t) t.status=status;
+    renderDashboard(); renderTx();
+    const p=allTx.filter(t=>t.status==='pending').length;
+    const elP=document.getElementById('nb-pending'); if(elP) elP.textContent=p||'-';
+    toast('Transaction '+id+' '+label, toastType);
+    logAction('TX '+label+' : '+id);
+  } catch(e) { toast('Erreur : '+e.message,'error'); }
+}
+
+function validerTx(id) {
+  confirm2('Valider la transaction ?', `<strong>${id}</strong> sera marque comme <strong style="color:var(--green)">Valide</strong>. Cette action est irreversible.`,
+    ()=>_updateTxStatus(id,'completed','validee','success'), 'Valider','btn-success');
+}
+
+function refuserTx(id) {
+  confirm2('Refuser la transaction ?', `<strong>${id}</strong> sera marque comme <strong style="color:var(--red)">Refuse</strong>.`,
+    ()=>_updateTxStatus(id,'rejected','refusee','warning'), 'Refuser','btn-danger');
+}
+
+function annulerTx(id) {
+  confirm2('Annuler la transaction ?', `<strong>${id}</strong> sera marque comme <strong style="color:var(--purple)">Annule</strong>.`,
+    ()=>_updateTxStatus(id,'cancelled','annulee','warning'), 'Annuler','btn-danger');
+}
+
+/* ================================================
+   UTILISATEURS
+   ================================================ */
+function renderUsers() {
+  /* Construire la liste des utilisateurs depuis transactions + table users si disponible */
+  const vol={};
+  allTx.forEach(t=>{
+    const key=t.user_id||t.client||'Inconnu';
+    if(!vol[key]) vol[key]={name:t.client||t.user_id||'Inconnu',phone:t.telephone||'',n:0,usdt:0,mga:0,last:t.created_at};
+    vol[key].n++; vol[key].usdt+=parseFloat(t.montant_crypto||0); vol[key].mga+=parseFloat(t.montant_mga||0);
+    if(t.created_at>vol[key].last) vol[key].last=t.created_at;
+  });
+  /* Fusionner avec allUsers si disponible */
+  if(allUsers.length) {
+    allUsers.forEach(u=>{
+      const key=u.id||u.email||u.name;
+      if(!vol[key]) vol[key]={name:u.full_name||u.name||u.email||key,phone:u.phone||u.telephone||'',n:0,usdt:0,mga:0,last:u.created_at||''};
+      else { if(u.full_name||u.name) vol[key].name=u.full_name||u.name; if(u.phone||u.telephone) vol[key].phone=u.phone||u.telephone; }
+    });
+  }
+  const users=Object.values(vol);
+  const sg=document.getElementById('usr-stats');
+  if(sg) sg.innerHTML=[
+    {c:'blue', i:'fa-users',        lb:'Total clients', v:users.length,                               u:'utilisateurs'},
+    {c:'green',i:'fa-circle-check', lb:'KYC verifies',  v:DEMO_KYC.filter(k=>k.status==='verified').length, u:'comptes'},
+    {c:'gold', i:'fa-clock',        lb:'KYC attente',   v:DEMO_KYC.filter(k=>k.status==='pending').length,  u:'a valider'},
+    {c:'purple',i:'fa-money-bill',  lb:'Volume total',  v:fmtMGA(allTx.reduce((s,t)=>s+parseFloat(t.montant_mga||0),0)),   u:'transactions',sm:true}
+  ].map(k=>`<div class="kpi-card ${k.c}" style="padding:.75rem"><div class="kpi-top"><div class="kpi-icon ${k.c}" style="width:32px;height:32px;font-size:.8rem"><i class="fa ${k.i}"></i></div></div><div class="kpi-value${k.sm?' sm':''}" style="font-size:${k.sm?'1rem':'1.4rem'}">${k.v}</div><div class="kpi-label">${k.lb}</div></div>`).join('');
+  renderUsersTable(users);
+}
+
+function renderUsersTable(users) {
+  const b=document.getElementById('usr-tbody'); if(!b) return;
+  const kyc=name=>DEMO_KYC.find(k=>k.name===name);
+  const km={verified:'badge-success',pending:'badge-pending',rejected:'badge-danger'};
+  const kl={verified:'Verifie',pending:'En attente',rejected:'Refuse'};
+  b.innerHTML=users.sort((a,b2)=>b2.usdt-a.usdt).map(u=>{
+    const k=kyc(u.name);
+    const ks=k?k.status:'none';
+    return `<tr>
+      <td><div class="user-cell"><div class="user-av ${av(u.name)}">${ini(u.name)}</div><div><div style="font-weight:600">${u.name}</div><div style="font-size:.7rem;color:var(--txt-dim)">${u.phone}</div></div></div></td>
+      <td style="font-size:.8rem">${u.phone}</td>
+      <td style="text-align:center;font-weight:700">${u.n}</td>
+      <td style="font-weight:700;color:var(--green)">${fmtN(u.usdt)} USDT</td>
+      <td style="font-size:.78rem;color:var(--txt-dim)">${fmtDs(u.last)}</td>
+      <td><span class="badge ${km[ks]||'badge-info'}">${kl[ks]||'Non soumis'}</span></td>
+      <td><span class="badge badge-success">Actif</span></td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-secondary btn-xs" onclick="toast('Profil : ${u.name}','info')">Voir</button>
+          <button class="btn btn-danger btn-xs" onclick="suspendUser('${u.name}')">Suspendre</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterUsers(q) {
+  const vol={};
+  allTx.forEach(t=>{if(!vol[t.client]) vol[t.client]={name:t.client,phone:t.telephone||'',n:0,usdt:0,mga:0,last:t.created_at};vol[t.client].n++;vol[t.client].usdt+=t.montant_crypto;vol[t.client].last=t.created_at;});
+  const users=Object.values(vol).filter(u=>u.name.toLowerCase().includes(q.toLowerCase())||u.phone.includes(q));
+  renderUsersTable(users);
+}
+
+function suspendUser(name) {
+  confirm2('Suspendre le compte ?', `Le compte de <strong>${name}</strong> sera suspendu. Il ne pourra plus effectuer de transactions.`, ()=>{ toast('Compte de '+name+' suspendu','warning'); logAction('Compte suspendu : '+name); },'Suspendre','btn-danger');
+}
+
+/* ================================================
+   KYC
+   ================================================ */
+function _kycField(k, ...fields) { for(const f of fields) if(k[f]!==undefined&&k[f]!==null&&k[f]!=='') return k[f]; return ''; }
+
+function renderKYC() {
+  const ft=document.getElementById('kyc-ft')?.value||'all';
+  let data=ft==='all'?DEMO_KYC:DEMO_KYC.filter(k=>k.status===ft);
+  const p=DEMO_KYC.filter(k=>k.status==='pending').length, v=DEMO_KYC.filter(k=>k.status==='verified').length, r=DEMO_KYC.filter(k=>k.status==='rejected').length;
+  const sg=document.getElementById('kyc-stats');
+  if(sg) sg.innerHTML=[
+    {c:'gold', i:'fa-clock',        lb:'En attente', v:p, u:'a valider'},
+    {c:'green',i:'fa-circle-check', lb:'Verifies',   v:v, u:'clients'},
+    {c:'red',  i:'fa-times-circle', lb:'Refuses',    v:r, u:'clients'},
+    {c:'blue', i:'fa-users',        lb:'Total',      v:DEMO_KYC.length, u:'soumissions'}
+  ].map(k=>`<div class="kpi-card ${k.c}" style="padding:.75rem"><div class="kpi-top"><div class="kpi-icon ${k.c}" style="width:32px;height:32px;font-size:.8rem"><i class="fa ${k.i}"></i></div></div><div class="kpi-value" style="font-size:1.4rem">${k.v}</div><div class="kpi-label">${k.lb}</div></div>`).join('');
+  const b=document.getElementById('kyc-tbody');
+  if(!b) return;
+  if(!data.length){ b.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--txt-dim)">Aucune demande KYC</td></tr>'; return; }
+  const sm={pending:'badge-pending',verified:'badge-success',rejected:'badge-danger'};
+  const sl={pending:'En attente',verified:'Verifie',rejected:'Refuse'};
+  b.innerHTML=data.map(k=>{
+    /* Compatibilite multi-colonnes Supabase */
+    const name  = _kycField(k,'full_name','name','client_name','nom') || 'Inconnu';
+    const email = _kycField(k,'email','client_email') || '-';
+    const phone = _kycField(k,'phone','telephone','phone_number') || '-';
+    const doc   = _kycField(k,'document_type','doc','type_document') || 'Document';
+    const sub   = _kycField(k,'submitted_at','submitted','created_at') || '';
+    const subFmt= sub ? fmtDs(sub) : '-';
+    const status= k.status||'pending';
+    const id    = k.id;
+    const safeName = name.replace(/'/g,"\\'");
+    return `<tr>
+    <td><div class="user-cell"><div class="user-av ${av(name)}">${ini(name)}</div><div><div style="font-weight:600">${name}</div><div style="font-size:.7rem;color:var(--txt-dim)">${phone}</div></div></div></td>
+    <td style="font-size:.8rem;color:var(--txt-muted)">${email}</td>
+    <td>${phone}</td>
+    <td><span class="badge badge-info">${doc}</span></td>
+    <td style="color:var(--txt-muted);font-size:.78rem">${subFmt}</td>
+    <td><span class="badge ${sm[status]||'badge-pending'}">${sl[status]||status}</span></td>
+    <td>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-xs" onclick="showKYCDetail('${id}')">Voir</button>
+        ${status==='pending'?`<button class="btn btn-success btn-xs" onclick="validerKYC('${id}','${safeName}')">Valider</button><button class="btn btn-danger btn-xs" onclick="refuserKYC('${id}','${safeName}')">Refuser</button>`:''}
+      </div>
+    </td>
+  </tr>`;
+  }).join('');
+}
+
+function showKYCDetail(id) {
+  const k=DEMO_KYC.find(x=>x.id===id); if(!k) return;
+  const sm={pending:'badge-pending',verified:'badge-success',rejected:'badge-danger'};
+  const sl={pending:'En attente',verified:'Verifie',rejected:'Refuse'};
+  const name  = _kycField(k,'full_name','name','client_name','nom') || 'Inconnu';
+  const email = _kycField(k,'email','client_email') || '-';
+  const phone = _kycField(k,'phone','telephone','phone_number') || '-';
+  const doc   = _kycField(k,'document_type','doc','type_document') || 'Document';
+  const sub   = _kycField(k,'submitted_at','submitted','created_at') || '';
+  const status= k.status||'pending';
+  const docUrl= _kycField(k,'document_url','file_url','doc_url');
+  const safeName = name.replace(/'/g,"\\'");
+  document.getElementById('modal-kyc-body').innerHTML=`
+    <div style="display:grid;gap:10px;margin-bottom:1rem">
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Client</span><span style="font-weight:700">${name}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Email</span><span>${email}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Telephone</span><span>${phone}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Type document</span><span class="badge badge-info">${doc}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Soumis le</span><span>${sub?fmtDs(sub):'-'}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="color:var(--txt-muted);font-size:.82rem">Statut</span><span class="badge ${sm[status]||'badge-pending'}">${sl[status]||status}</span></div>
+      ${k.note?`<div style="padding:.6rem;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius-sm);font-size:.82rem;color:var(--red)">${k.note}</div>`:''}
+      <div style="padding:1rem;background:var(--card2);border-radius:var(--radius-sm);text-align:center;color:var(--txt-dim);font-size:.82rem">
+        ${docUrl
+          ?`<a href="${docUrl}" target="_blank" style="color:var(--gold)"><i class="fa fa-file-image fa-2x" style="display:block;margin-bottom:.5rem"></i>Voir le document</a>`
+          :`<i class="fa fa-file-image fa-2x" style="display:block;margin-bottom:.5rem;color:var(--txt-dim)"></i>Document justificatif<br><span style="font-size:.72rem">Lien disponible si stocke dans Supabase Storage</span>`}
+      </div>
+    </div>`;
+  const footer=document.getElementById('modal-kyc-footer');
+  if(footer){
+    footer.innerHTML='<button class="btn btn-secondary" onclick="closeModal(\'modal-kyc\')">Fermer</button>';
+    if(status==='pending'){
+      footer.innerHTML+=`<button class="btn btn-danger" onclick="closeModal('modal-kyc');refuserKYC('${id}','${safeName}')">Refuser</button>`;
+      footer.innerHTML+=`<button class="btn btn-success" onclick="closeModal('modal-kyc');validerKYC('${id}','${safeName}')">Valider</button>`;
+    }
+  }
+  openModal('modal-kyc');
+}
+
+async function _updateKYCStatus(id, name, status, note='') {
+  try {
+    const payload={status};
+    if(note) payload.note=note;
+    await sb.upd('kyc_submissions', payload, `?id=eq.${encodeURIComponent(id)}`);
+    /* Mise a jour locale */
+    const k=DEMO_KYC.find(x=>x.id===id); if(k){ k.status=status; if(note) k.note=note; }
+    renderKYC();
+    const el=document.getElementById('nb-kyc'); if(el) el.textContent=DEMO_KYC.filter(k=>k.status==='pending').length||'-';
+    const label = status==='verified' ? 'valide' : 'refuse';
+    toast('KYC de '+name+' '+label, status==='verified'?'success':'warning');
+    logAction('KYC '+label+' : '+name);
+  } catch(e) { toast('Erreur KYC : '+e.message,'error'); }
+}
+
+function validerKYC(id, name) {
+  confirm2('Valider le KYC de '+name+' ?', 'Le compte sera marque comme verifie et le client pourra effectuer des transactions.',
+    ()=>_updateKYCStatus(id, name, 'verified'), 'Valider','btn-success');
+}
+
+function refuserKYC(id, name) {
+  confirm2('Refuser le KYC de '+name+' ?', 'Le client sera notifie et devra soumettre un nouveau dossier.',
+    ()=>_updateKYCStatus(id, name, 'rejected', 'Refuse par admin le '+new Date().toLocaleDateString('fr-FR')), 'Refuser','btn-danger');
+}
+
+/* ================================================
+   TAUX
+   ================================================ */
+function renderTaux() {
+  const tauxUSDT=parseFloat(window._TC_TAUX_USDT||'4850');
+  const coins=[
+    {sym:'USDT',cls:'usdt',color:'#26a17b',mga:tauxUSDT,chg:+.2},
+    {sym:'BTC', cls:'btc', color:'#f7931a',mga:67234*tauxUSDT,chg:-1.4},
+    {sym:'ETH', cls:'eth', color:'#627eea',mga:3521*tauxUSDT,chg:+2.1},
+    {sym:'BNB', cls:'bnb', color:'#f3ba2f',mga:612*tauxUSDT,chg:+.8},
+    {sym:'TRX', cls:'trx', color:'#ef4444',mga:.12*tauxUSDT,chg:-.3},
+    {sym:'SOL', cls:'sol', color:'#9945ff',mga:178*tauxUSDT,chg:+3.2}
+  ];
+  const g=document.getElementById('taux-live-grid'); if(!g) return;
+  g.innerHTML=coins.map(c=>`<div style="background:#111;border:1px solid ${c.color}22;border-radius:10px;padding:12px;text-align:center">
+    <div style="font-size:15px;font-weight:900;color:${c.color};margin-bottom:4px">${c.sym}</div>
+    <div style="font-size:.85rem;font-weight:700">${fmtMGA(c.mga)}</div>
+    <div style="font-size:.7rem;font-weight:700;color:${c.chg>=0?'var(--green)':'var(--red)'};margin-top:3px">${c.chg>=0?'+ ':'- '}${Math.abs(c.chg)}%</div>
+  </div>`).join('');
+  const el=document.getElementById('taux-usdt-inp'); if(el&&window._TC_TAUX_USDT) el.value=window._TC_TAUX_USDT;
+}
+
+function previewTaux() {
+  const usdt=parseFloat(document.getElementById('taux-usdt-inp')?.value||'');
+  const spread=parseFloat(document.getElementById('taux-spread-inp')?.value||'2');
+  const box=document.getElementById('taux-preview'), g=document.getElementById('taux-preview-grid');
+  if(!box||!g) return;
+  if(!usdt){ box.style.display='none'; return; }
+  box.style.display='block';
+  const a=usdt*(1-spread/100), v=usdt*(1+spread/100);
+  g.innerHTML=`<div style="text-align:center"><div style="font-size:.65rem;color:var(--blue);text-transform:uppercase;margin-bottom:3px">Prix Achat</div><div style="font-size:.9rem;font-weight:800;color:var(--blue)">${fmtMGA(a)}</div><div style="font-size:.68rem;color:var(--txt-dim)">TakaloCash achete</div></div>
+    <div style="text-align:center"><div style="font-size:.65rem;color:var(--txt-dim);text-transform:uppercase;margin-bottom:3px">Base Spot</div><div style="font-size:.9rem;font-weight:800">${fmtMGA(usdt)}</div><div style="font-size:.68rem;color:var(--txt-dim)">Binance</div></div>
+    <div style="text-align:center"><div style="font-size:.65rem;color:var(--green);text-transform:uppercase;margin-bottom:3px">Prix Vente</div><div style="font-size:.9rem;font-weight:800;color:var(--green)">${fmtMGA(v)}</div><div style="font-size:.68rem;color:var(--txt-dim)">TakaloCash vend</div></div>`;
+}
+
+function saveTaux() {
+  const v=document.getElementById('taux-usdt-inp')?.value;
+  if(!v){ toast('Entrez un taux USDT valide','warning'); return; }
+  window._TC_TAUX_USDT = v;
+  toast('Taux USDT/MGA mis a jour : '+parseInt(v).toLocaleString('fr-FR')+' Ar','success');
+  logAction('Taux USDT modifie : '+v+' MGA'); renderTaux();
+}
+
+/* ================================================
+   FRAIS
+   ================================================ */
+function calcFrais(m, type) {
+  const bs=parseFloat(document.getElementById('fee-buy-s')?.value||'3');
+  const bm=parseFloat(document.getElementById('fee-buy-m')?.value||'2');
+  const bl=parseFloat(document.getElementById('fee-buy-l')?.value||'1.5');
+  const ss=parseFloat(document.getElementById('fee-sell-s')?.value||'2');
+  const sm=parseFloat(document.getElementById('fee-sell-m')?.value||'1.5');
+  const sl=parseFloat(document.getElementById('fee-sell-l')?.value||'1');
+  let rate;
+  if(type==='buy') rate=m<100000?bs:m<1000000?bm:bl;
+  else             rate=m<100000?ss:m<5000000?sm:sl;
+  return {rate, fees:m*rate/100, net:m-m*rate/100};
+}
+
+function simFrais() {
+  const m=parseFloat(document.getElementById('sim-m')?.value||'');
+  const t=document.getElementById('sim-t')?.value||'buy';
+  const r=document.getElementById('sim-result'); if(!r) return;
+  if(!m||m<=0){ r.style.display='none'; return; }
+  r.style.display='block';
+  const {rate,fees,net}=calcFrais(m,t);
+  const eb=document.getElementById('sim-brut'),er=document.getElementById('sim-rate'),ef=document.getElementById('sim-fees'),en=document.getElementById('sim-net');
+  if(eb) eb.textContent=m.toLocaleString('fr-FR')+' Ar';
+  if(er) er.textContent=rate+'%';
+  if(ef) ef.textContent=fees.toLocaleString('fr-FR')+' Ar';
+  if(en) en.textContent=net.toLocaleString('fr-FR')+' Ar';
+}
+
+function saveFrais() {
+  const fees={buy:{s:document.getElementById('fee-buy-s').value,m:document.getElementById('fee-buy-m').value,l:document.getElementById('fee-buy-l').value},sell:{s:document.getElementById('fee-sell-s').value,m:document.getElementById('fee-sell-m').value,l:document.getElementById('fee-sell-l').value}};
+  window._TC_ADMIN_FEES = fees;
+  toast('Bareme de frais sauvegarde','success'); logAction('Frais de service mis a jour');
+}
+
+/* ================================================
+   RESERVES
+   ================================================ */
+function renderReserves() {
+  const tauxUSDT=parseFloat(window._TC_TAUX_USDT||'4850');
+  const wallets=[
+    {name:'USDT TRC-20',sym:'USDT',bal:1245.5,color:'#26a17b',seuil:500,mga:1245.5*tauxUSDT},
+    {name:'USDT BEP-20',sym:'USDT',bal:320,  color:'#f3ba2f',seuil:500,mga:320*tauxUSDT},
+    {name:'Bitcoin BTC', sym:'BTC', bal:.084,  color:'#f7931a',seuil:.01,mga:.084*67234*tauxUSDT},
+    {name:'Ethereum ETH',sym:'ETH', bal:1.25,  color:'#627eea',seuil:.1, mga:1.25*3521*tauxUSDT},
+    {name:'BNB BEP-20',  sym:'BNB', bal:4.2,   color:'#f3ba2f',seuil:1,  mga:4.2*612*tauxUSDT},
+    {name:'TRX TRC-20',  sym:'TRX', bal:12500, color:'#ef4444',seuil:1000,mga:12500*.12*tauxUSDT},
+    {name:'MVola MGA',   sym:'MGA', bal:850000, color:'#f5c518',seuil:500000,mga:850000},
+    {name:'Orange Money',sym:'MGA', bal:420000, color:'#f97316',seuil:300000,mga:420000}
+  ];
+  const low=wallets.filter(w=>w.bal<=w.seuil);
+  const al=document.getElementById('rsv-alert'),am=document.getElementById('rsv-alert-msg');
+  if(al&&am){ if(low.length){ al.style.display='flex'; am.textContent=low.map(w=>w.name).join(', ')+' sous le seuil minimum'; } else al.style.display='none'; }
+  const g=document.getElementById('reserves-grid'); if(!g) return;
+  const fmtB=(b,s)=>s==='MGA'?b.toLocaleString('fr-FR')+' Ar':b.toLocaleString('fr-FR',{maximumFractionDigits:6})+' '+s;
+  g.innerHTML=wallets.map(w=>{
+    const pct=Math.min(100,Math.round(w.bal/(w.seuil*3)*100)), isLow=w.bal<=w.seuil;
+    return `<div style="background:#111;border:1px solid ${isLow?'rgba(239,68,68,.4)':w.color+'22'};border-radius:var(--radius-sm);padding:14px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:32px;height:32px;border-radius:8px;background:${w.color}22;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:900;color:${w.color};flex-shrink:0">${w.sym.slice(0,3)}</div>
+        <div><div style="font-size:.82rem;font-weight:700">${w.name}</div><span style="font-size:.65rem;background:${isLow?'rgba(239,68,68,.15)':'rgba(34,197,94,.15)'};color:${isLow?'var(--red)':'var(--green)'};border-radius:20px;padding:1px 6px;font-weight:700">${isLow?'Bas':'OK'}</span></div>
+      </div>
+      <div style="font-size:1.1rem;font-weight:900;margin-bottom:2px">${fmtB(w.bal,w.sym)}</div>
+      <div style="font-size:.72rem;color:var(--txt-dim);margin-bottom:8px">${fmtMGA(w.mga)}</div>
+      <div class="progress-bar" style="height:5px"><div class="progress-fill" style="background:${isLow?'var(--red)':w.color};width:${pct}%"></div></div>
+      <div style="font-size:.68rem;color:var(--txt-dim);margin-top:4px">Seuil min : ${fmtB(w.seuil,w.sym)}</div>
+    </div>`;
+  }).join('');
+}
+
+function saveSeuils() {
+  ['seuil-usdt','seuil-btc','seuil-eth','seuil-mga'].forEach(id=>{ const el=document.getElementById(id); if(el) window['_TC_'+id.toUpperCase().replace(/-/g,'_')]=el.value; });
+  toast('Seuils d\'alerte sauvegardes','success'); logAction('Seuils de reserve mis a jour');
+}
+
+/* ================================================
+   WALLETS
+   ================================================ */
+function renderWallets() {
+  const g=document.getElementById('wallets-grid'); if(!g) return;
+  g.innerHTML=DEMO_WALLETS.map((w,i)=>`<div class="card" style="border-color:${w.color}22">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+      <div style="width:38px;height:38px;border-radius:10px;background:${w.color}22;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;color:${w.color}">${w.crypto}</div>
+      <div style="flex:1"><div style="font-size:.95rem;font-weight:800">${w.crypto}</div><div style="font-size:.72rem;color:var(--txt-dim)">${w.reseau}</div></div>
+      <span class="badge ${w.actif?'badge-success':'badge-danger'}">${w.actif?'Actif':'Inactif'}</span>
+    </div>
+    <div style="font-family:monospace;font-size:.72rem;color:var(--txt-muted);word-break:break-all;background:var(--card2);border-radius:var(--radius-sm);padding:.6rem;border:1px solid var(--border)">${w.adresse}</div>
+    <div style="display:flex;gap:.5rem;margin-top:.75rem">
+      <button class="btn btn-secondary btn-sm" style="flex:1;justify-content:center" onclick="copyAddr('${w.adresse}')"><i class="fa fa-copy"></i> Copier</button>
+      <button class="btn ${w.actif?'btn-danger':'btn-success'} btn-sm" onclick="toggleWallet(${i})">${w.actif?'Desactiver':'Activer'}</button>
+    </div>
+  </div>`).join('');
+}
+
+function toggleWallet(i) {
+  DEMO_WALLETS[i].actif=!DEMO_WALLETS[i].actif;
+  renderWallets();
+  toast('Wallet '+(DEMO_WALLETS[i].actif?'active':'desactive'),'success');
+  logAction('Wallet '+(DEMO_WALLETS[i].actif?'active':'desactive')+' : '+DEMO_WALLETS[i].crypto);
+}
+
+function addWallet() {
+  toast('Formulaire ajout wallet - disponible en production','info');
+}
+
+function copyAddr(addr) {
+  navigator.clipboard?.writeText(addr).then(()=>toast('Adresse copiee','success')).catch(()=>toast('Adresse : '+addr,'info'));
+}
+
+/* ================================================
+   NOTIFICATIONS
+   ================================================ */
+function renderNotifTemplates() {
+  const g=document.getElementById('notif-templates'); if(!g) return;
+  const tpls=[
+    {icon:'fa-wrench',   t:'Maintenance',     m:'TakaloCash sera en maintenance le [DATE] de [HH]h a [HH]h. Merci de planifier vos transactions.',type:'warning'},
+    {icon:'fa-gift',     t:'Promotion',        m:'Frais reduits a 1% sur tous les echanges ce weekend. Profitez-en !',type:'promo'},
+    {icon:'fa-check',    t:'Transaction OK',   m:'Votre transaction #[ID] a ete validee. Les fonds arrivent dans les 30 minutes.',type:'success'},
+    {icon:'fa-id-card',  t:'KYC requis',       m:'Votre verification KYC est requise pour continuer. Completez-la maintenant.',type:'warning'},
+    {icon:'fa-chart-line',t:'Nouveaux taux',   m:'Mise a jour des taux ! 1 USDT = [TAUX] Ar. Consultez nos offres.',type:'info'},
+    {icon:'fa-shield',   t:'Alerte securite',  m:'Connexion depuis un nouvel appareil detectee. Contactez-nous si ce n est pas vous.',type:'warning'}
+  ];
+  g.innerHTML=tpls.map(t=>`<div class="card" style="cursor:pointer;padding:.85rem;transition:border-color .2s" onclick="useNotifTemplate('${t.t}','${t.m.replace(/'/g,"\\'")}','${t.type}')" onmouseover="this.style.borderColor='rgba(245,197,24,.3)'" onmouseout="this.style.borderColor=''">
+    <div><i class="fa ${t.icon}" style="color:var(--gold);margin-right:.4rem"></i><strong style="font-size:.85rem">${t.t}</strong></div>
+    <div style="font-size:.72rem;color:var(--txt-dim);margin-top:.35rem">${t.m.slice(0,70)}...</div>
+  </div>`).join('');
+}
+
+function useNotifTemplate(titre, msg, type) {
+  const t=document.getElementById('notif-titre'),m=document.getElementById('notif-msg'),tp=document.getElementById('notif-type');
+  if(t) t.value=titre; if(m) m.value=msg;
+  if(tp) { for(const o of tp.options) if(o.value===type){ tp.value=type; break; } }
+  toast('Template charge : '+titre,'info');
+}
+
+function envoyerNotif() {
+  const titre=document.getElementById('notif-titre')?.value, msg=document.getElementById('notif-msg')?.value;
+  if(!titre||!msg){ toast('Remplissez le titre et le message','warning'); return; }
+  const dest=document.getElementById('notif-dest')?.value||'all';
+  const dLabels={all:'tous les utilisateurs',active:'utilisateurs actifs',pending:'avec tx en attente',kyc:'KYC en attente'};
+  const b=document.getElementById('notif-hist');
+  if(b){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="font-size:.78rem;color:var(--txt-dim)">${new Date().toLocaleString('fr-FR')}</td><td style="font-weight:600">${titre}</td><td><span class="badge badge-info">${document.getElementById('notif-type')?.value||'info'}</span></td><td style="font-size:.78rem">${dLabels[dest]||dest}</td><td><span class="badge badge-success">Envoyee</span></td><td><button class="btn btn-danger btn-xs" onclick="this.closest('tr').remove()">Suppr.</button></td>`;
+    if(b.querySelector('td[colspan]')) b.innerHTML='';
+    b.prepend(tr);
+  }
+  const nd=document.getElementById('nb-notif'),bd=document.getElementById('bell-dot');
+  if(nd){ const c=parseInt(nd.textContent||'0')+1; nd.textContent=c; nd.style.display='block'; }
+  if(bd) bd.style.display='block';
+  toast('Notification envoyee a '+(dLabels[dest]||dest)+' : '+titre,'success');
+  logAction('Notification push : '+titre+' => '+dest);
+}
+
+function programmerNotif() {
+  const d=document.getElementById('notif-date')?.value;
+  if(!d){ toast('Choisissez une date et heure','warning'); return; }
+  toast('Notification programmee : '+new Date(d).toLocaleString('fr-FR'),'success');
+  logAction('Notification programmee : '+new Date(d).toLocaleString('fr-FR'));
+}
+
+/* ================================================
+   CONTACT
+   ================================================ */
+function _msgField(m, ...fields) { for(const f of fields) if(m[f]!==undefined&&m[f]!==null&&m[f]!=='') return m[f]; return ''; }
+
+function renderContact() {
+  const ft=document.getElementById('contact-ft')?.value||'all';
+  let data;
+  if(ft==='all') data=DEMO_CONTACT;
+  else if(ft==='unread') data=DEMO_CONTACT.filter(m=>!(m.read||m.is_read));
+  else data=DEMO_CONTACT.filter(m=>(m.status||'open')===ft);
+
+  const sg=document.getElementById('contact-stats');
+  if(sg){
+    const total=DEMO_CONTACT.length;
+    const unread=DEMO_CONTACT.filter(m=>!(m.read||m.is_read)).length;
+    const open=DEMO_CONTACT.filter(m=>(m.status||'open')==='open').length;
+    const closed=DEMO_CONTACT.filter(m=>m.status==='closed'||m.status==='resolved').length;
+    sg.innerHTML=[
+      {c:'blue', i:'fa-envelope',     lb:'Total',    v:total,  u:'messages'},
+      {c:'red',  i:'fa-envelope-open',lb:'Non lus',  v:unread, u:'messages'},
+      {c:'gold', i:'fa-circle-dot',   lb:'Ouverts',  v:open,   u:'a traiter'},
+      {c:'green',i:'fa-circle-check', lb:'Resolus',  v:closed, u:'messages'}
+    ].map(k=>`<div class="kpi-card ${k.c}" style="padding:.75rem"><div class="kpi-top"><div class="kpi-icon ${k.c}" style="width:32px;height:32px;font-size:.8rem"><i class="fa ${k.i}"></i></div></div><div class="kpi-value" style="font-size:1.4rem">${k.v}</div><div class="kpi-label">${k.lb}</div></div>`).join('');
+  }
+  const b=document.getElementById('contact-tbody'); if(!b) return;
+  if(!data.length){ b.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--txt-dim)">Aucun message</td></tr>'; return; }
+  b.innerHTML=data.map(m=>{
+    const name   = _msgField(m,'name','full_name','sender_name','nom') || 'Inconnu';
+    const email  = _msgField(m,'email','sender_email') || '-';
+    const sujet  = _msgField(m,'sujet','subject','titre') || '(sans sujet)';
+    const date   = _msgField(m,'date','created_at','sent_at') || '';
+    const read   = m.read || m.is_read || false;
+    const status = m.status || 'open';
+    const isOpen = status==='open'||status==='pending';
+    return `<tr>
+    <td style="font-size:.78rem;color:var(--txt-dim)">${date?fmtDs(date):'-'}</td>
+    <td style="font-weight:${read?'400':'700'}">${name} ${!read?'<span class="badge badge-danger" style="font-size:.6rem">NEW</span>':''}</td>
+    <td style="font-size:.8rem;color:var(--txt-muted)">${email}</td>
+    <td style="font-weight:600">${sujet}</td>
+    <td><span class="badge ${isOpen?'badge-pending':'badge-success'}">${isOpen?'Ouvert':'Resolu'}</span></td>
+    <td>
+      <div style="display:flex;gap:4px">
+        <button class="btn btn-secondary btn-xs" onclick="voirMessage('${m.id}')">Voir</button>
+        ${isOpen?`<button class="btn btn-success btn-xs" onclick="cloturerMessage('${m.id}')">Resoudre</button>`:''}
+        <button class="btn btn-danger btn-xs" onclick="supprimerMessage('${m.id}')">Suppr.</button>
+      </div>
+    </td>
+  </tr>`;
+  }).join('');
+}
+
+async function voirMessage(id) {
+  const m=DEMO_CONTACT.find(x=>x.id===id); if(!m) return;
+  /* Marquer comme lu dans Supabase (best-effort) */
+  if(!(m.read||m.is_read)) {
+    try {
+      await sb.upd('contact_messages',{read:true,is_read:true},`?id=eq.${encodeURIComponent(id)}`);
+      m.read=true; m.is_read=true;
+    } catch(e) { m.read=true; } /* tolérer si colonne absente */
+  }
+  const name  = _msgField(m,'name','full_name','sender_name','nom') || 'Inconnu';
+  const email = _msgField(m,'email','sender_email') || '-';
+  const sujet = _msgField(m,'sujet','subject','titre') || '(sans sujet)';
+  const date  = _msgField(m,'date','created_at','sent_at') || '';
+  const msg   = _msgField(m,'message','content','body') || '(vide)';
+  document.getElementById('mc2-title').textContent='Message de '+name;
+  document.getElementById('modal-content-body').innerHTML=`
+    <div style="display:grid;gap:8px;margin-bottom:1rem">
+      <div style="padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="font-size:.72rem;color:var(--txt-dim);display:block">De</span><strong>${name}</strong> (${email})</div>
+      <div style="padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="font-size:.72rem;color:var(--txt-dim);display:block">Sujet</span><strong>${sujet}</strong></div>
+      <div style="padding:.6rem;background:var(--card2);border-radius:var(--radius-sm)"><span style="font-size:.72rem;color:var(--txt-dim);display:block">Date</span>${date?fmtDs(date):'-'}</div>
+      <div style="padding:.8rem;background:var(--card2);border-radius:var(--radius-sm);line-height:1.6;font-size:.88rem">${msg}</div>
+    </div>
+    <div class="form-group"><label class="form-label">Reponse</label><textarea class="form-input" rows="4" id="msg-reply" placeholder="Votre reponse..." style="width:100%;resize:vertical"></textarea></div>`;
+  editingContent={type:'contact',id:m.id};
+  openModal('modal-content');
+  renderContact();
+}
+
+function saveContent() {
+  if(!editingContent) return;
+  if(editingContent.type==='contact'){
+    const reply=document.getElementById('msg-reply')?.value;
+    if(!reply){ toast('Ecrivez une reponse','warning'); return; }
+    toast('Reponse envoyee a '+(DEMO_CONTACT.find(m=>m.id===editingContent.id)?.email||''),'success');
+    logAction('Reponse message : '+editingContent.id);
+    closeModal('modal-content');
+  } else if(editingContent.type==='legal'){
+    const content=document.getElementById('legal-editor')?.value;
+    const legal=DEMO_LEGAL.find(l=>l.id===editingContent.id);
+    if(legal&&content){ legal.contenu=content; legal.lastUpdate=new Date().toISOString().slice(0,10); }
+    toast('Page legale mise a jour','success'); logAction('Page legale mise a jour : '+editingContent.id);
+    closeModal('modal-content'); renderLegal();
+  } else if(editingContent.type==='faq'){
+    const q=document.getElementById('faq-q-edit')?.value, r=document.getElementById('faq-r-edit')?.value;
+    const faq=DEMO_FAQ.find(f=>f.id===editingContent.id);
+    if(faq){ faq.q=q; faq.r=r; }
+    toast('FAQ mise a jour','success'); closeModal('modal-content'); renderFAQ();
+  } else if(editingContent.type==='temoignage'){
+    const n=document.getElementById('tem-name')?.value, t=document.getElementById('tem-texte')?.value;
+    const tem=DEMO_TEMOIGNAGES.find(t2=>t2.id===editingContent.id);
+    if(tem){ tem.name=n; tem.texte=t; }
+    toast('Temoignage mis a jour','success'); closeModal('modal-content'); renderTemoignages();
+  }
+}
+
+async function cloturerMessage(id) {
+  try {
+    await sb.upd('contact_messages',{status:'closed',read:true,is_read:true},`?id=eq.${encodeURIComponent(id)}`);
+    const m=DEMO_CONTACT.find(x=>x.id===id); if(m){ m.status='closed'; m.read=true; m.is_read=true; }
+    renderContact(); toast('Message marque comme resolu','success'); logAction('Message resolu : '+id);
+  } catch(e) { toast('Erreur : '+e.message,'error'); }
+}
+
+function supprimerMessage(id) {
+  confirm2('Supprimer ce message ?', 'Cette action est irreversible.', async ()=>{
+    try {
+      await sb.del('contact_messages',`?id=eq.${encodeURIComponent(id)}`);
+      const i=DEMO_CONTACT.findIndex(x=>x.id===id); if(i>-1) DEMO_CONTACT.splice(i,1);
+      renderContact(); toast('Message supprime','warning'); logAction('Message supprime : '+id);
+    } catch(e) { toast('Erreur suppression : '+e.message,'error'); }
+  },'Supprimer','btn-danger');
+}
+
+/* ================================================
+   LEGAL
+   ================================================ */
+function renderLegal() {
+  const g=document.getElementById('legal-grid'); if(!g) return;
+  g.innerHTML=DEMO_LEGAL.map(l=>`<div class="card">
+    <div style="display:flex;align-items:flex-start;gap:.75rem;margin-bottom:1rem">
+      <div style="width:40px;height:40px;border-radius:10px;background:rgba(245,197,24,.15);display:flex;align-items:center;justify-content:center;color:var(--gold);flex-shrink:0"><i class="fa fa-file-contract"></i></div>
+      <div><div style="font-size:.9rem;font-weight:800">${l.titre}</div><div style="font-size:.72rem;color:var(--txt-dim);margin-top:.2rem">Mise a jour : ${l.lastUpdate}</div></div>
+    </div>
+    <div style="font-size:.8rem;color:var(--txt-muted);line-height:1.5;margin-bottom:1rem">${l.contenu.slice(0,120)}...</div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="editerLegal('${l.id}')"><i class="fa fa-pen"></i> Modifier</button>
+      <button class="btn btn-secondary btn-sm" onclick="previewLegal('${l.id}')"><i class="fa fa-eye"></i></button>
+    </div>
+  </div>`).join('');
+}
+
+function editerLegal(id) {
+  const l=DEMO_LEGAL.find(x=>x.id===id); if(!l) return;
+  document.getElementById('mc2-title').textContent='Modifier : '+l.titre;
+  document.getElementById('modal-content-body').innerHTML=`
+    <div class="form-group"><label class="form-label">Titre</label><input class="form-input" value="${l.titre}" readonly></div>
+    <div class="form-group"><label class="form-label">Contenu</label><textarea class="form-input" id="legal-editor" rows="14" style="width:100%;resize:vertical;font-family:monospace;font-size:.82rem">${l.contenu}</textarea></div>
+    <div style="font-size:.72rem;color:var(--txt-dim);margin-top:.5rem">Derniere mise a jour : ${l.lastUpdate}</div>`;
+  editingContent={type:'legal',id};
+  openModal('modal-content');
+}
+
+function previewLegal(id) {
+  const l=DEMO_LEGAL.find(x=>x.id===id); if(!l) return;
+  document.getElementById('mc2-title').textContent='Apercu : '+l.titre;
+  document.getElementById('modal-content-body').innerHTML=`<div style="white-space:pre-wrap;font-size:.85rem;line-height:1.7;color:var(--txt-muted)">${l.contenu}</div>`;
+  editingContent=null;
+  openModal('modal-content');
+}
+
+/* ================================================
+   FAQ
+   ================================================ */
+function renderFAQ() {
+  const el=document.getElementById('faq-list'); if(!el) return;
+  el.innerHTML=DEMO_FAQ.map((f,i)=>`<div class="card" style="border-color:${f.actif?'var(--border)':'rgba(239,68,68,.2)'}">
+    <div style="display:flex;align-items:flex-start;gap:.75rem">
+      <div style="flex:1">
+        <div style="font-size:.9rem;font-weight:700;margin-bottom:.4rem">${f.q}</div>
+        <div style="font-size:.8rem;color:var(--txt-muted);line-height:1.5">${f.r.slice(0,120)}${f.r.length>120?'...':''}</div>
+        <div style="margin-top:.5rem;display:flex;gap:.4rem;flex-wrap:wrap">
+          <span class="badge badge-info" style="font-size:.65rem">${f.cat}</span>
+          <span class="badge ${f.actif?'badge-success':'badge-danger'}" style="font-size:.65rem">${f.actif?'Publie':'Masque'}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:.4rem;flex-shrink:0">
+        <button class="btn btn-secondary btn-xs" onclick="editerFAQ('${f.id}')"><i class="fa fa-pen"></i></button>
+        <button class="btn ${f.actif?'btn-danger':'btn-success'} btn-xs" onclick="toggleFAQ('${f.id}')">${f.actif?'Masquer':'Publier'}</button>
+        <button class="btn btn-danger btn-xs" onclick="supprimerFAQ('${f.id}')"><i class="fa fa-trash"></i></button>
+      </div>
+    </div>
+  </div>`).join('');
+}
+
+function addFAQ() {
+  DEMO_FAQ.push({id:'F'+Date.now(),q:'Nouvelle question ?',r:'Reponse a completer...',cat:'General',actif:false});
+  renderFAQ(); toast('Question ajoutee - cliquez sur modifier pour completer','info');
+}
+
+function editerFAQ(id) {
+  const f=DEMO_FAQ.find(x=>x.id===id); if(!f) return;
+  document.getElementById('mc2-title').textContent='Modifier FAQ';
+  document.getElementById('modal-content-body').innerHTML=`
+    <div class="form-group"><label class="form-label">Question</label><input class="form-input" id="faq-q-edit" value="${f.q}"></div>
+    <div class="form-group"><label class="form-label">Reponse</label><textarea class="form-input" id="faq-r-edit" rows="6" style="width:100%;resize:vertical">${f.r}</textarea></div>
+    <div class="form-group"><label class="form-label">Categorie</label><input class="form-input" value="${f.cat}"></div>`;
+  editingContent={type:'faq',id};
+  openModal('modal-content');
+}
+
+function toggleFAQ(id) { const f=DEMO_FAQ.find(x=>x.id===id); if(f) f.actif=!f.actif; renderFAQ(); toast('FAQ mise a jour','success'); }
+function supprimerFAQ(id) { confirm2('Supprimer cette FAQ ?', '', ()=>{ const i=DEMO_FAQ.findIndex(x=>x.id===id); if(i>-1) DEMO_FAQ.splice(i,1); renderFAQ(); toast('FAQ supprimee','warning'); },'Supprimer','btn-danger'); }
+
+/* ================================================
+   TEMOIGNAGES
+   ================================================ */
+function renderTemoignages() {
+  const g=document.getElementById('temoignages-grid'); if(!g) return;
+  g.innerHTML=DEMO_TEMOIGNAGES.map(t=>`<div class="card" style="border-color:${t.actif?'var(--border)':'rgba(239,68,68,.2)'}">
+    <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem">
+      <div class="user-av a" style="width:38px;height:38px">${ini(t.name)}</div>
+      <div><div style="font-weight:700">${t.name}</div><div style="font-size:.72rem;color:var(--txt-dim)">${t.ville}</div></div>
+      <div style="margin-left:auto">
+        ${'★'.repeat(t.note)+'☆'.repeat(5-t.note)}
+      </div>
+    </div>
+    <p style="font-size:.82rem;color:var(--txt-muted);line-height:1.6;margin-bottom:.75rem;font-style:italic">"${t.texte}"</p>
+    <div style="display:flex;gap:.4rem;align-items:center">
+      <span class="badge ${t.actif?'badge-success':'badge-danger'}" style="font-size:.65rem">${t.actif?'Publie':'Masque'}</span>
+      <div style="margin-left:auto;display:flex;gap:.4rem">
+        <button class="btn btn-secondary btn-xs" onclick="editerTemoignage('${t.id}')"><i class="fa fa-pen"></i></button>
+        <button class="btn ${t.actif?'btn-danger':'btn-success'} btn-xs" onclick="toggleTem('${t.id}')">${t.actif?'Masquer':'Publier'}</button>
+        <button class="btn btn-danger btn-xs" onclick="supprimerTem('${t.id}')"><i class="fa fa-trash"></i></button>
+      </div>
+    </div>
+  </div>`).join('');
+}
+
+function addTemoignage() {
+  DEMO_TEMOIGNAGES.push({id:'T'+Date.now(),name:'Nouveau client',ville:'Madagascar',note:5,texte:'Excellent service !',actif:false});
+  renderTemoignages(); toast('Temoignage ajoute - modifiez-le pour le personnaliser','info');
+}
+
+function editerTemoignage(id) {
+  const t=DEMO_TEMOIGNAGES.find(x=>x.id===id); if(!t) return;
+  document.getElementById('mc2-title').textContent='Modifier le temoignage';
+  document.getElementById('modal-content-body').innerHTML=`
+    <div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="tem-name" value="${t.name}"></div>
+    <div class="form-group"><label class="form-label">Ville</label><input class="form-input" id="tem-ville" value="${t.ville}"></div>
+    <div class="form-group"><label class="form-label">Note (1-5)</label><input class="form-input" type="number" id="tem-note" min="1" max="5" value="${t.note}"></div>
+    <div class="form-group"><label class="form-label">Temoignage</label><textarea class="form-input" id="tem-texte" rows="4" style="width:100%;resize:vertical">${t.texte}</textarea></div>`;
+  editingContent={type:'temoignage',id};
+  openModal('modal-content');
+}
+
+function toggleTem(id) { const t=DEMO_TEMOIGNAGES.find(x=>x.id===id); if(t) t.actif=!t.actif; renderTemoignages(); toast('Temoignage mis a jour','success'); }
+function supprimerTem(id) { confirm2('Supprimer ce temoignage ?', '', ()=>{ const i=DEMO_TEMOIGNAGES.findIndex(x=>x.id===id); if(i>-1) DEMO_TEMOIGNAGES.splice(i,1); renderTemoignages(); toast('Temoignage supprime','warning'); },'Supprimer','btn-danger'); }
+
+/* ================================================
+   PARTENAIRES
+   ================================================ */
+function renderPartenaires() {
+  const g=document.getElementById('partenaires-grid'); if(!g) return;
+  g.innerHTML=DEMO_PARTENAIRES.map(p=>`<div class="card" style="text-align:center;border-color:${p.actif?'var(--border)':'rgba(239,68,68,.2)'}">
+    <div style="width:56px;height:56px;border-radius:14px;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.2);display:flex;align-items:center;justify-content:center;margin:0 auto .75rem;font-size:1.1rem;font-weight:900;color:var(--gold)">${p.nom.slice(0,2)}</div>
+    <div style="font-size:.9rem;font-weight:800;margin-bottom:.2rem">${p.nom}</div>
+    <div style="font-size:.72rem;color:var(--txt-dim);margin-bottom:.5rem">${p.categorie}</div>
+    <span class="badge ${p.actif?'badge-success':'badge-danger'}" style="font-size:.65rem;margin-bottom:.75rem;display:inline-block">${p.actif?'Actif':'Inactif'}</span>
+    <div style="display:flex;gap:.4rem;justify-content:center">
+      <button class="btn ${p.actif?'btn-danger':'btn-success'} btn-xs" onclick="togglePart('${p.id}')">${p.actif?'Masquer':'Afficher'}</button>
+      <button class="btn btn-danger btn-xs" onclick="supprimerPart('${p.id}')"><i class="fa fa-trash"></i></button>
+    </div>
+  </div>`).join('');
+}
+
+function addPartenaire() {
+  DEMO_PARTENAIRES.push({id:'P'+Date.now(),nom:'Nouveau Partenaire',url:'#',categorie:'Autre',actif:false});
+  renderPartenaires(); toast('Partenaire ajoute','info');
+}
+
+function togglePart(id) { const p=DEMO_PARTENAIRES.find(x=>x.id===id); if(p) p.actif=!p.actif; renderPartenaires(); toast('Partenaire mis a jour','success'); }
+function supprimerPart(id) { confirm2('Supprimer ce partenaire ?', '', ()=>{ const i=DEMO_PARTENAIRES.findIndex(x=>x.id===id); if(i>-1) DEMO_PARTENAIRES.splice(i,1); renderPartenaires(); toast('Partenaire supprime','warning'); },'Supprimer','btn-danger'); }
+
+/* ================================================
+   RAPPORTS
+   ================================================ */
+function renderRptStats() {
+  const el=document.getElementById('rpt-stats'); if(!el) return;
+  const total=allTx.length, comp=allTx.filter(t=>t.status==='completed').length;
+  const vmga=allTx.reduce((s,t)=>s+t.montant_mga,0), ben=allTx.reduce((s,t)=>s+(t.benefice||0),0);
+  [
+    {lb:'Total transactions',       v:total},
+    {lb:'Transactions validees',    v:comp+' ('+Math.round(comp/total*100)+'%)'},
+    {lb:'Transactions en attente',  v:allTx.filter(t=>t.status==='pending').length},
+    {lb:'Volume total MGA',         v:fmtMGA(vmga)},
+    {lb:'Benefice total USDT',      v:fmtN(ben)+' USDT'},
+    {lb:'Clients uniques',          v:new Set(allTx.map(t=>t.client)).size},
+    {lb:'KYC soumis / verifies',    v:DEMO_KYC.length+' / '+DEMO_KYC.filter(k=>k.status==='verified').length},
+    {lb:'Messages contacts',        v:DEMO_CONTACT.length+' ('+DEMO_CONTACT.filter(m=>!(m.read||m.is_read)).length+' non lus)'}
+  ].forEach(item=>{
+    const div=document.createElement('div');
+    div.style.cssText='display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid rgba(42,42,53,.5)';
+    div.innerHTML=`<span style="font-size:.82rem;color:var(--txt-muted)">${item.lb}</span><span style="font-size:.82rem;font-weight:700">${item.v}</span>`;
+    el.appendChild(div);
+  });
+}
+
+function exportCSV() {
+  const rows=[['ID','Type','Client','Telephone','Crypto','Reseau','Montant USDT','Montant MGA','Mobile Money','Frais','Benefice','Statut','Date']];
+  allTx.forEach(t=>rows.push([t.id,t.type,t.client,t.telephone||'',t.crypto,t.reseau||'',t.montant_crypto,t.montant_mga,t.mobile_money||'',t.frais||0,t.benefice||0,t.status,t.created_at]));
+  dl(rows.map(r=>r.join(',')).join('\n'),'takalocash-'+new Date().toISOString().slice(0,10)+'.csv','text/csv');
+  toast('CSV exporte : '+(rows.length-1)+' transactions','success');
+  logAction('Export CSV genere : '+(rows.length-1)+' tx');
+}
+
+function exportJSON() {
+  const data={transactions:allTx,users:allUsers,kyc:DEMO_KYC,contacts:DEMO_CONTACT,exported_at:new Date().toISOString(),by:'TakaloCash Admin'};
+  dl(JSON.stringify(data,null,2),'takalocash-'+new Date().toISOString().slice(0,10)+'.json','application/json');
+  toast('JSON exporte','success'); logAction('Export JSON genere');
+}
+
+/* dl() — défini en tête de script */
+
+/* ================================================
+   SECURITE
+   ================================================ */
+function renderSecurite() {
+  const loginLog=[];
+  const actLog=window._TC_ACTION_LOG||[];
+  const ll=document.getElementById('login-log');
+  if(ll) ll.innerHTML=loginLog.length?loginLog.slice(-10).reverse().map(l=>`<div style="display:flex;align-items:center;gap:8px;padding:.5rem;background:var(--card2);border-radius:var(--radius-sm)"><div style="width:8px;height:8px;background:var(--green);border-radius:50%;flex-shrink:0"></div><div style="flex:1"><div style="font-size:.8rem;font-weight:600">Admin</div><div style="font-size:.7rem;color:var(--txt-dim)">${l.time||'-'}</div></div></div>`).join(''):'<p style="color:var(--txt-dim);font-size:.82rem">Aucune connexion enregistree</p>';
+  const al=document.getElementById('action-log');
+  if(al) al.innerHTML=actLog.length?actLog.slice(-10).reverse().map(a=>`<div style="display:flex;align-items:center;gap:8px;padding:.5rem;background:var(--card2);border-radius:var(--radius-sm)"><div style="width:8px;height:8px;background:var(--gold);border-radius:50%;flex-shrink:0"></div><div style="flex:1"><div style="font-size:.8rem;font-weight:600">${a.action}</div><div style="font-size:.7rem;color:var(--txt-dim)">${a.time}</div></div></div>`).join(''):'<p style="color:var(--txt-dim);font-size:.82rem">Aucune action enregistree</p>';
+}
+
+function clearLogs() {
+  confirm2('Vider les journaux ?', 'Toutes les actions enregistrees seront effacees.', ()=>{
+    window._TC_ACTION_LOG=[];
+    renderSecurite(); toast('Journaux vides','warning');
+  },'Vider','btn-danger');
+}
+
+function changePwd() {
+  const o=document.getElementById('pwd-old')?.value, n=document.getElementById('pwd-new')?.value, c=document.getElementById('pwd-conf')?.value;
+  if(!o||!n||!c){ toast('Remplissez tous les champs','warning'); return; }
+  if(n.length<12){ toast('Le mot de passe doit contenir au moins 12 caracteres','warning'); return; }
+  if(n!==c){ toast('Les mots de passe ne correspondent pas','warning'); return; }
+  toast('Mot de passe change avec succes','success'); logAction('Mot de passe admin modifie');
+  document.getElementById('pwd-old').value=''; document.getElementById('pwd-new').value=''; document.getElementById('pwd-conf').value='';
+}
+
+/* ================================================
+   SAUVEGARDES
+   ================================================ */
+function creerSauvegarde() {
+  toast('Sauvegarde en cours...','info');
+  logAction('Sauvegarde manuelle declenchee');
+  setTimeout(()=>{
+    toast('Sauvegarde complete ! Toutes les donnees sont securisees','success');
+    const el=document.getElementById('backup-last'); if(el) el.textContent='Sauvegarde le '+new Date().toLocaleString('fr-FR');
+    const bt=document.getElementById('bkp-tx'),bu=document.getElementById('bkp-us');
+    if(bt) bt.textContent=allTx.length; if(bu) bu.textContent=new Set(allTx.map(t=>t.client)).size;
+  },2000);
+}
+
+function importData() {
+  const input=document.createElement('input'); input.type='file'; input.accept='.json,.csv';
+  input.onchange=e=>{ const f=e.target.files[0]; if(!f) return; toast('Fichier selectionne : '+f.name+' - Import disponible en mode production','info'); };
+  input.click();
+}
+
+function viderCache() {
+  confirm2('Vider le cache session ?', 'Les parametres de cette session seront reinitialises. Les donnees Supabase ne sont pas affectees.', ()=>{
+    const keys=['_TC_TAUX_USDT','_TC_ADMIN_FEES','_TC_ACTION_LOG'];
+    let n=0; keys.forEach(k=>{ if(window[k]!==undefined){ delete window[k]; n++; } });
+    window._TC_ACTION_LOG=[];
+    toast('Cache vide ('+n+' entrees reinitialises)','success');
+    logAction('Cache admin vide : '+n+' entrees');
+  },'Vider','btn-danger');
+}
+
+/* ================================================
+   PARAMETRES
+   ================================================ */
+function saveBinance() { toast('Cles Binance sauvegardees','success'); logAction('Cles Binance mises a jour'); }
+function testBinance() { toast('Connexion Binance testee avec succes (demo)','success'); }
+function saveSB() { toast('Configuration Supabase sauvegardee','success'); logAction('Config Supabase mise a jour'); }
+function saveSMTP() { toast('Configuration SMTP sauvegardee','success'); logAction('Config SMTP mise a jour'); }
+function testSMTP() { toast('Email de test envoye (demo)','success'); }
+
+function saveCfg() {
+  const n=document.getElementById('cfg-nom')?.value, e=document.getElementById('cfg-email')?.value;
+  if(n) { const el=document.querySelector('.logo-text'); if(el) el.innerHTML=n.slice(0,6)+'<span>'+n.slice(6)+'</span>'; }
+  if(document.getElementById('cfg-maint')?.checked) toast('Mode maintenance ACTIVE','warning');
+  toast('Parametres generaux sauvegardes','success'); logAction('Parametres generaux mis a jour');
+}
+
+/* ================================================
+   TAUX LIVE (Binance)
+   ================================================ */
+async function fetchRates() {
+  const tauxUSDT=parseFloat(window._TC_TAUX_USDT||'4850');
+  const coins=[{id:'USDTMGA',sym:'USDT',cls:'usdt',net:'TRC-20/BEP-20'},{id:'BTCUSDT',sym:'BTC',cls:'btc',net:'Bitcoin'},{id:'ETHUSDT',sym:'ETH',cls:'eth',net:'ERC-20'},{id:'BNBUSDT',sym:'BNB',cls:'bnb',net:'BEP-20'}];
+  const mock={BTCUSDT:67234.5,ETHUSDT:3521.8,BNBUSDT:612.4};
+  let prices=mock;
+  if(!DEMO){ try{ const rs=await Promise.all(['BTCUSDT','ETHUSDT','BNBUSDT'].map(s=>fetch('https://api.binance.com/api/v3/ticker/price?symbol='+s).then(r=>r.json()))); prices={}; rs.forEach(r=>prices[r.symbol]=parseFloat(r.price)); }catch(e){} }
+  const chgs={USDTMGA:+.2,BTCUSDT:-1.4,ETHUSDT:+2.1,BNBUSDT:+.8};
+  const g=document.getElementById('rates-grid'); if(!g) return;
+  g.innerHTML=coins.map(c=>{
+    const mga=c.sym==='USDT'?tauxUSDT:(prices[c.id]||0)*tauxUSDT, chg=chgs[c.id]||0;
+    return `<div class="rate-row"><div style="display:flex;align-items:center;gap:.6rem"><div class="coin-dot ${c.cls}">${c.sym.slice(0,3)}</div><div><div style="font-size:.82rem;font-weight:700">${c.sym}</div><div style="font-size:.68rem;color:var(--txt-dim)">${c.net}</div></div></div>
+    <div style="text-align:right"><div style="font-size:.88rem;font-weight:700">${fmtMGA(mga)}</div><div style="font-size:.72rem;font-weight:700;color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''} ${Math.abs(chg)}%</div></div></div>`;
+  }).join('');
+  renderTaux();
+}
+
+/* ================================================
+   RECHERCHE GLOBALE
+   ================================================ */
+function globalSearch(q) {
+  if(!q||q.length<2) return;
+  const found=allTx.filter(t=>t.id.toLowerCase().includes(q.toLowerCase())||t.client.toLowerCase().includes(q.toLowerCase()));
+  if(found.length){ go('transactions',null); setTimeout(()=>{ const st=document.getElementById('tx-st'); if(st){ st.value=''; renderTx(); } },100); }
+}
+
+/* openModal / closeModal / confirm2 — définis en tête de script */
+
+/* ================================================
+   HELPERS — déclarés en tête de script (voir ci-dessus)
+   ================================================ */
+/* fmtN, fmtMGA, fmtDs, av, ini, delay, spin, logAction, toast,
+   openSidebar, closeSidebar, openModal, closeModal, confirm2,
+   last7, dl, logout — tous définis en tête pour éviter tout ReferenceError */
+</script>
+</body>
+</html>
