@@ -4888,9 +4888,9 @@ async function handleSignUp() {
     const phone   = document.getElementById('reg-phone').value.trim();
     const pass    = document.getElementById('reg-pass').value;
     const confirm = document.getElementById('reg-confirm').value;
-    if (!name || !email || !phone || !pass) tcToast("Veuillez remplir tous les champs."); return;
-    if (pass.length < 6)                    tcToast("Le mot de passe doit contenir au moins 6 caractères."); return;
-    if (pass !== confirm)                   tcToast("Les mots de passe ne correspondent pas !"); return;
+    if (!name || !email || !phone || !pass) { tcToast("Veuillez remplir tous les champs."); return; }
+    if (pass.length < 6)                    { tcToast("Le mot de passe doit contenir au moins 6 caractères."); return; }
+    if (pass !== confirm)                   { tcToast("Les mots de passe ne correspondent pas !"); return; }
     const tkId = "TK-" + Math.floor(1000 + Math.random() * 9000);
     try {
         // Store Nom & Prénom / Mobile in Supabase Auth metadata (in addition to the
@@ -4925,15 +4925,15 @@ async function handleSignUp() {
 async function handleLogin() {
     const email = document.getElementById('login-email').value.trim();
     const pass  = document.getElementById('login-pass').value;
-    if (!email || !pass) tcToast("Veuillez entrer votre email et mot de passe."); return;
+    if (!email || !pass) { tcToast("Veuillez entrer votre email et mot de passe."); return; }
     const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-    if (error) tcToastError("Email ou mot de passe incorrect."); return;
+    if (error) { tcToastError("Email ou mot de passe incorrect."); return; }
     // onAuthStateChange handles initApp()
 }
 
 async function handleForgot() {
     const email = document.getElementById('forgot-email').value.trim();
-    if (!email) tcToast("Veuillez entrer votre adresse email."); return;
+    if (!email) { tcToast("Veuillez entrer votre adresse email."); return; }
     // The redirect URL brings the user back to this exact page with a marker
     // that tells our DOMContentLoaded listener to open the "new password" form.
     const redirectTo = window.location.origin + window.location.pathname + '?action=reset_password';
@@ -4948,12 +4948,12 @@ async function handleForgot() {
 async function handleUpdatePassword() {
     const pass    = document.getElementById('newpass-pass').value;
     const confirm = document.getElementById('newpass-confirm').value;
-    if (!pass || !confirm)  tcToast("Veuillez remplir les deux champs."); return;
-    if (pass.length < 6)    tcToast("Le mot de passe doit contenir au moins 6 caractères."); return;
-    if (pass !== confirm)   tcToast("Les mots de passe ne correspondent pas !"); return;
+    if (!pass || !confirm) { tcToast("Veuillez remplir les deux champs."); return; }
+    if (pass.length < 6) { tcToast("Le mot de passe doit contenir au moins 6 caractères."); return; }
+    if (pass !== confirm) { tcToast("Les mots de passe ne correspondent pas !"); return; }
 
     const { error } = await supabaseClient.auth.updateUser({ password: pass });
-    if (error) tcToastError('Erreur : ' + error.message); return;
+    if (error) { tcToastError('Erreur : ' + error.message); return; }
 
     tcToast("✅ Mot de passe mis à jour avec succès ! Veuillez vous reconnecter avec votre nouveau mot de passe.");
 
@@ -5520,8 +5520,8 @@ async function handleTransaction() {
     const address = document.getElementById('input-addr').value.trim();
     const solde   = userData?.solde || 0;
 
-    if (!amount || amount <= 0) tcToastWarning("Ampidiro ny montant azafady."); return;
-    if (!address)               tcToastWarning("Ampidiro ny adiresy na ID handefasana azy."); return;
+    if (!amount || amount <= 0) { tcToastWarning("Ampidiro ny montant azafady."); return; }
+    if (!address) { tcToastWarning("Ampidiro ny adiresy na ID handefasana azy."); return; }
 
     const check = document.getElementById('check-conditions');
     if (!check || !check.checked) tcToastWarning("Azafady ekeo ny fepetra (Terms & Conditions); return.");
@@ -5667,7 +5667,7 @@ function _defaultAvatar() {
 async function updateProfile() {
     const newName  = document.getElementById('edit-full-name').value.trim();
     const newPhone = document.getElementById('edit-phone').value.trim();
-    if (!newName) tcToast("Le nom ne peut pas être vide."); return;
+    if (!newName) { tcToast("Le nom ne peut pas être vide."); return; }
 
     // Détermine l'avatar à sauvegarder
     const avatarToSave = window._pendingAvatar || userData?.avatar_url || null;
@@ -7727,7 +7727,7 @@ function _adminSaveConfig() {
 function _adminSaveBinanceKeys() {
     const key    = document.getElementById('adm-binance-key')?.value;
     const secret = document.getElementById('adm-binance-secret')?.value;
-    if (!key || !secret) tcToast('Veuillez entrer la clé et le secret Binance.'); return;
+    if (!key || !secret) { tcToast('Veuillez entrer la clé et le secret Binance.'); return; }
     // Store encrypted (simple XOR for demo — use proper encryption in production)
     const encoded = btoa(key + ':' + secret);
     localStorage.setItem('tc_binance_cfg', encoded);
@@ -7816,7 +7816,7 @@ async function _adminDeleteUser(uid) {
 // =========================================================
 function _exportPDF() {
     const d = window._rapportData;
-    if (!d) tcToast("Chargez les rapports d'abord."); return;
+    if (!d) { tcToast("Chargez les rapports d'abord."); return; }
     const content = `TakaloCash — Rapport d'activité\n${'='.repeat(40)}\nExporté le: ${new Date().toLocaleString('fr-FR')}\n\nRevenues du jour: ${document.getElementById('rpt-jour')?.textContent}\nRevenues du mois: ${document.getElementById('rpt-mois')?.textContent}\nRevenues de l'année: ${document.getElementById('rpt-annee')?.textContent}`;
     const blob = new Blob([content], { type:'text/plain;charset=utf-8' });
     const url  = URL.createObjectURL(blob);
@@ -7828,7 +7828,7 @@ function _exportPDF() {
 
 function _exportExcel() {
     const d = window._rapportData;
-    if (!d) tcToast("Chargez les rapports d'abord."); return;
+    if (!d) { tcToast("Chargez les rapports d'abord."); return; }
     const rows = ['ID,Type,Montant,Frais,Date,Statut'];
     (d.txs||[]).forEach(t => rows.push(`${t.id},${t.type||t.action||'—'},${t.amount||t.montant||0},${_calcFees(t.amount||t.montant||0,'buy').fraisAr},${t.created_at},${t.status||'—'}`));
     const blob = new Blob([rows.join('\n')], { type:'text/csv;charset=utf-8' });
