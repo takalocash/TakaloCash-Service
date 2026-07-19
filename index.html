@@ -4956,14 +4956,38 @@ async function initApp() {
             .channel('realtime-notifications')
             .on('postgres_changes',
                 { event: 'INSERT', filter: `user_id=eq.${currentUserId}`, schema: 'public', table: 'notifications' },
-                () => { loadUserNotifications(); })
+                (payload) => {
+                    loadUserNotifications();
+                    // Show in-app toast
+                    const n = payload?.new;
+                    if (n) {
+                        const icons = { success: '✅', warning: '⚠️', error: '❌', info: 'ℹ️' };
+                        tcToastSuccess((icons[n.type] || '🔔') + ' ' + (n.title || 'Notification'), n.message || '');
+                        // Browser push notification
+                        if (Notification?.permission === 'granted') {
+                            new Notification('TakaloCash — ' + (n.title || 'Notification'), {
+                                body: n.message || '',
+                                icon: '/favicon.ico'
+                            });
+                        }
+                    }
+                })
             .subscribe();
 
         supabaseClient
             .channel('realtime-ledger')
             .on('postgres_changes',
                 { event: '*', filter: `user_id=eq.${currentUserId}`, schema: 'public', table: 'transactions' },
-                () => { fetchData(); })
+                (payload) => {
+                    // Refresh data (solde + historique)
+                    fetchData();
+                    // Remove "Refuser" button on home preview if tx completed/rejected
+                    const s = payload?.new?.status;
+                    if (s === 'completed' || s === 'rejected' || s === 'cancelled') {
+                        // Re-render preview
+                        renderHistory(allTransactions);
+                    }
+                })
             .subscribe();
     }
 }
@@ -5060,9 +5084,16 @@ function generateHistRow(t) {
 
         let statusClass = 'pending', statusIcon = 'clock', statusLabel = 'En attente';
         const _st = (t.status || t.statut || '').toLowerCase();
+        // Statuts Français
         if (_st === 'confirmé'   || _st === 'terminé')  { statusClass = 'confirmed';  statusIcon = 'check-double';  statusLabel = 'Confirmé'; }
         if (_st === 'en cours'   || _st === 'progress') { statusClass = 'inprogress'; statusIcon = 'rotate';        statusLabel = 'En cours'; }
         if (_st === 'rejeté'     || _st === 'annulé')   { statusClass = 'rejected';   statusIcon = 'xmark';         statusLabel = _st === 'annulé' ? 'Annulé' : 'Rejeté'; }
+        // Statuts Anglais (admin)
+        if (_st === 'completed')  { statusClass = 'confirmed';  statusIcon = 'check-double'; statusLabel = 'Confirmé'; }
+        if (_st === 'processing') { statusClass = 'inprogress'; statusIcon = 'rotate';       statusLabel = 'En cours'; }
+        if (_st === 'rejected')   { statusClass = 'rejected';   statusIcon = 'xmark';        statusLabel = 'Rejeté'; }
+        if (_st === 'cancelled')  { statusClass = 'rejected';   statusIcon = 'xmark';        statusLabel = 'Annulé'; }
+        if (_st === 'pending' || _st === 'en attente') { statusClass = 'pending'; statusIcon = 'clock'; statusLabel = 'En attente'; }
 
         return `
         <tr>
