@@ -1550,15 +1550,75 @@ function showTxDetail(id) {
 
 async function _updateTxStatus(id, status, label, toastType) {
   try {
-    await sb.upd('transactions',{status},`?id=eq.${encodeURIComponent(id)}`);
-    /* Mise a jour locale immediate (avant que Realtime ne rafraichisse) */
-    const t=allTx.find(x=>x.id===id); if(t) t.status=status;
+    // 1. Fetch the full transaction
+    const txList = await sb.sel('transactions', '?id=eq.' + encodeURIComponent(id));
+    const tx = txList && txList[0];
+    if (!tx) throw new Error('Transaction introuvable');
+
+    // 2. Update transaction status + admin note + updated_at
+    await sb.upd('transactions', {
+      status,
+      admin_note: label + ' par admin le ' + new Date().toLocaleDateString('fr-FR'),
+      updated_at: new Date().toISOString()
+    }, '?id=eq.' + encodeURIComponent(id));
+
+    // 3. Update user solde
+    if (tx.user_id) {
+      const uList = await sb.sel('users', '?id=eq.' + encodeURIComponent(tx.user_id));
+      const u = uList && uList[0];
+      if (u) {
+        let newSolde = parseFloat(u.solde) || 0;
+        const montant = parseFloat(tx.amount_input || tx.montant || 0);
+
+        if (status === 'completed') {
+          // Depot / Recevoir → solde + montant
+          // Envoi → déjà déduit à la soumission, rien à faire
+          if (tx.type === 'Recevoir' || tx.category === 'depot') {
+            newSolde += montant;
+          }
+        } else if (status === 'rejected' || status === 'cancelled') {
+          // Remboursement si c'était un envoi (montant avait été déduit)
+          if (tx.type === 'Envoyer' && tx.status !== 'rejected' && tx.status !== 'cancelled') {
+            newSolde += montant + (parseFloat(tx.frais) || 0);
+          }
+        }
+
+        await sb.upd('users', { solde: Math.max(0, newSolde) }, '?id=eq.' + encodeURIComponent(tx.user_id));
+      }
+    }
+
+    // 4. Send notification to user
+    if (tx.user_id) {
+      const icons   = { completed: '✅', rejected: '❌', cancelled: '⚪' };
+      const titles  = { completed: 'Transaction validée', rejected: 'Transaction refusée', cancelled: 'Transaction annulée' };
+      const msgs    = {
+        completed : `Votre transaction ${tx.reference || id} a été validée. Votre solde a été mis à jour.`,
+        rejected  : `Votre transaction ${tx.reference || id} a été refusée. ${tx.type === 'Envoyer' ? 'Votre solde a été remboursé.' : ''}`,
+        cancelled : `Votre transaction ${tx.reference || id} a été annulée.`
+      };
+      try {
+        await sb.ins('notifications', {
+          user_id   : tx.user_id,
+          title     : (icons[status] || '📋') + ' ' + (titles[status] || label),
+          message   : msgs[status] || label,
+          type      : status === 'completed' ? 'success' : 'warning',
+          is_read   : false,
+          created_at: new Date().toISOString()
+        });
+      } catch(ne) { console.warn('[notif]', ne.message); }
+    }
+
+    // 5. Update local state + re-render
+    const t = allTx.find(x => x.id === id);
+    if (t) t.status = status;
     renderDashboard(); renderTx();
-    const p=allTx.filter(t=>t.status==='pending').length;
-    const elP=document.getElementById('nb-pending'); if(elP) elP.textContent=p||'-';
-    toast('Transaction '+id+' '+label, toastType);
-    logAction('TX '+label+' : '+id);
-  } catch(e) { toast('Erreur : '+e.message,'error'); }
+    const p = allTx.filter(t => t.status === 'pending').length;
+    const elP = document.getElementById('nb-pending');
+    if (elP) elP.textContent = p || '-';
+    toast('Transaction ' + (tx.reference || id) + ' ' + label, toastType);
+    logAction('TX ' + label + ' : ' + (tx.reference || id));
+
+  } catch(e) { toast('Erreur : ' + e.message, 'error'); }
 }
 
 function validerTx(id) {
