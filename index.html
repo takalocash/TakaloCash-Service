@@ -1259,11 +1259,11 @@ body.light-mode .partners-title { color: #555; }
     position: relative;
     overflow: hidden;
     border-radius: 20px;
-    padding: 28px 20px 24px;
+    padding: 14px 16px 16px;
     margin-bottom: 18px;
     background: linear-gradient(135deg,#0d0f1a 0%,#0e1528 40%,#0a1520 100%);
     border: 1px solid rgba(245,197,24,0.15);
-    min-height: 200px;
+    min-height: auto;
 }
 .hero-content { position: relative; z-index: 1; }
 .hero-taux-bar {
@@ -1970,6 +1970,11 @@ body.light-mode .partners-title { color: #555; }
 .tc-pl-airtel   { background: #E40026; color: #fff; }
 .tc-partner-name { font-size: 13px; font-weight: 600; color: #f0f0f0; }
 
+
+
+    to   { transform: rotate(360deg); }
+}
+
 /* ── SECTION FAQ ── */
 .tc-faq-wrapper {
     padding: 56px 16px;
@@ -2268,7 +2273,7 @@ body.light-mode .partners-title { color: #555; }
 
 /* ── Mobile performance ── */
 img { content-visibility: auto; }
-.hero-bg-canvas { will-change: transform; }
+
 
 /* ── Pages légales / pro communes ── */
 .pro-page { display:none; padding:0 0 60px; }
@@ -2787,7 +2792,6 @@ img { content-visibility: auto; }
 
         <!-- ========== HERO BANNER ========== -->
         <div class="hero-banner">
-            <canvas class="hero-bg-canvas" id="hero-canvas"></canvas>
             <div class="hero-content">
                 <!-- Taux en direct -->
                 <div class="hero-taux-bar" id="hero-taux-bar">
@@ -3218,139 +3222,6 @@ img { content-visibility: auto; }
                     <div class="testi-stars">⭐⭐⭐⭐⭐</div>
                     <div class="testi-text">"Interface mora ampiasaina. Ny 1xBet recharge dia haingana be."</div>
                     <div class="testi-author">— Jean P., Antsirabe</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ══ PARTENAIRES SUPPORTÉS (landing) ══ -->
-        <div class="tc-divider-gold"></div>
-        <div class="tc-partners-wrapper" id="tc-section-partners">
-            <div class="tc-partners-header">
-                <span class="tc-section-label">Écosystème</span>
-                <h2 class="tc-section-title-lg">Services <span>disponibles</span></h2>
-                <p class="tc-section-sub-lg" style="margin:0 auto">Crypto · Mobile Money · Fiat · Paris sportifs · Abonnements — tout en un.</p>
-            </div>
-            <div style="overflow:hidden;position:relative;">
-                <div style="position:absolute;top:0;left:0;width:80px;height:100%;background:linear-gradient(90deg,#111,transparent);z-index:2;pointer-events:none;"></div>
-                <div style="position:absolute;top:0;right:0;width:80px;height:100%;background:linear-gradient(270deg,#111,transparent);z-index:2;pointer-events:none;"></div>
-                <div class="tc-marquee-track">
-                    <div class="tc-partner-pill"><div class="tc-partner-logo tc-pl-binance">BNB</div><span class="tc-partner-name">Binance</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo tc-pl-tron">TRX</div><span class="tc-partner-name">TRON</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo tc-pl-bitcoin">₿</div><span class="tc-partner-name">Bitcoin</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo tc-pl-ethereum">Ξ</div><span class="tc-partner-name">Ethereum</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo tc-pl-mvola">MV</div><span class="tc-partner-name">Mvola</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo tc-pl-orange">OM</div><span class="tc-partner-name">Orange Money</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo tc-pl-airtel">AM</div><span class="tc-partner-name">Airtel Money</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo" style="background:#003087;color:#fff;font-size:10px;">PP</div><span class="tc-partner-name">PayPal</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo" style="background:#8B0000;color:#fff;font-size:10px;">1X</div><span class="tc-partner-name">1xBet</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo" style="background:#E50914;color:#fff;font-size:10px;">NF</div><span class="tc-partner-name">Netflix</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo" style="background:#1DB954;color:#fff;font-size:10px;">SP</div><span class="tc-partner-name">Spotify</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo" style="background:#00A4E4;color:#fff;font-size:10px;">C+</div><span class="tc-partner-name">Canal+</span></div>
-                    <!-- lot 2 -->
-                    <div class="tc-partner-pill"><div class="tc-partner-logo tc-pl-binance">BNB</div><span class="tc-partner-name">Binance</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo tc-pl-tron">TRX</div><span class="tc-partner-name">TRON</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo tc-pl-bitcoin">₿</div><span class="tc-partner-name">Bitcoin</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo tc-pl-ethereum">Ξ</div><span class="tc-partner-name">Ethereum</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo tc-pl-mvola">MV</div><span class="tc-partner-name">Mvola</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo tc-pl-orange">OM</div><span class="tc-partner-name">Orange Money</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo tc-pl-airtel">AM</div><span class="tc-partner-name">Airtel Money</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo" style="background:#003087;color:#fff;font-size:10px;">PP</div><span class="tc-partner-name">PayPal</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo" style="background:#8B0000;color:#fff;font-size:10px;">1X</div><span class="tc-partner-name">1xBet</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo" style="background:#E50914;color:#fff;font-size:10px;">NF</div><span class="tc-partner-name">Netflix</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo" style="background:#1DB954;color:#fff;font-size:10px;">SP</div><span class="tc-partner-name">Spotify</span></div>
-                    <div class="tc-partner-pill"><div class="tc-partner-logo" style="background:#00A4E4;color:#fff;font-size:10px;">C+</div><span class="tc-partner-name">Canal+</span></div>
-                </div>
-            </div>
-        </div>
-        <div class="tc-divider-gold"></div>
-
-
-    </div><!-- /#page-home -->
-
-
-    <!-- ============ PAGE HISTORY ============ -->
-    <div id="page-history">
-        <div style="display:flex; align-items:center; gap:12px; padding:8px 0 18px;">
-            <div class="back-btn" onclick="showPage('home')">
-                <i class="fa-solid fa-arrow-left"></i>
-            </div>
-            <h2 style="margin:0; font-size:20px; font-weight:800; letter-spacing:-0.5px;">
-                Historique des transferts
-            </h2>
-        </div>
-
-        <div class="filter-bar" id="history-filters">
-            <div class="filter-chip active" onclick="filterHistory('All',      this)">Tous</div>
-            <div class="filter-chip"        onclick="filterHistory('Envoyer',  this)">Envoi</div>
-            <div class="filter-chip"        onclick="filterHistory('Retrait',  this)">Retrait</div>
-            <div class="filter-chip"        onclick="filterHistory('Dépôt',    this)">Dépôt</div>
-            <div class="filter-chip"        onclick="filterHistory('Recevoir', this)">Réception</div>
-        </div>
-
-        <!-- Mobile card view (shown only on < 480px) -->
-        <div id="history-cards-mobile" style="display:none; padding:0 2px;"></div>
-
-        <div id="full-history-container"
-             style="background:var(--bg-card); border:1px solid var(--border); border-radius:14px; overflow:hidden;">
-        </div>
-    </div><!-- /#page-history -->
-
-    <!-- ============ PAGE DÉPÔT ============ -->
-    <div id="page-depot" style="display:none;">
-        <div style="display:flex; align-items:center; gap:12px; padding:8px 0 18px;">
-            <div class="back-btn" onclick="showPage('home')"><i class="fa-solid fa-arrow-left"></i></div>
-            <h2 style="margin:0; font-size:20px; font-weight:800; letter-spacing:-0.5px;">Dépôt Mobile Money</h2>
-        </div>
-        <div id="mm-page-content" data-mode="depot"></div>
-    </div>
-
-    <!-- ============ PAGE RETRAIT ============ -->
-    <div id="page-retrait" style="display:none;">
-        <div style="display:flex; align-items:center; gap:12px; padding:8px 0 18px;">
-            <div class="back-btn" onclick="showPage('home')"><i class="fa-solid fa-arrow-left"></i></div>
-            <h2 style="margin:0; font-size:20px; font-weight:800; letter-spacing:-0.5px;">Retrait Mobile Money</h2>
-        </div>
-        <div id="mm-retrait-page-content" data-mode="retrait"></div>
-    </div>
-
-    <!-- ============ PAGE SUIVI TRANSACTION ============ -->
-    <div id="page-suivi" style="display:none;">
-
-        <div class="suivi-header">
-            <div class="back-btn" onclick="showPage('home')">
-                <i class="fa-solid fa-arrow-left"></i>
-            </div>
-            <h2>🔍 Suivi Transaction</h2>
-        </div>
-
-        <!-- Barre de recherche -->
-        <div class="suivi-search-box">
-            <label>Identifiant de transaction</label>
-            <div class="suivi-search-row">
-                <input
-                    class="suivi-search-input"
-                    id="suivi-input"
-                    type="text"
-                    placeholder="TC-2026-000001"
-                    oninput="this.value=this.value.toUpperCase()"
-                    onkeydown="if(event.key==='Enter') tcSuiviSearch()"
-                >
-                <button class="suivi-search-btn" onclick="tcSuiviSearch()">
-                    <i class="fa-solid fa-magnifying-glass"></i> Rechercher
-                </button>
-            </div>
-        </div>
-
-        <!-- Zone résultat -->
-        <div id="suivi-result-zone"></div>
-
-        <!-- Mes transactions récentes -->
-        <div class="suivi-my-list" id="suivi-my-list">
-            <div class="suivi-my-title">Mes transactions récentes</div>
-            <div id="suivi-my-items">
-                <div class="suivi-empty">
-                    <div class="suivi-empty-icon">📋</div>
-                    <div>Chargement...</div>
                 </div>
             </div>
         </div>
@@ -5058,6 +4929,9 @@ async function fetchData() {
 
     if (u) {
         userData = u;
+        // Afficher le bouton Admin si l'utilisateur est admin
+        const adminBtn = document.getElementById('sidebar-admin');
+        if (adminBtn) adminBtn.style.display = u.is_admin ? 'flex' : 'none';
         const solde = (u.solde || 0).toLocaleString('fr-FR') + " Ar";
         document.getElementById('display-solde').innerText   = solde;
         document.getElementById('form-solde-hint').innerText = solde;
@@ -6221,75 +6095,6 @@ document.addEventListener('click', function(e) {
 // =========================================================
 // HERO CANVAS — PARTICLES + NEON LINES
 // =========================================================
-function _initHeroCanvas() {
-    const canvas = document.getElementById('hero-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let w, h, particles = [], lines = [];
-
-    function resize() {
-        w = canvas.width  = canvas.offsetWidth;
-        h = canvas.height = canvas.offsetHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    // Particles
-    for (let i = 0; i < 40; i++) particles.push({
-        x: Math.random() * 1000, y: Math.random() * 400,
-        r: Math.random() * 1.5 + 0.3,
-        dx: (Math.random() - 0.5) * 0.4,
-        dy: (Math.random() - 0.5) * 0.4,
-        a: Math.random()
-    });
-
-    // Neon lines
-    for (let i = 0; i < 6; i++) lines.push({
-        x: Math.random() * 1000, y: Math.random() * 400,
-        len: 60 + Math.random() * 120,
-        angle: Math.random() * Math.PI * 2,
-        speed: 0.3 + Math.random() * 0.5,
-        a: Math.random() * 0.4 + 0.1
-    });
-
-    function draw() {
-        ctx.clearRect(0, 0, w, h);
-
-        // Draw lines
-        lines.forEach(l => {
-            l.x += Math.cos(l.angle) * l.speed;
-            l.y += Math.sin(l.angle) * l.speed;
-            if (l.x > w + 100) l.x = -100;
-            if (l.y > h + 50)  l.y = -50;
-            const grd = ctx.createLinearGradient(l.x, l.y, l.x + Math.cos(l.angle)*l.len, l.y + Math.sin(l.angle)*l.len);
-            grd.addColorStop(0, `rgba(245,197,24,0)`);
-            grd.addColorStop(0.5, `rgba(245,197,24,${l.a})`);
-            grd.addColorStop(1, `rgba(52,211,153,0)`);
-            ctx.beginPath();
-            ctx.moveTo(l.x, l.y);
-            ctx.lineTo(l.x + Math.cos(l.angle)*l.len, l.y + Math.sin(l.angle)*l.len);
-            ctx.strokeStyle = grd;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-        });
-
-        // Draw particles
-        particles.forEach(p => {
-            p.x += p.dx; p.y += p.dy;
-            p.a += 0.008;
-            if (p.x < 0 || p.x > w) p.dx *= -1;
-            if (p.y < 0 || p.y > h) p.dy *= -1;
-            const alpha = 0.3 + 0.4 * Math.abs(Math.sin(p.a));
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(245,197,24,${alpha})`;
-            ctx.fill();
-        });
-
-        requestAnimationFrame(draw);
-    }
-    draw();
-}
 
 // =========================================================
 // RIPPLE EFFECT
@@ -6367,7 +6172,6 @@ function _applyTheme() {
 // INIT HOME ANIMATIONS (appelé depuis initApp)
 // =========================================================
 function _initHomeAnimations() {
-    _initHeroCanvas();
     _applyTheme();
     // Taux après chargement Binance
     setTimeout(_updateHeroTaux, 3000);
