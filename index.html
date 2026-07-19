@@ -2649,6 +2649,17 @@ img { content-visibility: auto; }
      HEADER
      ======================================== -->
 <header id="nav-header">
+
+<!-- ── ANNOUNCEMENT BANNER ── -->
+<div id="tc-announce-bar" data-color="gold">
+    <div class="tc-announce-inner">
+        <span class="tc-announce-icon" id="tc-announce-icon">📢</span>
+        <div class="tc-announce-scroll">
+            <span class="tc-announce-text" id="tc-announce-text"></span>
+        </div>
+        <button class="tc-announce-close" onclick="tcCloseBanner()" title="Fermer">✕</button>
+    </div>
+</div>
     <div class="header-inner">
 
         <!-- Logo -->
@@ -3066,7 +3077,69 @@ img { content-visibility: auto; }
         </div>
         <style>
             @media(max-width:400px){#converter-inputs-grid{grid-template-columns:1fr;}}
-        </style>
+        
+/* ── ANNOUNCEMENT BANNER ── */
+#tc-announce-bar {
+    display: none;
+    position: relative;
+    width: 100%;
+    padding: 0;
+    z-index: 1100;
+    overflow: hidden;
+}
+#tc-announce-bar.active { display: block; }
+.tc-announce-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 14px 9px 16px;
+    gap: 10px;
+    font-family: var(--font, 'Exo 2', sans-serif);
+    font-size: 13px;
+    font-weight: 700;
+    position: relative;
+    overflow: hidden;
+}
+.tc-announce-scroll {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    height: 20px;
+    display: flex;
+    align-items: center;
+}
+.tc-announce-text {
+    display: inline-block;
+    white-space: nowrap;
+    animation: tcAnnounceScroll 18s linear infinite;
+    position: absolute;
+}
+.tc-announce-text:hover { animation-play-state: paused; }
+@keyframes tcAnnounceScroll {
+    0%   { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+.tc-announce-icon { font-size: 15px; flex-shrink: 0; }
+.tc-announce-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 0.7;
+    padding: 0 4px;
+    line-height: 1;
+}
+.tc-announce-close:hover { opacity: 1; }
+/* Color variants */
+#tc-announce-bar[data-color="gold"] .tc-announce-inner    { background: rgba(245,197,24,0.15); border-bottom: 1px solid rgba(245,197,24,0.3); color: #f5c518; }
+#tc-announce-bar[data-color="green"] .tc-announce-inner   { background: rgba(52,211,153,0.12); border-bottom: 1px solid rgba(52,211,153,0.3); color: #34d399; }
+#tc-announce-bar[data-color="red"] .tc-announce-inner     { background: rgba(248,113,113,0.12); border-bottom: 1px solid rgba(248,113,113,0.3); color: #f87171; }
+#tc-announce-bar[data-color="blue"] .tc-announce-inner    { background: rgba(96,165,250,0.12); border-bottom: 1px solid rgba(96,165,250,0.3); color: #60a5fa; }
+#tc-announce-bar[data-color="purple"] .tc-announce-inner  { background: rgba(167,139,250,0.12); border-bottom: 1px solid rgba(167,139,250,0.3); color: #a78bfa; }
+
+</style>
         <!-- ===== FIN CONVERTISSEUR ===== -->
 
         <!-- Transaction form -->
@@ -4874,6 +4947,7 @@ async function initApp() {
 
     selectCategory('crypto');
     await fetchData();
+    tcLoadAnnouncement();
 
     await loadUserNotifications();
 
@@ -7808,6 +7882,51 @@ document.addEventListener('DOMContentLoaded', () => {
         showAuth('newpass');
     }
 });
+
+
+// =========================================================
+// ANNOUNCEMENT BANNER
+// =========================================================
+let _tcBannerClosed = false;
+
+async function tcLoadAnnouncement() {
+    if (!supabaseClient || !currentUserId) return;
+    try {
+        const { data, error } = await supabaseClient
+            .from('announcements')
+            .select('*')
+            .eq('active', true)
+            .or(`target_type.eq.all,target_user_id.eq.${currentUserId}`)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+        if (error || !data) { tcHideBanner(); return; }
+        tcShowBanner(data);
+    } catch(e) { console.warn('[Banner]', e.message); }
+}
+
+function tcShowBanner(data) {
+    const bar  = document.getElementById('tc-announce-bar');
+    const txt  = document.getElementById('tc-announce-text');
+    const icon = document.getElementById('tc-announce-icon');
+    if (!bar || !txt) return;
+    // Icon per color
+    const icons = { gold:'📢', green:'✅', red:'⚠️', blue:'ℹ️', purple:'🎉' };
+    txt.textContent  = data.message;
+    icon.textContent = icons[data.color] || '📢';
+    bar.setAttribute('data-color', data.color || 'gold');
+    bar.classList.add('active');
+}
+
+function tcHideBanner() {
+    const bar = document.getElementById('tc-announce-bar');
+    if (bar) bar.classList.remove('active');
+}
+
+function tcCloseBanner() {
+    _tcBannerClosed = true;
+    tcHideBanner();
+}
 
 // =========================================================
 // BOOT
