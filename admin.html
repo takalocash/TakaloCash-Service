@@ -275,6 +275,7 @@ ul{list-style:none}
     <ul class="nav-section">
       <li class="nav-label">Communication</li>
       <li class="nav-item" onclick="go('notifications',this)"><i class="fa fa-bell"></i> Notifications <span class="nav-badge" id="nb-notif" style="display:none">0</span></li>
+      <li class="nav-item" onclick="go('annonces',this)"><i class="fa fa-bullhorn" style="color:#f5c518"></i> Annonces Banner</li>
       <li class="nav-item" onclick="go('contact',this)"><i class="fa fa-envelope"></i> Messages Contact</li>
     </ul>
     <ul class="nav-section">
@@ -381,6 +382,7 @@ ul{list-style:none}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
         <button class="quick-btn" onclick="go('kyc',null)"><i class="fa fa-id-card" style="background:rgba(59,130,246,.15);color:var(--blue)"></i>Valider KYC</button>
         <button class="quick-btn" onclick="go('notifications',null)"><i class="fa fa-bell" style="background:rgba(168,85,247,.15);color:var(--purple)"></i>Notification</button>
+            <button class="quick-btn" onclick="go('annonces',null)"><i class="fa fa-bullhorn" style="background:rgba(245,197,24,.15);color:var(--gold)"></i>Annonces</button>
         <button class="quick-btn" onclick="go('reserves',null)"><i class="fa fa-vault" style="background:rgba(34,197,94,.15);color:var(--green)"></i>Reserves</button>
         <button class="quick-btn" onclick="exportCSV()"><i class="fa fa-file-csv" style="background:rgba(245,197,24,.15);color:var(--gold)"></i>Export CSV</button>
         <button class="quick-btn" onclick="go('taux',null)"><i class="fa fa-chart-line" style="background:rgba(249,115,22,.15);color:var(--orange)"></i>Taux</button>
@@ -618,6 +620,73 @@ ul{list-style:none}
     </div>
   </div>
 </div>
+
+<!-- ============================
+     PANEL ANNONCES BANNER
+     ============================ -->
+<div class="panel" id="panel-annonces">
+  <div class="page-header">
+    <div><h1 class="page-title"><i class="fa fa-bullhorn" style="color:var(--gold);margin-right:.5rem"></i>Annonces Banner</h1><p class="page-subtitle">Bandeau défilant affiché en haut du site pour tous ou un utilisateur</p></div>
+  </div>
+
+  <!-- Créer / Modifier -->
+  <div class="card" style="border-color:rgba(245,197,24,.25)">
+    <div class="card-header"><span class="card-title" style="color:var(--gold)"><i class="fa fa-plus-circle"></i> Nouvelle Annonce</span></div>
+    <div class="form-group">
+      <label class="form-label">Message (texte défilant)</label>
+      <textarea class="form-input" id="ann-msg" rows="2" style="resize:vertical;width:100%" placeholder="ex: ⚡ Maintenance prévue le 20 juillet de 02h00 à 04h00 — Les transactions seront suspendues."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Couleur / Thème</label>
+        <select class="form-input" id="ann-color">
+          <option value="gold">🟡 Or (info)</option>
+          <option value="green">🟢 Vert (succès)</option>
+          <option value="red">🔴 Rouge (alerte)</option>
+          <option value="blue">🔵 Bleu (info)</option>
+          <option value="purple">🟣 Violet (promo)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Destinataires</label>
+        <select class="form-input" id="ann-target">
+          <option value="all">Tous les utilisateurs</option>
+          <option value="user">Utilisateur spécifique</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group" id="ann-user-row" style="display:none">
+      <label class="form-label">ID ou Email utilisateur</label>
+      <input class="form-input" id="ann-user-id" type="text" placeholder="Email ou UUID de l'utilisateur...">
+    </div>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem">
+      <button class="btn btn-primary" onclick="annPublier()"><i class="fa fa-bullhorn"></i> Publier le bandeau</button>
+      <button class="btn btn-secondary" onclick="annPreview()"><i class="fa fa-eye"></i> Aperçu</button>
+    </div>
+    <!-- Preview -->
+    <div id="ann-preview" style="display:none;margin-top:1rem;border-radius:10px;overflow:hidden">
+      <div id="ann-preview-inner" style="padding:10px 16px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:10px;">
+        <span id="ann-preview-icon">📢</span>
+        <span id="ann-preview-text" style="flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste des annonces actives/inactives -->
+  <div class="card" style="padding:0;overflow:hidden">
+    <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <span class="card-title"><i class="fa fa-list"></i> Annonces</span>
+      <button class="btn btn-secondary btn-sm" onclick="annLoad()"><i class="fa fa-arrows-rotate"></i> Actualiser</button>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Message</th><th>Couleur</th><th>Cible</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="ann-list"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- ============================
      PANEL CONTACT
      ============================ -->
@@ -1023,11 +1092,118 @@ let editingContent = null;
 /* ================================================
    INIT
    ================================================ */
+
+// ====================================================
+// ANNONCES BANNER
+// ====================================================
+document.getElementById('ann-target')?.addEventListener('change', function() {
+  const row = document.getElementById('ann-user-row');
+  if (row) row.style.display = this.value === 'user' ? 'block' : 'none';
+});
+
+async function annLoad() {
+  const tbody = document.getElementById('ann-list');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--txt-dim)">Chargement…</td></tr>';
+  try {
+    const rows = await sb.sel('announcements', '?select=*&order=created_at.desc&limit=50');
+    if (!rows || rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--txt-dim)">Aucune annonce</td></tr>';
+      return;
+    }
+    const colorLabel = { gold:'🟡 Or', green:'🟢 Vert', red:'🔴 Rouge', blue:'🔵 Bleu', purple:'🟣 Violet' };
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem">${r.message}</td>
+        <td>${colorLabel[r.color] || r.color}</td>
+        <td style="font-size:.8rem">${r.target_type === 'all' ? 'Tous' : '👤 ' + (r.target_user_id || '').slice(0,8) + '…'}</td>
+        <td><span class="badge ${r.active ? 'badge-success' : 'badge-warning'}">${r.active ? 'Actif' : 'Inactif'}</span></td>
+        <td style="display:flex;gap:.4rem;flex-wrap:wrap">
+          <button class="btn btn-xs ${r.active ? 'btn-warning' : 'btn-success'}" onclick="annToggle('${r.id}',${r.active})">${r.active ? '⏸ Désactiver' : '▶ Activer'}</button>
+          <button class="btn btn-danger btn-xs" onclick="annSuppr('${r.id}')">🗑</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) { tbody.innerHTML = `<tr><td colspan="5" style="color:var(--red)">${e.message}</td></tr>`; }
+}
+
+async function annPublier() {
+  const msg    = document.getElementById('ann-msg')?.value?.trim();
+  const color  = document.getElementById('ann-color')?.value || 'gold';
+  const target = document.getElementById('ann-target')?.value || 'all';
+  const userId = document.getElementById('ann-user-id')?.value?.trim();
+  if (!msg) { adm_toast('Entrez un message', 'warning'); return; }
+
+  let targetUserId = null;
+  if (target === 'user' && userId) {
+    // Resolve email to UUID if needed
+    if (userId.includes('@')) {
+      try {
+        const u = await sb.sel('users', '?select=id&email=eq.' + encodeURIComponent(userId));
+        if (u && u[0]) targetUserId = u[0].id;
+        else { adm_toast('Utilisateur introuvable', 'error'); return; }
+      } catch(e) { adm_toast('Erreur recherche user: ' + e.message, 'error'); return; }
+    } else {
+      targetUserId = userId;
+    }
+  }
+
+  try {
+    await sb.ins('announcements', {
+      message: msg,
+      color,
+      target_type: target,
+      target_user_id: targetUserId,
+      active: true
+    });
+    adm_toast('✅ Annonce publiée !', 'success');
+    document.getElementById('ann-msg').value = '';
+    annLoad();
+  } catch(e) { adm_toast('Erreur: ' + e.message, 'error'); }
+}
+
+function annPreview() {
+  const msg   = document.getElementById('ann-msg')?.value?.trim();
+  const color = document.getElementById('ann-color')?.value || 'gold';
+  if (!msg) { adm_toast("Entrez un message d'abord", "warning"); return; }
+  const icons   = { gold:'📢', green:'✅', red:'⚠️', blue:'ℹ️', purple:'🎉' };
+  const bgMap   = { gold:'rgba(245,197,24,.15)', green:'rgba(52,211,153,.12)', red:'rgba(248,113,113,.12)', blue:'rgba(96,165,250,.12)', purple:'rgba(167,139,250,.12)' };
+  const clrMap  = { gold:'#f5c518', green:'#34d399', red:'#f87171', blue:'#60a5fa', purple:'#a78bfa' };
+  const prev    = document.getElementById('ann-preview');
+  const inner   = document.getElementById('ann-preview-inner');
+  const prevTxt = document.getElementById('ann-preview-text');
+  const prevIco = document.getElementById('ann-preview-icon');
+  if (!prev) return;
+  prev.style.display = 'block';
+  inner.style.background = bgMap[color];
+  inner.style.color      = clrMap[color];
+  inner.style.borderBottom = `1px solid ${clrMap[color]}40`;
+  prevIco.textContent = icons[color] || '📢';
+  prevTxt.textContent = msg;
+}
+
+async function annToggle(id, currentActive) {
+  try {
+    await sb.upd('announcements', { active: !currentActive }, '?id=eq.' + id);
+    adm_toast(currentActive ? '⏸ Désactivé' : '▶ Activé', 'success');
+    annLoad();
+  } catch(e) { adm_toast('Erreur: ' + e.message, 'error'); }
+}
+
+async function annSuppr(id) {
+  if (!confirm('Supprimer cette annonce ?')) return;
+  try {
+    await sb.del('announcements', '?id=eq.' + id);
+    adm_toast('🗑 Supprimée', 'success');
+    annLoad();
+  } catch(e) { adm_toast('Erreur: ' + e.message, 'error'); }
+}
+
 window.addEventListener('DOMContentLoaded', async () => {
   setDates();
   /* Tenter de charger la table users (optionnel selon le schema) */
   try { allUsers = await sb.sel('users','?select=*&order=created_at.desc&limit=500'); } catch(e) { allUsers = []; }
   await loadAll();
+  annLoad();
   setInterval(fetchRates, 30000);
   renderNotifTemplates();
   renderWallets();
