@@ -558,14 +558,19 @@ select, input { font-family: var(--font); }
     margin-bottom:         14px;
 }
 
+/* 6 items → 3 colonnes sur écran ≥ 400px */
+@media (min-width: 400px) {
+    .services-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
 .service-item {
     background:    var(--bg-card);
     border:        1px solid var(--border);
-    padding:       14px 12px;
+    padding:       11px 10px;
     border-radius: 14px;
     display:       flex;
     align-items:   center;
-    gap:           11px;
+    gap:           9px;
     cursor:        pointer;
     transition:    border-color 0.2s, background 0.2s;
     overflow:      hidden;
@@ -579,14 +584,14 @@ select, input { font-family: var(--font); }
 .service-item.active .svc-title { color: var(--yellow); }
 
 .svc-icon-wrap {
-    width:           42px;
-    height:          42px;
+    width:           36px;
+    height:          36px;
     border-radius:   50%;
     display:         flex;
     align-items:     center;
     justify-content: center;
     flex-shrink:     0;
-    font-size:       19px;
+    font-size:       16px;
 }
 .svc-icon-wrap.gold    { background: rgba(245,197,24,.15); color: var(--yellow); }
 .svc-icon-wrap.green   { background: rgba(29,184,122,.15); color: var(--green);  }
@@ -594,8 +599,8 @@ select, input { font-family: var(--font); }
 .svc-icon-wrap.purple  { background: rgba(130,80,220,.15); color: #9b6ef0;       }
 
 .svc-text { min-width: 0; }
-.svc-title   { font-weight: 700; font-size: 13px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.svc-sub     { font-size: 10.5px; color: var(--gray); margin-top: 2px; line-height: 1.3; }
+.svc-title { font-weight: 700; font-size: 12px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.svc-sub   { font-size: 10px; color: var(--gray); margin-top: 1px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* =====================================================
    TRANSACTION FORM CARD
@@ -946,7 +951,7 @@ select, input { font-family: var(--font); }
     .modal-legal-box { max-width: 620px; }
 
     /* Services: 4 colonnes sur tablette/desktop */
-    .services-grid { grid-template-columns: repeat(4, 1fr); }
+    .services-grid { grid-template-columns: repeat(6, 1fr); }
 
     /* Convertisseur + Transaction côte à côte */
     #binance-converter-card { max-width: 100%; }
@@ -972,7 +977,7 @@ select, input { font-family: var(--font); }
     #section-hist   { grid-column: 1 / -1; }
     #app-footer     { grid-column: 1 / -1; }
 
-    .services-grid  { grid-template-columns: repeat(4, 1fr); }
+    .services-grid  { grid-template-columns: repeat(6, 1fr); }
     .solde-amount   { font-size: 46px; }
     .modal-legal-box { max-width: 700px; }
     #bot-messages   { height: 300px; }
@@ -2726,6 +2731,14 @@ img { content-visibility: auto; }
     <div class="sidebar-item" onclick="showPage('history')">
         <i class="fa-solid fa-clock-rotate-left"></i> Historique
     </div>
+
+    <!-- ── P2P & Virement ── -->
+    <div class="sidebar-item" onclick="_openP2P()" style="color:var(--yellow);">
+        <i class="fa-solid fa-arrow-right-arrow-left"></i> P2P Exchange
+    </div>
+    <div class="sidebar-item" onclick="_openTransfer()">
+        <i class="fa-solid fa-paper-plane"></i> Virement interne
+    </div>
     <div class="sidebar-item" onclick="showPage('suivi')">
         <i class="fa-solid fa-magnifying-glass-chart"></i> Suivi Transaction
     </div>
@@ -2855,33 +2868,45 @@ img { content-visibility: auto; }
                 <div class="svc-icon-wrap gold"><i class="fa-brands fa-bitcoin"></i></div>
                 <div class="svc-text">
                     <div class="svc-title">Crypto</div>
-                    <div class="svc-sub">Envoyer &amp; recevoir monnaie virtuelle</div>
+                    <div class="svc-sub">Envoyer &amp; recevoir</div>
                 </div>
             </div>
             <div class="service-item" id="btn-wallet" onclick="selectCategory('wallet')">
                 <div class="svc-icon-wrap green"><i class="fa-solid fa-wallet"></i></div>
                 <div class="svc-text">
                     <div class="svc-title">Porte-feuille</div>
-                    <div class="svc-sub">PayPal / Skrill / Nete...</div>
+                    <div class="svc-sub">PayPal / Skrill...</div>
                 </div>
             </div>
             <div class="service-item" id="btn-betting" onclick="selectCategory('betting')">
                 <div class="svc-icon-wrap orange"><i class="fa-solid fa-dice"></i></div>
                 <div class="svc-text">
-                    <div class="svc-title">Betting &amp; paris</div>
-                    <div class="svc-sub">Envoyer, retirer &amp; jouer</div>
+                    <div class="svc-title">Betting</div>
+                    <div class="svc-sub">Paris sportifs</div>
                 </div>
             </div>
             <div class="service-item" id="btn-abonnement" onclick="selectCategory('abonnement')">
                 <div class="svc-icon-wrap purple"><i class="fa-solid fa-satellite-dish"></i></div>
                 <div class="svc-text">
                     <div class="svc-title">Abonnement</div>
-                    <div class="svc-sub">Netflix / Canal / Starlink...</div>
+                    <div class="svc-sub">Netflix / Canal...</div>
                 </div>
             </div>
-        </div>
-
-        <!-- ===== GRILLE PRINCIPALE (Convertisseur | Formulaire) ===== -->
+            <div class="service-item" onclick="_openP2P()" style="border-color:rgba(245,197,24,0.3);">
+                <div class="svc-icon-wrap" style="background:rgba(245,197,24,0.15);"><i class="fa-solid fa-arrow-right-arrow-left" style="color:var(--yellow);"></i></div>
+                <div class="svc-text">
+                    <div class="svc-title" style="color:var(--yellow);">P2P</div>
+                    <div class="svc-sub">Hanakalo</div>
+                </div>
+            </div>
+            <div class="service-item" onclick="_openTransfer()">
+                <div class="svc-icon-wrap" style="background:rgba(96,165,250,0.15);"><i class="fa-solid fa-paper-plane" style="color:#60a5fa;"></i></div>
+                <div class="svc-text">
+                    <div class="svc-title" style="color:#60a5fa;">Virement</div>
+                    <div class="svc-sub">0 frais • Instantané</div>
+                </div>
+            </div>
+        </div><!-- /.services-grid -->
         <div id="main-layout-grid">
 
         <!-- ===== CONVERTISSEUR DYNAMIQUE ===== -->
@@ -4172,6 +4197,12 @@ body { padding-top: var(--sticky-h); }
                 </button>
                 <button class="footer-btn yellow" onclick="showPage('contact')" style="justify-content:flex-start;">
                     <i class="fa-solid fa-envelope"></i> Nous contacter
+                </button>
+                <button class="footer-btn" onclick="_openP2P()" style="justify-content:flex-start;background:rgba(245,197,24,0.12);color:var(--yellow);border:1px solid rgba(245,197,24,0.3);">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i> P2P Exchange
+                </button>
+                <button class="footer-btn" onclick="_openTransfer()" style="justify-content:flex-start;background:rgba(96,165,250,0.12);color:#60a5fa;border:1px solid rgba(96,165,250,0.3);">
+                    <i class="fa-solid fa-paper-plane"></i> Virement interne
                 </button>
             </div>
         </div>
@@ -9026,6 +9057,20 @@ function tcToastWarning(msg, title)  { tcToast(msg, 'warning', title); }
 
 /* ── Email validation helper ── */
 function _isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((e||'').trim()); }
+
+/* ── P2P Exchange — ouvre dans un nouvel onglet ── */
+function _openP2P() {
+    /* Soloina ny URL raha vita ny deploy Vercel */
+    const P2P_URL = 'https://takalo-cash-service.vercel.app/p2p';
+    window.open(P2P_URL, '_blank', 'noopener,noreferrer');
+}
+
+/* ── Virement interne — ouvre dans un nouvel onglet ── */
+function _openTransfer() {
+    /* Soloina ny URL raha vita ny deploy Vercel */
+    const TRANSFER_URL = 'https://takalo-cash-service.vercel.app/transfer';
+    window.open(TRANSFER_URL, '_blank', 'noopener,noreferrer');
+}
 
 /* ── Sync body padding-top avec la hauteur du fixed bar ── */
 (function _syncStickyPadding() {
