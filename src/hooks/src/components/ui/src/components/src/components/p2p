@@ -1,0 +1,159 @@
+'use client';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { P2POffer, PaymentMethod } from '@/types/p2p';
+import { fmtAr, fmtCrypto } from '@/lib/format';
+import { Button, PaymentBadge, ReputationBadge, Modal, Alert, Select, Input } from '@/components/ui';
+
+// ── OfferCard ──────────────────────────────────────────────────────────────────
+export const OfferCard: React.FC<{ offer: P2POffer; currentUserId?: string }> = ({ offer, currentUserId }) => {
+      const [showModal, setShowModal] = useState(false);
+        const isOwn = currentUserId === offer.user_id;
+
+          return (
+                <>
+                      <div className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-4 px-5 py-4 bg-white/5 hover:bg-white/8 border border-white/10 rounded-2xl transition-colors">
+
+                              {/* Trader info */}
+                                      <div className="flex flex-col gap-1 min-w-0">
+                                                <div className="flex items-center gap-2">
+                                                            <div className="w-8 h-8 rounded-full bg-yellow-400/20 flex items-center justify-center text-yellow-400 font-bold text-sm flex-shrink-0">
+                                                                          {offer.profile?.display_name?.[0]?.toUpperCase() ?? '?'}
+                                                                                      </div>
+                                                                                                  <div>
+                                                                                                                <p className="text-sm font-semibold text-white truncate">{offer.profile?.display_name ?? 'Anonyme'}</p>
+                                                                                                                              <ReputationBadge rep={offer.profile?.reputation ?? 100} trades={offer.profile?.trades_count ?? 0} verified={offer.profile?.is_verified} />
+                                                                                                                                          </div>
+                                                                                                                                                    </div>
+                                                                                                                                                              <div className="flex flex-wrap gap-1 mt-1">
+                                                                                                                                                                          {offer.payment_methods.map(m => <PaymentBadge key={m} method={m} />)}
+                                                                                                                                                                                    </div>
+                                                                                                                                                                                            </div>
+
+                                                                                                                                                                                                    {/* Rate */}
+                                                                                                                                                                                                            <div className="text-right">
+                                                                                                                                                                                                                      <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Taux</p>
+                                                                                                                                                                                                                                <p className="text-yellow-400 font-bold text-base">{fmtAr(offer.rate)}</p>
+                                                                                                                                                                                                                                          <p className="text-xs text-gray-500">/ 1 {offer.from_currency}</p>
+                                                                                                                                                                                                                                                  </div>
+
+                                                                                                                                                                                                                                                          {/* Limit */}
+                                                                                                                                                                                                                                                                  <div className="text-right">
+                                                                                                                                                                                                                                                                            <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Limite</p>
+                                                                                                                                                                                                                                                                                      <p className="text-white text-sm font-semibold">{fmtCrypto(offer.min_amount, offer.from_currency)}</p>
+                                                                                                                                                                                                                                                                                                <p className="text-gray-400 text-xs">→ {fmtCrypto(offer.max_amount, offer.from_currency)}</p>
+                                                                                                                                                                                                                                                                                                        </div>
+
+                                                                                                                                                                                                                                                                                                                {/* Fiat equiv */}
+                                                                                                                                                                                                                                                                                                                        <div className="text-right hidden md:block">
+                                                                                                                                                                                                                                                                                                                                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Valeur</p>
+                                                                                                                                                                                                                                                                                                                                            <p className="text-sm text-gray-300">{fmtAr(offer.min_amount * offer.rate)}</p>
+                                                                                                                                                                                                                                                                                                                                                      <p className="text-xs text-gray-500">→ {fmtAr(offer.max_amount * offer.rate)}</p>
+                                                                                                                                                                                                                                                                                                                                                              </div>
+
+                                                                                                                                                                                                                                                                                                                                                                      {/* Action */}
+                                                                                                                                                                                                                                                                                                                                                                              <div>
+                                                                                                                                                                                                                                                                                                                                                                                        {isOwn ? (
+                                                                                                                                                                                                                                                                                                                                                                                                        <span className="text-xs text-gray-500 italic">Votre offre</span>
+                                                                                                                                                                                                                                                                                                                                                                                        ) : (
+                                                                                                                                                                                                                                                                                                                                                                                                        <Button variant={offer.type === 'SELL' ? 'primary' : 'success'} size="sm" onClick={() => setShowModal(true)}>
+                                                                                                                                                                                                                                                                                                                                                                                                                      {offer.type === 'SELL' ? 'Acheter' : 'Vendre'}
+                                                                                                                                                                                                                                                                                                                                                                                                                                  </Button>
+                                                                                                                                                                                                                                                                                                                                                                                        )}
+                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                      </div>
+
+                                                                                                                                                                                                                                                                                                                                                                                                            <StartTradeModal offer={offer} open={showModal} onClose={() => setShowModal(false)} />
+                                                                                                                                                                                                                                                                                                                                                                                                                </>
+          );
+};
+
+// ── StartTradeModal ─────────────────────────────────────────────────────────────
+const StartTradeModal: React.FC<{ offer: P2POffer; open: boolean; onClose: () => void }> = ({ offer, open, onClose }) => {
+      const router = useRouter();
+        const [amount, setAmount]     = useState('');
+          const [method, setMethod]     = useState<string>(offer.payment_methods[0] ?? '');
+            const [loading, setLoading]   = useState(false);
+              const [error, setError]       = useState<string | null>(null);
+
+                const amountNum = parseFloat(amount) || 0;
+                  const fiatTotal = amountNum * offer.rate;
+                    const valid     = amountNum >= offer.min_amount && amountNum <= offer.max_amount;
+
+                      const handleStart = async () => {
+                            if (!valid) { setError(`Montant hors limite (${offer.min_amount}–${offer.max_amount} ${offer.from_currency})`); return; }
+                                setError(null); setLoading(true);
+                                    const { data, error: err } = await supabase.rpc('start_p2p_trade', {
+                                              p_offer_id:               offer.id,
+                                                    p_amount_crypto:          amountNum,
+                                                          p_selected_payment_method: method,
+                                    });
+                                        setLoading(false);
+                                            if (err) { setError(err.message); return; }
+                                                router.push(`/p2p/trade/${data}`);
+                      };
+
+                        return (
+                                <Modal open={open} onClose={onClose} title={`${offer.type === 'SELL' ? '📥 Acheter' : '📤 Vendre'} ${offer.from_currency}`}>
+                                      <div className="flex flex-col gap-4">
+                                              {/* Price info */}
+                                                      <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-xl p-4">
+                                                                <p className="text-xs text-gray-400 mb-1">Taux appliqué</p>
+                                                                          <p className="text-2xl font-bold text-yellow-400">{fmtAr(offer.rate)} <span className="text-base font-normal text-gray-400">/ {offer.from_currency}</span></p>
+                                                                                    <p className="text-xs text-gray-400 mt-1">Limite : {offer.min_amount} – {offer.max_amount} {offer.from_currency}</p>
+                                                                                            </div>
+
+                                                                                                    {/* Amount input */}
+                                                                                                            <Input label={`Montant (${offer.from_currency})`} type="number" value={amount}
+                                                                                                                      onChange={e => setAmount(e.target.value)}
+                                                                                                                                placeholder={`Min ${offer.min_amount}`}
+                                                                                                                                          error={amountNum > 0 && !valid ? `Hors limite (${offer.min_amount}–${offer.max_amount})` : undefined}
+                                                                                                                                                  />
+
+                                                                                                                                                          {/* Fiat total */}
+                                                                                                                                                                  {amountNum > 0 && (
+                                                                                                                                                                              <div className="flex justify-between text-sm py-2 border-t border-white/10">
+                                                                                                                                                                                          <span className="text-gray-400">Vous {offer.type === 'SELL' ? 'payez' : 'recevez'}</span>
+                                                                                                                                                                                                      <span className="font-bold text-white">{fmtAr(fiatTotal)}</span>
+                                                                                                                                                                                                                </div>
+                                                                                                                                                                  )}
+
+                                                                                                                                                                          {/* Payment method */}
+                                                                                                                                                                                  <Select label="Méthode de paiement" value={method} onChange={e => setMethod(e.target.value)}>
+                                                                                                                                                                                            {offer.payment_methods.map(m => <option key={m} value={m}>{m}</option>)}
+                                                                                                                                                                                                    </Select>
+
+                                                                                                                                                                                                            {/* Seller's payment details preview */}
+                                                                                                                                                                                                                    {offer.payment_details && (
+                                                                                                                                                                                                                                  <div className="bg-white/5 rounded-xl p-3 text-xs text-gray-300">
+                                                                                                                                                                                                                                              <p className="text-gray-400 mb-1 font-semibold">Coordonnées vendeur</p>
+                                                                                                                                                                                                                                                          <p className="whitespace-pre-wrap">{offer.payment_details}</p>
+                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                    )}
+
+                                                                                                                                                                                                                            {/* Timer warning */}
+                                                                                                                                                                                                                                    <Alert type="warning">⏱ Après confirmation, vous aurez 15 minutes pour effectuer le paiement.</Alert>
+
+                                                                                                                                                                                                                                            {error && <Alert type="error">{error}</Alert>}
+
+                                                                                                                                                                                                                                                    <div className="flex gap-3">
+                                                                                                                                                                                                                                                              <Button variant="ghost" onClick={onClose} className="flex-1">Annuler</Button>
+                                                                                                                                                                                                                                                                        <Button variant="primary" onClick={handleStart} loading={loading} disabled={!valid || !method} className="flex-1">
+                                                                                                                                                                                                                                                                                    Confirmer l'échange
+                                                                                                                                                                                                                                                                                              </Button>
+                                                                                                                                                                                                                                                                                                      </div>
+                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                </Modal>
+                        );
+};
+                                                                                                                                                                                                                    )}
+                                                                                                                                                                  )}
+                        )
+                                    })
+                      }
+}
+                                                                                                                                                                                                                                                                                                                                                                                        )
+                                                                                                                                                                                                                                                                                                                                                                                        )}
+          )
+}
