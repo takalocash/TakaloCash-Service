@@ -1,0 +1,90 @@
+EnterEnterimport crypto from 'crypto';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+// Fonction manao Signature ho an'ny Binance API
+function generateSignature(queryString, secretKey) {
+  return crypto.createHmac('sha256', secretKey).update(queryString).digest('hex');
+}
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const { userId, txId } = req.body;
+
+  if (!userId || !txId) {
+    return res.status(400).json({ error: 'User ID sy TxID ilaina' });
+  }
+
+  try {
+    // A. FERANA NY FRAUD: Jereo raha efa nampiasaina ao amin'ny TakaloCash io TxID io
+    const { data: existingTx } = await supabase
+      .from('deposits')
+      .select('id')
+      .eq('tx_id', txId)
+      .single();
+
+    if (existingTx) {
+      return res.status(400).json({ error: 'Efa nampiasaina io TxID io!' });
+    }
+
+    // B. ANTSOINA NY BINANCE API (Hajairana ny Deposit History)
+    const apiKey = process.env.BINANCE_API_KEY;
+    const secretKey = process.env.BINANCE_SECRET_KEY;
+    const timestamp = Date.now();
+
+    const queryString = `timestamp=${timestamp}&txId=${txId.trim()}`;
+    const signature = generateSignature(queryString, secretKey);
+
+    const binanceRes = await fetch(
+      `https://api.binance.com/sapi/v1/capital/deposit/hisrec?${queryString}&signature=${signature}`,
+      {
+        headers: { 'X-MBX-APIKEY': apiKey }
+      }
+    );
+
+    const depositHistory = await binanceRes.json();
+
+    // C. FANAMARINANA NY VOKATRA AVY AMIN'NY BINANCE
+    // depositHistory dia Array. Jerena raha misy alaina amin'ilay TxID.
+    if (!Array.isArray(depositHistory) || depositHistory.length === 0) {
+      return res.status(404).json({ error: 'Tsy hita tao amin\'ny Binance io deposit io. Miandry fenoina ny confirmations.' });
+    }
+
+    const deposit = depositHistory[0];
+
+    // Status: 1 = Success, 0 = Pending, 6 = Credited but cannot withdraw
+    if (deposit.status !== 1) {
+      return res.status(400).json({ error: 'Mbola am-pamarina (Pending) ny deposit ao amin\'ny Binance. Ny miandry kely.' });
+    }
+
+    const amountReceived = parseFloat(deposit.amount);
+
+    // D. AUTOMATIQUE CONFIRMATION: Tehirizina ny TxID ary akatratra ny Solde
+    // 1. Tehirizo ny TxID
+    await supabase.from('deposits').insert({
+      user_id: userId,
+      tx_id: txId,
+      amount: amountReceived,
+      asset: deposit.coin
+    });
+
+    // 2. Ampio amin'ny solde an'ilay mpanjifa (Ohatra: ao amin'ny profiles / wallets)
+    // Afaka manao query SQL increment solde ianao eto
+
+    return res.status(200).json({
+      success: true,
+      message: 'Transaction voamarina soa aman-tsara!',
+      amount: amountReceived,
+      currency: deposit.coin
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Olana teknika amin\'ny fanamarinana ny TxID.' });
+  }
+}
